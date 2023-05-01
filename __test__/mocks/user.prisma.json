@@ -1,0 +1,47 @@
+{
+  "user": [
+    {
+      "email": "usuario1@example.com",
+      "endHour": 17,
+      "extraNightShiftPay": 0,
+      "formCompleted": false,
+      "holidayPay": true,
+      "holidayPayRate": 1.5,
+      "hourlyRate": 10.5,
+      "id": 1,
+      "lastname": "Uno",
+      "name": "Usuario",
+      "nightShift": false,
+      "online": false,
+      "password": "secreto",
+      "shifts": [
+        {
+          "amount": 12.5,
+          "end": "2023-04-25T17:00:00.000Z",
+          "endDate": "2023-04-25",
+          "id": 1,
+          "isClosed": true,
+          "isHoliday": false,
+          "notes": "Nota por defecto",
+          "start": "2023-04-25T08:00:00.000Z",
+          "startDate": "2023-04-25",
+          "userId": 1
+        },
+        {
+          "amount": 0,
+          "end": "2023-04-26T17:00:00.000Z",
+          "endDate": "2023-04-26",
+          "id": "6447f8f69b99bfbb6ebe8675",
+          "isClosed": false,
+          "isHoliday": false,
+          "notes": "",
+          "start": "2023-04-26T08:00:00.000Z",
+          "startDate": "2023-04-26",
+          "userId": "6447f8f59b99bfbb6ebe8673"
+        }
+      ],
+      "startHour": 8,
+      "unpaidBreaks": 0
+    }
+  ]
+}

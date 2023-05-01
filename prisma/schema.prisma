@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Shift {
+  id               Int      @id @default(autoincrement())
+  start            String
+  end              String?
+  startDate        String
+  endDate          String?
+  amount           Float?
+  isHoliday        Boolean  @default(false)
+  isClosed         Boolean  @default(false)
+  notes            String?
+  User             User?    @relation(fields: [userId], references: [id])
+  userId           Int?
+}
+
+model User {
+  id                 Int      @id @default(autoincrement())
+  email              String   @unique
+  name               String
+  lastname           String
+  password           String
+  hourlyRate         Float
+  startHour          Float
+  endHour            Float
+  nightShift         Boolean
+  extraNightShiftPay Float?
+  holidayPay         Boolean
+  holidayPayRate     Float?
+  unpaidBreaks       Float?
+  online             Boolean  @default(false)
+  formCompleted      Boolean  @default(false)
+  shifts             Shift[]
+}
+

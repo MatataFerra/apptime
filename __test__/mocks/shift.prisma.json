@@ -1,0 +1,28 @@
+{
+  "shift": [
+    {
+      "amount": 12.5,
+      "end": "2023-04-25T17:00:00.000Z",
+      "endDate": "2023-04-25",
+      "id": "6447f8f69b99bfbb6ebe8674",
+      "isClosed": true,
+      "isHoliday": false,
+      "notes": "Nota por defecto",
+      "start": "2023-04-25T08:00:00.000Z",
+      "startDate": "2023-04-25",
+      "userId": "6447f8f59b99bfbb6ebe8673"
+    },
+    {
+      "amount": 0,
+      "end": "2023-04-26T17:00:00.000Z",
+      "endDate": "2023-04-26",
+      "id": "6447f8f69b99bfbb6ebe8675",
+      "isClosed": false,
+      "isHoliday": false,
+      "notes": "",
+      "start": "2023-04-26T08:00:00.000Z",
+      "startDate": "2023-04-26",
+      "userId": "6447f8f59b99bfbb6ebe8673"
+    }
+  ]
+}
