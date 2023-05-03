@@ -19,8 +19,11 @@ jobs:
         run: npm install --no-audit --no-fund --no-optional
       - name: Run linter
         run: npm run lint
+      
       - name: Run docker compose
         run: docker compose -f "docker-compose.yml" up -d --build --remove-orphans
+      - name: Prisma config
+        run: npx prisma generate && npx prisma migrate dev && npx prisma db seed
       - name: npm run test:ci
         run: npm run test:ci
         env: 
