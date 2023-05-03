@@ -46,5 +46,10 @@
   "prisma": {
     "schema": "prisma/schema.prisma",
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": "please-use-yarn",
+    "yarn": ">= 1.19.1"
   }
 }
