@@ -4,7 +4,6 @@ import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 import { createRequest, createResponse, RequestOptions } from "node-mocks-http";
 import userMock from "../mocks/user.prisma.json";
 import shiftMock from "../mocks/shift.prisma.json";
-import _ from "lodash";
 
 type ApiRequest = NextApiRequest & ReturnType<typeof createRequest>;
 type APiResponse = NextApiResponse & ReturnType<typeof createResponse>;
