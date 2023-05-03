@@ -10,6 +10,9 @@ jobs:
   install:
     runs-on: ubuntu-20.04
     steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -27,9 +30,6 @@ jobs:
       - install
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - uses: actions/download-artifact@v3
         with:
           name: deps
@@ -44,9 +44,6 @@ jobs:
       - install
       - prisma
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - uses: actions/download-artifact@v3
         with:
           name: deps
@@ -62,9 +59,6 @@ jobs:
     needs: install
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - uses: actions/download-artifact@v3
         with:
           name: deps
