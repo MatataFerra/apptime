@@ -1,0 +1,27 @@
+name: "Pipeline"
+
+on: 
+  push:
+    branches:
+      - test
+
+jobs:
+  linter:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund --no-optional
+      - name: Run linter
+        run: npm run lint
+      - name: Run docker compose
+        run: docker compose -f "docker-compose.yml" up -d --build --remove-orphans
+      - name: npm run test
+        run: npm run test
+        env: 
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
