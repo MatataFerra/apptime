@@ -50,6 +50,7 @@
   "engines": {
     "node": ">=16.0.0",
     "npm": "please-use-yarn",
+    "pnpm": "please-use-yarn",
     "yarn": ">= 1.19.1"
   }
 }
