@@ -6,7 +6,7 @@ on:
       - test
 
 jobs:
-  test_hello:
+  test_ci:
     runs-on: ubuntu-20.04
     steps:
       - name: Display first message
