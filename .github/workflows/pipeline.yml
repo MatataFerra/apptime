@@ -15,21 +15,13 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Run install
-        uses: borales/actions-yarn@v4
-        with:
-          cmd: install # will run `yarn install` command
-      - name: Build production bundle
-        uses: borales/actions-yarn@v4
-        with:
-          cmd: build # will run `yarn build:prod` command
       - name: Install dependencies
-        run: yarn --prefer-offline
-      - name: Running linter
-        run: yarn lint
+        run: npm install --no-audit --no-fund --no-optional
+      - name: Run linter
+        run: npm run lint
       - name: Run docker compose
         run: docker compose -f "docker-compose.yml" up -d --build --remove-orphans
-      - name: Running test
-        run: yarn test
+      - name: npm run test:ci
+        run: npm run test:ci
         env: 
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
