@@ -23,22 +23,6 @@ jobs:
 
   test:
     runs-on: ubuntu-20.04
-    container: node:latest
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: apptimedb
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - uses: actions/checkout@v3
         with:
@@ -49,13 +33,15 @@ jobs:
           cache: "npm"
       - name: Install dependencies
         run: npm install --no-audit --no-fund --no-optional
-      - name: Prisma config & running test
+      - name: Prisma config
         run: | 
-          npm run build
-          npx prisma db push --preview-feature
+          docker compose -f "action-compose.yml" up -d --build --remove-orphans
+          npx prisma generate
+          npx prisma migrate dev
           npx prisma db seed
-          npm run test:ci
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/apptimedb
+      - name: Running Test
+        run: npm run test:ci
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/apptimedb
