@@ -1,0 +1,44 @@
+import { z } from "zod";
+
+const ShiftModelSchema = z.object({
+  id: z.number({
+    required_error: "Id must be provided correctly",
+  }),
+  amount: z.number(),
+  end: z.string(),
+  endDate: z.string(),
+  isClosed: z.boolean(),
+  isHoliday: z.boolean(),
+  notes: z.string(),
+  start: z.string(),
+  startDate: z.string(),
+  userId: z.number().optional(),
+});
+
+const UserModelSchema = z.object({
+  id: z.number(),
+  email: z.string().email(),
+  endHour: z.number(),
+  extraNightShiftPay: z.number(),
+  formCompleted: z.boolean(),
+  holidayPay: z.boolean(),
+  holidayPayRate: z.number(),
+  hourlyRate: z.number(),
+  lastname: z.string(),
+  name: z.string(),
+  nightShift: z.boolean(),
+  online: z.boolean(),
+  password: z.string(),
+  startHour: z.number(),
+  unpaidBreaks: z.number(),
+  shifts: z.array(ShiftModelSchema),
+});
+
+const Data = z.object({
+  message: z.string(),
+  response: z.boolean(),
+  shift: z.array(ShiftModelSchema).optional(),
+  user: z.array(UserModelSchema).optional(),
+});
+
+export { Data, ShiftModelSchema, UserModelSchema };
