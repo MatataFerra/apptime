@@ -3,13 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "dotenv -e .env.development next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "dotenv -e .env.development vitest",
     "test:ci": "vitest run",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "compose": "docker compose -f \"docker-compose.yml\" up -d --build --remove-orphans",
+    "prisma:push": "dotenv -e .env.development -- prisma db push",
+    "prisma:seed": "dotenv -e .env.development -- prisma db seed",
+    "prisma:studio": "dotenv -e .env.development -- prisma studio"
   },
   "dependencies": {
     "@prisma/client": "^4.13.0",
@@ -50,7 +54,6 @@
   "engines": {
     "node": ">=16.0.0",
     "npm": "please-use-yarn",
-    "pnpm": "please-use-yarn",
-    "yarn": ">= 1.19.1"
+    "yarn": "1.22.19"
   }
 }

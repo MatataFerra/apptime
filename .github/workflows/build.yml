@@ -1,0 +1,30 @@
+name: "Build"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "npm"
+      - name: Install Yarn
+        run: |
+          npm install -g yarn
+          yarn -v
+      - name: Install dependencies
+        run: yarn install
+      - name: Build app
+        run: yarn build
+      - name: Run test
+        run: yarn test:ci
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
