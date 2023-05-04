@@ -1,0 +1,48 @@
+name: "Pipeline"
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  linter:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "npm"
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund --no-optional
+      - name: Run linter
+        run: npm run lint
+
+  test:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "npm"
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund --no-optional
+      - name: Database installing
+        run: docker compose -f "action-compose.yml" up -d --build --remove-orphans
+      - name: Prisma config
+        run: |
+          npx prisma generate
+          npx prisma migrate dev
+          npx prisma db seed
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/apptimedb
+      - name: Running Test
+        run: npm run test:ci
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/apptimedb
