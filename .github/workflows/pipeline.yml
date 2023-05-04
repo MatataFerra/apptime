@@ -7,23 +7,7 @@ on:
 
 jobs:
 
-  install:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm install --no-audit --no-fund --no-optional
-
-
   linter:
-    needs: 
-      - install
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -40,9 +24,18 @@ jobs:
       
       
   test:
-    runs-on: ubuntu-20.04 
-    needs:
-      - install
+    runs-on: ubuntu-20.04
+    container: node:10.18-jessie
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v3
         with:
@@ -53,13 +46,15 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm install --no-audit --no-fund --no-optional
-      - name: Run docker compose
-        run: docker compose -f "docker-compose.yml" up -d --build --remove-orphans
       - name: Prisma config
         run: npx prisma generate && npx prisma migrate dev && npx prisma db seed
         env: 
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
       - name: npm run test:ci
         run: npm run test:ci
         env: 
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    env:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
