@@ -51,8 +51,11 @@ jobs:
         run: npm install --no-audit --no-fund --no-optional
       - name: Prisma config & running test
         run: | 
-          npx prisma db push
+          npm run build
+          npx prisma db push --preview-feature
           npx prisma db seed
           npm run test:ci
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/apptimedb
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/apptimedb
