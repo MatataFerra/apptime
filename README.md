@@ -8,7 +8,8 @@ This was created for real porpouses. When I think this app it was for a real iss
 
 The files are already in the repo, you need to run this commands
 
-1. `docker compose -f "docker-compose.yml" up -d --build --remove-orphans`
+- `docker compose -f "docker-compose.yml" up -d --build --remove-orphans`
+- or just run the script `yarn compose or npm run compose`
 
 ### Install dependencies and seed DB
 

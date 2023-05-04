@@ -16,12 +16,18 @@ jobs:
         with:
           node-version: 16
           cache: "npm"
+      - name: Install Yarn
+        run: |
+          npm install -g yarn
+          yarn -v
       - name: Install dependencies
-        run: npm install --no-audit --no-fund --no-optional
+        run: yarn install
       - name: Run linter
-        run: npm run lint
+        run: yarn lint
 
   test:
+    needs:
+      - linter
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -31,10 +37,14 @@ jobs:
         with:
           node-version: 16
           cache: "npm"
+      - name: Install Yarn
+        run: |
+          npm install -g yarn
+          yarn -v
       - name: Install dependencies
-        run: npm install --no-audit --no-fund --no-optional
+        run: yarn install
       - name: Database installing
-        run: docker compose -f "action-compose.yml" up -d --build --remove-orphans
+        run: yarn compose
       - name: Prisma config
         run: |
           npx prisma generate
