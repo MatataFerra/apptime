@@ -37,8 +37,8 @@ const UserModelSchema = z.object({
 const Data = z.object({
   message: z.string(),
   response: z.boolean(),
-  shift: z.array(ShiftModelSchema).optional(),
-  user: z.array(UserModelSchema).optional(),
+  shift: z.union([z.array(ShiftModelSchema).optional(), ShiftModelSchema]),
+  user: z.union([z.array(UserModelSchema).optional(), UserModelSchema]),
 });
 
 export { Data, ShiftModelSchema, UserModelSchema };

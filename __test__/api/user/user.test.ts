@@ -1,52 +1,68 @@
-import { beforeAll, describe, expect, test } from "vitest";
-import userRoute from "@/pages/api/user";
-import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-import { createRequest, createResponse, RequestOptions } from "node-mocks-http";
-import userMock from "test/mocks/user.prisma.json";
-import { TypeData } from "@/types";
+import { NextApiRequest, NextApiResponse } from "next";
+import userHandler from "@/pages/api/user";
+import { prismaMock } from "#/prisma/singleton";
+import mockedUser from "#/__test__/mocks/user.prisma.json";
 
-type ApiRequest = NextApiRequest & ReturnType<typeof createRequest>;
-type APiResponse = NextApiResponse & ReturnType<typeof createResponse>;
+describe("userHandler", () => {
+  let req: NextApiRequest;
+  let res: NextApiResponse;
 
-const toEqualKeys = (obj1: any, obj2: any): boolean =>
-  Object.keys(obj1).every(
-    (k) =>
-      k in obj2 &&
-      (typeof obj1[k] != "object" ||
-        (typeof obj2[k] == "object" && toEqualKeys(obj1[k], obj2[k])))
-  );
-
-export const testHandler = async (
-  handler: NextApiHandler,
-  options: RequestOptions
-) => {
-  const req = createRequest<ApiRequest>(options);
-  const res = createResponse<APiResponse>();
-
-  await handler(req, res);
-  return res;
-};
-
-describe("Testing Api route hello", () => {
-  let response: APiResponse;
-  beforeAll(async () => {
-    response = await testHandler(userRoute, { method: "GET" });
+  beforeEach(() => {
+    req = {} as NextApiRequest;
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    } as unknown as NextApiResponse;
   });
 
-  test("should return a successful response from Postgres", async () => {
-    expect(response.statusCode).toBe(200);
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  test("Should return data from server", async () => {
-    expect(response._getJSONData()).to.haveOwnProperty("message");
-    expect(response._getJSONData()).to.haveOwnProperty("response");
-    expect(response._getJSONData()).to.haveOwnProperty("shift");
-    expect(response._getJSONData()).to.haveOwnProperty("user");
+  it("should return a user when one exists", async () => {
+    prismaMock.user.findFirst.mockResolvedValue(mockedUser.user);
+
+    await userHandler(req, res);
+
+    expect(prismaMock.user.findFirst).toHaveBeenCalledTimes(1);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      message: "success",
+      response: true,
+      user: mockedUser.user,
+    });
   });
 
-  test("should user has the right shape", () => {
-    const user: TypeData = response._getJSONData().user;
+  it("should return an error when no user exists", async () => {
+    (prismaMock.user.findFirst as jest.Mock).mockResolvedValue(null);
 
-    expect(toEqualKeys(user, userMock.user)).toBeTruthy();
+    await userHandler(req, res);
+
+    expect(prismaMock.user.findFirst).toHaveBeenCalledTimes(1);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      message: "User not found",
+      response: false,
+    });
+  });
+
+  it("should return an error when data parsing fails", async () => {
+    prismaMock.user.findFirst.mockResolvedValue(mockedUser.user);
+
+    const originalData = JSON.parse(JSON.stringify(mockedUser.user));
+
+    // @ts-ignore
+    mockedUser.user.email = 12345;
+
+    await userHandler(req, res);
+
+    expect(prismaMock.user.findFirst).toHaveBeenCalledTimes(1);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      message: "Invalid input",
+      response: false,
+    });
+
+    mockedUser.user.email = originalData.email;
   });
 });
