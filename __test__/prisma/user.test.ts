@@ -1,5 +1,4 @@
 import { prismaMock } from "#/prisma/singleton";
-import { NextResponse } from "next/server";
 import mockedUser from "#/mocks/user.prisma.json";
 import prisma from "#/prisma/client";
 
