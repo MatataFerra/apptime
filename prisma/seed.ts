@@ -1,5 +1,6 @@
-import { PrismaClient, User } from "@prisma/client";
-const prisma = new PrismaClient();
+/* eslint-disable no-console */
+import { User } from "@prisma/client";
+import prisma from "./client";
 
 async function main() {
   clearDatabase();
@@ -52,6 +53,9 @@ async function main() {
 
   console.log(`Se creó el usuario con email: ${user.email}`);
   console.log(`Creados unos ${shifts.count} Shifts`);
+
+  const findFirst = prisma.user.findFirst();
+  console.log("El primer usuario encontrado es: ", findFirst);
 }
 
 async function clearDatabase() {
