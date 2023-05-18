@@ -11,10 +11,11 @@
     "test:ci": "jest",
     "coverage": "jest --coverage",
     "compose": "docker compose -f \"docker-compose.yml\" up -d --build --remove-orphans",
-    "prisma:migrate": "dotenv -e .env.development -- prisma migrate dev",
+    "prisma:migrate": "yarn scripts:access && ./scripts/prisma-migrate.sh",
     "prisma:seed": "dotenv -e .env.development -- prisma db seed",
     "prisma:studio": "dotenv -e .env.development -- prisma studio",
-    "curl": "./scripts/curl.sh"
+    "curl": "yarn scripts:access && ./scripts/curl.sh",
+    "scripts:access": "chmod +x ./access.sh && ./access.sh"
   },
   "dependencies": {
     "@prisma/client": "^4.13.0",
