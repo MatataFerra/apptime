@@ -5,12 +5,10 @@ const ShiftModelSchema = z.object({
     required_error: "Id must be provided correctly",
   }),
   amount: z.number(),
-  end: z.string(),
   endDate: z.string(),
   isClosed: z.boolean(),
   isHoliday: z.boolean(),
   notes: z.string(),
-  start: z.string(),
   startDate: z.string(),
   userId: z.number().optional(),
 });

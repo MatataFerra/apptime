@@ -11,22 +11,20 @@ datasource db {
 }
 
 model Shift {
-  id               Int      @id @default(autoincrement())
-  start            String
-  end              String?
-  startDate        String
-  endDate          String?
-  amount           Float?
-  isHoliday        Boolean  @default(false)
-  isClosed         Boolean  @default(false)
-  notes            String?
-  User             User?    @relation(fields: [userId], references: [id])
-  userId           Int?
+  id        Int     @id @default(autoincrement())
+  startDate String
+  endDate   String?
+  amount    Float?
+  isHoliday Boolean @default(false)
+  isClosed  Boolean @default(false)
+  notes     String?
+  User      User?   @relation(fields: [userId], references: [id])
+  userId    Int?
 }
 
 model User {
-  id                 Int      @id @default(autoincrement())
-  email              String   @unique
+  id                 Int     @id @default(autoincrement())
+  email              String  @unique
   name               String
   lastname           String
   password           String
@@ -38,8 +36,7 @@ model User {
   holidayPay         Boolean
   holidayPayRate     Float?
   unpaidBreaks       Float?
-  online             Boolean  @default(false)
-  formCompleted      Boolean  @default(false)
+  online             Boolean @default(false)
+  formCompleted      Boolean @default(false)
   shifts             Shift[]
 }
-
