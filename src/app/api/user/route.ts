@@ -1,10 +1,9 @@
 /* eslint-disable no-console */
 import prisma from "#/prisma/client";
-import { Data, TypeData } from "@/types";
-import { NextApiRequest, NextApiResponse } from "next";
-import { NextResponse } from "next/server";
+import { Data } from "@/types";
+import { NextResponse, NextRequest } from "next/server";
 
-export async function GET(req: NextApiRequest, res: NextApiResponse<TypeData>) {
+export async function GET(req: NextRequest) {
   try {
     const user = await prisma.user.findFirst({
       include: {
@@ -29,10 +28,6 @@ export async function GET(req: NextApiRequest, res: NextApiResponse<TypeData>) {
     });
 
     if (!parsedData.success) {
-      console.log(
-        "🚀 ~ file: route.ts:30 ~ GET ~ parsedData:",
-        parsedData.error
-      );
       return NextResponse.json(
         {
           message: parsedData.error.issues
@@ -53,7 +48,6 @@ export async function GET(req: NextApiRequest, res: NextApiResponse<TypeData>) {
       { status: 200 }
     );
   } catch (error) {
-    // Manejar errores de forma adecuada
     console.error(error);
 
     return NextResponse.json(
