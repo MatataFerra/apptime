@@ -7,17 +7,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "dotenv -e .env.development vitest",
-    "test:ci": "vitest run",
-    "coverage": "vitest run --coverage",
+    "test": "dotenv -e .env.development -- jest -i --watch",
+    "test:ci": "jest",
+    "coverage": "jest --coverage",
     "compose": "docker compose -f \"docker-compose.yml\" up -d --build --remove-orphans",
-    "prisma:push": "dotenv -e .env.development -- prisma db push",
+    "prisma:migrate": "yarn scripts:access && ./scripts/prisma-migrate.sh",
     "prisma:seed": "dotenv -e .env.development -- prisma db seed",
-    "prisma:studio": "dotenv -e .env.development -- prisma studio"
+    "prisma:studio": "dotenv -e .env.development -- prisma studio",
+    "curl": "yarn scripts:access && ./scripts/curl.sh",
+    "scripts:access": "chmod +x ./access.sh && ./access.sh"
   },
   "dependencies": {
     "@prisma/client": "^4.13.0",
-    "@types/node": "18.16.0",
     "@types/react": "18.0.38",
     "@types/react-dom": "18.0.11",
     "autoprefixer": "10.4.14",
@@ -37,15 +38,16 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.1",
     "@types/lodash": "^4.14.194",
     "@types/swagger-ui-react": "^4.18.0",
-    "@vitejs/plugin-react": "^4.0.0",
-    "@vitest/coverage-c8": "^0.30.1",
+    "jest": "^29.5.0",
+    "jest-mock-extended": "^3.0.4",
     "jsdom": "^21.1.1",
-    "node-mocks-http": "^1.12.2",
+    "msw": "^1.2.1",
     "prisma": "^4.13.0",
-    "ts-node": "^10.9.1",
-    "vitest": "^0.31.0"
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.1"
   },
   "prisma": {
     "schema": "prisma/schema.prisma",
