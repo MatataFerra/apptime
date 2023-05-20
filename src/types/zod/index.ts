@@ -32,6 +32,18 @@ const UserModelSchema = z.object({
   shifts: z.array(ShiftModelSchema),
 });
 
+const UserUpdateSchema = UserModelSchema.partial().refine(
+  (values) => Object.keys(values).length > 0,
+  { message: "One of the fields must be defined" }
+);
+
+const UserCreateSchema = UserModelSchema.omit({
+  id: true,
+  shifts: true,
+}).refine((values) => Object.keys(values).length > 0, {
+  message: "One of the fields must be defined",
+});
+
 const Data = z.object({
   message: z.string(),
   response: z.boolean(),
@@ -39,4 +51,10 @@ const Data = z.object({
   user: z.union([z.array(UserModelSchema).optional(), UserModelSchema]),
 });
 
-export { Data, ShiftModelSchema, UserModelSchema };
+export {
+  Data,
+  ShiftModelSchema,
+  UserModelSchema,
+  UserUpdateSchema,
+  UserCreateSchema,
+};
