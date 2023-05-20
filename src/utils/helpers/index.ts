@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-export const hasEqualKeysTwoObjects = (obj1: any, obj2: any): boolean => {
+export function hasEqualKeysTwoObjects(obj1: any, obj2: any): boolean {
   return Object.keys(obj1)
     .sort((a, b) => a.localeCompare(b))
     .every(
@@ -10,4 +10,4 @@ export const hasEqualKeysTwoObjects = (obj1: any, obj2: any): boolean => {
           (typeof obj2[k] == "object" &&
             hasEqualKeysTwoObjects(obj1[k], obj2[k])))
     );
-};
+}
