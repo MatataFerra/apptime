@@ -11,7 +11,7 @@ function ApiDoc({ spec }: InferGetStaticPropsType<typeof getStaticProps>) {
   return <SwaggerUI spec={spec} />;
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export async function getStaticProps() {
   const spec: Record<string, any> = createSwaggerSpec({
     apiFolder: "/src/pages/api",
     openApiVersion: 3,
@@ -23,6 +23,6 @@ export const getStaticProps: GetStaticProps = async () => {
       spec,
     },
   };
-};
+}
 
 export default ApiDoc;
