@@ -1,6 +1,5 @@
-/* eslint-disable no-console */
 import prisma from "#/prisma/client";
-import { Data, UserUpdateSchema } from "@/types";
+import { SearchParamsSchema, UserUpdateSchema } from "@/types";
 import { Prisma, User } from "@prisma/client";
 import { NextResponse, NextRequest } from "next/server";
 
@@ -11,10 +10,33 @@ type UserParams = {
 };
 
 export async function GET(req: NextRequest, { params }: UserParams) {
+  const searchParams = await req.nextUrl.searchParams;
+  const shifts = searchParams.get("shifts");
+  const profile = searchParams.get("profile");
+
+  const parsedSearchParams = SearchParamsSchema.safeParse({
+    shifts,
+    profile,
+  });
+
+  if (!parsedSearchParams.success) {
+    return NextResponse.json(
+      {
+        message: parsedSearchParams.error.issues.map((issue) => ({
+          error: issue.message,
+          input: issue.path,
+        })),
+        response: false,
+      },
+      { status: 400 }
+    );
+  }
+
   try {
     const user = await prisma.user.findUnique({
       include: {
-        shifts: true,
+        shifts: !!parsedSearchParams.data.shifts,
+        profile: !!parsedSearchParams.data.profile,
       },
       where: {
         id: Number(params.id),
@@ -31,34 +53,16 @@ export async function GET(req: NextRequest, { params }: UserParams) {
       );
     }
 
-    const parsedData = Data.safeParse({
-      message: "success",
-      response: true,
-      user,
-    });
-
-    if (!parsedData.success) {
-      return NextResponse.json(
-        {
-          message: parsedData.error.issues.map((issue) => ({
-            error: issue.message,
-            input: issue.path,
-          })),
-          response: false,
-        },
-        { status: 400 }
-      );
-    }
-
     return NextResponse.json(
       {
-        message: parsedData.data.message,
-        response: parsedData.data.response,
-        user: parsedData.data.user,
+        message: "success",
+        response: true,
+        user,
       },
       { status: 200 }
     );
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(error);
 
     return NextResponse.json(
@@ -93,10 +97,6 @@ export async function PUT(req: NextRequest, { params }: UserParams) {
     const user = await prisma.user.findUnique({
       where: {
         id: Number(params.id),
-      },
-
-      include: {
-        shifts: true,
       },
     });
 
