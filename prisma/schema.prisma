@@ -23,11 +23,19 @@ model Shift {
 }
 
 model User {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  name          String
+  lastname      String
+  password      String
+  online        Boolean  @default(false)
+  formCompleted Boolean  @default(false)
+  shifts        Shift[]
+  profile       Profile?
+}
+
+model Profile {
   id                 Int     @id @default(autoincrement())
-  email              String  @unique
-  name               String
-  lastname           String
-  password           String
   hourlyRate         Float
   startHour          Float
   endHour            Float
@@ -36,7 +44,6 @@ model User {
   holidayPay         Boolean
   holidayPayRate     Float?
   unpaidBreaks       Float?
-  online             Boolean @default(false)
-  formCompleted      Boolean @default(false)
-  shifts             Shift[]
+  User               User?   @relation(fields: [userId], references: [id])
+  userId             Int?    @unique
 }

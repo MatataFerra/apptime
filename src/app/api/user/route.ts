@@ -1,14 +1,43 @@
-/* eslint-disable no-console */
 import prisma from "#/prisma/client";
-import { UserCreateSchema } from "@/types";
+import { SearchParamsSchema, UserCreateSchema } from "@/types";
 import { User } from "@prisma/client";
 import { NextResponse, NextRequest } from "next/server";
 
-export async function GET(req: NextRequest) {
+type BodyIncludesPrisma = {
+  params: {
+    shifts: boolean;
+    profile: boolean;
+  };
+};
+
+export async function GET(req: NextRequest, ctx: any) {
+  const searchParams = await req.nextUrl.searchParams;
+  const shifts = searchParams.get("shifts");
+  const profile = searchParams.get("profile");
+
+  const parsedSearchParams = SearchParamsSchema.safeParse({
+    shifts,
+    profile,
+  });
+
+  if (!parsedSearchParams.success) {
+    return NextResponse.json(
+      {
+        message: parsedSearchParams.error.issues.map((issue) => ({
+          error: issue.message,
+          input: issue.path,
+        })),
+        response: false,
+      },
+      { status: 400 }
+    );
+  }
+
   try {
     const user = await prisma.user.findMany({
       include: {
-        shifts: true,
+        shifts: !!parsedSearchParams.data.shifts,
+        profile: !!parsedSearchParams.data.profile,
       },
     });
 
@@ -31,6 +60,7 @@ export async function GET(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(error);
 
     return NextResponse.json(
@@ -81,17 +111,10 @@ export async function POST(req: NextRequest) {
     const newUser = await prisma.user.create({
       data: {
         email: parsedBody.data.email,
-        endHour: parsedBody.data.endHour,
-        holidayPay: parsedBody.data.holidayPay,
         name: parsedBody.data.name,
-        startHour: parsedBody.data.startHour,
-        hourlyRate: parsedBody.data.hourlyRate,
         lastname: parsedBody.data.lastname,
-        nightShift: parsedBody.data.nightShift,
         password: parsedBody.data.password,
-        extraNightShiftPay: parsedBody.data.extraNightShiftPay,
         formCompleted: parsedBody.data.formCompleted,
-        holidayPayRate: parsedBody.data.holidayPayRate,
         online: parsedBody.data.online,
       },
     });
@@ -105,6 +128,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(error);
 
     return NextResponse.json(

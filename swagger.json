@@ -11,7 +11,33 @@
         "get": {
           "summary": "Returns a list of users",
           "description": "This resource represents a list of users in the system. Each user is identified by a numeric `id`.",
-          "tags": ["User"],
+          "tags": [
+            "User"
+          ],
+          "parameters": [
+            {
+              "name": "profile",
+              "in": "query",
+              "required": false,
+              "description": "boolean to add profile info",
+              "schema": {
+                "type": "boolean",
+                "example": false,
+                "default": false
+              }
+            },
+            {
+              "name": "shifts",
+              "in": "query",
+              "required": false,
+              "description": "boolean to add shifts info",
+              "schema": {
+                "type": "boolean",
+                "example": false,
+                "default": false
+              }
+            }
+          ],
           "responses": {
             "200": {
               "description": "A JSON array of user info with their shifts",
@@ -19,52 +45,7 @@
                 "application/json": {
                   "schema": {
                     "type": "array",
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              }
-            },
-            "400": {
-              "summary": "User not found",
-              "description": "Returns a 400 error if the user is not found",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-
-      "/user/{id}": {
-        "get": {
-          "summary": "Returns one user by ID",
-          "description": "The user is identified by a numeric `ID`.",
-          "tags": ["User"],
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "description": "ID of user",
-              "schema": {
-                "type": "integer",
-                "minimum": 1,
-                "example": 5
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "A JSON object of user info with their shifts",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/UserSuccessResponse"
                   }
                 }
               }
@@ -82,7 +63,116 @@
             }
           }
         },
-
+        "post": {
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "summary": "Create one user by ID and return the created user",
+          "description": "Send a JSON with the properties you want to create",
+          "tags": [
+            "User"
+          ],
+          "responses": {
+            "200": {
+              "description": "Success operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/UserSuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "summary": "One field must be provided",
+              "description": "Returns a 400 error if the user doesn't provide a valid Body",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/user/{id}": {
+        "get": {
+          "summary": "Returns one user by ID",
+          "description": "The user is identified by a numeric `ID`.",
+          "tags": [
+            "User"
+          ],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "description": "ID of user",
+              "schema": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 5
+              }
+            },
+            {
+              "name": "profile",
+              "in": "query",
+              "required": false,
+              "description": "boolean to add profile info",
+              "schema": {
+                "type": "boolean",
+                "example": false,
+                "default": false
+              }
+            },
+            {
+              "name": "shifts",
+              "in": "query",
+              "required": false,
+              "description": "boolean to add shifts info",
+              "schema": {
+                "type": "boolean",
+                "example": false,
+                "default": false
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "A JSON object of user info with their shifts",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/UserSuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "summary": "User not found",
+              "description": "Returns a 400 error if the user is not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        },
         "put": {
           "requestBody": {
             "required": true,
@@ -95,7 +185,6 @@
               }
             }
           },
-
           "parameters": [
             {
               "name": "id",
@@ -109,11 +198,11 @@
               }
             }
           ],
-
           "summary": "Update one user by ID and return the updated user",
           "description": "Send a JSON object with the properties you want to update, and the server will update the user and return the updated user.",
-          "tags": ["User"],
-
+          "tags": [
+            "User"
+          ],
           "responses": {
             "200": {
               "description": "an updated user",
@@ -121,7 +210,7 @@
                 "application/json": {
                   "schema": {
                     "type": "object",
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/UserSuccessResponse"
                   }
                 }
               }
@@ -152,38 +241,23 @@
       "schemas": {
         "User": {
           "type": "object",
-          "required": ["email", "password"],
+          "required": [
+            "email",
+            "password"
+          ],
           "properties": {
             "id": {
               "type": "number",
               "readOnly": true
             },
-            "endHour": {
-              "type": "number"
-            },
-            "extraNightShiftPay": {
-              "type": "number"
-            },
             "formCompleted": {
               "type": "boolean"
-            },
-            "holidayPay": {
-              "type": "boolean"
-            },
-            "holidayPayRate": {
-              "type": "number"
-            },
-            "hourlyRate": {
-              "type": "number"
             },
             "lastname": {
               "type": "string"
             },
             "name": {
               "type": "string"
-            },
-            "nightShift": {
-              "type": "boolean"
             },
             "online": {
               "type": "boolean"
@@ -196,13 +270,15 @@
               "type": "string",
               "format": "email"
             },
-
             "shifts": {
               "type": "array",
               "items": {
                 "$ref": "#/components/schemas/Shift"
               }
-            
+            },
+            "profile": {
+              "type": "object",
+              "$ref": "#/components/schemas/Profile"
             }
           }
         },
@@ -216,7 +292,6 @@
             "amount": {
               "type": "number"
             },
-
             "endDate": {
               "type": "string"
             },
@@ -229,7 +304,6 @@
             "notes": {
               "type": "string"
             },
-
             "startDate": {
               "type": "string"
             },
@@ -239,7 +313,37 @@
             }
           }
         },
-
+        "Profile": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "number",
+              "readOnly": true
+            },
+            "endHour": {
+              "type": "number"
+            },
+            "extraNightShiftPay": {
+              "type": "number"
+            },
+            "holidayPay": {
+              "type": "boolean"
+            },
+            "holidayPayRate": {
+              "type": "number"
+            },
+            "hourlyRate": {
+              "type": "number"
+            },
+            "nightShift": {
+              "type": "boolean"
+            },
+            "userId": {
+              "type": "number",
+              "readOnly": true
+            }
+          }
+        },
         "Error": {
           "type": "object",
           "properties": {
@@ -247,13 +351,29 @@
               "type": "string"
             },
             "response": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        "UserSuccessResponse": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "response": {
+              "type": "boolean",
+              "default": true
+            },
+            "user": {
+              "type": "object",
+              "$ref": "#/components/schemas/User"
             }
           }
         }
       }
     },
-
     "securitySchemes": {
       "basicAuth": {
         "type": "http",

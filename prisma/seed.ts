@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-import { User } from "@prisma/client";
 import prisma from "./client";
 
 async function main() {
@@ -12,14 +11,6 @@ async function main() {
         name: "Usuario",
         lastname: "Uno",
         password: "secreto",
-        hourlyRate: 10.5,
-        startHour: 8.0,
-        endHour: 17.0,
-        nightShift: false,
-        extraNightShiftPay: 0.0,
-        holidayPay: true,
-        holidayPayRate: 1.5,
-        unpaidBreaks: 0.0,
         online: false,
         formCompleted: false,
       },
@@ -29,21 +20,13 @@ async function main() {
         name: "Ramiro",
         lastname: "Test",
         password: "ultra-secreto",
-        hourlyRate: 10.5,
-        startHour: 8.0,
-        endHour: 17.0,
-        nightShift: true,
-        extraNightShiftPay: 2.0,
-        holidayPay: true,
-        holidayPayRate: 1.5,
-        unpaidBreaks: 30.0,
         online: false,
         formCompleted: false,
       },
     ],
   });
 
-  const oneUser = await prisma.user.findUnique({
+  const firstUser = await prisma.user.findUnique({
     where: {
       email: "usuario1@example.com",
     },
@@ -58,7 +41,7 @@ async function main() {
         isHoliday: false,
         isClosed: true,
         notes: "Nota por defecto",
-        userId: oneUser?.id,
+        userId: firstUser?.id,
       },
       {
         startDate: "2023-04-25T08:00:00.000Z",
@@ -67,9 +50,23 @@ async function main() {
         isHoliday: false,
         isClosed: false,
         notes: "",
-        userId: oneUser?.id,
+        userId: firstUser?.id,
       },
     ],
+  });
+
+  await prisma.profile.create({
+    data: {
+      userId: firstUser?.id,
+      endHour: 17,
+      extraNightShiftPay: 0,
+      holidayPay: true,
+      holidayPayRate: 1.5,
+      hourlyRate: 10.5,
+      nightShift: false,
+      startHour: 8,
+      unpaidBreaks: 0,
+    },
   });
 
   const emails = await (

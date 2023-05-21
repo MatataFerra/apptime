@@ -13,22 +13,32 @@ const ShiftModelSchema = z.object({
   userId: z.number().optional(),
 });
 
-const UserModelSchema = z.object({
-  id: z.number(),
-  email: z.string().email(),
+const ProfileSchema = z.object({
+  id: z.number({
+    required_error: "Id must be provided correctly",
+  }),
   endHour: z.number(),
   extraNightShiftPay: z.number(),
-  formCompleted: z.boolean(),
   holidayPay: z.boolean(),
   holidayPayRate: z.number(),
   hourlyRate: z.number(),
-  lastname: z.string(),
-  name: z.string(),
   nightShift: z.boolean(),
-  online: z.boolean(),
-  password: z.string(),
   startHour: z.number(),
   unpaidBreaks: z.number(),
+  userId: z.number().optional(),
+});
+
+const UserModelSchema = z.object({
+  id: z.number({
+    required_error: "Id must be provided correctly",
+  }),
+  email: z.string().email(),
+  lastname: z.string(),
+  name: z.string(),
+  password: z.string(),
+  online: z.boolean(),
+  formCompleted: z.boolean(),
+  profile: ProfileSchema.optional(),
   shifts: z.array(ShiftModelSchema),
 });
 
@@ -40,6 +50,7 @@ const UserUpdateSchema = UserModelSchema.partial().refine(
 const UserCreateSchema = UserModelSchema.omit({
   id: true,
   shifts: true,
+  profile: true,
 }).refine((values) => Object.keys(values).length > 0, {
   message: "One of the fields must be defined",
 });
@@ -51,10 +62,16 @@ const Data = z.object({
   user: z.union([z.array(UserModelSchema).optional(), UserModelSchema]),
 });
 
+const SearchParamsSchema = z.object({
+  shifts: z.string().nullable(),
+  profile: z.string().nullable(),
+});
+
 export {
   Data,
   ShiftModelSchema,
   UserModelSchema,
   UserUpdateSchema,
   UserCreateSchema,
+  SearchParamsSchema,
 };

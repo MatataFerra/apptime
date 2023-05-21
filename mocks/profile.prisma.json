@@ -1,0 +1,12 @@
+{
+  "profile": {
+    "endHour": 17,
+    "extraNightShiftPay": 0,
+    "holidayPay": true,
+    "holidayPayRate": 1.5,
+    "hourlyRate": 10.5,
+    "nightShift": false,
+    "startHour": 8,
+    "unpaidBreaks": 0
+  }
+}
