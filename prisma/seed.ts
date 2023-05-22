@@ -17,8 +17,8 @@ async function main() {
 
       {
         email: "test@example.com",
-        name: "Ramiro",
-        lastname: "Test",
+        name: "Testing Name",
+        lastname: "Testing lastname",
         password: "ultra-secreto",
         online: false,
         formCompleted: false,
@@ -32,6 +32,12 @@ async function main() {
     },
   });
 
+  const secondUser = await prisma.user.findUnique({
+    where: {
+      email: "test@example.com",
+    },
+  });
+
   await prisma.shift.createMany({
     data: [
       {
@@ -40,7 +46,7 @@ async function main() {
         amount: 12.5,
         isHoliday: false,
         isClosed: true,
-        notes: "Nota por defecto",
+        notes: `Default note from ${firstUser?.name}`,
         userId: firstUser?.id,
       },
       {
@@ -53,6 +59,18 @@ async function main() {
         userId: firstUser?.id,
       },
     ],
+  });
+
+  await prisma.shift.create({
+    data: {
+      startDate: "2023-04-25T08:00:00.000Z",
+      endDate: "2023-04-25T17:00:00.000Z",
+      amount: 12.5,
+      isHoliday: false,
+      isClosed: true,
+      notes: `Default note from ${secondUser?.name}`,
+      userId: secondUser?.id,
+    },
   });
 
   await prisma.profile.create({
