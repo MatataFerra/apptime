@@ -12,4 +12,11 @@ describe("Error Service", () => {
     expect(error.cause).toBe(cause);
     expect(error.handler).toBe(type_error);
   });
+
+  test("Should throw an error if the handler is not found", () => {
+    const handler = "UserNotFound";
+    const error = new ErrorService(handler);
+
+    expect(() => error.handleException()).toThrowError();
+  });
 });

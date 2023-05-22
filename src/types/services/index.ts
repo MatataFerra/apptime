@@ -1,8 +1,11 @@
-export type HandlerErrorTypes = "UserNotFound" | "UserAlreadyExists";
+import { HandleErrorTypesSchema } from "@/utils/constants";
+import { z } from "zod";
+
+export type HandleErrorTypes = z.infer<typeof HandleErrorTypesSchema>;
 export interface InterfaceConfig {
   config: {
     message: string;
     cause?: string;
-    type_error: HandlerErrorTypes;
+    type_error: HandleErrorTypes;
   };
 }
