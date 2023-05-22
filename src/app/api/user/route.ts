@@ -3,14 +3,7 @@ import { SearchParamsSchema, UserCreateSchema } from "@/types";
 import { User } from "@prisma/client";
 import { NextResponse, NextRequest } from "next/server";
 
-type BodyIncludesPrisma = {
-  params: {
-    shifts: boolean;
-    profile: boolean;
-  };
-};
-
-export async function GET(req: NextRequest, ctx: any) {
+export async function GET(req: NextRequest) {
   const searchParams = await req.nextUrl.searchParams;
   const shifts = searchParams.get("shifts");
   const profile = searchParams.get("profile");
