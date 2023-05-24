@@ -34,4 +34,8 @@ class ExceptionsHandler extends Error implements InterfaceExceptionsHandler {
   }
 }
 
-export default ExceptionsHandler;
+function ExceptionsHandlerFactory(handler: HandleErrorTypes) {
+  return new ExceptionsHandler(handler);
+}
+
+export default ExceptionsHandlerFactory;

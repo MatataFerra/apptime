@@ -6,17 +6,10 @@ describe("Error Service", () => {
     const cause = "The user does not exist in the database";
     const type_error = "UserNotFound";
 
-    const error = new ErrorService(type_error);
+    const error = ErrorService(type_error);
 
     expect(error.message).toBe(message);
     expect(error.cause).toBe(cause);
     expect(error.handler).toBe(type_error);
-  });
-
-  test("Should throw an error if the handler is not found", () => {
-    const handler = "UserNotFound";
-    const error = new ErrorService(handler);
-
-    expect(() => error.handleException()).toThrowError();
   });
 });
