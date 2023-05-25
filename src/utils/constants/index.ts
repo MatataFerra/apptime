@@ -1,7 +1,7 @@
-import { HandleErrorTypes, InterfaceConfig } from "@/types/services";
+import { HandleErrorType, InterfaceConfig } from "@/types/services";
 import { z } from "zod";
 
-export const EXCEPTIONS: Record<HandleErrorTypes, InterfaceConfig["config"]> = {
+export const EXCEPTIONS: Record<HandleErrorType, InterfaceConfig["config"]> = {
   UserNotFound: {
     message: "User not found",
     cause: "The user does not exist in the database",
@@ -40,10 +40,9 @@ export const EXCEPTIONS: Record<HandleErrorTypes, InterfaceConfig["config"]> = {
 
 /**
  * @description Enum to handle errors
- * @example  const error = new ErrorService("UserNotFound");
  *
  */
-export const HandleErrorTypesSchema = z.enum([
+export const HandleErrorTypeSchema = z.enum([
   "UserNotFound",
   "UserAlreadyExists",
   "ShiftNotFound",

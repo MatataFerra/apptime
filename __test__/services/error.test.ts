@@ -2,14 +2,8 @@ import ErrorFactory from "@/services/Error/factory"; // Asegúrate de que la rut
 import { EXCEPTIONS } from "@/utils/constants";
 
 describe("ErrorFactory", () => {
-  test("Should be an instance of ErrorFactory", () => {
-    const errorFactory = new ErrorFactory();
-    expect(errorFactory).toBeInstanceOf(ErrorFactory);
-  });
-
   test("should create UserNotFound error", () => {
-    const errorFactory = new ErrorFactory();
-    const error = errorFactory.createError("UserNotFound");
+    const error = ErrorFactory.createError("UserNotFound");
 
     expect(error).toHaveProperty(
       "exception.message",
@@ -26,8 +20,7 @@ describe("ErrorFactory", () => {
   });
 
   test("should handle UserNotFound error correctly", () => {
-    const errorFactory = new ErrorFactory();
-    const error = errorFactory.createError("UserNotFound");
+    const error = ErrorFactory.createError("UserNotFound");
 
     // Check that error has the expected properties
     expect(error.exception.message).toEqual(EXCEPTIONS.UserNotFound.message);
@@ -38,8 +31,7 @@ describe("ErrorFactory", () => {
   });
 
   test("Check if can throw QueryNotProvided error", () => {
-    const errorFactory = new ErrorFactory();
-    const error = errorFactory.createError("QueryNotProvided");
+    const error = ErrorFactory.createError("QueryNotProvided");
 
     // Check that error has the expected properties
     expect(error.exception.message).toEqual(
@@ -52,11 +44,9 @@ describe("ErrorFactory", () => {
   });
 
   test("should throw an error for unsupported error type", () => {
-    const errorFactory = new ErrorFactory();
     expect(() => {
-      // ignore the error in the next line
       // @ts-ignore
-      errorFactory.createError("UnsupportedTypeError");
+      ErrorFactory.createError("UnsupportedTypeError");
     }).toThrow(new Error(`Error type 'UnsupportedTypeError' not supported`));
   });
 });
