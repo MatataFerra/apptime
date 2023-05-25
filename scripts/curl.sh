@@ -11,7 +11,5 @@ if [[ -z "$endpoint" ]]; then
     exit 1
 fi
 
-curl -H "Content-Type: application/json" "http://localhost:3000/api/${endpoint}"
-
-# Asignar permisos de ejecución al archivo
-chmod +x "${SCRIPT_PATH}/curl.sh"
+response=$(curl -s -H "Content-Type: application/json" "http://localhost:3000/api/${endpoint}")
+echo "$response"
