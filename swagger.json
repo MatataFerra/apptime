@@ -228,6 +228,51 @@
             }
           }
         }
+      },
+      "/shift": {
+        "get": {
+          "summary": "Returns a list of shifts for one user by ID",
+          "description": "Each user by `id` has a list of shifts.",
+          "tags": [
+            "Shift"
+          ],
+          "parameters": [
+            {
+              "name": "userId",
+              "in": "query",
+              "required": false,
+              "description": "numeric ID of user",
+              "schema": {
+                "type": "integer",
+                "example": 12
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "A JSON array of shift info",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/ShiftSuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "summary": "User not found",
+              "description": "Returns a 400 error if the user is not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "servers": [
@@ -369,6 +414,24 @@
             "user": {
               "type": "object",
               "$ref": "#/components/schemas/User"
+            }
+          }
+        },
+        "ShiftSuccessResponse": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "response": {
+              "type": "boolean",
+              "default": true
+            },
+            "shift": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Shift"
+              }
             }
           }
         }
