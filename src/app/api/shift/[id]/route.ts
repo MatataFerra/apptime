@@ -44,7 +44,7 @@ export async function PUT(req: NextRequest, { params }: ShiftParams) {
           error: ErrorFactory.createError("ShiftNotFound").exception,
           response: false,
         },
-        { status: 400 }
+        { status: 404 }
       );
     }
 
@@ -63,7 +63,7 @@ export async function PUT(req: NextRequest, { params }: ShiftParams) {
           error: ErrorFactory.createError("PrismaClientUpdateRecord").exception,
           response: false,
         },
-        { status: 400 }
+        { status: 408 }
       );
     }
     return NextResponse.json(
