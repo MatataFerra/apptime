@@ -1,5 +1,9 @@
 import prisma from "#/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import ErrorFactory from "@/services/Error/factory";
+import { Shift } from "@prisma/client";
+import { ShiftCreateSchema } from "@/types";
+import { PrismaClientValidationError } from "@prisma/client/runtime/library";
 
 export async function GET(req: NextRequest) {
   const searchParams = await req.nextUrl.searchParams;
@@ -8,8 +12,7 @@ export async function GET(req: NextRequest) {
   if (!userId) {
     return NextResponse.json(
       {
-        message:
-          "Please provide the query string see docs /api-doc for more info",
+        error: ErrorFactory.createError("QueryNotProvided").exception,
         response: false,
       },
       { status: 400 }
@@ -23,10 +26,10 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    if (!shift) {
+    if (shift.length === 0) {
       return NextResponse.json(
         {
-          message: "Shifts not found",
+          error: ErrorFactory.createError("ShiftNotFound").exception,
           response: false,
         },
         { status: 400 }
@@ -41,5 +44,77 @@ export async function GET(req: NextRequest) {
       },
       { status: 200 }
     );
-  } catch (error) {}
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: ErrorFactory.createError("InternalServer").exception,
+        response: false,
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: NextRequest) {
+  const body: Shift = await req.json();
+  const parsedBody = ShiftCreateSchema.safeParse(body);
+
+  if (!parsedBody.success) {
+    return NextResponse.json(
+      {
+        error: parsedBody.error.issues.map((issue) => ({
+          error: issue.message,
+          input: issue.path,
+        })),
+        response: false,
+      },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const shift = await prisma.shift.create({
+      data: {
+        User: {
+          connect: {
+            id: Number(parsedBody.data?.userId),
+          },
+        },
+
+        startDate: parsedBody.data.startDate,
+        endDate: parsedBody.data.endDate,
+        amount: parsedBody.data.amount,
+        isClosed: parsedBody.data.isClosed,
+        isHoliday: parsedBody.data.isHoliday,
+        notes: parsedBody.data.notes,
+      },
+    });
+
+    return NextResponse.json(
+      {
+        message: "success",
+        response: true,
+        shift,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    if (error instanceof PrismaClientValidationError) {
+      return NextResponse.json(
+        {
+          error: ErrorFactory.createError("PrismaClientFields").exception,
+          response: false,
+        },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(
+      {
+        error: ErrorFactory.createError("InternalServer").exception,
+        response: false,
+      },
+      { status: 500 }
+    );
+  }
 }

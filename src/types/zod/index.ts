@@ -55,6 +55,17 @@ const UserCreateSchema = UserModelSchema.omit({
   message: "One of the fields must be defined",
 });
 
+const ShiftUpdateSchema = ShiftModelSchema.partial().refine(
+  (values) => Object.keys(values).length > 0,
+  { message: "One of the fields must be defined" }
+);
+
+const ShiftCreateSchema = ShiftModelSchema.omit({
+  id: true,
+}).refine((values) => Object.keys(values).length > 0, {
+  message: "One of the fields must be defined",
+});
+
 const Data = z.object({
   message: z.string(),
   response: z.boolean(),
@@ -70,6 +81,8 @@ const SearchParamsSchema = z.object({
 export {
   Data,
   ShiftModelSchema,
+  ShiftUpdateSchema,
+  ShiftCreateSchema,
   UserModelSchema,
   UserUpdateSchema,
   UserCreateSchema,
