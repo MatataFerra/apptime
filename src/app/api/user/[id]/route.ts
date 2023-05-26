@@ -1,6 +1,7 @@
 import prisma from "#/prisma/client";
 import { SearchParamsSchema, UserUpdateSchema } from "@/types";
-import { Prisma, User } from "@prisma/client";
+import { User } from "@prisma/client";
+import { PrismaClientValidationError } from "@prisma/client/runtime/library";
 import { NextResponse, NextRequest } from "next/server";
 
 type UserParams = {
@@ -128,7 +129,7 @@ export async function PUT(req: NextRequest, { params }: UserParams) {
       { status: 200 }
     );
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientValidationError) {
+    if (error instanceof PrismaClientValidationError) {
       return NextResponse.json(
         {
           message: "Please provide valid fields",

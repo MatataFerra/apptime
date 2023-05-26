@@ -36,6 +36,16 @@ export const EXCEPTIONS: Record<HandleErrorType, InterfaceConfig["config"]> = {
     cause: "The shift does not exist in the database",
     type_error: "ShiftNotFound",
   },
+  BodyNotProvided: {
+    message: "Please provide the body see docs /api-doc for more info",
+    cause: "Body not provided",
+    type_error: "BodyNotProvided",
+  },
+  PrismaClientUpdateRecord: {
+    message: "Please provide a valid id to update the record",
+    cause: "Record to update not found.",
+    type_error: "PrismaClientUpdateRecord",
+  },
 };
 
 /**
@@ -48,5 +58,7 @@ export const HandleErrorTypeSchema = z.enum([
   "ShiftNotFound",
   "InternalServer",
   "PrismaClientFields",
+  "PrismaClientUpdateRecord",
   "QueryNotProvided",
+  "BodyNotProvided",
 ]);
