@@ -60,6 +60,17 @@ const ShiftUpdateSchema = ShiftModelSchema.partial().refine(
   { message: "One of the fields must be defined" }
 );
 
+const ProfileUpdateSchema = ProfileSchema.partial().refine(
+  (values) => Object.keys(values).length > 0,
+  { message: "One of the fields must be defined" }
+);
+
+const ProfileCreateSchema = ProfileSchema.omit({
+  id: true,
+}).refine((values) => Object.keys(values).length > 0, {
+  message: "One of the fields must be defined",
+});
+
 const ShiftCreateSchema = ShiftModelSchema.omit({
   id: true,
 }).refine((values) => Object.keys(values).length > 0, {
@@ -86,5 +97,8 @@ export {
   UserModelSchema,
   UserUpdateSchema,
   UserCreateSchema,
+  ProfileSchema,
+  ProfileUpdateSchema,
+  ProfileCreateSchema,
   SearchParamsSchema,
 };
