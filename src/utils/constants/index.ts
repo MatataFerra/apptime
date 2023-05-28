@@ -46,6 +46,19 @@ export const EXCEPTIONS: Record<HandleErrorType, InterfaceConfig["config"]> = {
     cause: "Record to update not found.",
     type_error: "PrismaClientUpdateRecord",
   },
+
+  ProfileNotFound: {
+    message: "Profile not found",
+    cause: "The profile does not exist in the database",
+    type_error: "ProfileNotFound",
+  },
+
+  ProfileAlreadyExists: {
+    message: "Profile already exists",
+    cause:
+      "The profile already exists in the database, try another user id or update the record",
+    type_error: "ProfileAlreadyExists",
+  },
 };
 
 /**
@@ -61,4 +74,6 @@ export const HandleErrorTypeSchema = z.enum([
   "PrismaClientUpdateRecord",
   "QueryNotProvided",
   "BodyNotProvided",
+  "ProfileNotFound",
+  "ProfileAlreadyExists",
 ]);

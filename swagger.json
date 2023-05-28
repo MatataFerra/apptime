@@ -450,6 +450,217 @@
             }
           }
         }
+      },
+      "/profile": {
+        "get": {
+          "summary": "Return the profile for one user by ID",
+          "description": "Each user by `id` has a profile.",
+          "tags": [
+            "Profile"
+          ],
+          "parameters": [
+            {
+              "name": "userId",
+              "in": "query",
+              "required": false,
+              "description": "numeric ID of user",
+              "schema": {
+                "type": "integer",
+                "example": 12
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "A JSON profile info about the user",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/ProfileSuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "summary": "Query nor provided",
+              "description": "Returns a 400 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "404": {
+              "summary": "User has no profile",
+              "description": "Returns a 404 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "500": {
+              "summary": "Internal server error",
+              "description": "Returns a 500 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Create a new profile for one user by ID",
+          "description": "Each user by `id` has an unique profile.",
+          "tags": [
+            "Profile"
+          ],
+          "parameters": [
+            {
+              "name": "userId",
+              "in": "query",
+              "required": false,
+              "description": "numeric ID of user",
+              "schema": {
+                "type": "integer",
+                "example": 12
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Profile has been created and its info is returned",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/ProfileSuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "summary": "Zod error or user already has a profile",
+              "description": "Returns a 400 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "404": {
+              "summary": "User not found",
+              "description": "Returns a 404 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "500": {
+              "summary": "Internal server error",
+              "description": "Returns a 500 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/profile/{id}": {
+        "put": {
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/Profile"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "description": "ID of profile to update",
+              "schema": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 5
+              }
+            }
+          ],
+          "summary": "Update the profile for one user by ID",
+          "description": "Send a JSON object with the properties you want to update, and the server will update the profile and return the updated profile.",
+          "tags": [
+            "Profile"
+          ],
+          "responses": {
+            "200": {
+              "description": "Profile has been updated and its info is returned",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/ProfileSuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "summary": "Zod error",
+              "description": "Returns a 400 error if the user doesn't provide a valid Body",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "404": {
+              "summary": "Prisma client error",
+              "description": "Returns a 404 error if prisma detect an invalid id or it doesn't was provided",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "500": {
+              "summary": "Internal server error",
+              "description": "Returns a 500 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "servers": [
@@ -636,6 +847,22 @@
             "shift": {
               "type": "object",
               "$ref": "#/components/schemas/Shift"
+            }
+          }
+        },
+        "ProfileSuccessResponse": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "response": {
+              "type": "boolean",
+              "default": true
+            },
+            "shift": {
+              "type": "object",
+              "$ref": "#/components/schemas/Profile"
             }
           }
         }
