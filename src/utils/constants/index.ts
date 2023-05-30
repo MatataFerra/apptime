@@ -1,6 +1,13 @@
 import { HandleErrorType, InterfaceConfig } from "@/types/services";
 import { z } from "zod";
 
+/**
+ * @summary Constants for build errors
+ * @tutorial
+ * 1. Create a new error in the enum HandleErrorTypeSchema
+ * 2. Create a new error in the EXCEPTIONS object
+ */
+
 export const EXCEPTIONS: Record<HandleErrorType, InterfaceConfig["config"]> = {
   UserNotFound: {
     message: "User not found",
@@ -63,7 +70,6 @@ export const EXCEPTIONS: Record<HandleErrorType, InterfaceConfig["config"]> = {
 
 /**
  * @description Enum to handle errors
- *
  */
 export const HandleErrorTypeSchema = z.enum([
   "UserNotFound",
@@ -77,3 +83,12 @@ export const HandleErrorTypeSchema = z.enum([
   "ProfileNotFound",
   "ProfileAlreadyExists",
 ]);
+
+/** 
+  @summary Contants for Routes
+  @description This constants are used to handle routes
+*/
+
+export const QUERY_PARAMS = {
+  USER_ID: "userId",
+};

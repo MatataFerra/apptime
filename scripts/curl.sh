@@ -55,11 +55,13 @@ shift $((OPTIND - 1))
 
 url="http://localhost:3000/api/${endpoint}"
 
-if [[ -z "$user_id" ]]; then
-  echo "=========================================="
-  echo "Please put the user ID with the -u option."
-  echo "Example: yarn curl user -u 1"
-  exit 0
+if [[ "$endpoint" != "user" ]]; then
+  if [[ -z "$user_id" ]]; then
+    echo "=========================================="
+    echo "Please put the user ID with the -u option."
+    echo "Example: yarn curl shift -u 1"
+    exit 0
+  fi
 fi
 
 if [[ -n "$user_id" ]]; then
@@ -76,9 +78,9 @@ fi
 
 if [[ "$get_shift" = true ]]; then
   if [[ "$url" == *"?"* ]]; then
-    url+="&shift=true"
+    url+="&shifts=true"
   else
-    url+="?shift=true"
+    url+="?shifts=true"
   fi
 fi
 
