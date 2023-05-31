@@ -2,7 +2,7 @@ import prisma from "#/prisma/client";
 import { ProfileUpdateSchema } from "@/types";
 import { Profile } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import ErrorFactory from "@/services/Error/factory";
+import { ErrorFactory } from "@/services";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 type ProfileParams = {

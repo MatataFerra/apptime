@@ -1,7 +1,6 @@
 import prisma from "#/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import ErrorFactory from "@/services/Error/factory";
-import DashboardService from "@/services/Dashboard";
+import { DashboardService, ErrorFactory } from "@/services";
 import { QUERY_PARAMS } from "@/utils/constants";
 
 export async function GET(req: NextRequest) {

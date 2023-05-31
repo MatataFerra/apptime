@@ -1,6 +1,6 @@
 import prisma from "#/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import ErrorFactory from "@/services/Error/factory";
+import { ErrorFactory } from "@/services";
 import { Shift } from "@prisma/client";
 import { ShiftUpdateSchema } from "@/types";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import ErrorFactory from "@/services/Error/factory";
+import { ErrorFactory } from "@/services";
 import prisma from "#/prisma/client";
 import { Profile } from "@prisma/client";
 import { ProfileCreateSchema } from "@/types";

@@ -1,9 +1,8 @@
 import prisma from "#/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import ErrorFactory from "@/services/Error/factory";
 import { Shift } from "@prisma/client";
 import { ShiftCreateSchema } from "@/types";
-import ShiftService from "@/services/Shift";
+import { ShiftService, ErrorFactory } from "@/services";
 import { PrismaClientValidationError } from "@prisma/client/runtime/library";
 
 export async function GET(req: NextRequest) {
