@@ -22,9 +22,6 @@ export interface DashboardInterface {
   get averageHoursWorkedPerDay(): number;
   get hourValue(): number;
   get lastDayRegistered(): string;
-  differenceBetweenStartAndEnd(shift: Shift): number;
-  transformUser(user: UserType): UserType;
-  convertAmountInDecimal(shift: Shift): number;
   getPaidInWeek(): number;
   dashboardData(): {
     shiftsLen: number;

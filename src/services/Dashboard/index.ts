@@ -1,6 +1,7 @@
 import { DashboardInterface, UserType } from "@/types/services";
-import { Shift } from "@prisma/client";
-import { isThisWeek, max, differenceInMinutes, minutesToHours } from "date-fns";
+import _ from "lodash";
+import { ShiftService } from "@/services";
+import { isThisWeek, max } from "date-fns";
 
 /**
   @description
@@ -28,16 +29,20 @@ class Dashboard implements DashboardInterface {
   }
 
   get hoursWorked() {
-    const total = this.user.shifts.reduce((acc, shift, i) => {
+    const total = this.user.shifts.reduce((acc, shift) => {
       const amount = shift?.amount ?? 0;
       return acc + amount;
     }, 0);
 
-    return minutesToHours(total);
+    return total;
   }
 
   get averageHoursWorkedPerDay() {
-    return this.hoursWorked / this.shiftsLen;
+    const total = this.hoursWorked / this.shiftsLen;
+
+    if (_.isNaN(total)) return 0;
+
+    return total;
   }
 
   get hourValue() {
@@ -49,36 +54,10 @@ class Dashboard implements DashboardInterface {
   }
 
   get lastDayRegistered() {
+    if (this.user.shifts.length === 0) return "There is no data";
     return max(
       this.user.shifts.map((shift) => new Date(shift.startDate))
     ).toString();
-  }
-
-  differenceBetweenStartAndEnd(shift: Shift): number {
-    const start = new Date(shift.startDate);
-    const end = new Date(shift?.endDate ?? "");
-    const difference = differenceInMinutes(end, start);
-
-    return difference;
-  }
-
-  transformUser(user: UserType): UserType {
-    const amount: Shift[] = user.shifts.map((shift) => ({
-      ...shift,
-      amount: this.convertAmountInDecimal(shift),
-    }));
-
-    const userTransformed: UserType = {
-      ...this.user,
-      shifts: amount,
-    };
-
-    return userTransformed;
-  }
-
-  convertAmountInDecimal(shift: Shift): number {
-    const value = this.differenceBetweenStartAndEnd(shift);
-    return Math.round((value / 60) * 100) / 100;
   }
 
   getPaidInWeek() {
@@ -96,8 +75,10 @@ class Dashboard implements DashboardInterface {
   dashboardData() {
     return {
       shiftsLen: this.shiftsLen,
-      hoursWorked: this.hoursWorked,
-      averageHoursWorkedPerDay: this.averageHoursWorkedPerDay,
+      hoursWorked: ShiftService.convertAmountInDecimal(this.hoursWorked),
+      averageHoursWorkedPerDay: ShiftService.convertAmountInDecimal(
+        this.averageHoursWorkedPerDay
+      ),
       hourValue: this.hourValue,
       lastDayRegistered: this.lastDayRegistered,
       getPaidInWeek: this.getPaidInWeek(),
