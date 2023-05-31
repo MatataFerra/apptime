@@ -1,4 +1,4 @@
-import { GET } from "@/app/api/user/route"; // Asegúrate de importar la instancia de tu servidor Next.js
+import { GET } from "@/app/api/user/route";
 
 describe("API tests", () => {
   test("Under construction", () => {

@@ -91,4 +91,6 @@ export const HandleErrorTypeSchema = z.enum([
 
 export const QUERY_PARAMS = {
   USER_ID: "userId",
+  PROFILE: "profile",
+  SHIFTS: "shifts",
 };

@@ -933,23 +933,26 @@
               "default": true
             },
             "data": {
-              "shiftsLen": {
-                "type": "number"
-              },
-              "hoursWorked": {
-                "type": "number"
-              },
-              "averageHoursWorkedPerDay": {
-                "type": "number"
-              },
-              "hourValue": {
-                "type": "number"
-              },
-              "lastDayRegistered": {
-                "type": "string"
-              },
-              "getPaidInWeek": {
-                "type": "number"
+              "type": "object",
+              "properties": {
+                "shiftsLen": {
+                  "type": "number"
+                },
+                "hoursWorked": {
+                  "type": "number"
+                },
+                "averageHoursWorkedPerDay": {
+                  "type": "number"
+                },
+                "hourValue": {
+                  "type": "number"
+                },
+                "lastDayRegistered": {
+                  "type": "string"
+                },
+                "getPaidInWeek": {
+                  "type": "number"
+                }
               }
             }
           }
