@@ -9,6 +9,7 @@
     "lint": "next lint",
     "test": "dotenv -e .env.development -- jest -i --watch",
     "test:ci": "jest",
+    "ts-lint": "tsc --noEmit --incremental --watch",
     "coverage": "jest --coverage",
     "compose": "docker compose -f \"docker-compose.yml\" up -d --build --remove-orphans",
     "prisma:migrate": "bash ./scripts/prisma-migrate.sh",

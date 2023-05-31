@@ -4,13 +4,13 @@ const ShiftModelSchema = z.object({
   id: z.number({
     required_error: "Id must be provided correctly",
   }),
-  amount: z.number(),
-  endDate: z.string(),
+  amount: z.number().nullable(),
+  endDate: z.string().nullable(),
   isClosed: z.boolean(),
   isHoliday: z.boolean(),
-  notes: z.string(),
+  notes: z.string().nullable(),
   startDate: z.string(),
-  userId: z.number().optional(),
+  userId: z.number().nullable(),
 });
 
 const ProfileSchema = z.object({
@@ -55,11 +55,6 @@ const UserCreateSchema = UserModelSchema.omit({
   message: "One of the fields must be defined",
 });
 
-const ShiftUpdateSchema = ShiftModelSchema.partial().refine(
-  (values) => Object.keys(values).length > 0,
-  { message: "One of the fields must be defined" }
-);
-
 const ProfileUpdateSchema = ProfileSchema.partial().refine(
   (values) => Object.keys(values).length > 0,
   { message: "One of the fields must be defined" }
@@ -76,6 +71,11 @@ const ShiftCreateSchema = ShiftModelSchema.omit({
 }).refine((values) => Object.keys(values).length > 0, {
   message: "One of the fields must be defined",
 });
+
+const ShiftUpdateSchema = ShiftModelSchema.partial().refine(
+  (values) => Object.keys(values).length > 0,
+  { message: "One of the fields must be defined" }
+);
 
 const Data = z.object({
   message: z.string(),

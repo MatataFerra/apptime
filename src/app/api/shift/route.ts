@@ -1,8 +1,8 @@
 import prisma from "#/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import ErrorFactory from "@/services/Error/factory";
 import { Shift } from "@prisma/client";
 import { ShiftCreateSchema } from "@/types";
+import { ShiftService, ErrorFactory } from "@/services";
 import { PrismaClientValidationError } from "@prisma/client/runtime/library";
 
 export async function GET(req: NextRequest) {
@@ -72,6 +72,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const amount = ShiftService.differenceBetweenStartAndEnd(parsedBody.data);
+  const status = ShiftService.shiftStatus(parsedBody.data);
+
   try {
     const shift = await prisma.shift.create({
       data: {
@@ -83,8 +86,8 @@ export async function POST(req: NextRequest) {
 
         startDate: parsedBody.data.startDate,
         endDate: parsedBody.data.endDate,
-        amount: parsedBody.data.amount,
-        isClosed: parsedBody.data.isClosed,
+        amount,
+        isClosed: status,
         isHoliday: parsedBody.data.isHoliday,
         notes: parsedBody.data.notes,
       },

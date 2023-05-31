@@ -1,7 +1,9 @@
 import { isThisWeek, max, minutesToHours } from "date-fns";
 import { userMocked, userShiftsMocked } from "#/mocks";
 import DashboardService from "@/services/Dashboard";
+import UserService from "@/services/User";
 import { UserModelSchema } from "@/types";
+import { ShiftService } from "@/services";
 
 describe("Dashboard Service", () => {
   test("should return the number of shifts", () => {
@@ -56,9 +58,12 @@ describe("Dashboard Service", () => {
       return acc + amount;
     }, 0);
 
-    const expectedHours = minutesToHours(total);
+    const expectedHours = ShiftService.convertAmountInDecimal(total);
+    const dashboardWorkedHours = ShiftService.convertAmountInDecimal(
+      dashboard.hoursWorked
+    );
 
-    expect(dashboard.hoursWorked).toBe(expectedHours);
+    expect(dashboardWorkedHours).toBe(expectedHours);
   });
 
   test("Should return the average of hours worked per day", () => {
@@ -78,11 +83,14 @@ describe("Dashboard Service", () => {
   });
 
   test("The amount must be a decimal number", () => {
-    const dashboard = new DashboardService(userMocked);
-    const user = dashboard.transformUser(userMocked);
+    const userService = new UserService(userMocked);
+    const user = userService.transformUser(userMocked);
     const shiftMock = userShiftsMocked[0].amount!; // must be 125 minutes (2 hours and 5 minutes) difference
     const expectedDecimal = Math.round((shiftMock / 60) * 100) / 100;
+    const userAmountDecimal = ShiftService.convertAmountInDecimal(
+      user.shifts[0].amount!
+    );
 
-    expect(expectedDecimal).toBe(user.shifts[0].amount);
+    expect(userAmountDecimal).toBe(expectedDecimal);
   });
 });
