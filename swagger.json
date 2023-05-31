@@ -661,6 +661,62 @@
             }
           }
         }
+      },
+      "dashboard": {
+        "get": {
+          "summary": "Get the dashboard info",
+          "description": "Returns the dashboard info",
+          "tags": [
+            "Dashboard"
+          ],
+          "parameters": [
+            {
+              "name": "userId",
+              "in": "query",
+              "required": false,
+              "description": "numeric ID of user",
+              "schema": {
+                "type": "integer",
+                "example": 12
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Dashboard info is returned",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/DashboardSuccessResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "summary": "User not found error or QueryNotProvided error",
+              "description": "Returns a 404 error if user not found or if the user doesn't provide a valid query",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "500": {
+              "summary": "Internal server error",
+              "description": "Returns a 500 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "servers": [
@@ -863,6 +919,38 @@
             "shift": {
               "type": "object",
               "$ref": "#/components/schemas/Profile"
+            }
+          }
+        },
+        "DashboardSuccessResponse": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "response": {
+              "type": "boolean",
+              "default": true
+            },
+            "data": {
+              "shiftsLen": {
+                "type": "number"
+              },
+              "hoursWorked": {
+                "type": "number"
+              },
+              "averageHoursWorkedPerDay": {
+                "type": "number"
+              },
+              "hourValue": {
+                "type": "number"
+              },
+              "lastDayRegistered": {
+                "type": "string"
+              },
+              "getPaidInWeek": {
+                "type": "number"
+              }
             }
           }
         }
