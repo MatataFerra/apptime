@@ -1,17 +1,11 @@
 import prisma from "#/prisma/client";
-import { ProfileUpdateSchema } from "@/types";
+import { ProfileUpdateSchema, RouteParams } from "@/types";
 import { Profile } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { ErrorFactory } from "@/services";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
-type ProfileParams = {
-  params: {
-    id: string;
-  };
-};
-
-export async function PUT(req: NextRequest, { params }: ProfileParams) {
+export async function PUT(req: NextRequest, { params }: RouteParams) {
   const body: Profile = await req.json();
   const parsedBody = ProfileUpdateSchema.safeParse(body);
 

@@ -14,6 +14,17 @@ async function findFirstMock() {
   return user;
 }
 
+async function findManyMock() {
+  const user = await prisma.user.findMany({
+    include: {
+      profile: true,
+      shifts: true,
+    },
+  });
+
+  return user;
+}
+
 const expectedUser = {
   id: expect.any(Number),
   email: expect.any(String),
@@ -78,5 +89,19 @@ describe("GET /user", () => {
     const result = await findFirstMock();
 
     expect(result).toBeNull();
+  });
+
+  it("should return a list of users when they exist", async () => {
+    prismaMock.user.findMany.mockResolvedValue([userMocked]);
+    const result = await findManyMock();
+
+    expect(result).not.toBeNull();
+  });
+
+  it("should return an empty list when no users exist", async () => {
+    prismaMock.user.findMany.mockResolvedValue([]);
+    const result = await findManyMock();
+
+    expect(result).toEqual([]);
   });
 });

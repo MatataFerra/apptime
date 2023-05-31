@@ -1,12 +1,14 @@
 import prisma from "#/prisma/client";
+import { ErrorFactory } from "@/services";
 import { SearchParamsSchema, UserCreateSchema } from "@/types";
+import { QUERY_PARAMS } from "@/utils/constants";
 import { User } from "@prisma/client";
 import { NextResponse, NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
   const searchParams = await req.nextUrl.searchParams;
-  const shifts = searchParams.get("shifts");
-  const profile = searchParams.get("profile");
+  const shifts = searchParams.get(QUERY_PARAMS.SHIFTS);
+  const profile = searchParams.get(QUERY_PARAMS.PROFILE);
 
   const parsedSearchParams = SearchParamsSchema.safeParse({
     shifts,
@@ -34,16 +36,6 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    if (!user) {
-      return NextResponse.json(
-        {
-          message: "User not found",
-          response: false,
-        },
-        { status: 400 }
-      );
-    }
-
     return NextResponse.json(
       {
         message: "success",
@@ -53,12 +45,9 @@ export async function GET(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-
     return NextResponse.json(
       {
-        message: "Internal Server Error",
+        error: ErrorFactory.createError("InternalServer").exception,
         response: false,
       },
       { status: 500 }
@@ -68,7 +57,6 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const body: User = await req.json();
-
   const parsedBody = UserCreateSchema.safeParse(body);
 
   if (!parsedBody.success) {
@@ -94,7 +82,7 @@ export async function POST(req: NextRequest) {
     if (user) {
       return NextResponse.json(
         {
-          message: "User already exists",
+          error: ErrorFactory.createError("UserAlreadyExists").exception,
           response: false,
         },
         { status: 400 }
@@ -121,12 +109,9 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-
     return NextResponse.json(
       {
-        message: "Internal Server Error",
+        error: ErrorFactory.createError("InternalServer").exception,
         response: false,
       },
       { status: 500 }

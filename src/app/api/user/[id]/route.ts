@@ -1,19 +1,15 @@
 import prisma from "#/prisma/client";
-import { SearchParamsSchema, UserUpdateSchema } from "@/types";
+import { ErrorFactory } from "@/services";
+import { RouteParams, SearchParamsSchema, UserUpdateSchema } from "@/types";
+import { QUERY_PARAMS } from "@/utils/constants";
 import { User } from "@prisma/client";
 import { PrismaClientValidationError } from "@prisma/client/runtime/library";
 import { NextResponse, NextRequest } from "next/server";
 
-type UserParams = {
-  params: {
-    id: string;
-  };
-};
-
-export async function GET(req: NextRequest, { params }: UserParams) {
+export async function GET(req: NextRequest, { params }: RouteParams) {
   const searchParams = await req.nextUrl.searchParams;
-  const shifts = searchParams.get("shifts");
-  const profile = searchParams.get("profile");
+  const shifts = searchParams.get(QUERY_PARAMS.SHIFTS);
+  const profile = searchParams.get(QUERY_PARAMS.PROFILE);
 
   const parsedSearchParams = SearchParamsSchema.safeParse({
     shifts,
@@ -47,7 +43,7 @@ export async function GET(req: NextRequest, { params }: UserParams) {
     if (!user) {
       return NextResponse.json(
         {
-          message: "User not found",
+          error: ErrorFactory.createError("UserNotFound").exception,
           response: false,
         },
         { status: 400 }
@@ -63,12 +59,9 @@ export async function GET(req: NextRequest, { params }: UserParams) {
       { status: 200 }
     );
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-
     return NextResponse.json(
       {
-        message: "Internal Server Error",
+        error: ErrorFactory.createError("InternalServer").exception,
         response: false,
       },
       { status: 500 }
@@ -76,9 +69,8 @@ export async function GET(req: NextRequest, { params }: UserParams) {
   }
 }
 
-export async function PUT(req: NextRequest, { params }: UserParams) {
+export async function PUT(req: NextRequest, { params }: RouteParams) {
   const body: User = await req.json();
-
   const parsedBody = UserUpdateSchema.safeParse(body);
 
   if (!parsedBody.success) {
@@ -104,7 +96,7 @@ export async function PUT(req: NextRequest, { params }: UserParams) {
     if (!user) {
       return NextResponse.json(
         {
-          message: "User not found",
+          error: ErrorFactory.createError("UserNotFound").exception,
           response: false,
         },
         { status: 400 }
@@ -116,7 +108,7 @@ export async function PUT(req: NextRequest, { params }: UserParams) {
         id: user.id,
       },
       data: {
-        ...body,
+        ...parsedBody.data,
       },
     });
 
@@ -132,7 +124,7 @@ export async function PUT(req: NextRequest, { params }: UserParams) {
     if (error instanceof PrismaClientValidationError) {
       return NextResponse.json(
         {
-          message: "Please provide valid fields",
+          error: ErrorFactory.createError("PrismaClientFields").exception,
           response: false,
         },
         { status: 404 }
@@ -141,7 +133,7 @@ export async function PUT(req: NextRequest, { params }: UserParams) {
 
     return NextResponse.json(
       {
-        message: "Internal Server Error",
+        error: ErrorFactory.createError("InternalServer").exception,
         response: false,
       },
       { status: 500 }

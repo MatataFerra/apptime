@@ -2,16 +2,10 @@ import prisma from "#/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { ErrorFactory } from "@/services";
 import { Shift } from "@prisma/client";
-import { ShiftUpdateSchema } from "@/types";
+import { RouteParams, ShiftUpdateSchema } from "@/types";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
-type ShiftParams = {
-  params: {
-    id: string;
-  };
-};
-
-export async function PUT(req: NextRequest, { params }: ShiftParams) {
+export async function PUT(req: NextRequest, { params }: RouteParams) {
   const body: Shift = await req.json();
   const parsedBody = ShiftUpdateSchema.safeParse(body);
 

@@ -4,10 +4,10 @@ import prisma from "#/prisma/client";
 import { Profile } from "@prisma/client";
 import { ProfileCreateSchema } from "@/types";
 import { PrismaClientValidationError } from "@prisma/client/runtime/library";
+import { QUERY_PARAMS } from "@/utils/constants";
 
 export async function GET(req: NextRequest) {
-  const searchParams = await req.nextUrl.searchParams;
-  const userId = searchParams.get("userId");
+  const userId = req.nextUrl.searchParams.get(QUERY_PARAMS.USER_ID);
 
   if (!userId) {
     return NextResponse.json(
