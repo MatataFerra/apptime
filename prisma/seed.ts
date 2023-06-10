@@ -41,7 +41,6 @@ async function main() {
       {
         email: "usuario1@example.com",
         name: "Usuario",
-        lastname: "Uno",
         password: "secreto",
         online: false,
         formCompleted: false,
@@ -50,7 +49,6 @@ async function main() {
       {
         email: "test@example.com",
         name: "Testing Name",
-        lastname: "Testing lastname",
         password: "ultra-secreto",
         online: false,
         formCompleted: false,

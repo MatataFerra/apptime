@@ -23,13 +23,14 @@ model Shift {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  email         String   @unique
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
   name          String
-  lastname      String
-  password      String
-  online        Boolean  @default(false)
-  formCompleted Boolean  @default(false)
+  password      String?
+  online        Boolean   @default(false)
+  formCompleted Boolean   @default(false)
   shifts        Shift[]
   profile       Profile?
 }
