@@ -1,4 +1,5 @@
 import { NextAuthOptions } from "next-auth";
+import _ from "lodash";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
@@ -22,15 +23,18 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials.password) return null;
 
+        if (!credentials.password) return null;
+
         const user = await prisma.user.findUnique({
           where: {
             email: credentials.email,
           },
         });
 
-        if (!user?.password) return null;
-
-        if (!user || !(await compare(credentials.password, user.password)))
+        if (
+          !user ||
+          !(await compare(credentials.password, user.password ?? ""))
+        )
           return null;
 
         return {
@@ -52,30 +56,25 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 
   callbacks: {
-    async jwt({ token, user, account }) {
-      token.accessToken = account?.access_token;
+    async session({ session, token }) {
+      const sessionDeepClone = _.cloneDeep(session);
+      const sessionAccessToken = {
+        ...sessionDeepClone,
+        accessToken: token.accessToken,
+      };
 
-      if (account?.type === "credentials") {
-        token.user = user;
-      }
-
-      console.log("🚀 ~ file: index.ts:57 ~ jwt ~ { token, user, account }:", {
-        token,
-        user,
-        account,
+      // eslint-disable-next-line no-console
+      console.log("🚀 ~ file: index.ts:60 ~ session ~ session:", {
+        sessionAccessToken,
       });
 
-      return token;
+      return sessionAccessToken;
     },
-    async session({ session, token, user }) {
-      if (typeof token.accessToken === "string") {
-        session.accessToken = token.accessToken;
+    async jwt({ token, user, account }) {
+      if (account) {
+        token.accessToken = account.access_token;
       }
-      console.log(
-        "🚀 ~ file: index.ts:70 ~ session ~ { session, token, user }:",
-        { session, token, user }
-      );
-      return session;
+      return token;
     },
   },
 };

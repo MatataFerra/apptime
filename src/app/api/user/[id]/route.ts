@@ -36,7 +36,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
         profile: !!parsedSearchParams.data.profile,
       },
       where: {
-        id: Number(params.id),
+        id: params.id,
       },
     });
 
@@ -89,7 +89,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
   try {
     const user = await prisma.user.findUnique({
       where: {
-        id: Number(params.id),
+        id: params.id,
       },
     });
 

@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
   try {
     const shift = await prisma.shift.findMany({
       where: {
-        userId: Number(userId),
+        userId: userId,
       },
     });
 
@@ -72,6 +72,16 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  if (!parsedBody.data.userId) {
+    return NextResponse.json(
+      {
+        error: ErrorFactory.createError("BodyNotProvided").exception,
+        response: false,
+      },
+      { status: 400 }
+    );
+  }
+
   const amount = ShiftService.differenceBetweenStartAndEnd(parsedBody.data);
   const status = ShiftService.shiftStatus(parsedBody.data);
 
@@ -80,7 +90,7 @@ export async function POST(req: NextRequest) {
       data: {
         User: {
           connect: {
-            id: Number(parsedBody.data?.userId),
+            id: parsedBody?.data?.userId,
           },
         },
 

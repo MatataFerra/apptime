@@ -3,6 +3,7 @@
 import { addDays, addMinutes, differenceInMinutes } from "date-fns";
 import prisma from "./client";
 import { Shift, User } from "@prisma/client";
+import { hashSync } from "bcryptjs";
 const now = new Date();
 const datesMock = [
   now, // today
@@ -33,38 +34,37 @@ function addShiftsForSeed(user: User): Shift[] {
   return datesMocked;
 }
 
+function addUsersMocked(): Omit<User, "id">[] {
+  return Array.from({ length: 5 }, (_, i) => {
+    return {
+      email: `usuario${i}@example.com`.trim(),
+      name: `User Testing ${i}`,
+      emailVerified: null,
+      formCompleted: false,
+      image: "https://placehold.co/100x100",
+      online: false,
+      password: hashSync(`secreto${i}`, 10),
+      type_account: "CREDENTIALS",
+    };
+  });
+}
+
 async function main() {
   await clearDatabase();
 
   await prisma.user.createMany({
-    data: [
-      {
-        email: "usuario1@example.com",
-        name: "Usuario",
-        password: "secreto",
-        online: false,
-        formCompleted: false,
-      },
-
-      {
-        email: "test@example.com",
-        name: "Testing Name",
-        password: "ultra-secreto",
-        online: false,
-        formCompleted: false,
-      },
-    ],
+    data: [...addUsersMocked()],
   });
 
   const firstUser = await prisma.user.findUnique({
     where: {
-      email: "usuario1@example.com",
+      email: [...addUsersMocked()][1].email,
     },
   });
 
   const secondUser = await prisma.user.findUnique({
     where: {
-      email: "test@example.com",
+      email: [...addUsersMocked()][2].email,
     },
   });
 
