@@ -1,4 +1,5 @@
 import { NextAuthOptions } from "next-auth";
+import { AuthService } from "@/services";
 import _ from "lodash";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -58,23 +59,21 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ session, token }) {
       const sessionDeepClone = _.cloneDeep(session);
-      const sessionAccessToken = {
-        ...sessionDeepClone,
+      const sessionAccessToken = _.assign(sessionDeepClone, {
         accessToken: token.accessToken,
-      };
-
-      // eslint-disable-next-line no-console
-      console.log("🚀 ~ file: index.ts:60 ~ session ~ session:", {
-        sessionAccessToken,
+        type_account: token.type_account,
       });
 
       return sessionAccessToken;
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token, account }) {
       if (account) {
         token.accessToken = account.access_token;
+        token.type_account = account.provider;
       }
-      return token;
+      const tokenClone = _.cloneDeep(token);
+
+      return tokenClone;
     },
   },
 };
