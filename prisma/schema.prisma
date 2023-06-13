@@ -23,17 +23,18 @@ model Shift {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  name          String
-  password      String?
-  type_account  Type      @default(CREDENTIALS)
-  online        Boolean   @default(false)
-  formCompleted Boolean   @default(false)
-  shifts        Shift[]
-  profile       Profile?
+  id              String           @id @default(cuid())
+  email           String           @unique
+  emailVerified   DateTime?
+  image           String?
+  name            String
+  password        String?
+  type_account    Type             @default(CREDENTIALS)
+  online          Boolean          @default(false)
+  formCompleted   Boolean          @default(false)
+  shifts          Shift[]
+  profile         Profile?
+  passwordAttemps PasswordAttemps?
 }
 
 model Profile {
@@ -48,6 +49,14 @@ model Profile {
   unpaidBreaks       Float?
   User               User?   @relation(fields: [userId], references: [id])
   userId             String? @unique
+}
+
+model PasswordAttemps {
+  id           Int       @id @default(autoincrement())
+  maxAttemps   Int       @default(5)
+  renewAttemps DateTime? @default(now())
+  User         User?     @relation(fields: [userId], references: [id])
+  userId       String?   @unique
 }
 
 enum Type {

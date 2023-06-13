@@ -1,4 +1,5 @@
 import { HandleErrorType, InterfaceConfig } from "@/types/services";
+import _ from "lodash";
 import { z } from "zod";
 
 /**
@@ -94,3 +95,5 @@ export const QUERY_PARAMS = {
   PROFILE: "profile",
   SHIFTS: "shifts",
 };
+
+export const now = _.now();

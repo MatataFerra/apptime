@@ -8,6 +8,8 @@ import prisma from "#/prisma/client";
 
 //TODO: Cuando se quiere crear un usuario con oauth2, lanza una excepción porque password es requerido y oauth no lo provee
 
+const authService = new AuthService();
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -62,6 +64,12 @@ export const authOptions: NextAuthOptions = {
       const sessionAccessToken = _.assign(sessionDeepClone, {
         accessToken: token.accessToken,
         type_account: token.type_account,
+      });
+
+      authService.oauthUser({
+        email: sessionAccessToken.user?.email ?? "",
+        name: sessionAccessToken.user?.name ?? "",
+        image: sessionAccessToken.user?.image ?? "",
       });
 
       return sessionAccessToken;
