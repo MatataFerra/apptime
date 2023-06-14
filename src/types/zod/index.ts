@@ -78,6 +78,23 @@ const SearchParamsSchema = z.object({
   profile: z.string().nullable(),
 });
 
+/**
+ * @description Enum to handle errors
+ */
+const HandleErrorTypeSchema = z.enum([
+  "UserNotFound",
+  "UserAlreadyExists",
+  "ShiftNotFound",
+  "InternalServer",
+  "PrismaClientFields",
+  "PrismaClientUpdateRecord",
+  "QueryNotProvided",
+  "BodyNotProvided",
+  "ProfileNotFound",
+  "ProfileAlreadyExists",
+  "CustomError",
+]);
+
 export {
   ShiftModelSchema,
   ShiftUpdateSchema,
@@ -89,4 +106,5 @@ export {
   ProfileUpdateSchema,
   ProfileCreateSchema,
   SearchParamsSchema,
+  HandleErrorTypeSchema,
 };

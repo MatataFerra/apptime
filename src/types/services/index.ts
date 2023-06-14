@@ -1,6 +1,6 @@
-import { HandleErrorTypeSchema } from "@/utils/constants";
 import { Profile, Shift, User } from "@prisma/client";
 import { z } from "zod";
+import { HandleErrorTypeSchema } from "../zod";
 
 // Types
 export type UserType = User & { shifts: Shift[]; profile: Profile | null };

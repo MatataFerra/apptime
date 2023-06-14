@@ -1,48 +1,103 @@
-import { EXCEPTIONS } from "../../utils/constants";
 import _ from "lodash";
+import {
+  UserNotFound,
+  UserAlreadyExists,
+  BodyNotProvided,
+  InternalServer,
+  PrismaClientFields,
+  PrismaClientUpdateRecord,
+  ProfileAlreadyExists,
+  ProfileNotFound,
+  QueryNotProvided,
+  ShiftNotFound,
+} from "./errors";
+import { HandleErrorType } from "@/types/services";
 
-interface ExceptionsInterface {
-  exception: {
-    message: string;
-    cause?: string;
-    type_error: string;
-  };
+export type Exception = {
+  message: string;
+  cause?: string;
+  type_error: string;
+};
+
+export interface ExceptionsInterface {
+  exception: Exception;
   stack?: string | undefined;
-  handleError(): void;
+  handleError(): Exception;
 }
 
 export class ErrorBoundary extends Error implements ExceptionsInterface {
-  constructor(exception: ExceptionsInterface["exception"]) {
-    super(exception.message);
-    this.exception = exception;
+  constructor(message: string) {
+    super(message);
+    this.message = message;
   }
-  exception: {
-    message: string;
-    cause?: string | undefined;
-    type_error: string;
-  };
+  get exception() {
+    return {
+      message: this.message,
+      type_error: "CustomError",
+    };
+  }
 
   handleError() {
     return this.exception;
   }
 }
 
-class ErrorFactory {
-  public createError(exception: keyof typeof EXCEPTIONS): ExceptionsInterface {
-    const typeError = EXCEPTIONS[exception];
+interface ErrorFactoryInterface {
+  createError(exception: HandleErrorType, message?: string): Exception | Error;
+}
 
-    const errorDetails = _.cloneDeep(typeError);
-    const typeErrorArray = Object.keys(EXCEPTIONS);
-
-    if (typeErrorArray.includes(exception)) {
-      return new ErrorBoundary(errorDetails);
-    } else {
-      throw new Error(`Error type '${exception}' not supported`);
+class ErrorFactory implements ErrorFactoryInterface {
+  public createError(
+    exception: HandleErrorType,
+    message?: string
+  ): Exception | Error {
+    if (exception === "UserNotFound") {
+      return new UserNotFound().handleError();
     }
-  }
 
-  private sendLogs() {
-    // Send logs to Sentry or other service
+    if (exception === "UserAlreadyExists") {
+      return new UserAlreadyExists().handleError();
+    }
+
+    if (exception === "BodyNotProvided") {
+      return new BodyNotProvided().handleError();
+    }
+
+    if (exception === "InternalServer") {
+      return new InternalServer().handleError();
+    }
+
+    if (exception === "PrismaClientFields") {
+      return new PrismaClientFields().handleError();
+    }
+
+    if (exception === "PrismaClientUpdateRecord") {
+      return new PrismaClientUpdateRecord().handleError();
+    }
+
+    if (exception === "ProfileAlreadyExists") {
+      return new ProfileAlreadyExists().handleError();
+    }
+
+    if (exception === "ProfileNotFound") {
+      return new ProfileNotFound().handleError();
+    }
+
+    if (exception === "QueryNotProvided") {
+      return new QueryNotProvided().handleError();
+    }
+
+    if (exception === "ShiftNotFound") {
+      return new ShiftNotFound().handleError();
+    }
+
+    if (exception === "CustomError") {
+      return new ErrorBoundary(
+        message || "Please provide a more accurate message"
+      ).handleError();
+    }
+
+    throw new Error(`Error type '${exception}' not supported`);
   }
 }
 
