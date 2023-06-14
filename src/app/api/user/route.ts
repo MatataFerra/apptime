@@ -3,6 +3,7 @@ import { ErrorFactory } from "@/services";
 import { SearchParamsSchema, UserCreateSchema } from "@/types";
 import { QUERY_PARAMS } from "@/utils/constants";
 import { User } from "@prisma/client";
+import { hash } from "bcryptjs";
 import { NextResponse, NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -89,14 +90,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const hashPassword = await hash(parsedBody.data.password, 10);
+
     const newUser = await prisma.user.create({
       data: {
         email: parsedBody.data.email,
         name: parsedBody.data.name,
-        lastname: parsedBody.data.lastname,
-        password: parsedBody.data.password,
+        password: hashPassword,
         formCompleted: parsedBody.data.formCompleted,
         online: parsedBody.data.online,
+        image: parsedBody.data.image,
       },
     });
 

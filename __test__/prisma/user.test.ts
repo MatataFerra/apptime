@@ -1,5 +1,4 @@
 import { prismaMock } from "#/prisma/singleton";
-
 import prisma from "#/prisma/client";
 import { userMocked } from "#/mocks";
 
@@ -26,7 +25,7 @@ async function findManyMock() {
 }
 
 const expectedUser = {
-  id: expect.any(Number),
+  id: expect.any(String),
   email: expect.any(String),
   lastname: expect.any(String),
   name: expect.any(String),

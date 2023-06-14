@@ -3,8 +3,13 @@ import { z } from "zod";
 import { HandleErrorTypeSchema } from "../zod";
 
 // Types
-export type UserType = User & { shifts: Shift[]; profile: Profile | null };
+export type UserType = User & {
+  shifts: Shift[];
+  profile: Profile | null;
+};
 export type HandleErrorType = z.infer<typeof HandleErrorTypeSchema>;
+
+export type DashboardUserType = Omit<UserType, "account" | "session">;
 
 // Interfaces
 export interface InterfaceConfig {
@@ -16,7 +21,7 @@ export interface InterfaceConfig {
 }
 
 export interface DashboardInterface {
-  user: UserType;
+  user: DashboardUserType;
   get shiftsLen(): number;
   get hoursWorked(): number;
   get averageHoursWorkedPerDay(): number;

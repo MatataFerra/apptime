@@ -10,7 +10,7 @@ const ShiftModelSchema = z.object({
   isHoliday: z.boolean(),
   notes: z.string().nullable(),
   startDate: z.string(),
-  userId: z.number().nullable(),
+  userId: z.string().nullable(),
 });
 
 const ProfileSchema = z.object({
@@ -25,19 +25,21 @@ const ProfileSchema = z.object({
   nightShift: z.boolean(),
   startHour: z.number(),
   unpaidBreaks: z.number(),
-  userId: z.number().optional(),
+  userId: z.string().nullable(),
 });
 
 const UserModelSchema = z.object({
-  id: z.number({
+  id: z.string({
     required_error: "Id must be provided correctly",
   }),
   email: z.string().email(),
-  lastname: z.string(),
+  emailVerified: z.string().nullable(),
+  image: z.string().nullable().default("https://i.imgur.com/6VBx3io.png"),
   name: z.string(),
   password: z.string(),
   online: z.boolean(),
   formCompleted: z.boolean(),
+  type_account: z.enum(["CREDENTIALS", "OAUTH"]),
 });
 
 const UserUpdateSchema = UserModelSchema.partial().refine(

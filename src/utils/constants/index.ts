@@ -1,4 +1,4 @@
-import { z } from "zod";
+import _ from "lodash";
 
 /** 
   @summary Contants for Routes
@@ -10,3 +10,5 @@ export const QUERY_PARAMS = {
   PROFILE: "profile",
   SHIFTS: "shifts",
 };
+
+export const now = _.now();

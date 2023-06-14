@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
   try {
     const profile = await prisma.profile.findUnique({
       where: {
-        userId: Number(userId),
+        userId,
       },
     });
 
@@ -72,13 +72,23 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  if (!parsedBody.data.userId) {
+    return NextResponse.json(
+      {
+        error: ErrorFactory.createError("BodyNotProvided").exception,
+        response: false,
+      },
+      { status: 400 }
+    );
+  }
+
   try {
     const user = await prisma.user.findUnique({
       include: {
         profile: true,
       },
       where: {
-        id: Number(parsedBody.data?.userId),
+        id: parsedBody.data?.userId,
       },
     });
 

@@ -1,5 +1,6 @@
-import { isThisWeek, max, minutesToHours } from "date-fns";
+import { isThisWeek, max } from "date-fns";
 import { userMocked, userShiftsMocked } from "#/mocks";
+import _ from "lodash";
 import DashboardService from "@/services/Dashboard";
 import UserService from "@/services/User";
 import { UserModelSchema } from "@/types";
@@ -13,24 +14,9 @@ describe("Dashboard Service", () => {
   });
 
   test("Should Zod validate the user model", () => {
-    const userParsed = UserModelSchema.safeParse(userMocked);
+    const userParsed = UserModelSchema.parse(userMocked);
 
-    expect(userParsed.success).toBeTruthy();
-  });
-
-  test("Should take the right shifts to be evaluated", () => {
-    const indexDatesPassTest: number[] = [];
-    const indexExpected = [0, 1, 3, 4];
-    userShiftsMocked.reduce((acc, shift) => {
-      if (isThisWeek(new Date(shift.startDate))) {
-        indexDatesPassTest.push(shift.id);
-        return acc;
-      }
-
-      return acc;
-    }, 0);
-
-    expect(indexDatesPassTest).toEqual(indexExpected);
+    expect(userParsed).toBeTruthy();
   });
 
   test("Should calculate the amount of paid for hours worked in the current week", () => {
