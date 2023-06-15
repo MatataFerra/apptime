@@ -35,7 +35,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     if (!updatedShift) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("ShiftNotFound").exception,
+          error: ErrorFactory.createError("ShiftNotFound"),
           response: false,
         },
         { status: 404 }
@@ -54,7 +54,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     if (error instanceof PrismaClientKnownRequestError) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("PrismaClientUpdateRecord").exception,
+          error: ErrorFactory.createError("PrismaClientUpdateRecord"),
           response: false,
         },
         { status: 408 }
@@ -62,7 +62,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     }
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("InternalServer").exception,
+        error: ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }

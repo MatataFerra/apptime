@@ -1,25 +1,23 @@
+import { PrismaClientInitializationError } from "@prisma/client/runtime/library";
 import { Exception, ExceptionsInterface } from "./factory";
 
 export class UserNotFound extends Error implements ExceptionsInterface {
-  constructor() {
-    super("User not found");
-  }
   exception: Exception = {
     message: "User not found",
     cause: "The user does not exist in the database",
     type_error: "UserNotFound",
   };
 
+  constructor() {
+    super("User not found");
+    this.stack = "";
+  }
+
   handleError() {
     return this.exception;
   }
 }
 
-/* 
-  PrismaClientUpdateRecord
-  ProfileNotFound
-  ProfileAlreadyExists
-*/
 export class UserAlreadyExists extends Error implements ExceptionsInterface {
   constructor() {
     super("User already exists");
@@ -30,7 +28,7 @@ export class UserAlreadyExists extends Error implements ExceptionsInterface {
     type_error: "UserAlreadyExists",
   };
 
-  handleError() {
+  handleError(): Exception {
     return this.exception;
   }
 }
@@ -45,7 +43,16 @@ export class InternalServer extends Error implements ExceptionsInterface {
     type_error: "InternalServer",
   };
 
-  handleError() {
+  handleError(error: unknown) {
+    if (error instanceof Error) {
+      this.stack = error.stack;
+    }
+
+    if (error instanceof PrismaClientInitializationError) {
+      this.exception.cause = error.message.split("\n").join(" ").trim();
+      this.exception.message = "Prisma Client Initialization Error";
+    }
+
     return this.exception;
   }
 }

@@ -43,7 +43,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     if (!user) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("UserNotFound").exception,
+          error: ErrorFactory.createError("UserNotFound"),
           response: false,
         },
         { status: 400 }
@@ -61,7 +61,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
   } catch (error) {
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("InternalServer").exception,
+        error: ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }
@@ -96,7 +96,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     if (!user) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("UserNotFound").exception,
+          error: ErrorFactory.createError("UserNotFound"),
           response: false,
         },
         { status: 400 }
@@ -124,7 +124,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     if (error instanceof PrismaClientValidationError) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("PrismaClientFields").exception,
+          error: ErrorFactory.createError("PrismaClientFields"),
           response: false,
         },
         { status: 404 }
@@ -133,7 +133,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("InternalServer").exception,
+        error: ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }

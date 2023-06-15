@@ -27,7 +27,7 @@ interface AuthServiceInterface {
     name: string;
     image: string;
   }): Promise<User>;
-  decodedCookieData(): Promise<JWTDecodedType | null>;
+  // decodedCookieData(): Promise<JWTDecodedType | null>;
   login(type_account: string, callbackUrl: string): Promise<void>;
   logout(): Promise<void>;
   register(body: User): Promise<User>;
@@ -38,18 +38,11 @@ interface AuthServiceInterface {
  * - [ ] Forgot Password
  */
 class Auth implements AuthServiceInterface {
-  user?: UserType;
+  constructor() {}
 
-  constructor(user?: UserType) {
-    this.user = user;
-  }
+  public static async decodedCookieData(): Promise<JWTDecodedType | null> {
+    const token = cookieStore().get("next-auth.session-token");
 
-  get cookieToken() {
-    return cookieStore().get("next-auth.session-token");
-  }
-
-  async decodedCookieData(): Promise<JWTDecodedType | null> {
-    const token = this.cookieToken;
     if (!token) return null;
 
     const result = (await decode({
@@ -72,18 +65,18 @@ class Auth implements AuthServiceInterface {
 
   async register(body: User) {
     if (!body.email || !body.password || !body.name) {
-      ErrorFactory.createError("BodyNotProvided").exception;
+      ErrorFactory.createError("BodyNotProvided");
     }
 
     const userSchema = UserCreateSchema.parse(body);
 
     if (!userSchema) {
-      ErrorFactory.createError("BodyNotProvided").exception;
+      ErrorFactory.createError("BodyNotProvided");
     }
 
     const user = await UserService.authenticatedUser();
     if (user) {
-      ErrorFactory.createError("UserAlreadyExists").exception;
+      ErrorFactory.createError("UserAlreadyExists");
     }
 
     const newUser: User = await prisma.user.create({
@@ -101,7 +94,7 @@ class Auth implements AuthServiceInterface {
 
   async oauthUser(body: { email: string; name: string; image: string }) {
     if (!body.email || !body.name || !body.image) {
-      ErrorFactory.createError("BodyNotProvided").exception;
+      ErrorFactory.createError("BodyNotProvided");
     }
 
     const user = await UserService.authenticatedUser();

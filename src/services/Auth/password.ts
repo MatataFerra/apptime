@@ -1,15 +1,11 @@
-import { now } from "@/utils/constants";
-import { addMinutes } from "date-fns";
 import prisma from "#/prisma/client";
-import { AuthService, UserService } from "..";
-
-const authService = new AuthService();
+import { AuthService, UserService } from "@/services";
 
 /**
  * Password class
  * @param password - Password
  */
-class Password {
+export default class Password {
   password: string;
   constructor(password: string) {
     this.password = password;

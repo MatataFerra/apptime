@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   if (!userId) {
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("QueryNotProvided").exception,
+        error: ErrorFactory.createError("QueryNotProvided"),
         response: false,
       },
       { status: 400 }
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     if (!profile) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("ProfileNotFound").exception,
+          error: ErrorFactory.createError("ProfileNotFound"),
           response: false,
         },
         { status: 404 }
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("InternalServer").exception,
+        error: ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
   if (!parsedBody.data.userId) {
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("BodyNotProvided").exception,
+        error: ErrorFactory.createError("BodyNotProvided"),
         response: false,
       },
       { status: 400 }
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("UserNotFound").exception,
+          error: ErrorFactory.createError("UserNotFound"),
           response: false,
         },
         { status: 404 }
@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
     if (user.profile) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("ProfileAlreadyExists").exception,
+          error: ErrorFactory.createError("ProfileAlreadyExists"),
           response: false,
         },
         { status: 400 }
@@ -143,7 +143,7 @@ export async function POST(req: NextRequest) {
     if (error instanceof PrismaClientValidationError) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("PrismaClientFields").exception,
+          error: ErrorFactory.createError("PrismaClientFields"),
           response: false,
         },
         { status: 400 }
@@ -152,7 +152,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("InternalServer").exception,
+        error: ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }

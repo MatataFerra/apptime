@@ -1,5 +1,5 @@
 import prisma from "#/prisma/client";
-import { ErrorFactory } from "@/services";
+import { ErrorFactory, AuthService } from "@/services";
 import { SearchParamsSchema, UserCreateSchema } from "@/types";
 import { QUERY_PARAMS } from "@/utils/constants";
 import { User } from "@prisma/client";
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("InternalServer").exception,
+        ...ErrorFactory.createError("InternalServer", { error }),
         response: false,
       },
       { status: 500 }
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
     if (user) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("UserAlreadyExists").exception,
+          error: ErrorFactory.createError("UserAlreadyExists"),
           response: false,
         },
         { status: 400 }
@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("InternalServer").exception,
+        error: ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }

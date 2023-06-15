@@ -11,7 +11,13 @@ import {
   QueryNotProvided,
   ShiftNotFound,
 } from "./errors";
-import { HandleErrorType } from "@/types/services";
+import { HandleErrorType } from "@/types";
+
+const USER_NOT_FOUND = {
+  message: "User not found",
+  cause: "The user does not exist in the database",
+  type_error: "UserNotFound",
+};
 
 export type Exception = {
   message: string;
@@ -22,7 +28,7 @@ export type Exception = {
 export interface ExceptionsInterface {
   exception: Exception;
   stack?: string | undefined;
-  handleError(): Exception;
+  handleError(...args: any[]): Exception;
 }
 
 export class ErrorBoundary extends Error implements ExceptionsInterface {
@@ -43,14 +49,17 @@ export class ErrorBoundary extends Error implements ExceptionsInterface {
 }
 
 interface ErrorFactoryInterface {
-  createError(exception: HandleErrorType, message?: string): Exception | Error;
+  createError(
+    exception: HandleErrorType,
+    options?: { message?: string; error?: unknown }
+  ): Exception;
 }
 
 class ErrorFactory implements ErrorFactoryInterface {
-  public createError(
+  createError(
     exception: HandleErrorType,
-    message?: string
-  ): Exception | Error {
+    options?: { message?: string; error?: unknown }
+  ): any {
     if (exception === "UserNotFound") {
       return new UserNotFound().handleError();
     }
@@ -64,7 +73,7 @@ class ErrorFactory implements ErrorFactoryInterface {
     }
 
     if (exception === "InternalServer") {
-      return new InternalServer().handleError();
+      return new InternalServer().handleError(options?.error);
     }
 
     if (exception === "PrismaClientFields") {
@@ -93,11 +102,15 @@ class ErrorFactory implements ErrorFactoryInterface {
 
     if (exception === "CustomError") {
       return new ErrorBoundary(
-        message || "Please provide a more accurate message"
+        options?.message || "Custom error"
       ).handleError();
     }
 
-    throw new Error(`Error type '${exception}' not supported`);
+    return new ErrorBoundary(
+      `Error type '${exception}' not supported`
+    ).handleError();
+
+    // throw new Error(`Error type '${exception}' not supported`);
   }
 }
 

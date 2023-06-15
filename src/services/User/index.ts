@@ -2,9 +2,7 @@ import { UserType } from "@/types/services";
 import { Shift } from "@prisma/client";
 import ShiftService from "../Shift";
 import prisma from "#/prisma/client";
-import { AuthService } from "..";
-
-const authService = new AuthService();
+import { AuthService } from "@/services";
 
 /**
  * @class UserService
@@ -34,7 +32,7 @@ class UserService {
   }
 
   static async authenticatedUser() {
-    const token = await authService.decodedCookieData();
+    const token = await AuthService.decodedCookieData();
     return await prisma.user.findUnique({
       where: {
         email: token?.email,
