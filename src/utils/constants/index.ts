@@ -12,3 +12,5 @@ export const QUERY_PARAMS = {
 };
 
 export const now = _.now();
+
+export const SALT = 10;

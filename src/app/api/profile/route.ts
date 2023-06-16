@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   if (!userId) {
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("QueryNotProvided"),
+        ...ErrorFactory.createError("QueryNotProvided"),
         response: false,
       },
       { status: 400 }
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     if (!profile) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("ProfileNotFound"),
+          ...ErrorFactory.createError("ProfileNotFound"),
           response: false,
         },
         { status: 404 }
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("InternalServer"),
+        ...ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }
@@ -62,10 +62,9 @@ export async function POST(req: NextRequest) {
   if (!parsedBody.success) {
     return NextResponse.json(
       {
-        error: parsedBody.error.issues.map((issue) => ({
-          error: issue.message,
-          input: issue.path,
-        })),
+        ...ErrorFactory.createError("DataProvidedIsNotValid", {
+          error: parsedBody.error,
+        }),
         response: false,
       },
       { status: 400 }
@@ -75,7 +74,7 @@ export async function POST(req: NextRequest) {
   if (!parsedBody.data.userId) {
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("BodyNotProvided"),
+        ...ErrorFactory.createError("BodyNotProvided"),
         response: false,
       },
       { status: 400 }
@@ -95,7 +94,7 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("UserNotFound"),
+          ...ErrorFactory.createError("UserNotFound"),
           response: false,
         },
         { status: 404 }
@@ -105,7 +104,7 @@ export async function POST(req: NextRequest) {
     if (user.profile) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("ProfileAlreadyExists"),
+          ...ErrorFactory.createError("ProfileAlreadyExists"),
           response: false,
         },
         { status: 400 }
@@ -143,7 +142,7 @@ export async function POST(req: NextRequest) {
     if (error instanceof PrismaClientValidationError) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("PrismaClientFields"),
+          ...ErrorFactory.createError("PrismaClientFields"),
           response: false,
         },
         { status: 400 }
@@ -152,7 +151,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("InternalServer"),
+        ...ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }

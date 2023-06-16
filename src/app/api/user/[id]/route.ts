@@ -43,7 +43,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     if (!user) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("UserNotFound"),
+          ...ErrorFactory.createError("UserNotFound"),
           response: false,
         },
         { status: 400 }
@@ -61,7 +61,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
   } catch (error) {
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("InternalServer"),
+        ...ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }
@@ -76,10 +76,9 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
   if (!parsedBody.success) {
     return NextResponse.json(
       {
-        message: parsedBody.error.issues.map((issue) => ({
-          error: issue.message,
-          input: issue.path,
-        })),
+        ...ErrorFactory.createError("DataProvidedIsNotValid", {
+          error: parsedBody.error,
+        }),
         response: false,
       },
       { status: 400 }
@@ -96,7 +95,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     if (!user) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("UserNotFound"),
+          ...ErrorFactory.createError("UserNotFound"),
           response: false,
         },
         { status: 400 }
@@ -124,7 +123,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     if (error instanceof PrismaClientValidationError) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("PrismaClientFields"),
+          ...ErrorFactory.createError("PrismaClientFields"),
           response: false,
         },
         { status: 404 }
@@ -133,7 +132,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("InternalServer"),
+        ...ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }

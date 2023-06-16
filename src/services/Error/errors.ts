@@ -1,5 +1,6 @@
 import { PrismaClientInitializationError } from "@prisma/client/runtime/library";
 import { Exception, ExceptionsInterface } from "./factory";
+import { ZodError } from "zod";
 
 export class UserNotFound extends Error implements ExceptionsInterface {
   exception: Exception = {
@@ -45,7 +46,7 @@ export class InternalServer extends Error implements ExceptionsInterface {
 
   handleError(error: unknown) {
     if (error instanceof Error) {
-      this.stack = error.stack;
+      this.exception.cause = error.message;
     }
 
     if (error instanceof PrismaClientInitializationError) {
@@ -53,7 +54,59 @@ export class InternalServer extends Error implements ExceptionsInterface {
       this.exception.message = "Prisma Client Initialization Error";
     }
 
+    return { ...this.exception, info: error };
+  }
+}
+
+export class PasswordIsNotValid extends Error implements ExceptionsInterface {
+  constructor() {
+    super("Password is not valid");
+  }
+  exception: Exception = {
+    message: "Password is not valid",
+    cause: "The password is not valid",
+    type_error: "PasswordIsNotValid",
+  };
+
+  handleError(error: unknown) {
+    if (error instanceof Error) {
+      this.exception.cause = error.message;
+    }
+
+    if (typeof error === "string") {
+      this.exception.cause = error;
+    }
+
     return this.exception;
+  }
+}
+
+export class DataProvidedIsNotValid
+  extends Error
+  implements ExceptionsInterface
+{
+  constructor() {
+    super("Data provided is not valid");
+  }
+  exception: Exception = {
+    message: "Data provided is not valid",
+    cause: "The body provided on the request doesn't match with the schema",
+    type_error: "DataProvidedIsNotValid",
+  };
+
+  zod?: {
+    error: string;
+    input: (string | number)[];
+  }[];
+
+  handleError(error: unknown) {
+    if (error instanceof ZodError) {
+      this.zod = error.issues.map((issue) => ({
+        error: issue.message,
+        input: issue.path,
+      }));
+    }
+    return { ...this.exception, zod: this.zod };
   }
 }
 

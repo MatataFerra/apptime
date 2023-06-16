@@ -6,10 +6,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import prisma from "#/prisma/client";
 
-//TODO: Cuando se quiere crear un usuario con oauth2, lanza una excepción porque password es requerido y oauth no lo provee
-
-const authService = new AuthService();
-
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -66,7 +62,7 @@ export const authOptions: NextAuthOptions = {
         type_account: token.type_account,
       });
 
-      authService.oauthUser({
+      AuthService.oauthUser({
         email: sessionAccessToken.user?.email ?? "",
         name: sessionAccessToken.user?.name ?? "",
         image: sessionAccessToken.user?.image ?? "",

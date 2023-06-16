@@ -3,11 +3,12 @@ import { signIn, signOut } from "next-auth/react";
 import { cookies as cookieStore } from "next/headers";
 import prisma from "#/prisma/client";
 import { User } from "@prisma/client";
-import { Session } from "next-auth";
+import { Session, getServerSession } from "next-auth";
 import { JWT, decode } from "next-auth/jwt";
 import jwt from "jsonwebtoken";
-import { ErrorFactory, UserService } from "@/services";
+import { ErrorFactory, UserService, PasswordService } from "@/services";
 import { UserCreateSchema } from "@/types";
+import { authOptions } from "@/utils/auth";
 
 export interface JWTDecodedType extends JWT {
   accessToken: string;
@@ -20,17 +21,17 @@ type SessionStorage = Session & {
   accessToken: unknown;
 };
 interface AuthServiceInterface {
-  user?: UserType;
+  user?: Omit<User, "id">;
   session?: SessionStorage;
-  oauthUser(body: {
-    email: string;
-    name: string;
-    image: string;
-  }): Promise<User>;
+  // oauthUser(body: {
+  //   email: string;
+  //   name: string;
+  //   image: string;
+  // }): Promise<User>;
   // decodedCookieData(): Promise<JWTDecodedType | null>;
   login(type_account: string, callbackUrl: string): Promise<void>;
   logout(): Promise<void>;
-  register(body: User): Promise<User>;
+  // register(user: User): Promise<User>;
   isValidToken(token: string): Promise<boolean>;
 }
 
@@ -40,7 +41,15 @@ interface AuthServiceInterface {
 class Auth implements AuthServiceInterface {
   constructor() {}
 
-  public static async decodedCookieData(): Promise<JWTDecodedType | null> {
+  static async getSession() {
+    const session = await getServerSession(authOptions);
+
+    if (!session) return null;
+
+    return session;
+  }
+
+  static async decodedCookieData(): Promise<JWTDecodedType | null> {
     const token = cookieStore().get("next-auth.session-token");
 
     if (!token) return null;
@@ -63,38 +72,27 @@ class Auth implements AuthServiceInterface {
     await signOut();
   }
 
-  async register(body: User) {
-    if (!body.email || !body.password || !body.name) {
-      ErrorFactory.createError("BodyNotProvided");
+  static async register(user: Omit<User, "id">) {
+    const userSchema = UserCreateSchema.safeParse(user);
+
+    if (!userSchema.success) {
+      return ErrorFactory.createError("BodyNotProvided");
     }
 
-    const userSchema = UserCreateSchema.parse(body);
-
-    if (!userSchema) {
-      ErrorFactory.createError("BodyNotProvided");
-    }
-
-    const user = await UserService.authenticatedUser();
-    if (user) {
-      ErrorFactory.createError("UserAlreadyExists");
-    }
-
-    const newUser: User = await prisma.user.create({
-      data: {
-        ...userSchema,
-        email: userSchema.email,
-        password: userSchema.password,
-        name: userSchema.name,
-        type_account: "CREDENTIALS",
-      },
+    const newUser: Omit<User, "id"> = await UserService.createUser({
+      ...userSchema.data,
+      password: userSchema.data.password,
+      email: userSchema.data.email,
+      type_account: "CREDENTIALS",
+      name: userSchema.data.name,
     });
 
     return newUser;
   }
 
-  async oauthUser(body: { email: string; name: string; image: string }) {
+  static async oauthUser(body: { email: string; name: string; image: string }) {
     if (!body.email || !body.name || !body.image) {
-      ErrorFactory.createError("BodyNotProvided");
+      return ErrorFactory.createError("BodyNotProvided");
     }
 
     const user = await UserService.authenticatedUser();

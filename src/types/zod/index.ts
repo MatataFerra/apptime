@@ -33,13 +33,13 @@ const UserModelSchema = z.object({
     required_error: "Id must be provided correctly",
   }),
   email: z.string().email(),
-  emailVerified: z.string().nullable(),
+  emailVerified: z.date().nullable(),
   image: z.string().nullable().default("https://i.imgur.com/6VBx3io.png"),
   name: z.string(),
   password: z.string(),
-  online: z.boolean(),
-  formCompleted: z.boolean(),
-  type_account: z.enum(["CREDENTIALS", "OAUTH"]),
+  online: z.boolean().default(false),
+  formCompleted: z.boolean().default(false),
+  type_account: z.enum(["CREDENTIALS", "OAUTH"]).default("CREDENTIALS"),
 });
 
 const UserUpdateSchema = UserModelSchema.partial().refine(
@@ -94,6 +94,8 @@ const HandleErrorTypeSchema = z.enum([
   "BodyNotProvided",
   "ProfileNotFound",
   "ProfileAlreadyExists",
+  "PasswordIsNotValid",
+  "DataProvidedIsNotValid",
   "CustomError",
 ]);
 

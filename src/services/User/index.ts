@@ -1,41 +1,43 @@
-import { UserType } from "@/types/services";
-import { Shift } from "@prisma/client";
-import ShiftService from "../Shift";
+import { User } from "@prisma/client";
 import prisma from "#/prisma/client";
-import { AuthService } from "@/services";
+import { AuthService, ErrorFactory } from "@/services";
 
 /**
  * @class UserService
  * @description This class is responsible for all the logic related to the User model
- * @method transformUser - Transforms the user object
  * @param {UserType} user - The user object.
  */
 
 class UserService {
-  user: UserType;
-  constructor(user: UserType) {
+  user: User;
+  constructor(user: User) {
     this.user = user;
   }
 
-  transformUser(user: UserType): UserType {
-    const amount: Shift[] = user.shifts.map((shift) => ({
-      ...shift,
-      amount: ShiftService.differenceBetweenStartAndEnd(shift),
-    }));
+  static async findUniqueUserByEmail(email: string): Promise<User | null> {
+    const user = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
 
-    const userTransformed: UserType = {
-      ...this.user,
-      shifts: amount,
-    };
-
-    return userTransformed;
+    return user;
   }
 
   static async authenticatedUser() {
     const token = await AuthService.decodedCookieData();
-    return await prisma.user.findUnique({
-      where: {
-        email: token?.email,
+    if (!token) return null;
+    return await this.findUniqueUserByEmail(token.email);
+  }
+
+  static async createUser(user: Omit<User, "id">) {
+    return await prisma.user.create({
+      data: {
+        ...user,
+        email: user.email,
+        password: user.password,
+        name: user.name,
+        type_account: user.type_account,
       },
     });
   }

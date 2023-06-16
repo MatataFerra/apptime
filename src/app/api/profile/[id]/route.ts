@@ -44,7 +44,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     if (error instanceof PrismaClientKnownRequestError) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("PrismaClientUpdateRecord"),
+          ...ErrorFactory.createError("PrismaClientUpdateRecord"),
           response: false,
         },
         { status: 404 }
@@ -52,7 +52,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     }
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("InternalServer"),
+        ...ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }

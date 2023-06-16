@@ -10,14 +10,10 @@ import {
   ProfileNotFound,
   QueryNotProvided,
   ShiftNotFound,
+  PasswordIsNotValid,
+  DataProvidedIsNotValid,
 } from "./errors";
 import { HandleErrorType } from "@/types";
-
-const USER_NOT_FOUND = {
-  message: "User not found",
-  cause: "The user does not exist in the database",
-  type_error: "UserNotFound",
-};
 
 export type Exception = {
   message: string;
@@ -27,24 +23,31 @@ export type Exception = {
 
 export interface ExceptionsInterface {
   exception: Exception;
-  stack?: string | undefined;
-  handleError(...args: any[]): Exception;
+  stack?: string;
+  zod?: {
+    error: string;
+    input: (string | number)[];
+  }[];
+  handleError(...args: unknown[]): Exception;
 }
 
 export class ErrorBoundary extends Error implements ExceptionsInterface {
-  constructor(message: string) {
-    super(message);
-    this.message = message;
-  }
-  get exception() {
-    return {
-      message: this.message,
-      type_error: "CustomError",
-    };
+  constructor() {
+    super("An error occurred");
   }
 
-  handleError() {
-    return this.exception;
+  exception: Exception = {
+    message: "An error occurred",
+    cause: "An Unhandled error occurred",
+    type_error: "CustomError",
+  };
+
+  handleError(error?: unknown) {
+    if (error instanceof Error) {
+      this.exception.cause = error.message;
+    }
+
+    return { ...this.exception, info: error };
   }
 }
 
@@ -100,15 +103,23 @@ class ErrorFactory implements ErrorFactoryInterface {
       return new ShiftNotFound().handleError();
     }
 
-    if (exception === "CustomError") {
-      return new ErrorBoundary(
-        options?.message || "Custom error"
-      ).handleError();
+    if (exception === "PasswordIsNotValid") {
+      return new PasswordIsNotValid().handleError(options?.error);
     }
 
-    return new ErrorBoundary(
+    if (exception === "DataProvidedIsNotValid") {
+      return new DataProvidedIsNotValid().handleError(options?.error);
+    }
+
+    if (exception === "CustomError") {
+      return new ErrorBoundary().handleError(
+        options?.message || "Custom error"
+      );
+    }
+
+    return new ErrorBoundary().handleError(
       `Error type '${exception}' not supported`
-    ).handleError();
+    );
 
     // throw new Error(`Error type '${exception}' not supported`);
   }

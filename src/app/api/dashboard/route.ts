@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   if (!userId) {
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("QueryNotProvided"),
+        ...ErrorFactory.createError("QueryNotProvided"),
         response: false,
       },
       { status: 404 }
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     if (!user) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("UserNotFound"),
+          ...ErrorFactory.createError("UserNotFound"),
           response: false,
         },
         { status: 404 }
@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("InternalServer"),
+        ...ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }

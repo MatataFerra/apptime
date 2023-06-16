@@ -1,5 +1,7 @@
 import prisma from "#/prisma/client";
-import { AuthService, UserService } from "@/services";
+import _ from "lodash";
+import bcrypt from "bcryptjs";
+import { UserService, ErrorFactory } from "@/services";
 
 /**
  * Password class
@@ -36,12 +38,68 @@ export default class Password {
     });
   }
 
-  isValid() {
-    return (
-      this._hasOneCapital() &&
-      this._hasOneNumber() &&
-      this._hasCorrectLenght() &&
-      this._hasOneSpecialCharacter()
-    );
+  isValid(): { valid: boolean; error?: string } {
+    if (!this._hasOneCapital()) {
+      return {
+        valid: false,
+        error: "Password must have at least one capital letter",
+      };
+    }
+    if (!this._hasOneNumber()) {
+      return {
+        valid: false,
+        error: "Password must have at least one number",
+      };
+    }
+
+    if (!this._hasCorrectLenght()) {
+      return {
+        valid: false,
+        error: "Password must have at least 8 characters",
+      };
+    }
+
+    if (!this._hasOneSpecialCharacter()) {
+      return {
+        valid: false,
+        error: "Password must have at least one special character",
+      };
+    }
+
+    return {
+      valid: true,
+    };
+  }
+
+  static validatePassword(password: string): {
+    valid: boolean;
+    error?: string;
+    password: string;
+  } {
+    const isValidPassword = new Password(password).isValid();
+    if (!isValidPassword.valid) {
+      return {
+        valid: false,
+        password,
+        error: isValidPassword.error,
+      };
+    }
+
+    return { ...isValidPassword, password };
+  }
+
+  static async hashPassword(password: string) {
+    return await bcrypt.hash(password, 10);
+  }
+
+  static async comparePassword(
+    password: string,
+    hash: string
+  ): Promise<boolean> {
+    return await bcrypt.compare(password, hash);
+  }
+
+  isSamePassword(password: string, confirmPassword: string): boolean {
+    return _.isEqual(password, confirmPassword);
   }
 }
