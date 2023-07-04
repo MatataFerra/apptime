@@ -18,7 +18,7 @@ import { HandleErrorType } from "@/types";
 export type Exception = {
   message: string;
   cause?: string;
-  type_error: string;
+  type_error: HandleErrorType;
 };
 
 export interface ExceptionsInterface {
@@ -56,6 +56,11 @@ interface ErrorFactoryInterface {
     exception: HandleErrorType,
     options?: { message?: string; error?: unknown }
   ): Exception;
+
+  findAndCreateError(
+    exception: HandleErrorType,
+    options?: { message?: string; error?: unknown }
+  ): ExceptionsInterface;
 }
 
 class ErrorFactory implements ErrorFactoryInterface {
@@ -122,6 +127,35 @@ class ErrorFactory implements ErrorFactoryInterface {
     );
 
     // throw new Error(`Error type '${exception}' not supported`);
+  }
+  findAndCreateError(
+    exception: HandleErrorType,
+    options?: { message?: string; error?: unknown }
+  ): ExceptionsInterface {
+    const errors = Array.from(
+      Object.values({
+        UserNotFound,
+        UserAlreadyExists,
+        BodyNotProvided,
+        InternalServer,
+        PrismaClientFields,
+        PrismaClientUpdateRecord,
+        ProfileAlreadyExists,
+        ProfileNotFound,
+        QueryNotProvided,
+        ShiftNotFound,
+        PasswordIsNotValid,
+        DataProvidedIsNotValid,
+      })
+    );
+
+    const error = errors.find((error) => error.name === exception);
+
+    if (error) {
+      return new error();
+    }
+
+    throw new Error(`Error type '${exception}' not supported`);
   }
 }
 
