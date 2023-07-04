@@ -2,10 +2,21 @@ import prisma from "#/prisma/client";
 import _ from "lodash";
 import bcrypt from "bcryptjs";
 import { UserService, ErrorFactory } from "@/services";
+import { PasswordAttemps } from "@prisma/client";
 
 /**
  * Password class
  * @param password - Password
+ * @description This class is responsible for all the logic related to the Password
+ * model
+ * @returns {Object} - Returns an object with the password and the methods
+ * isValid and maxAttemps
+ * @method isValid - Checks if the password is valid
+ * @returns {Object} { valid: Boolean, error: String } - Returns an object with the valid property and the error
+ * @method maxAttemps - Checks if the user has reached the maximum number of
+ * attempts
+ *
+ *
  */
 export default class Password {
   password: string;
@@ -31,11 +42,12 @@ export default class Password {
 
   async maxAttemps(max: number) {
     const user = await UserService.authenticatedUser();
-    const maxAttemps = await prisma.passwordAttemps.findFirst({
-      where: {
-        userId: user?.id,
-      },
-    });
+    const maxAttemps: PasswordAttemps | null =
+      await prisma.passwordAttemps.findFirst({
+        where: {
+          userId: user?.id,
+        },
+      });
   }
 
   isValid(): { valid: boolean; error?: string } {

@@ -4,9 +4,11 @@ import {
   PasswordService,
   UserService,
 } from "@/services";
+import _ from "lodash";
 import { UserCreateSchema } from "@/types";
 import { User } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { Exception } from "@/services/Error/factory";
 
 export async function POST(req: NextRequest) {
   const body: User = await req.json();
@@ -25,43 +27,9 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const user = await UserService.findUniqueUserByEmail(parsedBody.data.email);
-    if (user) {
-      return NextResponse.json(
-        {
-          ...ErrorFactory.createError("UserAlreadyExists"),
-          response: false,
-        },
-        { status: 400 }
-      );
-    }
-
-    const validatePassword = PasswordService.validatePassword(
-      parsedBody.data.password
-    );
-
-    if (!validatePassword.valid) {
-      return NextResponse.json(
-        {
-          ...ErrorFactory.createError("PasswordIsNotValid", {
-            error: validatePassword.error,
-          }),
-          response: false,
-        },
-        { status: 400 }
-      );
-    }
-
-    const hashPassword = await PasswordService.hashPassword(
-      validatePassword.password
-    );
-    const newUser = await AuthService.register({
+    const newUser = await new AuthService({
       ...parsedBody.data,
-      password: hashPassword,
-      email: parsedBody.data.email,
-      type_account: "CREDENTIALS",
-      name: parsedBody.data.name,
-    });
+    }).register();
 
     return NextResponse.json(
       {
@@ -71,7 +39,20 @@ export async function POST(req: NextRequest) {
       },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: unknown) {
+    if (_.has(error, "type_error")) {
+      const exception = _.cloneDeep(error) as Exception;
+      return NextResponse.json(
+        {
+          ...ErrorFactory.findAndCreateError(exception.type_error).handleError(
+            error
+          ),
+          response: false,
+        },
+        { status: 409 }
+      );
+    }
+
     return NextResponse.json(
       {
         ...ErrorFactory.createError("InternalServer", { error }),

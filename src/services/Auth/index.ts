@@ -21,17 +21,11 @@ type SessionStorage = Session & {
   accessToken: unknown;
 };
 interface AuthServiceInterface {
-  user?: Omit<User, "id">;
+  user: Omit<User, "id">;
   session?: SessionStorage;
-  // oauthUser(body: {
-  //   email: string;
-  //   name: string;
-  //   image: string;
-  // }): Promise<User>;
-  // decodedCookieData(): Promise<JWTDecodedType | null>;
   login(type_account: string, callbackUrl: string): Promise<void>;
   logout(): Promise<void>;
-  // register(user: User): Promise<User>;
+  register(user: Omit<User, "id">): Promise<User>;
   isValidToken(token: string): Promise<boolean>;
 }
 
@@ -39,7 +33,10 @@ interface AuthServiceInterface {
  * - [ ] Forgot Password
  */
 class Auth implements AuthServiceInterface {
-  constructor() {}
+  user: Omit<User, "id">;
+  constructor(user: Omit<User, "id">) {
+    this.user = user;
+  }
 
   static async getSession() {
     const session = await getServerSession(authOptions);
@@ -72,27 +69,49 @@ class Auth implements AuthServiceInterface {
     await signOut();
   }
 
-  static async register(user: Omit<User, "id">) {
-    const userSchema = UserCreateSchema.safeParse(user);
+  async register(): Promise<User> {
+    // check if user already exists
+    const user = await UserService.findUniqueUser({ email: this.user.email });
 
-    if (!userSchema.success) {
-      return ErrorFactory.createError("BodyNotProvided");
+    if (user) {
+      throw ErrorFactory.createError("UserAlreadyExists");
     }
 
-    const newUser: Omit<User, "id"> = await UserService.createUser({
-      ...userSchema.data,
-      password: userSchema.data.password,
-      email: userSchema.data.email,
+    if (!this.user.password) {
+      throw ErrorFactory.createError("PasswordIsNotValid", {
+        error: "Password doesn't provided",
+      });
+    }
+
+    // validate and hash password
+    const isValidPassword = PasswordService.validatePassword(
+      this.user.password
+    );
+
+    if (!isValidPassword.valid) {
+      throw ErrorFactory.createError("PasswordIsNotValid", {
+        error: isValidPassword.error,
+      });
+    }
+    const password = await PasswordService.hashPassword(
+      isValidPassword.password
+    );
+
+    // create user
+    const newUser = await new UserService({
+      ...this.user,
+      password,
+      email: this.user.email,
       type_account: "CREDENTIALS",
-      name: userSchema.data.name,
-    });
+      name: this.user.name,
+    }).createUser();
 
     return newUser;
   }
 
   static async oauthUser(body: { email: string; name: string; image: string }) {
     if (!body.email || !body.name || !body.image) {
-      return ErrorFactory.createError("BodyNotProvided");
+      throw ErrorFactory.createError("BodyNotProvided");
     }
 
     const user = await UserService.authenticatedUser();
