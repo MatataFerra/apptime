@@ -42,9 +42,27 @@ const UserModelSchema = z.object({
   type_account: z.enum(["CREDENTIALS", "OAUTH"]).default("CREDENTIALS"),
 });
 
-const UserUpdateSchema = UserModelSchema.partial().refine(
-  (values) => Object.keys(values).length > 0,
-  { message: "One of the fields must be defined" }
+/*
+  TODO tratar de ver que el schema valide bien el input,
+  TODO no se podría actualizar el email y el password en primera instancia
+*/
+
+const UserUpdateSchema = UserModelSchema.partial().superRefine(
+  (values, ctx) => {
+    if (Object.keys(values).length < 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "One field must be provided",
+      });
+    }
+
+    if (values.password || values.email) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Can't update those fields",
+      });
+    }
+  }
 );
 
 const UserCreateSchema = UserModelSchema.omit({
