@@ -1,5 +1,5 @@
 import { NextAuthOptions } from "next-auth";
-import { AuthService } from "@/services";
+import { AuthService, UserService } from "@/services";
 import _ from "lodash";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -24,10 +24,8 @@ export const authOptions: NextAuthOptions = {
 
         if (!credentials.password) return null;
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
+        const user = await UserService.findUniqueUser({
+          email: credentials.email,
         });
 
         if (
