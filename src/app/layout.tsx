@@ -1,9 +1,6 @@
 import React from "react";
 import "./globals.css";
-import { Inter } from "next/font/google";
 import { NextAuthProvider } from "@/providers";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Create Next App",
@@ -18,7 +15,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <NextAuthProvider>
-        <body className={inter.className}>{children}</body>
+        <body>{children}</body>
       </NextAuthProvider>
     </html>
   );

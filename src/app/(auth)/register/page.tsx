@@ -4,10 +4,11 @@ import { userMockedParsed } from "#/mocks";
 export default function Register() {
   async function onRegister(e: any) {
     e.preventDefault();
-    const res = await fetch("/api/user", {
+    const res = await fetch("/api/user/create", {
       body: JSON.stringify({
         ...userMockedParsed,
-        email: "tres@gmail.com",
+        password: "567",
+        email: "cinco@gmail.com",
       }),
       headers: {
         "Content-Type": "application/json",
