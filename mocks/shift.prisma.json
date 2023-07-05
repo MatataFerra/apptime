@@ -8,7 +8,7 @@
       "isHoliday": false,
       "notes": "Nota por defecto",
       "startDate": "2023-04-25T08:00:00.000Z",
-      "userId": 1
+      "userId": "1"
     },
     {
       "amount": 0,
@@ -18,7 +18,7 @@
       "isHoliday": false,
       "notes": "",
       "startDate": "2023-04-26T08:00:00.000Z",
-      "userId": 1
+      "userId": "1"
     }
   ],
   "shift": {
@@ -29,6 +29,6 @@
     "isHoliday": false,
     "notes": "",
     "startDate": "2023-04-26T08:00:00.000Z",
-    "userId": 2
+    "userId": "2"
   }
 }

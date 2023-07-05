@@ -1,6 +1,6 @@
 {
   "userOne": {
-    "id": 1,
+    "id": "1",
     "email": "usuario1@example.com",
     "emailVerified": null,
     "image": "https://firebasestorage.googleapis.com/v0/b/ionic-chat-7f0e9.appspot.com/o/images%2Fuser1.jpg?alt=media&token=8a5b9b9b-4b9a-4b9a-8b9a-8b9a8b9a8b9a",
@@ -11,7 +11,7 @@
     "formCompleted": false
   },
   "userTwo": {
-    "id": 2,
+    "id": "2",
     "email": "usuario2@hotmail.com",
     "emailVerified": null,
     "image": "https://firebasestorage.googleapis.com/v0/b/ionic-chat-7f0e9.appspot.com/o/images%2Fuser1.jpg?alt=media&token=8a5b9b9b-4b9a-4b9a-8b9a-8b9a8b9a8b9a",
