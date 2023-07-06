@@ -42,11 +42,6 @@ const UserModelSchema = z.object({
   type_account: z.enum(["CREDENTIALS", "OAUTH"]).default("CREDENTIALS"),
 });
 
-/*
-  TODO tratar de ver que el schema valide bien el input,
-  TODO no se podría actualizar el email y el password en primera instancia
-*/
-
 const UserUpdateSchema = UserModelSchema.partial().superRefine(
   (values, ctx) => {
     if (Object.keys(values).length < 0) {
