@@ -7,6 +7,7 @@ endpoint=$1
 user_id=''
 get_profile=false
 get_shift=false
+no_params_routes=("user" "session")
 shift
 
 if [ -z $endpoint ]; then
@@ -55,13 +56,19 @@ shift $((OPTIND - 1))
 
 url="http://localhost:3000/api/${endpoint}"
 
-if [[ "$endpoint" != "user" ]]; then
-  if [[ -z "$user_id" ]]; then
-    echo "=========================================="
-    echo "Please put the user ID with the -u option."
-    echo "Example: yarn curl shift -u 1"
-    exit 0
-  fi
+if [[ ! " ${no_params_routes[*]} " =~ " ${endpoint} " ]]; then
+  echo "=========================================="
+  echo "Please put the user ID with the -u option."
+  echo "Example: yarn curl shift -u 1"
+  exit 0
+fi
+
+if [[ "$endpoint" == "session" ]]; then
+  echo "=========================================="
+  echo "You try to get the session with this script."
+  echo "/$endpoint endpoint for the URL: $url is not working for now."
+  echo "please use the **Browser** NOT Postman or Insomnia."
+  exit 0
 fi
 
 if [[ -n "$user_id" ]]; then

@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   if (!userId) {
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("QueryNotProvided").exception,
+        ...ErrorFactory.createError("QueryNotProvided"),
         response: false,
       },
       { status: 400 }
@@ -22,14 +22,14 @@ export async function GET(req: NextRequest) {
   try {
     const profile = await prisma.profile.findUnique({
       where: {
-        userId: Number(userId),
+        userId,
       },
     });
 
     if (!profile) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("ProfileNotFound").exception,
+          ...ErrorFactory.createError("ProfileNotFound"),
           response: false,
         },
         { status: 404 }
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("InternalServer").exception,
+        ...ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }
@@ -62,10 +62,19 @@ export async function POST(req: NextRequest) {
   if (!parsedBody.success) {
     return NextResponse.json(
       {
-        error: parsedBody.error.issues.map((issue) => ({
-          error: issue.message,
-          input: issue.path,
-        })),
+        ...ErrorFactory.createError("DataProvidedIsNotValid", {
+          error: parsedBody.error,
+        }),
+        response: false,
+      },
+      { status: 400 }
+    );
+  }
+
+  if (!parsedBody.data.userId) {
+    return NextResponse.json(
+      {
+        ...ErrorFactory.createError("BodyNotProvided"),
         response: false,
       },
       { status: 400 }
@@ -78,14 +87,14 @@ export async function POST(req: NextRequest) {
         profile: true,
       },
       where: {
-        id: Number(parsedBody.data?.userId),
+        id: parsedBody.data?.userId,
       },
     });
 
     if (!user) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("UserNotFound").exception,
+          ...ErrorFactory.createError("UserNotFound"),
           response: false,
         },
         { status: 404 }
@@ -95,7 +104,7 @@ export async function POST(req: NextRequest) {
     if (user.profile) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("ProfileAlreadyExists").exception,
+          ...ErrorFactory.createError("ProfileAlreadyExists"),
           response: false,
         },
         { status: 400 }
@@ -133,7 +142,7 @@ export async function POST(req: NextRequest) {
     if (error instanceof PrismaClientValidationError) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("PrismaClientFields").exception,
+          ...ErrorFactory.createError("PrismaClientFields"),
           response: false,
         },
         { status: 400 }
@@ -142,7 +151,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("InternalServer").exception,
+        ...ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }

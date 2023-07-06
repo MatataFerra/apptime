@@ -10,7 +10,7 @@ const ShiftModelSchema = z.object({
   isHoliday: z.boolean(),
   notes: z.string().nullable(),
   startDate: z.string(),
-  userId: z.number().nullable(),
+  userId: z.string().nullable(),
 });
 
 const ProfileSchema = z.object({
@@ -25,24 +25,39 @@ const ProfileSchema = z.object({
   nightShift: z.boolean(),
   startHour: z.number(),
   unpaidBreaks: z.number(),
-  userId: z.number().optional(),
+  userId: z.string().nullable(),
 });
 
 const UserModelSchema = z.object({
-  id: z.number({
+  id: z.string({
     required_error: "Id must be provided correctly",
   }),
   email: z.string().email(),
-  lastname: z.string(),
+  emailVerified: z.date().nullable(),
+  image: z.string().nullable().default("https://i.imgur.com/6VBx3io.png"),
   name: z.string(),
   password: z.string(),
-  online: z.boolean(),
-  formCompleted: z.boolean(),
+  online: z.boolean().default(false),
+  formCompleted: z.boolean().default(false),
+  type_account: z.enum(["CREDENTIALS", "OAUTH"]).default("CREDENTIALS"),
 });
 
-const UserUpdateSchema = UserModelSchema.partial().refine(
-  (values) => Object.keys(values).length > 0,
-  { message: "One of the fields must be defined" }
+const UserUpdateSchema = UserModelSchema.partial().superRefine(
+  (values, ctx) => {
+    if (Object.keys(values).length < 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "One field must be provided",
+      });
+    }
+
+    if (values.password || values.email) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Can't update those fields",
+      });
+    }
+  }
 );
 
 const UserCreateSchema = UserModelSchema.omit({
@@ -78,6 +93,25 @@ const SearchParamsSchema = z.object({
   profile: z.string().nullable(),
 });
 
+/**
+ * @description Enum to handle errors
+ */
+const HandleErrorTypeSchema = z.enum([
+  "UserNotFound",
+  "UserAlreadyExists",
+  "ShiftNotFound",
+  "InternalServer",
+  "PrismaClientFields",
+  "PrismaClientUpdateRecord",
+  "QueryNotProvided",
+  "BodyNotProvided",
+  "ProfileNotFound",
+  "ProfileAlreadyExists",
+  "PasswordIsNotValid",
+  "DataProvidedIsNotValid",
+  "CustomError",
+]);
+
 export {
   ShiftModelSchema,
   ShiftUpdateSchema,
@@ -89,4 +123,5 @@ export {
   ProfileUpdateSchema,
   ProfileCreateSchema,
   SearchParamsSchema,
+  HandleErrorTypeSchema,
 };

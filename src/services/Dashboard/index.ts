@@ -1,4 +1,4 @@
-import { DashboardInterface, UserType } from "@/types/services";
+import { DashboardInterface, DashboardUserType } from "@/types/services";
 import _ from "lodash";
 import { ShiftService } from "@/services";
 import { isThisWeek, max } from "date-fns";
@@ -19,8 +19,8 @@ import { isThisWeek, max } from "date-fns";
 */
 
 class Dashboard implements DashboardInterface {
-  user: UserType;
-  constructor(user: UserType) {
+  user: DashboardUserType;
+  constructor(user: DashboardUserType) {
     this.user = user;
   }
 

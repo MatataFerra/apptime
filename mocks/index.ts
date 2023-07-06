@@ -1,7 +1,8 @@
 import userMock from "#/mocks/user.prisma.json";
 import profileMock from "#/mocks/profile.prisma.json";
 import { addDays, addMinutes, differenceInMinutes } from "date-fns";
-import { Shift } from "@prisma/client";
+import { Profile, Shift, User } from "@prisma/client";
+import { generateRandomID } from "@/utils/helpers";
 
 /**
  * Now date for testing the dashboard service
@@ -47,10 +48,16 @@ export const datesMock = [
   addDays(now, -8), // one day before one week before
 ];
 
+export const userMockedParsed: User = {
+  ...userMock.userOne,
+  type_account: "CREDENTIALS",
+  id: generateRandomID("uuid"),
+};
+
 export const userShiftsMocked: Shift[] = datesMock.map((date, i) => {
   return {
     id: i,
-    userId: userMock.userOne.id,
+    userId: userMockedParsed.id,
     startDate: date.toString(),
     endDate: addMinutes(date, 125 + i).toString(),
     amount: differenceInMinutes(addMinutes(date, 125 + i), date),
@@ -60,8 +67,13 @@ export const userShiftsMocked: Shift[] = datesMock.map((date, i) => {
   };
 });
 
+export const profileParsed: Profile = {
+  ...profileMock.profile,
+  userId: userMockedParsed.id,
+};
+
 export const userMocked = {
-  ...userMock.userOne,
+  ...userMockedParsed,
   shifts: userShiftsMocked,
-  profile: profileMock.profile,
+  profile: profileParsed,
 };

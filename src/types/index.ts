@@ -1,4 +1,5 @@
 export * from "@/types/zod";
+export * from "@/types/services";
 
 /* 
   Routes types

@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   if (!userId) {
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("QueryNotProvided").exception,
+        ...ErrorFactory.createError("QueryNotProvided"),
         response: false,
       },
       { status: 400 }
@@ -22,14 +22,14 @@ export async function GET(req: NextRequest) {
   try {
     const shift = await prisma.shift.findMany({
       where: {
-        userId: Number(userId),
+        userId: userId,
       },
     });
 
     if (shift.length === 0) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("ShiftNotFound").exception,
+          ...ErrorFactory.createError("ShiftNotFound"),
           response: false,
         },
         { status: 400 }
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("InternalServer").exception,
+        ...ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }
@@ -72,6 +72,16 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  if (!parsedBody.data.userId) {
+    return NextResponse.json(
+      {
+        ...ErrorFactory.createError("BodyNotProvided"),
+        response: false,
+      },
+      { status: 400 }
+    );
+  }
+
   const amount = ShiftService.differenceBetweenStartAndEnd(parsedBody.data);
   const status = ShiftService.shiftStatus(parsedBody.data);
 
@@ -80,7 +90,7 @@ export async function POST(req: NextRequest) {
       data: {
         User: {
           connect: {
-            id: Number(parsedBody.data?.userId),
+            id: parsedBody?.data?.userId,
           },
         },
 
@@ -105,7 +115,7 @@ export async function POST(req: NextRequest) {
     if (error instanceof PrismaClientValidationError) {
       return NextResponse.json(
         {
-          error: ErrorFactory.createError("PrismaClientFields").exception,
+          ...ErrorFactory.createError("PrismaClientFields"),
           response: false,
         },
         { status: 400 }
@@ -114,7 +124,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       {
-        error: ErrorFactory.createError("InternalServer").exception,
+        ...ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }
