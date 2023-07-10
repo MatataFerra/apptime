@@ -62,6 +62,32 @@ export class UserAlreadyExists extends Error implements ExceptionsInterface {
 }
 
 /**
+ * @class UserNotAllowed
+ * @description This class throw an error if user is not an Admin o Super User
+ * @default Error
+ * message: "You  are not authorized",
+  cause: "You have no valid credentials to enter",
+  type_error: "UserNotAllowed",
+ * @example
+ * import { ErrorFactory } from "@/services";
+ * if(user.role !== "ADMIN") return ErrorFactory.createError("UserNotAllowed");
+ */
+export class UserNotAllowed extends Error implements ExceptionsInterface {
+  constructor() {
+    super("You  are not authorized");
+  }
+  exception: Exception = {
+    message: "You  are not authorized",
+    cause: "You have no valid credentials to enter",
+    type_error: "UserNotAllowed",
+  };
+
+  handleError() {
+    return this.exception;
+  }
+}
+
+/**
  * @class InternalServer
  * @description This class is responsible for the logic related to the InternalServer error
  * Can parameterize the error message, recomended for try/catch blocks

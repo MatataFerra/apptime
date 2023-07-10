@@ -1,21 +1,10 @@
-import { UserType } from "@/types/services";
 import { signIn, signOut } from "next-auth/react";
-import { cookies as cookieStore } from "next/headers";
 import prisma from "#/prisma/client";
 import { User } from "@prisma/client";
 import { Session, getServerSession } from "next-auth";
-import { JWT, decode } from "next-auth/jwt";
 import jwt from "jsonwebtoken";
 import { ErrorFactory, UserService, PasswordService } from "@/services";
-import { UserCreateSchema } from "@/types";
 import { authOptions } from "@/utils/auth";
-
-export interface JWTDecodedType extends JWT {
-  accessToken: string;
-  email: string;
-  name: string;
-  image: string;
-}
 
 type SessionStorage = Session & {
   accessToken: unknown;
@@ -44,19 +33,6 @@ class Auth implements AuthServiceInterface {
     if (!session) return null;
 
     return session;
-  }
-
-  static async decodedCookieData(): Promise<JWTDecodedType | null> {
-    const token = cookieStore().get("next-auth.session-token");
-
-    if (!token) return null;
-
-    const result = (await decode({
-      token: token.value,
-      secret: process.env.NEXTAUTH_SECRET,
-    })) as JWTDecodedType;
-
-    return result;
   }
 
   async login(type_account: string, callbackUrl: string = "/") {

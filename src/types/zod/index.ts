@@ -99,6 +99,7 @@ const SearchParamsSchema = z.object({
 const HandleErrorTypeSchema = z.enum([
   "UserNotFound",
   "UserAlreadyExists",
+  "UserNotAllowed",
   "ShiftNotFound",
   "InternalServer",
   "PrismaClientFields",

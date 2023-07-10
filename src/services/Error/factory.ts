@@ -2,6 +2,7 @@ import _ from "lodash";
 import {
   UserNotFound,
   UserAlreadyExists,
+  UserNotAllowed,
   BodyNotProvided,
   InternalServer,
   PrismaClientFields,
@@ -74,6 +75,10 @@ class ErrorFactory implements ErrorFactoryInterface {
 
     if (exception === "UserAlreadyExists") {
       return new UserAlreadyExists().handleError();
+    }
+
+    if (exception === "UserNotAllowed") {
+      return new UserNotAllowed().handleError();
     }
 
     if (exception === "BodyNotProvided") {

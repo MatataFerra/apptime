@@ -14,3 +14,9 @@ export const QUERY_PARAMS = {
 export const now = _.now();
 
 export const SALT = 10;
+
+export const USER_ROLES = {
+  ADMIN: "ADMIN",
+  USER: "USER",
+  SUPER_USER: "SUPER_USER",
+};

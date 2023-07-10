@@ -1,4 +1,5 @@
 import { Profile, Shift, User } from "@prisma/client";
+import { JWT } from "next-auth/jwt";
 import { z } from "zod";
 import { HandleErrorTypeSchema } from "../zod";
 
@@ -36,4 +37,12 @@ export interface DashboardInterface {
     lastDayRegistered: string;
     getPaidInWeek: number;
   };
+}
+
+export interface JWTDecodedType extends JWT {
+  accessToken: string;
+  email: string;
+  name: string;
+  image: string;
+  role: "USER" | "ADMIN" | "SUPER_USER";
 }
