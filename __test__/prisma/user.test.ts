@@ -32,10 +32,12 @@ const expectedUser = {
   formCompleted: expect.any(Boolean),
   online: expect.any(Boolean),
   password: expect.any(String),
+  emailVerified: expect.any(Date),
+  role: expect.any(String),
 
   profile: expect.objectContaining({
     id: expect.any(Number),
-    userId: expect.any(Number),
+    userId: expect.any(String),
     endHour: expect.any(Number),
     extraNightShiftPay: expect.any(Number),
     holidayPay: expect.any(Boolean),
@@ -55,7 +57,7 @@ const expectedUser = {
       isHoliday: expect.any(Boolean),
       notes: expect.any(String),
       startDate: expect.any(String),
-      userId: expect.any(Number),
+      userId: expect.any(String),
     },
   ]),
 };

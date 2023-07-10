@@ -45,6 +45,7 @@ function addUsersMocked(): Omit<User, "id">[] {
       online: false,
       password: hashSync(`secreto${i}`, 10),
       type_account: "CREDENTIALS",
+      role: i === 4 ? "ADMIN" : "USER",
     };
   });
 }
@@ -114,9 +115,7 @@ async function main() {
     },
   });
 
-  const emails = await (
-    await prisma.user.findMany({})
-  ).map((user) => user.email);
+  const emails = (await prisma.user.findMany({})).map((user) => user.email);
   console.log("users with these emails have been created ", emails);
 }
 

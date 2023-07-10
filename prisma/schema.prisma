@@ -30,6 +30,7 @@ model User {
   name            String
   password        String?
   type_account    Type             @default(CREDENTIALS)
+  role            Role             @default(USER)
   online          Boolean          @default(false)
   formCompleted   Boolean          @default(false)
   shifts          Shift[]
@@ -62,4 +63,10 @@ model PasswordAttemps {
 enum Type {
   OAUTH
   CREDENTIALS
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPER_USER
 }

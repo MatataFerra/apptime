@@ -50,7 +50,9 @@ export const datesMock = [
 
 export const userMockedParsed: User = {
   ...userMock.userOne,
+  emailVerified: new Date(userMock.userOne.emailVerified),
   type_account: "CREDENTIALS",
+  role: "USER",
   id: generateRandomID("uuid"),
 };
 
