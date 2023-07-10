@@ -25,6 +25,12 @@ export default async function Home() {
           >
             <p>Protected</p>
           </Link>
+          <Link
+            href="/admin"
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+          >
+            <p>Admin</p>
+          </Link>
         </div>
         <div>
           <h1>Server Session</h1>
