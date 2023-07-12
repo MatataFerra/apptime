@@ -1,10 +1,11 @@
 import { User } from "@prisma/client";
 import prisma from "#/prisma/client";
-import { AuthService, ErrorFactory } from "@/services";
+import { TokenService } from "@/services";
+import { USER_ROLES } from "@/utils/constants";
 
 type FindUniqueUserType = {
-  id?: string;
-  email?: string;
+  id?: string | null;
+  email?: string | null;
 };
 
 /**
@@ -36,9 +37,14 @@ class UserService {
   }
 
   static async authenticatedUser() {
-    const token = await AuthService.decodedCookieData();
+    const cookie = TokenService.getCookie();
+    const token = await new TokenService(cookie).decodedCookieData();
+
     if (!token) return null;
-    return await this.findUniqueUser({ email: token.email });
+
+    const user = await UserService.findUniqueUser({ email: token.email });
+
+    return user;
   }
 
   async createUser() {
@@ -51,6 +57,10 @@ class UserService {
         type_account: this.user.type_account,
       },
     });
+  }
+
+  isAdmin(): boolean {
+    return this.user.role === USER_ROLES.ADMIN;
   }
 }
 

@@ -1,13 +1,29 @@
-import { authOptions } from "@/utils/auth";
-import { getServerSession } from "next-auth";
+import { ErrorFactory, UserService } from "@/services";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  const session = await getServerSession(authOptions);
+  const user = await UserService.authenticatedUser();
+
+  if (!user) {
+    return NextResponse.json(
+      {
+        ...ErrorFactory.createError("UserNotFound"),
+      },
+      {
+        status: 401,
+      }
+    );
+  }
+
+  const isAdmin = new UserService(user).isAdmin();
+
+  if (!isAdmin) {
+    return NextResponse.json({
+      message: "UserNotAllowed",
+    });
+  }
 
   return NextResponse.json({
-    authenticated: !!session,
-    session,
-    message: "This is a public route, no authentication required.",
+    isAdmin,
   });
 }

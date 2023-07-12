@@ -53,7 +53,7 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 
   callbacks: {
-    async session({ session, token }) {
+    async session({ session, token, user }) {
       const sessionDeepClone = _.cloneDeep(session);
       const sessionAccessToken = _.assign(sessionDeepClone, {
         accessToken: token.accessToken,
@@ -70,8 +70,12 @@ export const authOptions: NextAuthOptions = {
     },
     async jwt({ token, account }) {
       if (account) {
+        const userFounded = await UserService.findUniqueUser({
+          email: token.email,
+        });
         token.accessToken = account.access_token;
         token.type_account = account.provider;
+        token.role = userFounded?.role ?? "NOT_FOUND";
       }
       const tokenClone = _.cloneDeep(token);
 
