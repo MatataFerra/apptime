@@ -81,9 +81,10 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-
-  const amount = ShiftService.differenceBetweenStartAndEnd(parsedBody.data);
-  const status = ShiftService.shiftStatus(parsedBody.data);
+  const shiftTransform = new ShiftService(parsedBody.data)
+    .differenceInMinsBetweenStartAndEnd()
+    .updateStatus()
+    .build();
 
   try {
     const shift = await prisma.shift.create({
@@ -94,12 +95,12 @@ export async function POST(req: NextRequest) {
           },
         },
 
-        startDate: parsedBody.data.startDate,
-        endDate: parsedBody.data.endDate,
-        amount,
-        isClosed: status,
-        isHoliday: parsedBody.data.isHoliday,
-        notes: parsedBody.data.notes,
+        startDate: shiftTransform.startDate,
+        endDate: shiftTransform.endDate,
+        amount: shiftTransform.amount,
+        isClosed: shiftTransform.isClosed,
+        isHoliday: shiftTransform.isHoliday,
+        notes: shiftTransform.notes,
       },
     });
 
