@@ -8,6 +8,7 @@ const ShiftModelSchema = z.object({
   endDate: z.string().nullable(),
   isClosed: z.boolean(),
   isHoliday: z.boolean(),
+  holidayWorked: z.boolean(),
   notes: z.string().nullable(),
   startDate: z.string(),
   userId: z.string().nullable(),
@@ -40,6 +41,7 @@ const UserModelSchema = z.object({
   online: z.boolean().default(false),
   formCompleted: z.boolean().default(false),
   type_account: z.enum(["CREDENTIALS", "OAUTH"]).default("CREDENTIALS"),
+  role: z.enum(["USER", "ADMIN", "SUPER_USER"]).default("USER"),
 });
 
 const UserUpdateSchema = UserModelSchema.partial().superRefine(
