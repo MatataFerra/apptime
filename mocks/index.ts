@@ -65,6 +65,7 @@ export const userShiftsMocked: Shift[] = datesMock.map((date, i) => {
     amount: differenceInMinutes(addMinutes(date, 125 + i), date),
     isClosed: true,
     isHoliday: false,
+    holidayWorked: false,
     notes: "mocked shift",
   };
 });

@@ -1,36 +1,86 @@
-import { Shift } from "@prisma/client";
-import { differenceInMinutes, minutesToHours } from "date-fns";
+import { Profile, Shift } from "@prisma/client";
+import { differenceInMinutes } from "date-fns";
+import _ from "lodash";
+import ProfileService from "../Profile";
 
-type TypeShiftService = Omit<Shift, "id">;
+type ShiftServiceType = Omit<Shift, "id">;
+
+interface ShiftServiceInterface {
+  shift: ShiftServiceType;
+  differenceInMinsBetweenStartAndEnd: () => void;
+  updateStatus: () => void;
+}
 
 /**
  * @class ShiftService
  * @description This class is responsible for all the logic related to the Shift model
- * @method differenceBetweenStartAndEnd - Calculates the difference between the start and end of a shift
+ * this class is based on Builder pattern
+ * @method differenceInMinsBetweenStartAndEnd - Calculates the difference between the start and end of a shift
  * @method convertAmountInDecimal - Converts the amount of minutes in decimal
+ * @param {ShiftServiceType["amount"]} amount - The amount of minutes.
+ * @method shiftStatus - Checks if the shift is closed
+ * @method checkPublicHoliday - Checks if the shift is a public holiday
+ * @method create - Creates a new shift and executes all the methods above
+ * @method build - Returns the shift
  */
-class ShiftService {
-  /**
-   * @description Calculates the difference between the start and end of a shift
-   * @param shift
-   * @returns {number}
-   */
-  static differenceBetweenStartAndEnd(shift: TypeShiftService): number {
-    const start = new Date(shift.startDate);
-    const end = new Date(shift?.endDate ?? "");
-    const difference = differenceInMinutes(end, start);
-
-    return difference;
+class ShiftService implements ShiftServiceInterface {
+  shift: ShiftServiceType;
+  constructor(shift: ShiftServiceType) {
+    this.shift = shift;
   }
 
-  static convertAmountInDecimal(amount: TypeShiftService["amount"]): number {
+  differenceInMinsBetweenStartAndEnd() {
+    const start = new Date(this.shift.startDate);
+
+    if (!this.shift?.endDate) {
+      this.shift.amount = 0;
+      return this;
+    }
+
+    const end = new Date(this.shift.endDate);
+    const difference = differenceInMinutes(end, start);
+
+    this.shift.amount = difference;
+
+    return this;
+  }
+
+  static convertAmountInDecimal(amount: ShiftServiceType["amount"]): number {
     const validAmount = amount ?? 0;
     return Math.round((validAmount / 60) * 100) / 100;
   }
 
-  static shiftStatus(shift: TypeShiftService): boolean {
-    if (!shift.endDate) return false;
-    return shift.isClosed;
+  updateStatus() {
+    if (!this.shift.endDate) {
+      this.shift.isClosed = false;
+
+      return this;
+    }
+
+    this.shift.isClosed = true;
+    return this;
+  }
+
+  checkPublicHoliday() {
+    if (this.shift.holidayWorked) {
+      this.shift.isHoliday = true;
+
+      return this;
+    }
+
+    return this;
+  }
+
+  create() {
+    this.differenceInMinsBetweenStartAndEnd();
+    this.updateStatus();
+    this.checkPublicHoliday();
+
+    return this.shift;
+  }
+
+  build() {
+    return this.shift;
   }
 }
 

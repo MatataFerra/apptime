@@ -5,3 +5,5 @@ export { default as ErrorFactory } from "./Error/factory";
 export { default as AuthService } from "./Auth";
 export { default as PasswordService } from "./Auth/password";
 export { default as TokenService } from "./Token";
+export { default as ProfileService } from "./Profile";
+export { default as PayService } from "./Pay";

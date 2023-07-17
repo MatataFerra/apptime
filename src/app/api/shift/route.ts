@@ -62,10 +62,9 @@ export async function POST(req: NextRequest) {
   if (!parsedBody.success) {
     return NextResponse.json(
       {
-        error: parsedBody.error.issues.map((issue) => ({
-          error: issue.message,
-          input: issue.path,
-        })),
+        ...ErrorFactory.createError("DataProvidedIsNotValid", {
+          error: parsedBody.error,
+        }),
         response: false,
       },
       { status: 400 }
@@ -81,9 +80,7 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-
-  const amount = ShiftService.differenceBetweenStartAndEnd(parsedBody.data);
-  const status = ShiftService.shiftStatus(parsedBody.data);
+  const shiftTransform = new ShiftService(parsedBody.data).create();
 
   try {
     const shift = await prisma.shift.create({
@@ -93,13 +90,13 @@ export async function POST(req: NextRequest) {
             id: parsedBody?.data?.userId,
           },
         },
-
-        startDate: parsedBody.data.startDate,
-        endDate: parsedBody.data.endDate,
-        amount,
-        isClosed: status,
-        isHoliday: parsedBody.data.isHoliday,
-        notes: parsedBody.data.notes,
+        startDate: shiftTransform.startDate,
+        endDate: shiftTransform.endDate,
+        amount: shiftTransform.amount,
+        isClosed: shiftTransform.isClosed,
+        isHoliday: shiftTransform.isHoliday,
+        notes: shiftTransform.notes,
+        holidayWorked: shiftTransform.holidayWorked,
       },
     });
 

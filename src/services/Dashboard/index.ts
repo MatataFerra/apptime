@@ -1,6 +1,6 @@
 import { DashboardInterface, DashboardUserType } from "@/types/services";
 import _ from "lodash";
-import { ShiftService } from "@/services";
+import ShiftService from "@/services/Shift";
 import { isThisWeek, max } from "date-fns";
 
 /**

@@ -55,6 +55,7 @@ const expectedUser = {
       endDate: expect.any(String),
       isClosed: expect.any(Boolean),
       isHoliday: expect.any(Boolean),
+      holidayWorked: expect.any(Boolean),
       notes: expect.any(String),
       startDate: expect.any(String),
       userId: expect.any(String),
