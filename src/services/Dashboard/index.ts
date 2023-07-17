@@ -60,7 +60,7 @@ class Dashboard implements DashboardInterface {
     ).toString();
   }
 
-  getPaidInWeek() {
+  estimatedWeeklyEarnings() {
     return this.user.shifts.reduce((acc, shift) => {
       const amount = shift.amount ?? 0;
 
@@ -81,7 +81,7 @@ class Dashboard implements DashboardInterface {
       ),
       hourValue: this.hourValue,
       lastDayRegistered: this.lastDayRegistered,
-      getPaidInWeek: this.getPaidInWeek(),
+      estimatedWeeklyEarnings: this.estimatedWeeklyEarnings(),
     };
   }
 }

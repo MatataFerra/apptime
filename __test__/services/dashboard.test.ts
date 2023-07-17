@@ -33,7 +33,7 @@ describe("Dashboard Service", () => {
       return acc;
     }, 0);
 
-    expect(dashboard.getPaidInWeek()).toBe(expectedPaid);
+    expect(dashboard.estimatedWeeklyEarnings()).toBe(expectedPaid);
   });
 
   test("Should return the amount of hours worked", () => {
