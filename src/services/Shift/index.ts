@@ -9,18 +9,19 @@ interface ShiftServiceInterface {
   shift: ShiftServiceType;
   differenceInMinsBetweenStartAndEnd: () => void;
   updateStatus: () => void;
-  publicHolidayPay: (profile: Profile) => number;
 }
 
 /**
  * @class ShiftService
  * @description This class is responsible for all the logic related to the Shift model
- * @method differenceBetweenStartAndEnd - Calculates the difference between the start and end of a shift
- * @param {ShiftServiceType} shift - The shift object.
+ * this class is based on Builder pattern
+ * @method differenceInMinsBetweenStartAndEnd - Calculates the difference between the start and end of a shift
  * @method convertAmountInDecimal - Converts the amount of minutes in decimal
  * @param {ShiftServiceType["amount"]} amount - The amount of minutes.
  * @method shiftStatus - Checks if the shift is closed
- * @param {ShiftServiceType} shift - The shift object.
+ * @method checkPublicHoliday - Checks if the shift is a public holiday
+ * @method create - Creates a new shift and executes all the methods above
+ * @method build - Returns the shift
  */
 class ShiftService implements ShiftServiceInterface {
   shift: ShiftServiceType;
@@ -30,7 +31,13 @@ class ShiftService implements ShiftServiceInterface {
 
   differenceInMinsBetweenStartAndEnd() {
     const start = new Date(this.shift.startDate);
-    const end = new Date(this.shift?.endDate ?? "");
+
+    if (!this.shift?.endDate) {
+      this.shift.amount = 0;
+      return this;
+    }
+
+    const end = new Date(this.shift.endDate);
     const difference = differenceInMinutes(end, start);
 
     this.shift.amount = difference;
@@ -54,18 +61,22 @@ class ShiftService implements ShiftServiceInterface {
     return this;
   }
 
-  publicHolidayPay(profile: Profile) {
-    const amount = this.shift.amount ?? 0;
-    let rate: number = 1;
-    const hourlyRate = ProfileService.convertHourlyRateInMinuteRate(
-      profile.hourlyRate
-    );
+  checkPublicHoliday() {
+    if (this.shift.holidayWorked) {
+      this.shift.isHoliday = true;
 
-    if (this.shift.holidayWorked) rate = profile.holidayPayRate ?? 1;
+      return this;
+    }
 
-    const holidayPay = amount * hourlyRate * rate;
+    return this;
+  }
 
-    return holidayPay;
+  create() {
+    this.differenceInMinsBetweenStartAndEnd();
+    this.updateStatus();
+    this.checkPublicHoliday();
+
+    return this.shift;
   }
 
   build() {
