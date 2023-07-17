@@ -4,6 +4,7 @@ import profileMock from "#/mocks/profile.prisma.json";
 import { Shift } from "@prisma/client";
 import { now } from "@/utils/constants";
 import { addMinutes } from "date-fns";
+import PayService from "@/services/Pay";
 
 const DIFFERENCE_SHIFT = 480;
 const start = new Date(now).toString();
@@ -46,11 +47,13 @@ describe("ShiftService", () => {
 
     const shift = new ShiftService(mock)
       .differenceInMinsBetweenStartAndEnd()
+      .checkPublicHoliday()
       .build();
 
-    const publicHoliday = new ShiftService(shift).publicHolidayPay(
-      profileMock.profile
-    );
+    const publicHoliday = PayService.publicHolidayPay({
+      profile: profileMock.profile,
+      shift,
+    });
 
     expect(publicHoliday).toBe(84);
   });
@@ -76,14 +79,26 @@ describe("ShiftService", () => {
       Total: 0.175 * 480 = 84 -> 84 * 1.5 = 126
     */
 
-    const shift = new ShiftService(mock)
-      .differenceInMinsBetweenStartAndEnd()
-      .build();
+    const shift = new ShiftService(mock).create();
 
-    const publicHoliday = new ShiftService(shift).publicHolidayPay(
-      profileMock.profile
-    );
+    const publicHoliday = PayService.publicHolidayPay({
+      profile: profileMock.profile,
+      shift,
+    });
 
     expect(publicHoliday).toBe(126);
+  });
+
+  test("Should change the status of the shift to closed", () => {
+    const mock: Shift = {
+      ...shiftMock.shift,
+      startDate: start,
+      endDate: end,
+      isClosed: false,
+    };
+
+    const shift = new ShiftService(mock).updateStatus().build();
+
+    expect(shift.isClosed).toBe(true);
   });
 });
