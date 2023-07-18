@@ -26,8 +26,8 @@
     "endDate": "2023-04-26T17:00:00.000Z",
     "id": 3,
     "isClosed": false,
-    "isHoliday": false,
-    "holidayWorked": false,
+    "isPublicHoliday": false,
+    "publicHolidayWorked": false,
     "notes": "",
     "startDate": "2023-04-26T08:00:00.000Z",
     "userId": "2"

@@ -61,8 +61,8 @@ class ShiftService implements ShiftServiceInterface {
   }
 
   checkPublicHoliday() {
-    if (this.shift.holidayWorked) {
-      this.shift.isHoliday = true;
+    if (this.shift.publicHolidayWorked) {
+      this.shift.isPublicHoliday = true;
 
       return this;
     }

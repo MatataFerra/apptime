@@ -34,6 +34,7 @@ const expectedUser = {
   password: expect.any(String),
   emailVerified: expect.any(Date),
   role: expect.any(String),
+  isActive: expect.any(Boolean),
 
   profile: expect.objectContaining({
     id: expect.any(Number),
@@ -54,8 +55,8 @@ const expectedUser = {
       amount: expect.any(Number),
       endDate: expect.any(String),
       isClosed: expect.any(Boolean),
-      isHoliday: expect.any(Boolean),
-      holidayWorked: expect.any(Boolean),
+      isPublicHoliday: expect.any(Boolean),
+      publicHolidayWorked: expect.any(Boolean),
       notes: expect.any(String),
       startDate: expect.any(String),
       userId: expect.any(String),

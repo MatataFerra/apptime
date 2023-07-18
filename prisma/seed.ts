@@ -26,8 +26,8 @@ function addShiftsForSeed(user: User): Shift[] {
       endDate: addMinutes(date, 125 + i).toString(),
       amount: differenceInMinutes(addMinutes(date, 125 + i), date),
       isClosed: true,
-      isHoliday: false,
-      holidayWorked: false,
+      isPublicHoliday: false,
+      publicHolidayWorked: false,
       notes: "mocked shift",
     };
   });
@@ -47,6 +47,7 @@ function addUsersMocked(): Omit<User, "id">[] {
       password: hashSync(`secreto${i}`, 10),
       type_account: "CREDENTIALS",
       role: i === 4 ? "ADMIN" : "USER",
+      isActive: true,
     };
   });
 }

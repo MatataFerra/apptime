@@ -94,9 +94,9 @@ export async function POST(req: NextRequest) {
         endDate: shiftTransform.endDate,
         amount: shiftTransform.amount,
         isClosed: shiftTransform.isClosed,
-        isHoliday: shiftTransform.isHoliday,
+        isPublicHoliday: shiftTransform.isPublicHoliday,
         notes: shiftTransform.notes,
-        holidayWorked: shiftTransform.holidayWorked,
+        publicHolidayWorked: shiftTransform.publicHolidayWorked,
       },
     });
 

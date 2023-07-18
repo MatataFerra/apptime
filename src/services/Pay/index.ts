@@ -22,7 +22,7 @@ class PayService {
       profile.hourlyRate
     );
 
-    if (shift.holidayWorked) rate = profile.holidayPayRate ?? 1;
+    if (shift.publicHolidayWorked) rate = profile.holidayPayRate ?? 1;
 
     const holidayPay = amount * hourlyRate * rate;
 
@@ -55,7 +55,7 @@ class PayService {
     const allShiftsPay = shifts.reduce((acc, curr) => {
       if (!curr.isClosed) return 0;
 
-      if (curr.isHoliday) {
+      if (curr.isPublicHoliday) {
         const publicHolidayPay = PayService.publicHolidayPay({
           profile: user.profile as Profile,
           shift: curr,

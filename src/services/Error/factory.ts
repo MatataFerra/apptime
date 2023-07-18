@@ -39,7 +39,7 @@ export class ErrorBoundary extends Error implements ExceptionsInterface {
 
   exception: Exception = {
     message: "An error occurred",
-    cause: "An Unhandled error occurred",
+    cause: "Please review the info message for further details",
     type_error: "CustomError",
   };
 
@@ -123,7 +123,7 @@ class ErrorFactory implements ErrorFactoryInterface {
 
     if (exception === "CustomError") {
       return new ErrorBoundary().handleError(
-        options?.message || "Custom error"
+        options?.message || options?.error || "Custom error"
       );
     }
 
