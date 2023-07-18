@@ -60,7 +60,9 @@ class Dashboard implements DashboardInterface {
     ).toString();
   }
 
-  getPaidInWeek() {
+  // We can refactor this function using the Pay Service, also we can migrate this
+  // functionality to Pay Service and create a better abastraction
+  estimatedWeeklyEarnings() {
     return this.user.shifts.reduce((acc, shift) => {
       const amount = shift.amount ?? 0;
 
@@ -81,7 +83,7 @@ class Dashboard implements DashboardInterface {
       ),
       hourValue: this.hourValue,
       lastDayRegistered: this.lastDayRegistered,
-      getPaidInWeek: this.getPaidInWeek(),
+      estimatedWeeklyEarnings: this.estimatedWeeklyEarnings(),
     };
   }
 }

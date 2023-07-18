@@ -28,14 +28,14 @@ export interface DashboardInterface {
   get averageHoursWorkedPerDay(): number;
   get hourValue(): number;
   get lastDayRegistered(): string;
-  getPaidInWeek(): number;
+  estimatedWeeklyEarnings(): number;
   dashboardData(): {
     shiftsLen: number;
     hoursWorked: number;
     averageHoursWorkedPerDay: number;
     hourValue: number;
     lastDayRegistered: string;
-    getPaidInWeek: number;
+    estimatedWeeklyEarnings: number;
   };
 }
 

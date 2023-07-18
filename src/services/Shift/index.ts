@@ -1,7 +1,6 @@
-import { Profile, Shift } from "@prisma/client";
+import { Shift } from "@prisma/client";
 import { differenceInMinutes } from "date-fns";
 import _ from "lodash";
-import ProfileService from "../Profile";
 
 type ShiftServiceType = Omit<Shift, "id">;
 
