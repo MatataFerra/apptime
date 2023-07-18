@@ -30,7 +30,7 @@ describe("ShiftService", () => {
       ...shiftMock.shift,
       startDate: start,
       endDate: end,
-      isHoliday: true,
+      isPublicHoliday: true,
     };
 
     /* 
@@ -63,8 +63,8 @@ describe("ShiftService", () => {
       ...shiftMock.shift,
       startDate: start,
       endDate: end,
-      isHoliday: true,
-      holidayWorked: true,
+      isPublicHoliday: true,
+      publicHolidayWorked: true,
     };
 
     /* 

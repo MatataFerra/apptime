@@ -69,3 +69,51 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     );
   }
 }
+
+export async function DELETE(req: NextRequest, { params }: RouteParams) {
+  try {
+    const deletedShift = await prisma.shift.delete({
+      where: {
+        id: Number(params.id),
+      },
+    });
+
+    if (!deletedShift) {
+      return NextResponse.json(
+        {
+          ...ErrorFactory.createError("ShiftNotFound"),
+          response: false,
+        },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      {
+        message: "success",
+        response: true,
+        shift: deletedShift,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      return NextResponse.json(
+        {
+          ...ErrorFactory.createError("CustomError", {
+            error: error.meta,
+          }),
+          response: false,
+        },
+        { status: 408 }
+      );
+    }
+    return NextResponse.json(
+      {
+        ...ErrorFactory.createError("InternalServer"),
+        response: false,
+      },
+      { status: 500 }
+    );
+  }
+}

@@ -34,6 +34,7 @@ model User {
   role            Role             @default(USER)
   online          Boolean          @default(false)
   formCompleted   Boolean          @default(false)
+  isActive        Boolean          @default(true)
   shifts          Shift[]
   profile         Profile?
   passwordAttemps PasswordAttemps?
