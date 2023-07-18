@@ -66,16 +66,4 @@ describe("Dashboard Service", () => {
 
     expect(dashboard.lastDayRegistered).toBe(expectedLastDayRegistered);
   });
-
-  // test("The amount must be a decimal number", () => {
-  //   const userService = new UserService(userMocked);
-  //   const user = userService.transformUser(userMocked);
-  //   const shiftMock = userShiftsMocked[0].amount!; // must be 125 minutes (2 hours and 5 minutes) difference
-  //   const expectedDecimal = Math.round((shiftMock / 60) * 100) / 100;
-  //   const userAmountDecimal = ShiftService.convertAmountInDecimal(
-  //     user.shifts[0].amount!
-  //   );
-
-  //   expect(userAmountDecimal).toBe(expectedDecimal);
-  // });
 });
