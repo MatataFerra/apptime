@@ -1,3 +1,5 @@
+import { HTMLAttributes } from "react";
+
 export * from "@/types/zod";
 export * from "@/types/services";
 
@@ -10,3 +12,9 @@ export type RouteParams = {
     id: string;
   };
 };
+
+/*
+  ClassNames Tailwind Types
+*/
+
+export type CSSClassNames = HTMLAttributes<HTMLElement>["className"];
