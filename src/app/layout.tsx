@@ -27,7 +27,11 @@ export default async function RootLayout({
     <>
       <html lang="en" className={cm(poppinsFont.className, "bg-white")}>
         <body
-          className={cm(isMobile ? "" : "h-screen grid grid-rows-[auto,1fr]")}
+          className={cm(
+            isMobile
+              ? ""
+              : "h-screen grid grid-rows-[auto,1fr] relative overflow-hidden"
+          )}
         >
           <NextAuthProvider>{children}</NextAuthProvider>
         </body>
