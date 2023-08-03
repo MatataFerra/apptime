@@ -1,6 +1,6 @@
-import _ from "lodash";
+export * from "./tailwind";
 
-/** 
+/* 
   @summary Contants for Routes
   @description This constants are used to handle routes
 */
@@ -11,7 +11,7 @@ export const QUERY_PARAMS = {
   SHIFTS: "shifts",
 };
 
-export const now = _.now();
+export const now = Date.now();
 
 export const SALT = 10;
 
