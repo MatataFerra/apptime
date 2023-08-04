@@ -1,13 +1,12 @@
 import Button from "../Button";
 import Input from "../Input";
 import Text from "../Text";
+import { notify } from "#/i18n";
 
-function Notify() {
+function Suscribe() {
   return (
-    <div className="z-50 col-start-2 row-start-3 row-end-[-2] mt-auto w-4/5 space-y-8 justify-self-end rounded-lg bg-gray-700 px-8 py-4">
-      <Text classes="text-lg text-white">
-        Do you want to get notice when the app is available for desktop?
-      </Text>
+    <article className="space-y-8 rounded-lg bg-gray-700 px-8 py-4">
+      <Text classes="text-lg text-white">{notify.notifyMessage}</Text>
       <div className="flex justify-between gap-2">
         <Input
           variants="default"
@@ -20,8 +19,8 @@ function Notify() {
           </div>
         </Button>
       </div>
-    </div>
+    </article>
   );
 }
 
-export default Notify;
+export default Suscribe;
