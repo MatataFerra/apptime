@@ -30,7 +30,7 @@ export default async function RootLayout({
           className={cm(
             isMobile
               ? ""
-              : "h-screen grid grid-rows-[auto,1fr] relative overflow-hidden"
+              : "relative grid h-screen grid-rows-[auto,1fr] overflow-hidden",
           )}
         >
           <NextAuthProvider>{children}</NextAuthProvider>

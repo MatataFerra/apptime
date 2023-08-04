@@ -9,7 +9,7 @@ interface Props {
 export default function NoMobileLayout({ children }: Props) {
   return (
     <>
-      <header className="flex gap-2 justify-start items-center py-2 px-4">
+      <header className="flex items-center justify-start gap-2 px-4 py-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/assets/apptime-logo.svg"

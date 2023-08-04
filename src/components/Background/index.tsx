@@ -49,8 +49,8 @@ Background.waves = (props: WavesProps) => (
     width="100%"
     height="100%"
     className={cm(
-      "transition duration-500 ease-in-out delay-300",
-      props.classes
+      "transition delay-300 duration-500 ease-in-out",
+      props.classes,
     )}
     viewBox="0 0 1440 590"
     {...props}
@@ -71,7 +71,7 @@ Background.waves = (props: WavesProps) => (
       fillOpacity={0.53}
       strokeWidth={0}
       d="M0 600V200c95.282-44.134 190.565-88.268 292-75s209.024 83.938 316 103c106.976 19.062 213.34-13.483 293-28s132.617-11.005 218-8c85.383 3.005 203.191 5.502 321 8v400Z"
-      className="transition-all duration-500 ease-in-out delay-300"
+      className="transition-all delay-300 duration-500 ease-in-out"
       style={{
         animation: "pathAnim-0 20s",
         animationTimingFunction: "linear",
@@ -82,7 +82,7 @@ Background.waves = (props: WavesProps) => (
       fill="url(#gradient)"
       strokeWidth={0}
       d="M0 600V400c99.799-6.488 199.598-12.976 283-23 83.402-10.024 150.407-23.584 244-19 93.593 4.584 213.775 27.311 317 23s189.493-35.66 286-37c96.507-1.34 203.254 27.33 310 56v200Z"
-      className="transition-all duration-500 ease-in-out delay-300 z-20"
+      className="z-20 transition-all delay-300 duration-500 ease-in-out"
       style={{
         animation: "pathAnim-1 20s",
         animationTimingFunction: "linear",
@@ -99,8 +99,8 @@ Background.waveBack = (props: WavesProps) => (
     width="100%"
     height="100%"
     className={cm(
-      "transition duration-500 ease-in-out delay-300",
-      props.classes
+      "transition delay-300 duration-500 ease-in-out",
+      props.classes,
     )}
     viewBox="0 0 1440 590"
     {...props}
@@ -121,7 +121,7 @@ Background.waveBack = (props: WavesProps) => (
       fillOpacity={0.53}
       strokeWidth={0}
       d="M0 600V200c95.282-44.134 190.565-88.268 292-75s209.024 83.938 316 103c106.976 19.062 213.34-13.483 293-28s132.617-11.005 218-8c85.383 3.005 203.191 5.502 321 8v400Z"
-      className="transition-all duration-500 ease-in-out delay-300"
+      className="transition-all delay-300 duration-500 ease-in-out"
       style={{
         animation: "pathAnim-0 20s",
         animationTimingFunction: "linear",
@@ -138,8 +138,8 @@ Background.waveFront = (props: WavesProps) => (
     width="100%"
     height="100%"
     className={cm(
-      "transition duration-500 ease-in-out delay-300",
-      props.classes
+      "transition delay-300 duration-500 ease-in-out",
+      props.classes,
     )}
     viewBox="0 0 1440 590"
     {...props}
@@ -159,7 +159,7 @@ Background.waveFront = (props: WavesProps) => (
       fill="url(#gradient)"
       strokeWidth={0}
       d="M0 600V400c99.799-6.488 199.598-12.976 283-23 83.402-10.024 150.407-23.584 244-19 93.593 4.584 213.775 27.311 317 23s189.493-35.66 286-37c96.507-1.34 203.254 27.33 310 56v200Z"
-      className="transition-all duration-500 ease-in-out delay-300 z-20"
+      className="z-20 transition-all delay-300 duration-500 ease-in-out"
       style={{
         animation: "pathAnim-1 20s",
         animationTimingFunction: "linear",
