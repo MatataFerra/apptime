@@ -23,9 +23,9 @@ function Button({
   return (
     <Component
       className={cm(
-        "w-40 py-1 px-2 text-center rounded-lg font-bold cursor-pointer",
+        "w-40 cursor-pointer rounded-lg px-2 py-1 text-center font-bold",
         BUTTON_VARIANTS[variants],
-        classes
+        classes,
       )}
     >
       {children}

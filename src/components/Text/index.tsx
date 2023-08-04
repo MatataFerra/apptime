@@ -44,7 +44,7 @@ function Text({
       className={cm(
         TEXT_VARIANTS[variants],
         classes,
-        _.isArray(children) && "inline-flex gap-2"
+        _.isArray(children) && "inline-flex gap-2",
       )}
       {...props}
     >

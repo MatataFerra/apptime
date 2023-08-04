@@ -23,7 +23,7 @@ function Input({
   return (
     <Component
       type={type}
-      className={cm(INPUT_VARIANTS[variants], classes, "py-1 px-2 rounded-lg")}
+      className={cm(INPUT_VARIANTS[variants], classes, "rounded-lg px-2 py-1")}
       {...props}
     />
   );

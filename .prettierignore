@@ -1,0 +1,8 @@
+# Ignore everything recursively
+*
+
+# But not the .tsx files
+!*.tsx
+
+# Check subdirectories too
+!*/
