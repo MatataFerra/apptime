@@ -1,10 +1,11 @@
 import React from "react";
-import "./globals.css";
-import { NextAuthProvider } from "@/providers";
+import "@/app/globals.css";
+import { Providers } from "@/providers";
 
 import { Poppins } from "next/font/google";
-import { cm } from "../utils/helpers";
+import { cm } from "@/utils/helpers";
 import { ut } from "@/services";
+import { Locale } from "#/i18n/i18n-config";
 
 export const metadata = {
   title: "Create Next App",
@@ -19,10 +20,13 @@ const poppinsFont = Poppins({
 
 export default async function RootLayout({
   children,
+  params
 }: {
   children: React.ReactNode;
+  params: {lang: string}
 }) {
   const isMobile = ut.isMobile();
+
   return (
     <>
       <html lang="en" className={cm(poppinsFont.className, "bg-white")}>
@@ -33,7 +37,7 @@ export default async function RootLayout({
               : "relative grid h-screen grid-rows-[auto,1fr] overflow-hidden",
           )}
         >
-          <NextAuthProvider>{children}</NextAuthProvider>
+          <Providers locale={params.lang as Locale}>{children}</Providers>
         </body>
       </html>
     </>
