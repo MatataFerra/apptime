@@ -1,0 +1,8 @@
+{
+  "no-mobile": {
+    "navigation": {},
+    "subscription": {
+      "notifyMessage": "¿Quieres que te avisemos cuando la versión de escritorio esté disponible?"
+    }
+  }
+}
