@@ -13,8 +13,7 @@ export const BUTTON_VARIANTS = {
   success: "bg-green-500 text-white",
   warning: "bg-yellow-500 text-white",
   info: "bg-blue-500 text-white",
-  gradient:
-    "bg-gradient-to-r from-blue-600 via-purple-500 to-orange-500 text-white",
+  gradient: "bg-gradient-to-r from-blue-600 via-purple-500 to-orange-500 text-white",
 };
 
 export const INPUT_VARIANTS = {

@@ -1,9 +1,4 @@
-import {
-  AuthService,
-  ErrorFactory,
-  PasswordService,
-  UserService,
-} from "@/services";
+import { AuthService, ErrorFactory, PasswordService, UserService } from "@/services";
 import _ from "lodash";
 import { UserCreateSchema } from "@/types";
 import { User } from "@prisma/client";
@@ -44,9 +39,7 @@ export async function POST(req: NextRequest) {
       const exception = _.cloneDeep(error) as Exception;
       return NextResponse.json(
         {
-          ...ErrorFactory.findAndCreateError(exception.type_error).handleError(
-            error
-          ),
+          ...ErrorFactory.findAndCreateError(exception.type_error).handleError(error),
           response: false,
         },
         { status: 409 }

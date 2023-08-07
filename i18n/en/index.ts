@@ -1,6 +1,3 @@
-import notify from './no-mobile.json'
+import notify from "./no-mobile.json";
 
-export {
-  notify,
-}
-
+export { notify };

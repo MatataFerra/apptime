@@ -28,11 +28,7 @@ export const authOptions: NextAuthOptions = {
           email: credentials.email,
         });
 
-        if (
-          !user ||
-          !(await compare(credentials.password, user.password ?? ""))
-        )
-          return null;
+        if (!user || !(await compare(credentials.password, user.password ?? ""))) return null;
 
         return {
           ...user,
