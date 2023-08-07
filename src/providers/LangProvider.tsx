@@ -1,9 +1,9 @@
 "use client"
 
 import { getDictionary } from "#/i18n/get-dictonaries";
-import { useRouter } from "next/router";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { Locale } from '../../i18n/i18n-config';
+import ErrorFactory from "@/services/Error/factory";
 
 interface Dictionary {
   [key: string]: string;
@@ -35,6 +35,16 @@ function LangProvider ({children, locale} : LangProviderProps){
       </DictionaryContext.Provider>
     </>
   );
+}
+
+export function useDictionary() {
+  const context = useContext(DictionaryContext);
+  if (context === undefined) {
+    throw ErrorFactory.createError("CustomError", {
+      message: "useDictionary must be used within a LangProvider",
+    })
+  }
+  return context;
 }
 
 export default LangProvider;

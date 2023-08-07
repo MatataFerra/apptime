@@ -1,3 +1,5 @@
+import { Locale } from "#/i18n/i18n-config";
+
 export * from "./tailwind";
 
 /* 
@@ -20,3 +22,5 @@ export const USER_ROLES = {
   USER: "USER",
   SUPER_USER: "SUPER_USER",
 };
+
+export const SUPPORTED_LOCALES: Locale[] = ["en", "es"];

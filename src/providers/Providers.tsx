@@ -12,9 +12,7 @@ type Props = {
 function Providers({ children, locale = "en" }: Props) {
   return (
     <>
-    <LangProvider locale={locale}>
       <SessionProvider>{children}</SessionProvider>
-    </LangProvider>
     </>
   );
 }
