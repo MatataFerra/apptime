@@ -45,23 +45,21 @@ const UserModelSchema = z.object({
   isActive: z.boolean().default(true),
 });
 
-const UserUpdateSchema = UserModelSchema.partial().superRefine(
-  (values, ctx) => {
-    if (Object.keys(values).length < 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "One field must be provided",
-      });
-    }
-
-    if (values.password || values.email) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Can't update those fields",
-      });
-    }
+const UserUpdateSchema = UserModelSchema.partial().superRefine((values, ctx) => {
+  if (Object.keys(values).length < 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "One field must be provided",
+    });
   }
-);
+
+  if (values.password || values.email) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Can't update those fields",
+    });
+  }
+});
 
 const UserCreateSchema = UserModelSchema.omit({
   id: true,

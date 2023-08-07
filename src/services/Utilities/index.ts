@@ -41,18 +41,12 @@ class Utilities {
 
   public static isTablet(): boolean {
     const userAgent = headers().get("user-agent") ?? "";
-    const isTablet =
-      /iPad|Android (?!.*Mobile)|Tablet|Touch|(Nexus 7)|Surface/i.test(
-        userAgent
-      );
+    const isTablet = /iPad|Android (?!.*Mobile)|Tablet|Touch|(Nexus 7)|Surface/i.test(userAgent);
 
     return isTablet;
   }
 
-  public static redirect(
-    req: NextRequestWithAuth | NextRequest,
-    destination: string
-  ) {
+  public static redirect(req: NextRequestWithAuth | NextRequest, destination: string) {
     const url = req.nextUrl.clone();
     url.pathname = destination;
     return NextResponse.redirect(url);

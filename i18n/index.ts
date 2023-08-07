@@ -1,5 +1,3 @@
-import {notify} from './en'
+import { notify } from "./en";
 
-export {
-  notify,
-}
+export { notify };

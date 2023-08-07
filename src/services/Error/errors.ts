@@ -226,10 +226,7 @@ export class PasswordIsNotValid extends Error implements ExceptionsInterface {
  *    return ErrorFactory.createError("DataProvidedIsNotValid", {error: userParsed.error});
  * }
  */
-export class DataProvidedIsNotValid
-  extends Error
-  implements ExceptionsInterface
-{
+export class DataProvidedIsNotValid extends Error implements ExceptionsInterface {
   constructor() {
     super("Data provided is not valid");
   }
@@ -428,10 +425,7 @@ export class BodyNotProvided extends Error implements ExceptionsInterface {
  * }
  */
 
-export class PrismaClientUpdateRecord
-  extends Error
-  implements ExceptionsInterface
-{
+export class PrismaClientUpdateRecord extends Error implements ExceptionsInterface {
   constructor() {
     super("Please provide a valid id to update the record");
   }
@@ -512,8 +506,7 @@ export class ProfileAlreadyExists extends Error implements ExceptionsInterface {
   }
   exception: Exception = {
     message: "Profile already exists",
-    cause:
-      "The profile already exists in the database, try another user id or update the record",
+    cause: "The profile already exists in the database, try another user id or update the record",
     type_error: "ProfileAlreadyExists",
   };
 

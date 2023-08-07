@@ -18,9 +18,7 @@ class PayService {
     const { profile, shift } = params;
     const amount = shift.amount ?? 0;
     let rate: number = 1;
-    const hourlyRate = ProfileService.convertHourlyRateInMinuteRate(
-      profile.hourlyRate
-    );
+    const hourlyRate = ProfileService.convertHourlyRateInMinuteRate(profile.hourlyRate);
 
     if (shift.publicHolidayWorked) rate = profile.holidayPayRate ?? 1;
 
@@ -35,9 +33,7 @@ class PayService {
     if (!shift.isClosed) return 0;
 
     const amount = shift.amount ?? 0;
-    const hourlyRate = ProfileService.convertHourlyRateInMinuteRate(
-      profile.hourlyRate
-    );
+    const hourlyRate = ProfileService.convertHourlyRateInMinuteRate(profile.hourlyRate);
 
     const regularPay = amount * hourlyRate;
 

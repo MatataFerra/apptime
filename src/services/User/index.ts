@@ -20,9 +20,7 @@ class UserService {
     this.user = user;
   }
 
-  static async findUniqueUser(
-    options: FindUniqueUserType
-  ): Promise<User | null> {
+  static async findUniqueUser(options: FindUniqueUserType): Promise<User | null> {
     let fieldSelected: "id" | "email" = "email";
     if (options.id) fieldSelected = "id";
     if (options.email) fieldSelected = "email";

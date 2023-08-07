@@ -60,17 +60,11 @@ export default function Register() {
 
           <div className="text-grey-dark mt-4 text-center text-sm">
             By signing up, you agree to the
-            <a
-              className="border-grey-dark text-grey-dark border-b no-underline"
-              href="#"
-            >
+            <a className="border-grey-dark text-grey-dark border-b no-underline" href="#">
               Terms of Service
             </a>{" "}
             and
-            <a
-              className="border-grey-dark text-grey-dark border-b no-underline"
-              href="#"
-            >
+            <a className="border-grey-dark text-grey-dark border-b no-underline" href="#">
               Privacy Policy
             </a>
           </div>

@@ -60,18 +60,14 @@ class Auth implements AuthServiceInterface {
     }
 
     // validate and hash password
-    const isValidPassword = PasswordService.validatePassword(
-      this.user.password
-    );
+    const isValidPassword = PasswordService.validatePassword(this.user.password);
 
     if (!isValidPassword.valid) {
       throw ErrorFactory.createError("PasswordIsNotValid", {
         error: isValidPassword.error,
       });
     }
-    const password = await PasswordService.hashPassword(
-      isValidPassword.password
-    );
+    const password = await PasswordService.hashPassword(isValidPassword.password);
 
     // create user
     const newUser = await new UserService({

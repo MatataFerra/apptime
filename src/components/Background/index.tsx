@@ -48,10 +48,7 @@ Background.waves = (props: WavesProps) => (
     id="svg"
     width="100%"
     height="100%"
-    className={cm(
-      "transition delay-300 duration-500 ease-in-out",
-      props.classes,
-    )}
+    className={cm("transition delay-300 duration-500 ease-in-out", props.classes)}
     viewBox="0 0 1440 590"
     {...props}
   >
@@ -98,10 +95,7 @@ Background.waveBack = (props: WavesProps) => (
     id="svg"
     width="100%"
     height="100%"
-    className={cm(
-      "transition delay-300 duration-500 ease-in-out",
-      props.classes,
-    )}
+    className={cm("transition delay-300 duration-500 ease-in-out", props.classes)}
     viewBox="0 0 1440 590"
     {...props}
   >
@@ -137,10 +131,7 @@ Background.waveFront = (props: WavesProps) => (
     id="svg"
     width="100%"
     height="100%"
-    className={cm(
-      "transition delay-300 duration-500 ease-in-out",
-      props.classes,
-    )}
+    className={cm("transition delay-300 duration-500 ease-in-out", props.classes)}
     viewBox="0 0 1440 590"
     {...props}
   >

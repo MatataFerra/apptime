@@ -1,7 +1,7 @@
 {
-  "extends": "next/core-web-vitals",
+  "extends": ["next/core-web-vitals", "prettier"],
   "rules": {
-    "no-console":"warn",
+    "no-console": "warn",
     "func-style": ["error", "declaration", { "allowArrowFunctions": false }]
   }
 }

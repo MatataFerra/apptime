@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .no-mobile-bg {
-  background-image: url('/assets/mobile-only.webp');
+  background-image: url("/assets/mobile-only.webp");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;

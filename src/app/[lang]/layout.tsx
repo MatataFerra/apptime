@@ -18,13 +18,7 @@ const poppinsFont = Poppins({
   variable: "--font-poppins",
 });
 
-export default async function RootLayout({
-  children,
-  params
-}: {
-  children: React.ReactNode;
-  params: {lang: string}
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const isMobile = ut.isMobile();
 
   return (
@@ -32,12 +26,10 @@ export default async function RootLayout({
       <html lang="en" className={cm(poppinsFont.className, "bg-white")}>
         <body
           className={cm(
-            isMobile
-              ? ""
-              : "relative grid h-screen grid-rows-[auto,1fr] overflow-hidden",
+            isMobile ? "" : "relative grid h-screen grid-rows-[auto,1fr] overflow-hidden"
           )}
         >
-          <Providers locale={params.lang as Locale}>{children}</Providers>
+          <Providers>{children}</Providers>
         </body>
       </html>
     </>
