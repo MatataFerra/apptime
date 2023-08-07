@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "tw:sort": "yarn prettier . --write",
+    "prettier:fix": "yarn prettier . --write",
     "test": "dotenv -e .env.development -- jest -i --watch",
     "test:ci": "jest",
     "ts-lint": "tsc --noEmit --incremental --watch",
