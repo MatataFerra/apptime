@@ -11,19 +11,12 @@ export default function NoMobileLayout({ children }: Props) {
     <>
       <header className="flex items-center justify-start gap-2 px-4 py-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/assets/apptime-logo.svg"
-          alt="App time logo"
-          width={25}
-          height={25}
-        />
+        <img src="/assets/apptime-logo.svg" alt="App time logo" width={25} height={25} />
         <Text as="h1" variants="gradient" classes="text-xl font-bold">
           App Time
         </Text>
       </header>
-      <main className={cm("flex flex-col items-center justify-center p-2")}>
-        {children}
-      </main>
+      <main className={cm("flex flex-col items-center justify-center p-2")}>{children}</main>
     </>
   );
 }

@@ -55,9 +55,7 @@ class Dashboard implements DashboardInterface {
 
   get lastDayRegistered() {
     if (this.user.shifts.length === 0) return "There is no data";
-    return max(
-      this.user.shifts.map((shift) => new Date(shift.startDate))
-    ).toString();
+    return max(this.user.shifts.map((shift) => new Date(shift.startDate))).toString();
   }
 
   // We can refactor this function using the Pay Service, also we can migrate this
@@ -78,9 +76,7 @@ class Dashboard implements DashboardInterface {
     return {
       shiftsLen: this.shiftsLen,
       hoursWorked: ShiftService.convertAmountInDecimal(this.hoursWorked),
-      averageHoursWorkedPerDay: ShiftService.convertAmountInDecimal(
-        this.averageHoursWorkedPerDay
-      ),
+      averageHoursWorkedPerDay: ShiftService.convertAmountInDecimal(this.averageHoursWorkedPerDay),
       hourValue: this.hourValue,
       lastDayRegistered: this.lastDayRegistered,
       estimatedWeeklyEarnings: this.estimatedWeeklyEarnings(),

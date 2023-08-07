@@ -15,9 +15,7 @@ export function useMediaQuery(query: keyof typeof MEDIA_QUERIES): boolean {
     return false;
   }
 
-  const [matches, setMatches] = useState<boolean>(
-    getMatches(MEDIA_QUERIES[query])
-  );
+  const [matches, setMatches] = useState<boolean>(getMatches(MEDIA_QUERIES[query]));
 
   function handleChange() {
     setMatches(getMatches(MEDIA_QUERIES[query]));

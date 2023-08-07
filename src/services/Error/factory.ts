@@ -65,10 +65,7 @@ interface ErrorFactoryInterface {
 }
 
 class ErrorFactory implements ErrorFactoryInterface {
-  createError(
-    exception: HandleErrorType,
-    options?: { message?: string; error?: unknown }
-  ): any {
+  createError(exception: HandleErrorType, options?: { message?: string; error?: unknown }): any {
     if (exception === "UserNotFound") {
       return new UserNotFound().handleError();
     }
@@ -122,14 +119,10 @@ class ErrorFactory implements ErrorFactoryInterface {
     }
 
     if (exception === "CustomError") {
-      return new ErrorBoundary().handleError(
-        options?.message || options?.error || "Custom error"
-      );
+      return new ErrorBoundary().handleError(options?.message || options?.error || "Custom error");
     }
 
-    return new ErrorBoundary().handleError(
-      `Error type '${exception}' not supported`
-    );
+    return new ErrorBoundary().handleError(`Error type '${exception}' not supported`);
 
     // throw new Error(`Error type '${exception}' not supported`);
   }

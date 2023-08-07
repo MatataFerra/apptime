@@ -41,11 +41,7 @@ function Text({
 
   return (
     <Component
-      className={cm(
-        TEXT_VARIANTS[variants],
-        classes,
-        _.isArray(children) && "inline-flex gap-2",
-      )}
+      className={cm(TEXT_VARIANTS[variants], classes, _.isArray(children) && "inline-flex gap-2")}
       {...props}
     >
       {children}

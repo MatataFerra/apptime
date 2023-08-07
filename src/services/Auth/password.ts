@@ -42,12 +42,11 @@ export default class Password {
 
   async maxAttemps(max: number) {
     const user = await UserService.authenticatedUser();
-    const maxAttemps: PasswordAttemps | null =
-      await prisma.passwordAttemps.findFirst({
-        where: {
-          userId: user?.id,
-        },
-      });
+    const maxAttemps: PasswordAttemps | null = await prisma.passwordAttemps.findFirst({
+      where: {
+        userId: user?.id,
+      },
+    });
   }
 
   isValid(): { valid: boolean; error?: string } {
@@ -104,10 +103,7 @@ export default class Password {
     return await bcrypt.hash(password, 10);
   }
 
-  static async comparePassword(
-    password: string,
-    hash: string
-  ): Promise<boolean> {
+  static async comparePassword(password: string, hash: string): Promise<boolean> {
     return await bcrypt.compare(password, hash);
   }
 
