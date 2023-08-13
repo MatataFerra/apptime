@@ -1,12 +1,25 @@
-"use client"
+"use client";
 
-import { getDictionary } from "#/i18n/get-dictonaries";
-import { createContext, useContext, useEffect, useState } from "react";
-import { Locale } from '../../i18n/i18n-config';
-import ErrorFactory from "@/services/Error/factory";
+import {
+  MutableRefObject,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { Locale } from "@/types";
+import i18n from "@/services/i18n";
+import lang from "#/i18n/en/en.json";
 
+export type DictionaryType = typeof lang;
 interface Dictionary {
   [key: string]: string;
+}
+
+interface DictionaryContext {
+  dictionary: DictionaryType;
 }
 
 interface LangProviderProps {
@@ -14,23 +27,27 @@ interface LangProviderProps {
   locale: Locale;
 }
 
-const DictionaryContext = createContext<Dictionary>({} as Dictionary);
+const DictionaryContext = createContext<DictionaryContext>({} as DictionaryContext);
 
-function LangProvider ({children, locale} : LangProviderProps){
-  const [dictionary, setDictionary] = useState({} as Dictionary);
+function LangProvider({ children, locale }: LangProviderProps) {
+  const [dictionary, setDictionary] = useState<DictionaryType>({} as DictionaryType);
 
-  const defaultLocale: Locale = ["es", "en"].includes(locale) ? locale : "en";
- 
   useEffect(() => {
-    getDictionary(defaultLocale).then((locale) => {
-      setDictionary(locale as unknown as Dictionary);
-    })
+    async function getDictionary() {
+      const res = await i18n.getDictionary(locale);
+      setDictionary(res);
+    }
 
-  }, [defaultLocale]);
+    getDictionary();
+  }, [locale]);
 
   return (
     <>
-      <DictionaryContext.Provider value={dictionary}>
+      <DictionaryContext.Provider
+        value={{
+          dictionary,
+        }}
+      >
         {children}
       </DictionaryContext.Provider>
     </>
@@ -40,9 +57,7 @@ function LangProvider ({children, locale} : LangProviderProps){
 export function useDictionary() {
   const context = useContext(DictionaryContext);
   if (context === undefined) {
-    throw ErrorFactory.createError("CustomError", {
-      message: "useDictionary must be used within a LangProvider",
-    })
+    throw new Error("useDictionary must be used within a LangProvider");
   }
   return context;
 }

@@ -1,6 +1,5 @@
-import { Locale } from "#/i18n/i18n-config";
-
-export * from "./tailwind";
+export * from "@/utils/constants/pathnames";
+export * from "@/utils/constants/tailwind";
 
 /* 
   @summary Contants for Routes
@@ -23,4 +22,4 @@ export const USER_ROLES = {
   SUPER_USER: "SUPER_USER",
 };
 
-export const SUPPORTED_LOCALES: Locale[] = ["en", "es"];
+export const SUPPORTED_LOCALES = ["en", "es"] as const;

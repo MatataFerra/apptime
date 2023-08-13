@@ -5,7 +5,6 @@ import { Providers } from "@/providers";
 import { Poppins } from "next/font/google";
 import { cm } from "@/utils/helpers";
 import { ut } from "@/services";
-import { Locale } from "#/i18n/i18n-config";
 
 export const metadata = {
   title: "Create Next App",
@@ -18,13 +17,7 @@ const poppinsFont = Poppins({
   variable: "--font-poppins",
 });
 
-export default async function RootLayout({
-  children,
-  params,
-}: {
-  children: React.ReactNode;
-  params: { lang: string };
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const isMobile = ut.isMobile();
 
   return (
@@ -35,7 +28,7 @@ export default async function RootLayout({
             isMobile ? "" : "relative grid h-screen grid-rows-[auto,1fr] overflow-hidden"
           )}
         >
-          <Providers locale={params.lang as Locale}>{children}</Providers>
+          <Providers>{children}</Providers>
         </body>
       </html>
     </>
