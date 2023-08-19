@@ -38,7 +38,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "__test__/components/Suscribe.test.tsx"  ],
   "exclude": [
     "node_modules"
   ]

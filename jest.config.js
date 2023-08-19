@@ -1,24 +1,15 @@
-module.exports = {
-  preset: "ts-jest/presets/js-with-ts",
-  testEnvironment: "node",
-  moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1",
-    "^#/(.*)$": "<rootDir>/$1",
-  },
+const nextJest = require('next/jest')
 
-  transform: {
-    "^.+\\.tsx?$": [
-      "ts-jest",
-      {
-        // Aquí va tu configuración de ts-jest
-        // isolatedModules: true,
-        tsconfig: "tsconfig.json",
-      },
-    ],
+const createJestConfig = nextJest({
+  // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
+  dir: './',
+})
 
-    "^.+\\.(js|jsx|ts|tsx)$": ["babel-jest", { presets: ["next/babel"] }],
-  },
+// Add any custom config to be passed to Jest
+const customJestConfig = {
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  testEnvironment: 'jest-environment-jsdom',
+}
 
-  clearMocks: true,
-  setupFilesAfterEnv: ["<rootDir>/prisma/singleton.ts", "./jest.setup.js"],
-};
+// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
+module.exports = createJestConfig(customJestConfig)

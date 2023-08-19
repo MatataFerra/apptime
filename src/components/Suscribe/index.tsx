@@ -13,7 +13,7 @@ function Suscribe() {
       <Text classes="text-lg text-white">{t("subscription.notifyMessage")}</Text>
       <div className="flex justify-between gap-2">
         <Input variants="default" placeholder="username@email.com" classes="w-full" />
-        <Button variants="gradient" classes="animate-text p-1">
+        <Button as="button" variants="gradient" classes="animate-text p-1">
           <div className="items-center justify-center rounded-[inherit] bg-gray-800 px-3 py-1 transition-all hover:bg-gray-900">
             <Text classes="font-black text-white">Notify Me</Text>
           </div>
