@@ -1,12 +1,16 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import Button from "../Button";
 import Input from "../Input";
 import Text from "../Text";
-import { notify } from "#/i18n";
 
 function Suscribe() {
+  const t = useTranslations("no-mobile");
+
   return (
     <article className="space-y-8 rounded-lg bg-gray-700 px-8 py-4">
-      <Text classes="text-lg text-white">{notify.notifyMessage}</Text>
+      <Text classes="text-lg text-white">{t("subscription.notifyMessage")}</Text>
       <div className="flex justify-between gap-2">
         <Input variants="default" placeholder="username@email.com" classes="w-full" />
         <Button variants="gradient" classes="animate-text p-1">

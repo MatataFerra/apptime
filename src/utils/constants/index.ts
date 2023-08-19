@@ -1,4 +1,5 @@
-export * from "./tailwind";
+export * from "@/utils/constants/pathnames";
+export * from "@/utils/constants/tailwind";
 
 /* 
   @summary Contants for Routes
@@ -20,3 +21,6 @@ export const USER_ROLES = {
   USER: "USER",
   SUPER_USER: "SUPER_USER",
 };
+
+export const SUPPORTED_LOCALES = ["en", "es"] as const;
+export const DEFAULT_LOCALE = SUPPORTED_LOCALES[0];

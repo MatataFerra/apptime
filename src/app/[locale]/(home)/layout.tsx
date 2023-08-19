@@ -5,7 +5,7 @@ interface Props {
   children: ReactElement;
 }
 
-export default function NoMobileLayout({ children }: Props) {
+export default function HomeLayout({ children }: Props) {
   return (
     <>
       <header>

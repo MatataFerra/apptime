@@ -1,9 +1,6 @@
 import { Background, Suscribe, Text } from "@/components";
-import { FC, ReactElement } from "react";
 
-interface Props {}
-
-function NoScreenCompatibility(): ReactElement<FC<Props>> {
+function NoScreenCompatibility() {
   return (
     <section className="grid h-full grid-cols-2 grid-rows-4">
       <aside className="z-50 col-start-2 row-start-1 row-end-[-1] flex flex-col items-end justify-between gap-1">
@@ -22,7 +19,7 @@ function NoScreenCompatibility(): ReactElement<FC<Props>> {
             This app is only available for mobile devices
           </Text>
         </nav>
-        <div className="w-4/5">
+        <div className="w-[40rem]">
           <Suscribe />
         </div>
       </aside>

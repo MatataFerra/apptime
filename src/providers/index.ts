@@ -1,1 +1,1 @@
-export { default as NextAuthProvider } from "./NextAuth";
+export { default as Providers } from "./Providers";
