@@ -23,3 +23,4 @@ export const USER_ROLES = {
 };
 
 export const SUPPORTED_LOCALES = ["en", "es"] as const;
+export const DEFAULT_LOCALE = SUPPORTED_LOCALES[0];

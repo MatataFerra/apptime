@@ -1,4 +1,4 @@
-import { SUPPORTED_LOCALES } from "@/utils/constants";
+import { PATH_NAMES, SUPPORTED_LOCALES } from "@/utils/constants";
 import { HTMLAttributes } from "react";
 
 export * from "@/types/zod";
@@ -25,8 +25,14 @@ export type CSSClassNames = HTMLAttributes<HTMLElement>["className"];
 */
 
 export type Locale = (typeof SUPPORTED_LOCALES)[number];
-export type Params<T> = {
-  params: {
-    lang: T;
-  };
+export type Params<K extends string, T> = {
+  [key in K]: T;
+};
+
+export type LocaleParams = Params<"locale", Locale>;
+
+export type PathNames = (typeof PATH_NAMES)[keyof typeof PATH_NAMES];
+
+export type PathNamesPaths = {
+  [key in PathNames]: string;
 };

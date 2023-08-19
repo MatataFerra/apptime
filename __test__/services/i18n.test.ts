@@ -1,7 +1,6 @@
 import i18n from "@/services/i18n";
-import en from "#/i18n/en/en.json";
-import es from "#/i18n/es/es.json";
-import { headers } from "next/headers";
+import en from "#/messages/en.json";
+import es from "#/messages/es.json";
 
 describe("i18n", () => {
   afterAll(() => {

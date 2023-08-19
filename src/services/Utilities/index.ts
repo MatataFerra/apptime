@@ -15,17 +15,10 @@ class Utilities {
    * @returns {boolean} - Returns true if the user is using a mobile device.
    */
 
-  public static isMobile(nextHeaders?: string): boolean {
-    let userAgent: string;
-    if (nextHeaders) {
-      userAgent = nextHeaders;
-    } else {
-      userAgent = headers().get("user-agent") ?? "";
-    }
-
+  public static isMobile(nextHeaders: string): boolean {
     const isMobile =
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Mobile Safari/i.test(
-        userAgent
+        nextHeaders
       );
 
     return isMobile;

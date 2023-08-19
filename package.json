@@ -36,6 +36,7 @@
     "negotiator": "^0.6.3",
     "next": "13.4.5",
     "next-auth": "4.22.1",
+    "next-intl": "^2.19.1",
     "next-swagger-doc": "^0.3.6",
     "postcss": "8.4.23",
     "react": "18.2.0",
