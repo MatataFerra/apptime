@@ -3,8 +3,7 @@
  */
 
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, screen } from "@testing-library/react";
 import Suscribe from "@/components/Suscribe"; // Ajusta la ruta según sea necesario
 import { NextIntlProvider } from "next-intl";
 
