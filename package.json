@@ -10,6 +10,7 @@
     "prettier:fix": "yarn prettier . --write",
     "test": "dotenv -e .env.development -- jest -i --watch",
     "test:ci": "jest",
+    "test:e2e": "playwright test",
     "ts-lint": "tsc --noEmit --incremental --watch",
     "coverage": "jest --coverage",
     "compose": "docker compose -f \"docker-compose.yml\" up -d --build --remove-orphans",
@@ -48,6 +49,7 @@
     "zod": "3.21.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.37.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.4.3",
