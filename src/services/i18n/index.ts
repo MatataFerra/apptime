@@ -1,12 +1,10 @@
 import { SUPPORTED_LOCALES } from "@/utils/constants";
-import _ from "lodash";
 import Negotiator from "negotiator";
 import { NextRequest } from "next/server";
 import { match as matchLocale } from "@formatjs/intl-localematcher";
 import { Locale, PathNames } from "@/types";
 import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
-
-const CLONE_SUPPORTED_LOCALES = _.cloneDeep(SUPPORTED_LOCALES) as unknown as Locale[];
+import { headers } from "next/headers";
 
 class i18n {
   defaultLocale: Locale;
@@ -26,8 +24,8 @@ class i18n {
 
   get dictionaries() {
     return {
-      en: () => import("#/messages/en.json").then((module) => module.default),
-      es: () => import("#/messages/es.json").then((module) => module.default),
+      en: () => import("../../../messages/en.json").then((mod) => mod.default),
+      es: () => import("../../../messages/es.json").then((mod) => mod.default),
     };
   }
 
@@ -49,17 +47,23 @@ class i18n {
     return locale;
   }
 
-  static getLocaleFromHeaders(headers: ReadonlyHeaders, defaultLocale: Locale) {
+  static getHeaders() {
+    const listHeaders = new Headers(headers());
+    return listHeaders;
+  }
+
+  static getLocaleFromHeaders(defaultLocale: Locale) {
+    const listHeaders = i18n.getHeaders();
     // Negotiator expects plain object so we need to transform headers
     const negotiatorHeaders: Record<string, string> = {};
-    Object.entries(headers).forEach(([key, value]) => (negotiatorHeaders[key] = value));
+    Object.entries(listHeaders).forEach(([key, value]) => (negotiatorHeaders[key] = value));
 
     // Use negotiator and intl-localematcher to get best locale
-    let languages = new Negotiator({ headers: negotiatorHeaders }).languages(
-      CLONE_SUPPORTED_LOCALES
-    );
+    let languages = new Negotiator({ headers: negotiatorHeaders }).languages([
+      ...SUPPORTED_LOCALES,
+    ]);
 
-    const locale = matchLocale(languages, CLONE_SUPPORTED_LOCALES, defaultLocale);
+    const locale = matchLocale(languages, [...SUPPORTED_LOCALES], defaultLocale);
 
     return locale;
   }

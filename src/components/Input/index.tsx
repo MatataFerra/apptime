@@ -1,32 +1,27 @@
 import { CSSClassNames } from "@/types";
 import { INPUT_VARIANTS } from "@/utils/constants";
 import { cm } from "@/utils/helpers";
-import { HTMLInputTypeAttribute, ReactElement } from "react";
+import { HTMLInputTypeAttribute, ReactElement, Ref, forwardRef } from "react";
 
 type Variants = keyof typeof INPUT_VARIANTS;
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
-  as?: "input";
   classes?: CSSClassNames;
   variants?: Variants;
   type?: HTMLInputTypeAttribute;
 }
 
-function Input({
-  as: El = "input",
-  classes,
-  variants = "default",
-  type,
-  ...props
-}: Props): ReactElement<Props> {
-  const Component = El;
+function Input(props: Props, ref: Ref<HTMLInputElement>): ReactElement<Props> {
+  const { classes, variants = "default", type, ...rest } = props;
+
   return (
-    <Component
+    <input
+      ref={ref}
       type={type}
       className={cm(INPUT_VARIANTS[variants], classes, "rounded-lg px-2 py-1")}
-      {...props}
+      {...rest}
     />
   );
 }
 
-export default Input;
+export default forwardRef(Input);

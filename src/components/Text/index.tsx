@@ -7,11 +7,11 @@ import React, { ReactElement } from "react";
 type As = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span";
 type Variants = keyof typeof TEXT_VARIANTS;
 
-interface Props {
+interface Props extends React.HTMLAttributes<HTMLElement> {
   as?: As;
   classes?: CSSClassNames;
   variants?: Variants;
-  children: (string | ReactElement)[] | string | ReactElement;
+  children: (string | ReactElement)[] | string | ReactElement | undefined;
 }
 
 /**

@@ -13,7 +13,7 @@ interface Props {
 }
 
 function Button({
-  as = "div",
+  as = "button",
   classes,
   variants = "primary",
   children = "Send",
