@@ -9,7 +9,6 @@ import { notFound } from "next/navigation";
 import { LocaleParams, Locale, PathNames } from "@/types";
 import { NextIntlClientProvider } from "next-intl";
 import i18n from "@/services/i18n";
-import { headers } from "next/headers";
 import { DEFAULT_LOCALE, PATH_NAMES } from "@/utils/constants";
 
 export function generateStaticParams() {
@@ -34,36 +33,26 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: LocaleParams;
 }) {
-  const isLocaleSupported = new i18n(params.locale).isLocaleSupported();
-  const listHeaders = headers();
+  // const isLocaleSupported = new i18n(params.locale).isLocaleSupported();
+  // const getLocale = i18n.getLocaleFromHeaders(DEFAULT_LOCALE) as Locale;
 
-  if (!isLocaleSupported) {
-    const getLocale = i18n.getLocaleFromHeaders(listHeaders, DEFAULT_LOCALE) as Locale;
-
-    if (Object.values(PATH_NAMES).includes(params.locale as PathNames)) {
-      return ut.redirectTo(`/${getLocale}/${params.locale}`);
-    }
-
-    params.locale = getLocale;
-  }
+  // if (!isLocaleSupported) {
+  //   if (Object.values(PATH_NAMES).includes(params.locale as PathNames)) {
+  //     return ut.redirectTo(`/${getLocale}/${params.locale}`);
+  //   }
+  //   return notFound();
+  // }
 
   let messages;
   try {
     messages = (await import(`#/messages/${params.locale}.json`)).default;
   } catch (error) {
-    notFound();
+    ut.redirectTo(`/`);
   }
-  // Check if the user is using a mobile device. In case it can't be detected it will be assumed
-  const isMobile = ut.isMobile(listHeaders.get("user-agent") ?? "Android");
-
   return (
     <>
       <html lang={params.locale} className={cm(poppinsFont.className, "bg-white")}>
-        <body
-          className={cm(
-            isMobile ? "" : "relative grid h-screen grid-rows-[auto,1fr] overflow-hidden"
-          )}
-        >
+        <body>
           <NextIntlClientProvider locale={params.locale} messages={messages}>
             <Providers>{children}</Providers>
           </NextIntlClientProvider>

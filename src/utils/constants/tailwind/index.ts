@@ -4,6 +4,8 @@ export const TEXT_VARIANTS = {
   gradient:
     "bg-gradient-to-r from-blue-600 via-purple-500 to-orange-500 text-transparent bg-clip-text",
   subtitle: "text-xl font-bold text-gray-800 dark:text-gray-100",
+  error: "text-red-600 dark:text-red-400",
+  success: "text-green-600 dark:text-green-400",
 };
 
 export const BUTTON_VARIANTS = {

@@ -62,6 +62,12 @@ model PasswordAttemps {
   userId       String?   @unique
 }
 
+model WaitingListDesktop {
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  createdAt DateTime @default(now())
+}
+
 enum Type {
   OAUTH
   CREDENTIALS

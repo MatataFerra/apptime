@@ -8,7 +8,7 @@ interface Props {
 
 export default function NoMobileLayout({ children }: Props) {
   return (
-    <>
+    <main className="relative grid h-screen grid-rows-[auto,1fr] overflow-hidden">
       <header className="flex items-center justify-start gap-2 px-4 py-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/assets/apptime-logo.svg" alt="App time logo" width={25} height={25} />
@@ -16,7 +16,7 @@ export default function NoMobileLayout({ children }: Props) {
           App Time
         </Text>
       </header>
-      <main className={cm("flex flex-col items-center justify-center p-2")}>{children}</main>
-    </>
+      <section className={cm("flex flex-col items-center justify-center p-2")}>{children}</section>
+    </main>
   );
 }

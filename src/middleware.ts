@@ -3,14 +3,12 @@ import createIntlMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
 import TokenService from "./services/Token";
 import ut from "./services/Utilities";
-import { SUPPORTED_LOCALES, USER_ROLES } from "./utils/constants";
+import { USER_ROLES } from "./utils/constants";
 import { PATH_NAMES } from "./utils/constants/pathnames";
 import i18n from "./services/i18n";
 
 const locales = ["en", "es"];
-
 const localeDefault: any = {};
-
 const intlMiddleware = createIntlMiddleware({
   locales,
   defaultLocale: "en",
