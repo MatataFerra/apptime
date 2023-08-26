@@ -25,6 +25,7 @@ module.exports = {
 
       animation: {
         text: "text 5s ease infinite",
+        shake: "shake 1s ease 1",
       },
       keyframes: {
         text: {
@@ -37,6 +38,18 @@ module.exports = {
             "background-position": "right center",
           },
         },
+
+        shake: {
+          "0%, 100%": {
+            transform: "translateX(0)",
+          },
+          "10%, 30%, 50%, 70%, 90%": {
+            transform: "translateX(-3px)",
+          },
+          "20%, 40%, 60%, 80%": {
+            transform: "translateX(3px)",
+          },
+        }
       },
     },
   },
