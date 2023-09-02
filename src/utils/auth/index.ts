@@ -1,10 +1,10 @@
-import { NextAuthOptions } from "next-auth";
-import { AuthService, UserService } from "@/services";
-import _ from "lodash";
-import GoogleProvider from "next-auth/providers/google";
-import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
-import prisma from "#/prisma/client";
+import _ from "lodash";
+import { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+
+import { AuthService, UserService } from "@/services";
 
 export const authOptions: NextAuthOptions = {
   providers: [

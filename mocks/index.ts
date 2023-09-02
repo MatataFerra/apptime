@@ -1,8 +1,10 @@
-import userMock from "#/mocks/user.prisma.json";
-import profileMock from "#/mocks/profile.prisma.json";
-import { addDays, addMinutes, differenceInMinutes } from "date-fns";
 import { Profile, Shift, User } from "@prisma/client";
+import { addDays, addMinutes, differenceInMinutes } from "date-fns";
+
 import { generateRandomID } from "@/utils/helpers";
+
+import profileMock from "#/mocks/profile.prisma.json";
+import userMock from "#/mocks/user.prisma.json";
 
 /**
  * Now date for testing the dashboard service

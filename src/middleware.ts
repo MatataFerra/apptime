@@ -1,11 +1,13 @@
+import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "next-auth/middleware";
 import createIntlMiddleware from "next-intl/middleware";
-import { NextRequest, NextResponse } from "next/server";
-import TokenService from "./services/Token";
-import ut from "./services/Utilities";
-import { USER_ROLES } from "./utils/constants";
-import { PATH_NAMES } from "./utils/constants/pathnames";
-import i18n from "./services/i18n";
+
+import i18n from "@/services/i18n";
+import TokenService from "@/services/Token";
+import ut from "@/services/Utilities";
+
+import { USER_ROLES } from "@/utils/constants";
+import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 const locales = ["en", "es"];
 const localeDefault: any = {};

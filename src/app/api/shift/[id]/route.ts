@@ -1,9 +1,12 @@
-import prisma from "#/prisma/client";
-import { NextRequest, NextResponse } from "next/server";
-import { ErrorFactory } from "@/services";
 import { Shift } from "@prisma/client";
-import { RouteParams, ShiftUpdateSchema } from "@/types";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { NextRequest, NextResponse } from "next/server";
+
+import { ErrorFactory } from "@/services";
+
+import { RouteParams, ShiftUpdateSchema } from "@/types";
+
+import prisma from "#/prisma/client";
 
 export async function PUT(req: NextRequest, { params }: RouteParams) {
   const body: Shift = await req.json();

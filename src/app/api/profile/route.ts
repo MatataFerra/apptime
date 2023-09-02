@@ -1,10 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
-import { ErrorFactory } from "@/services";
-import prisma from "#/prisma/client";
 import { Profile } from "@prisma/client";
-import { ProfileCreateSchema } from "@/types";
 import { PrismaClientValidationError } from "@prisma/client/runtime/library";
+import { NextRequest, NextResponse } from "next/server";
+
+import { ErrorFactory } from "@/services";
+
+import { ProfileCreateSchema } from "@/types";
+
 import { QUERY_PARAMS } from "@/utils/constants";
+
+import prisma from "#/prisma/client";
 
 export async function GET(req: NextRequest) {
   const userId = req.nextUrl.searchParams.get(QUERY_PARAMS.USER_ID);

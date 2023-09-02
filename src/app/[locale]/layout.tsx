@@ -1,15 +1,17 @@
 import React from "react";
-import "@/app/globals.css";
-import { Providers } from "@/providers";
 
 import { Poppins } from "next/font/google";
-import { cm } from "@/utils/helpers";
-import { ut } from "@/services";
-import { notFound } from "next/navigation";
-import { LocaleParams, Locale, PathNames } from "@/types";
 import { NextIntlClientProvider } from "next-intl";
-import i18n from "@/services/i18n";
-import { DEFAULT_LOCALE, PATH_NAMES } from "@/utils/constants";
+
+import { ut } from "@/services";
+
+import { LocaleParams } from "@/types";
+
+import { Providers } from "@/providers";
+
+import { cm } from "@/utils/helpers";
+
+import "@/app/globals.css";
 
 export function generateStaticParams() {
   return [{ locale: "en" }, { locale: "de" }];

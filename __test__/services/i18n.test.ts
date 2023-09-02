@@ -1,4 +1,5 @@
 import i18n from "@/services/i18n";
+
 import en from "#/messages/en.json";
 import es from "#/messages/es.json";
 

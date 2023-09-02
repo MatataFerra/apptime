@@ -1,10 +1,14 @@
-import prisma from "#/prisma/client";
-import { ErrorFactory } from "@/services";
-import { RouteParams, SearchParamsSchema, UserUpdateSchema } from "@/types";
-import { QUERY_PARAMS } from "@/utils/constants";
 import { User } from "@prisma/client";
 import { PrismaClientValidationError } from "@prisma/client/runtime/library";
-import { NextResponse, NextRequest } from "next/server";
+import { NextRequest,NextResponse } from "next/server";
+
+import { ErrorFactory } from "@/services";
+
+import { RouteParams, SearchParamsSchema, UserUpdateSchema } from "@/types";
+
+import { QUERY_PARAMS } from "@/utils/constants";
+
+import prisma from "#/prisma/client";
 
 export async function GET(req: NextRequest, { params }: RouteParams) {
   const searchParams = await req.nextUrl.searchParams;

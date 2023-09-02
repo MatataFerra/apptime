@@ -1,6 +1,7 @@
 import { Profile, Shift, User } from "@prisma/client";
 import { JWT } from "next-auth/jwt";
 import { z } from "zod";
+
 import { HandleErrorTypeSchema } from "../zod";
 
 // Types

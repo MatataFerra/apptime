@@ -1,7 +1,8 @@
 import { PrismaClientInitializationError } from "@prisma/client/runtime/library";
-import { Exception, ExceptionsInterface } from "./factory";
-import { ZodError } from "zod";
 import _ from "lodash";
+import { ZodError } from "zod";
+
+import { Exception, ExceptionsInterface } from "./factory";
 
 /**
  * @class UserNotFound

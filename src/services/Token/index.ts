@@ -1,7 +1,8 @@
-import { JWTDecodedType } from "@/types";
-import { decode } from "next-auth/jwt";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { cookies as cookieStore } from "next/headers";
+import { decode } from "next-auth/jwt";
+
+import { JWTDecodedType } from "@/types";
 
 interface TokenServiceInterface {
   cookie: RequestCookie | undefined;

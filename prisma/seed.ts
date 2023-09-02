@@ -1,9 +1,10 @@
 /* eslint-disable no-console */
 
-import { addDays, addMinutes, differenceInMinutes } from "date-fns";
-import prisma from "./client";
 import { Shift, User } from "@prisma/client";
 import { hashSync } from "bcryptjs";
+import { addDays, addMinutes, differenceInMinutes } from "date-fns";
+
+import prisma from "./client";
 const now = new Date();
 const datesMock = [
   now, // today

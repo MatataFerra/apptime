@@ -1,7 +1,10 @@
 import { User } from "@prisma/client";
-import prisma from "#/prisma/client";
+
 import { TokenService } from "@/services";
+
 import { USER_ROLES } from "@/utils/constants";
+
+import prisma from "#/prisma/client";
 
 type FindUniqueUserType = {
   id?: string | null;

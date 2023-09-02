@@ -1,10 +1,14 @@
-import prisma from "#/prisma/client";
-import { NextRequest, NextResponse } from "next/server";
 import { Shift } from "@prisma/client";
-import { ShiftCreateSchema } from "@/types";
-import { ShiftService, ErrorFactory } from "@/services";
 import { PrismaClientValidationError } from "@prisma/client/runtime/library";
+import { NextRequest, NextResponse } from "next/server";
+
+import { ErrorFactory,ShiftService } from "@/services";
+
+import { ShiftCreateSchema } from "@/types";
+
 import { QUERY_PARAMS } from "@/utils/constants";
+
+import prisma from "#/prisma/client";
 
 export async function GET(req: NextRequest) {
   const userId = req.nextUrl.searchParams.get(QUERY_PARAMS.USER_ID);

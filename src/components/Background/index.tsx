@@ -1,6 +1,8 @@
-import { CSSClassNames } from "@/types";
-import { cm } from "@/utils/helpers";
 import { SVGProps } from "react";
+
+import { CSSClassNames } from "@/types";
+
+import { cm } from "@/utils/helpers";
 
 interface Props {
   img?: string;

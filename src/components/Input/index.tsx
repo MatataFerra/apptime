@@ -1,7 +1,9 @@
+import { forwardRef, HTMLInputTypeAttribute, ReactElement, Ref } from "react";
+
 import { CSSClassNames } from "@/types";
+
 import { INPUT_VARIANTS } from "@/utils/constants";
 import { cm } from "@/utils/helpers";
-import { HTMLInputTypeAttribute, ReactElement, Ref, forwardRef } from "react";
 
 type Variants = keyof typeof INPUT_VARIANTS;
 

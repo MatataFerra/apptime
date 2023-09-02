@@ -3,12 +3,13 @@
  */
 
 import React from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import Suscribe from "@/components/Suscribe"; // Ajusta la ruta según sea necesario
-import { NextIntlProvider } from "next-intl";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { enableFetchMocks } from "jest-fetch-mock";
+import { NextIntlProvider } from "next-intl";
+
+import Suscribe from "@/components/Suscribe"; // Ajusta la ruta según sea necesario
 
 enableFetchMocks();
 describe("Suscribe Component", () => {
