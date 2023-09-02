@@ -1,38 +1,34 @@
 "use client";
 
+// third party imports
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+// services
+import db from "@/services/Database";
+
+// types
+import { Inputs, SuscribeSchema } from "@/types";
+
+// components
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import Text from "@/components/Text";
-import { useMutation } from "@tanstack/react-query";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-
-const SuscribeSchema = z.object({
-  email: z.string().email(),
-});
-
-type Inputs = z.infer<typeof SuscribeSchema>;
+import Loader from "@/components/Loader";
 
 function Suscribe() {
   const t = useTranslations("no-mobile");
-  function createWaitingList(email: Inputs["email"]) {
-    return fetch("/api/waiting-list", {
-      method: "POST",
-      body: JSON.stringify({ email }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  }
+
   const mutation = useMutation({
-    mutationFn: createWaitingList,
+    mutationFn: db.createWaitingList,
   });
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitSuccessful },
+
+    formState: { errors, isSubmitSuccessful, isSubmitting, isValid },
   } = useForm<Inputs>({
     resolver: zodResolver(SuscribeSchema),
   });
@@ -41,11 +37,22 @@ function Suscribe() {
     mutation.mutate(event.email);
   }
 
+  function onKeyPress(event: React.KeyboardEvent<HTMLFormElement>) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleSubmit(onSubmit)();
+    }
+  }
+
   return (
-    <article className="h-44 space-y-4 rounded-lg bg-gray-900 bg-opacity-80 bg-clip-padding px-8 py-4 backdrop-blur-sm backdrop-filter">
+    <article className="h-44 space-y-4 rounded-lg bg-black bg-opacity-80 bg-clip-padding px-8 py-4 backdrop-blur-sm backdrop-filter">
       <Text classes="text-lg text-white">{t("subscription.notifyMessage")}</Text>
 
-      <form className="flex justify-between gap-2" onSubmit={handleSubmit(onSubmit)}>
+      <form
+        className="flex justify-between gap-2"
+        onSubmit={handleSubmit(onSubmit)}
+        onKeyDown={onKeyPress}
+      >
         <Input
           variants="default"
           placeholder="username@email.com"
@@ -62,11 +69,13 @@ function Suscribe() {
           </div>
         </Button>
       </form>
-      {!isSubmitSuccessful ? (
+      {isSubmitting && <Loader.spinner />}
+
+      {!isValid && (
         <Text classes="animate-shake text-sm text-red-700">{errors.email?.message}</Text>
-      ) : mutation.isSuccess ? (
-        <Text variants="success">{t("subscription.successMessage")}</Text>
-      ) : null}
+      )}
+
+      {isSubmitSuccessful && <Text variants="success">{t("subscription.successMessage")}</Text>}
     </article>
   );
 }

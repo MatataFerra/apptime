@@ -3,7 +3,6 @@ import Negotiator from "negotiator";
 import { NextRequest } from "next/server";
 import { match as matchLocale } from "@formatjs/intl-localematcher";
 import { Locale, PathNames } from "@/types";
-import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
 import { headers } from "next/headers";
 
 class i18n {
