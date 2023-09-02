@@ -94,6 +94,14 @@ const SearchParamsSchema = z.object({
   profile: z.string().nullable(),
 });
 
+/* 
+  Suscribe Schema
+*/
+
+const SuscribeSchema = z.object({
+  email: z.string().email({ message: "Email is not valid" }),
+});
+
 /**
  * @description Enum to handle errors
  */
@@ -126,4 +134,5 @@ export {
   ProfileCreateSchema,
   SearchParamsSchema,
   HandleErrorTypeSchema,
+  SuscribeSchema,
 };

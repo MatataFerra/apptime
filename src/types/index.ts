@@ -1,5 +1,7 @@
 import { PATH_NAMES, SUPPORTED_LOCALES } from "@/utils/constants";
 import { HTMLAttributes } from "react";
+import { z } from "zod";
+import { SuscribeSchema } from ".";
 
 export * from "@/types/zod";
 export * from "@/types/services";
@@ -36,3 +38,5 @@ export type PathNames = (typeof PATH_NAMES)[keyof typeof PATH_NAMES];
 export type PathNamesPaths = {
   [key in PathNames]: string;
 };
+
+export type Inputs = z.infer<typeof SuscribeSchema>;
