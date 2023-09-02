@@ -7,9 +7,6 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import Suscribe from "@/components/Suscribe"; // Ajusta la ruta según sea necesario
 import { NextIntlProvider } from "next-intl";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { server } from "#/mocks/server";
-import { post_waiting_list } from "#/mocks/handlers";
-import { rest } from "msw";
 
 import { enableFetchMocks } from "jest-fetch-mock";
 
@@ -115,7 +112,7 @@ describe("Suscribe Component", () => {
     const button = screen.getByText("Notify Me");
     fireEvent.click(button);
 
-    expect(await screen.findByText("Invalid email")).toBeInTheDocument();
+    expect(await screen.findByText("Email is not valid")).toBeInTheDocument();
   });
 
   test("Suscribe to the waiting list with an empty email", async () => {
@@ -134,6 +131,25 @@ describe("Suscribe Component", () => {
     const button = screen.getByText("Notify Me");
     fireEvent.click(button);
 
-    expect(await screen.findByText("Invalid email")).toBeInTheDocument();
+    expect(await screen.findByText("Email is not valid")).toBeInTheDocument();
+  });
+
+  test("Show loader when submitting", async () => {
+    render(
+      <Providers locale="en">
+        <Suscribe />
+      </Providers>
+    );
+
+    // Simula la entrada de datos en el campo de correo electrónico
+    const emailInput = screen.getByPlaceholderText("username@email.com");
+    fireEvent.input(emailInput, { target: { value: "username@email.com" } });
+
+    // Simula hacer clic en el botón
+    const button = screen.getByText("Notify Me");
+    fireEvent.click(button);
+
+    const loader = screen.getByRole("status");
+    await waitFor(() => expect(loader).toBeInTheDocument());
   });
 });
