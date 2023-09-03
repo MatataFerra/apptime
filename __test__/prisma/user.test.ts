@@ -1,6 +1,6 @@
-import { prismaMock } from "#/prisma/singleton";
-import prisma from "#/prisma/client";
 import { userMocked } from "#/mocks";
+import prisma from "#/prisma/client";
+import { prismaMock } from "#/prisma/singleton";
 
 async function findFirstMock() {
   const user = await prisma.user.findFirst({

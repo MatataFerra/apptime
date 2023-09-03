@@ -1,9 +1,11 @@
-import { AuthService, ErrorFactory, PasswordService, UserService } from "@/services";
-import _ from "lodash";
-import { UserCreateSchema } from "@/types";
 import { User } from "@prisma/client";
+import _ from "lodash";
 import { NextRequest, NextResponse } from "next/server";
+
+import { AuthService, ErrorFactory, PasswordService, UserService } from "@/services";
 import { Exception } from "@/services/Error/factory";
+
+import { UserCreateSchema } from "@/types";
 
 export async function POST(req: NextRequest) {
   const body: User = await req.json();

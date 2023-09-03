@@ -1,8 +1,8 @@
 import _ from "lodash";
-import { NextRequestWithAuth } from "next-auth/middleware";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
+import { NextRequestWithAuth } from "next-auth/middleware";
 
 /**
  * @class Utilities

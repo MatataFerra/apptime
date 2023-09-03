@@ -1,9 +1,12 @@
 import { isThisWeek, max } from "date-fns";
-import { userMocked, userShiftsMocked } from "#/mocks";
 import _ from "lodash";
+
 import DashboardService from "@/services/Dashboard";
-import { UserModelSchema } from "@/types";
 import ShiftService from "@/services/Shift";
+
+import { UserModelSchema } from "@/types";
+
+import { userMocked, userShiftsMocked } from "#/mocks";
 
 describe("Dashboard Service", () => {
   test("should return the number of shifts", () => {

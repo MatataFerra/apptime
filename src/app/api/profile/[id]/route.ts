@@ -1,9 +1,12 @@
-import prisma from "#/prisma/client";
-import { ProfileUpdateSchema, RouteParams } from "@/types";
 import { Profile } from "@prisma/client";
-import { NextRequest, NextResponse } from "next/server";
-import { ErrorFactory } from "@/services";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { NextRequest, NextResponse } from "next/server";
+
+import { ErrorFactory } from "@/services";
+
+import { ProfileUpdateSchema, RouteParams } from "@/types";
+
+import prisma from "#/prisma/client";
 
 export async function PUT(req: NextRequest, { params }: RouteParams) {
   const body: Profile = await req.json();

@@ -1,20 +1,22 @@
 import _ from "lodash";
+
+import { HandleErrorType } from "@/types";
+
 import {
-  UserNotFound,
-  UserAlreadyExists,
-  UserNotAllowed,
   BodyNotProvided,
+  DataProvidedIsNotValid,
   InternalServer,
+  PasswordIsNotValid,
   PrismaClientFields,
   PrismaClientUpdateRecord,
   ProfileAlreadyExists,
   ProfileNotFound,
   QueryNotProvided,
   ShiftNotFound,
-  PasswordIsNotValid,
-  DataProvidedIsNotValid,
+  UserAlreadyExists,
+  UserNotAllowed,
+  UserNotFound,
 } from "./errors";
-import { HandleErrorType } from "@/types";
 
 export type Exception = {
   message: string;

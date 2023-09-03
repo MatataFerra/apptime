@@ -1,7 +1,10 @@
-import prisma from "#/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+
 import { DashboardService, ErrorFactory } from "@/services";
+
 import { QUERY_PARAMS } from "@/utils/constants";
+
+import prisma from "#/prisma/client";
 
 export async function GET(req: NextRequest) {
   const userId = req.nextUrl.searchParams.get(QUERY_PARAMS.USER_ID);

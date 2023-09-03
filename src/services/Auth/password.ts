@@ -1,8 +1,10 @@
-import prisma from "#/prisma/client";
-import _ from "lodash";
-import bcrypt from "bcryptjs";
-import { UserService, ErrorFactory } from "@/services";
 import { PasswordAttemps } from "@prisma/client";
+import bcrypt from "bcryptjs";
+import _ from "lodash";
+
+import { ErrorFactory,UserService } from "@/services";
+
+import prisma from "#/prisma/client";
 
 /**
  * Password class

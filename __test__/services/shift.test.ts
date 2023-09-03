@@ -1,10 +1,13 @@
-import ShiftService from "@/services/Shift";
-import PayService from "@/services/Pay";
-import shiftMock from "#/mocks/shift.prisma.json";
-import profileMock from "#/mocks/profile.prisma.json";
 import { Shift } from "@prisma/client";
-import { now } from "@/utils/constants";
 import { addMinutes } from "date-fns";
+
+import PayService from "@/services/Pay";
+import ShiftService from "@/services/Shift";
+
+import { now } from "@/utils/constants";
+
+import profileMock from "#/mocks/profile.prisma.json";
+import shiftMock from "#/mocks/shift.prisma.json";
 
 const DIFFERENCE_SHIFT = 480;
 const start = new Date(now).toString();

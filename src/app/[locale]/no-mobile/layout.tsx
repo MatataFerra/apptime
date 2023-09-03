@@ -1,6 +1,8 @@
-import { Text } from "@/components";
-import { cm } from "@/utils/helpers";
 import { ReactElement } from "react";
+
+import { Text } from "@/components";
+
+import { cm } from "@/utils/helpers";
 
 interface Props {
   children: ReactElement;

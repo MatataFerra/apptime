@@ -1,22 +1,19 @@
 "use client";
 
-// third party imports
-import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
-import { zodResolver } from "@hookform/resolvers/zod";
 
-// services
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+
 import db from "@/services/Database";
 
-// types
 import { Inputs, SuscribeSchema } from "@/types";
 
-// components
 import Button from "@/components/Button";
 import Input from "@/components/Input";
-import Text from "@/components/Text";
 import Loader from "@/components/Loader";
+import Text from "@/components/Text";
 
 function Suscribe() {
   const t = useTranslations("no-mobile");

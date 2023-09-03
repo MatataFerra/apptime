@@ -1,6 +1,8 @@
 import { Profile, Shift } from "@prisma/client";
-import ProfileService from "../Profile";
+
 import { UserType } from "@/types";
+
+import ProfileService from "../Profile";
 
 type PayServiceType = {
   publicHolidayParams: {

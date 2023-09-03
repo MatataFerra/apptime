@@ -2,9 +2,9 @@ import {
   DefaultBodyType,
   PathParams,
   ResponseComposition,
+  rest,
   RestContext,
   RestRequest,
-  rest,
 } from "msw";
 
 export async function post_waiting_list(

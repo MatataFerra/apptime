@@ -1,10 +1,13 @@
-import { PATH_NAMES, SUPPORTED_LOCALES } from "@/utils/constants";
 import { HTMLAttributes } from "react";
+
 import { z } from "zod";
+
+import { PATH_NAMES, SUPPORTED_LOCALES } from "@/utils/constants";
+
 import { SuscribeSchema } from ".";
 
-export * from "@/types/zod";
 export * from "@/types/services";
+export * from "@/types/zod";
 
 /* 
   Routes types

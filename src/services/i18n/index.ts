@@ -1,9 +1,11 @@
-import { SUPPORTED_LOCALES } from "@/utils/constants";
-import Negotiator from "negotiator";
-import { NextRequest } from "next/server";
 import { match as matchLocale } from "@formatjs/intl-localematcher";
-import { Locale, PathNames } from "@/types";
+import Negotiator from "negotiator";
 import { headers } from "next/headers";
+import { NextRequest } from "next/server";
+
+import { Locale, PathNames } from "@/types";
+
+import { SUPPORTED_LOCALES } from "@/utils/constants";
 
 class i18n {
   defaultLocale: Locale;

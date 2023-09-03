@@ -1,8 +1,12 @@
-import prisma from "#/prisma/client";
+import { NextRequest,NextResponse } from "next/server";
+
 import { ErrorFactory } from "@/services";
+
 import { SearchParamsSchema } from "@/types";
+
 import { QUERY_PARAMS } from "@/utils/constants";
-import { NextResponse, NextRequest } from "next/server";
+
+import prisma from "#/prisma/client";
 
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;

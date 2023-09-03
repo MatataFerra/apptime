@@ -1,8 +1,11 @@
+import React, { ReactElement } from "react";
+
+import _ from "lodash";
+
 import { CSSClassNames } from "@/types";
+
 import { TEXT_VARIANTS } from "@/utils/constants";
 import { cm } from "@/utils/helpers";
-import _ from "lodash";
-import React, { ReactElement } from "react";
 
 type As = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span";
 type Variants = keyof typeof TEXT_VARIANTS;

@@ -1,7 +1,10 @@
-import { Text } from "@/components";
 import { ut } from "@/services";
 import i18n from "@/services/i18n";
+
 import { LocaleParams } from "@/types";
+
+import { Text } from "@/components";
+
 import { PATH_NAMES } from "@/utils/constants";
 
 export default async function Home({ params }: { params: LocaleParams }) {
