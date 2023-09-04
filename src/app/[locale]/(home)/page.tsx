@@ -1,8 +1,9 @@
-import { ut } from "@/services";
 import i18n from "@/services/i18n";
+import ut from "@/services/Utilities";
 
 import { LocaleParams } from "@/types";
 
+import LoginScreen from "@/modules/login";
 import { Text } from "@/components";
 
 import { PATH_NAMES } from "@/utils/constants";
@@ -16,7 +17,10 @@ export default async function Home({ params }: { params: LocaleParams }) {
 
   return (
     <main className="flex h-[100dvh] flex-col items-center justify-center p-2">
-      <Text>Screen compatibility HOME</Text>
+      <Text variants="title" className="mb-4">
+        Home
+      </Text>
+      <LoginScreen />
     </main>
   );
 }

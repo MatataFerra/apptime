@@ -25,6 +25,8 @@ export default withAuth(async function middleware(req: NextRequest) {
   localeDefault.locale = locale;
   const parsedPath = i18n.parsePathname(nextPathName, locale);
 
+  console.log({ parsedPath });
+
   const pathnameIsMissingLocale = i18n.isMissingLocale(nextPathName);
 
   if (pathnameIsMissingLocale) {
@@ -62,15 +64,16 @@ export default withAuth(async function middleware(req: NextRequest) {
 });
 
 export const config = {
+  //! tratar de reemplazar con un array de rutas para evitar escribirlas a mano
   matcher: [
     "/",
-    "/no-mobile",
+    "/es",
+    "/en",
     "/admin",
     "/es/admin",
-    "/es",
-    "/es/no-mobile",
-    "/en",
-    "/en/no-mobile",
     "/en/admin",
+    "/no-mobile",
+    "/es/no-mobile",
+    "/en/no-mobile",
   ],
 };

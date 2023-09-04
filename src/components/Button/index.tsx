@@ -7,7 +7,8 @@ import { cm } from "@/utils/helpers";
 
 type Variants = keyof typeof BUTTON_VARIANTS;
 
-interface Props {
+interface Props
+  extends React.HTMLAttributes<HTMLButtonElement | HTMLAnchorElement | HTMLDivElement> {
   as?: "button" | "a" | "div";
   classes?: CSSClassNames;
   variants?: Variants;
@@ -19,6 +20,7 @@ function Button({
   classes,
   variants = "primary",
   children = "Send",
+  ...props
 }: Props): ReactElement {
   const Component = as;
 
@@ -29,6 +31,7 @@ function Button({
         BUTTON_VARIANTS[variants],
         classes
       )}
+      {...props}
     >
       {children}
     </Component>
