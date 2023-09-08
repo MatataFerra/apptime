@@ -35,7 +35,7 @@ class i18n {
     return I18N.dictionaries[lang]() ?? I18N.dictionaries.en();
   }
 
-  getLocale(request: NextRequest): Locale | undefined {
+  getLocale(request: NextRequest): Locale {
     // Negotiator expects plain object so we need to transform headers
     const negotiatorHeaders: Record<string, string> = {};
     request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));

@@ -2,13 +2,11 @@ import { ReactElement } from "react";
 
 import { Text } from "@/components";
 
-import { cm } from "@/utils/helpers";
-
 interface Props {
   children: ReactElement;
 }
 
-export default function NoMobileLayout({ children }: Props) {
+export default function LoginLayout({ children }: Props) {
   return (
     <main className="relative grid h-screen grid-rows-[auto,1fr] overflow-hidden">
       <header className="flex items-center justify-start gap-2 px-4 py-2">
@@ -18,7 +16,7 @@ export default function NoMobileLayout({ children }: Props) {
           App Time
         </Text>
       </header>
-      <section className={cm("flex flex-col items-center justify-center p-2")}>{children}</section>
+      <section className="flex flex-col items-center justify-center p-2">{children}</section>
     </main>
   );
 }

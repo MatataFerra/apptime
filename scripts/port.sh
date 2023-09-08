@@ -23,5 +23,5 @@ if [ -z "$pid" ]; then
 fi
 
 # Matar el proceso
-sudo pkill -9 -P "$pid"
+sudo kill "$pid"
 echo "Killed process $pid on port $port"

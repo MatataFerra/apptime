@@ -35,16 +35,6 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: LocaleParams;
 }) {
-  // const isLocaleSupported = new i18n(params.locale).isLocaleSupported();
-  // const getLocale = i18n.getLocaleFromHeaders(DEFAULT_LOCALE) as Locale;
-
-  // if (!isLocaleSupported) {
-  //   if (Object.values(PATH_NAMES).includes(params.locale as PathNames)) {
-  //     return ut.redirectTo(`/${getLocale}/${params.locale}`);
-  //   }
-  //   return notFound();
-  // }
-
   let messages;
   try {
     messages = (await import(`#/messages/${params.locale}.json`)).default;

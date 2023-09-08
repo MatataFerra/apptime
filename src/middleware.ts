@@ -6,13 +6,11 @@ import i18n from "@/services/i18n";
 import TokenService from "@/services/Token";
 import ut from "@/services/Utilities";
 
-import { USER_ROLES } from "@/utils/constants";
-import { PATH_NAMES } from "@/utils/constants/pathnames";
+import { PATH_NAMES, SUPPORTED_LOCALES, USER_ROLES } from "@/utils/constants";
 
-const locales = ["en", "es"];
 const localeDefault: any = {};
 const intlMiddleware = createIntlMiddleware({
-  locales,
+  locales: [...SUPPORTED_LOCALES],
   defaultLocale: "en",
   localePrefix: "always",
 });
@@ -24,8 +22,6 @@ export default withAuth(async function middleware(req: NextRequest) {
   const locale = I18N.getLocale(req) ?? "en";
   localeDefault.locale = locale;
   const parsedPath = i18n.parsePathname(nextPathName, locale);
-
-  console.log({ parsedPath });
 
   const pathnameIsMissingLocale = i18n.isMissingLocale(nextPathName);
 
@@ -45,20 +41,18 @@ export default withAuth(async function middleware(req: NextRequest) {
   }
 
   if (i18n.isRouteSupported(PATH_NAMES.HOME, nextPathName)) {
-    const headers = new Headers(req.headers).get("user-agent") ?? "";
-    const parsedPath = i18n.parsePathname(PATH_NAMES.NO_MOBILE, locale);
+    const noMobilePath = i18n.parsePathname(PATH_NAMES.NO_MOBILE, locale);
 
-    if (!ut.isMobile(headers)) {
-      return ut.redirect(req, parsedPath);
+    if (!ut.isMobile({ request: req })) {
+      return ut.redirect(req, noMobilePath);
     }
   }
 
   if (i18n.isRouteSupported(PATH_NAMES.NO_MOBILE, nextPathName)) {
-    const headers = new Headers(req.headers).get("user-agent") ?? "";
-    const parsedPath = i18n.parsePathname(PATH_NAMES.HOME, locale);
+    const homePath = i18n.parsePathname(PATH_NAMES.HOME, locale);
 
-    if (ut.isMobile(headers)) {
-      return ut.redirect(req, parsedPath);
+    if (ut.isMobile({ request: req })) {
+      return ut.redirect(req, homePath);
     }
   }
 });
