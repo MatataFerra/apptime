@@ -79,6 +79,18 @@ class Utilities {
   public static redirectTo(destination: string) {
     return redirect(destination);
   }
+
+  /**
+   * @description Check if the value is a truty value.
+   * @param value {string} - The value to check if it's a truty value.
+   * @returns {boolean} - Returns true if the value is a truty value.
+   */
+
+  public static isTrutyValue(value: string) {
+    const isTrue = /^true/i.test(value);
+
+    return isTrue;
+  }
 }
 
 export default Utilities;

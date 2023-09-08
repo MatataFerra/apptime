@@ -97,6 +97,14 @@ export async function GET(req: NextApiRequest & NextRequest, res: NextResponse &
 
         return tokenClone;
       },
+
+      async redirect({ url, baseUrl }) {
+        const isMobile = ut.isMobile({ request: req });
+        const parseUrl = new URL(baseUrl);
+        parseUrl.searchParams.set("isMobile", isMobile.toString());
+
+        return parseUrl.href;
+      },
     },
   });
 }
