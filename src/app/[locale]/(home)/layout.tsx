@@ -12,7 +12,7 @@ export default function HomeLayout({ children }: Props) {
       <header>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/assets/apptime-logo.svg" alt="App time logo" width={50} height={50} />
-        <Text as="h1" variants="title" classes="text-center text-6xl">
+        <Text as="h1" variant="title" classes="text-center text-6xl">
           App Time home
         </Text>
       </header>

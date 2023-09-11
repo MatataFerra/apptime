@@ -1,5 +1,5 @@
 import i18n from "@/services/i18n";
-import ut from "@/services/Utilities";
+import ut from "@/services/Utilities/client";
 
 import { LocaleParams } from "@/types";
 
@@ -17,7 +17,7 @@ export default async function Home({ params }: { params: LocaleParams }) {
 
   return (
     <main className="flex h-[100dvh] flex-col items-center justify-center p-2">
-      <Text variants="title" className="mb-4">
+      <Text variant="title" classes="mb-4">
         Home
       </Text>
       <LoginScreen />

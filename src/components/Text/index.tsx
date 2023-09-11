@@ -10,10 +10,14 @@ import { cm } from "@/utils/helpers";
 type As = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span";
 type Variants = keyof typeof TEXT_VARIANTS;
 
-interface Props extends React.HTMLAttributes<HTMLElement> {
+interface Props
+  extends Omit<
+    React.HTMLAttributes<HTMLHeadingElement | HTMLParagraphElement | HTMLSpanElement>,
+    "className"
+  > {
   as?: As;
   classes?: CSSClassNames;
-  variants?: Variants;
+  variant?: Variants;
   children: (string | ReactElement)[] | string | ReactElement | undefined;
 }
 
@@ -33,18 +37,12 @@ interface Props extends React.HTMLAttributes<HTMLElement> {
  * @default "default"
  */
 
-function Text({
-  children,
-  as = "p",
-  classes,
-  variants = "default",
-  ...props
-}: Props): ReactElement {
+function Text({ children, as = "p", classes, variant = "default", ...props }: Props): ReactElement {
   const Component = as;
 
   return (
     <Component
-      className={cm(TEXT_VARIANTS[variants], classes, _.isArray(children) && "inline-flex gap-2")}
+      className={cm(TEXT_VARIANTS[variant], classes, _.isArray(children) && "inline-flex gap-2")}
       {...props}
     >
       {children}

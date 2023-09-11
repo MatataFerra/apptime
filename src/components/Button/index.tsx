@@ -8,17 +8,20 @@ import { cm } from "@/utils/helpers";
 type Variants = keyof typeof BUTTON_VARIANTS;
 
 interface Props
-  extends React.HTMLAttributes<HTMLButtonElement | HTMLAnchorElement | HTMLDivElement> {
+  extends Omit<
+    React.HTMLAttributes<HTMLButtonElement | HTMLAnchorElement | HTMLDivElement>,
+    "className"
+  > {
   as?: "button" | "a" | "div";
   classes?: CSSClassNames;
-  variants?: Variants;
+  variant?: Variants;
   children?: (string | ReactElement)[] | string | ReactElement;
 }
 
 function Button({
   as = "button",
   classes,
-  variants = "primary",
+  variant = "primary",
   children = "Send",
   ...props
 }: Props): ReactElement {
@@ -27,8 +30,8 @@ function Button({
   return (
     <Component
       className={cm(
-        "w-40 cursor-pointer rounded-lg px-2 py-1 text-center font-bold",
-        BUTTON_VARIANTS[variants],
+        "w-40 cursor-pointer rounded-lg px-2 py-1 text-center",
+        BUTTON_VARIANTS[variant],
         classes
       )}
       {...props}
