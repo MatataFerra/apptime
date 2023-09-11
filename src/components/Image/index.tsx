@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { cm } from "@/utils/helpers";
+import { cm } from "@/utils/helpers/styleMerger";
 
 interface ImgProps {
   src: string;

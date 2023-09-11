@@ -6,7 +6,8 @@ import i18n from "@/services/i18n";
 import TokenService from "@/services/Token";
 import ut from "@/services/Utilities";
 
-import { PATH_NAMES, SUPPORTED_LOCALES, USER_ROLES } from "@/utils/constants";
+import { SUPPORTED_LOCALES, USER_ROLES } from "@/utils/constants";
+import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 const localeDefault: any = {};
 const intlMiddleware = createIntlMiddleware({

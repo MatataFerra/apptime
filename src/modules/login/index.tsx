@@ -1,8 +1,8 @@
-import { Input } from "@/components";
 import LoginFooter from "@/components/Footer/login";
+import Input from "@/components/Input";
 import Text from "@/components/Text";
 
-import { GRADIENTS } from "@/utils/constants";
+import { GRADIENTS } from "@/utils/constants/tailwind";
 
 function LoginScreen() {
   return (

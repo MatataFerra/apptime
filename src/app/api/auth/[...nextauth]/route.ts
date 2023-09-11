@@ -6,11 +6,13 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
-import { AuthService, UserService, ut } from "@/services";
+import AuthService from "@/services/Auth";
 import i18n from "@/services/i18n";
+import UserService from "@/services/User";
+import ut from "@/services/Utilities";
 
 import { authOptions } from "@/utils/auth";
-import { PATH_NAMES } from "@/utils/constants";
+import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 export async function GET(req: NextApiRequest & NextRequest, res: NextResponse & NextApiResponse) {
   const locale = new i18n("en").getLocale(req);

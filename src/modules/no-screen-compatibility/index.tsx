@@ -2,7 +2,7 @@ import Background from "@/components/Background";
 import Suscribe from "@/components/Suscribe";
 import Text from "@/components/Text";
 
-import { GRADIENTS } from "@/utils/constants";
+import { GRADIENTS } from "@/utils/constants/tailwind";
 
 function NoScreenCompatibility() {
   return (

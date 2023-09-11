@@ -3,8 +3,8 @@
 
 import ut from "@/services/Utilities/client";
 
-import { ScreenDetector } from "@/modules";
 import LoginScreen from "@/modules/login";
+import ScreenDetector from "@/modules/screen-detector";
 
 // export default async function Login({ searchParams }: { searchParams: { callbackUrl: string } }) {
 //   const param = searchParams.callbackUrl.split("?")[1].split("=")[1];

@@ -3,8 +3,8 @@ import { CSSClassNames } from "@/types";
 import Img from "@/components/Image";
 import Text from "@/components/Text";
 
-import { GRADIENTS, HEADER_POSITION } from "@/utils/constants";
-import { cm } from "@/utils/helpers";
+import { GRADIENTS, HEADER_POSITION } from "@/utils/constants/tailwind";
+import { cm } from "@/utils/helpers/styleMerger";
 
 interface Props {
   position?: "start" | "center" | "end";
