@@ -2,7 +2,7 @@ import { PasswordAttemps } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import _ from "lodash";
 
-import { ErrorFactory,UserService } from "@/services";
+import UserService from "@/services/User";
 
 import prisma from "#/prisma/client";
 

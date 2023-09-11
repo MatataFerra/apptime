@@ -1,11 +1,11 @@
-import { ut } from "@/services";
 import i18n from "@/services/i18n";
+import ut from "@/services/Utilities";
 
 import { LocaleParams } from "@/types";
 
-import { Text } from "@/components";
+import Text from "@/components/Text";
 
-import { PATH_NAMES } from "@/utils/constants";
+import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 export default async function Home({ params }: { params: LocaleParams }) {
   const isLocaleSupported = new i18n(params.locale).isLocaleSupported();

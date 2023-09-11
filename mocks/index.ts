@@ -1,7 +1,7 @@
 import { Profile, Shift, User } from "@prisma/client";
 import { addDays, addMinutes, differenceInMinutes } from "date-fns";
 
-import { generateRandomID } from "@/utils/helpers";
+import { generateRandomID } from "@/utils/helpers/generateRandomID";
 
 import profileMock from "#/mocks/profile.prisma.json";
 import userMock from "#/mocks/user.prisma.json";

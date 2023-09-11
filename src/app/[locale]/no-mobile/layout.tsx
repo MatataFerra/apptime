@@ -1,8 +1,8 @@
 import { ReactElement } from "react";
 
-import { Text } from "@/components";
+import Text from "@/components/Text";
 
-import { cm } from "@/utils/helpers";
+import { cm } from "@/utils/helpers/styleMerger";
 
 interface Props {
   children: ReactElement;

@@ -2,8 +2,8 @@ import { User } from "@prisma/client";
 import _ from "lodash";
 import { NextRequest, NextResponse } from "next/server";
 
-import { AuthService, ErrorFactory, PasswordService, UserService } from "@/services";
-import { Exception } from "@/services/Error/factory";
+import AuthService from "@/services/Auth";
+import ErrorFactory, { type Exception } from "@/services/Error/factory";
 
 import { UserCreateSchema } from "@/types";
 
