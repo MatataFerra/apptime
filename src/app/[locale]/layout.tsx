@@ -3,7 +3,7 @@ import React from "react";
 import { Poppins } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 
-import { ut } from "@/services";
+import ut from "@/services/Utilities/client";
 
 import { LocaleParams } from "@/types";
 
