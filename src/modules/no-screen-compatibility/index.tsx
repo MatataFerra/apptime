@@ -1,4 +1,6 @@
-import { Background, Suscribe, Text } from "@/components";
+import Background from "@/components/Background";
+import Suscribe from "@/components/Suscribe";
+import Text from "@/components/Text";
 
 function NoScreenCompatibility() {
   return (

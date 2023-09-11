@@ -4,8 +4,8 @@ import _ from "lodash";
 
 import { CSSClassNames } from "@/types";
 
-import { TEXT_VARIANTS } from "@/utils/constants";
-import { cm } from "@/utils/helpers";
+import { TEXT_VARIANTS } from "@/utils/constants/tailwind";
+import { cm } from "@/utils/helpers/styleMerger";
 
 type As = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span";
 type Variants = keyof typeof TEXT_VARIANTS;

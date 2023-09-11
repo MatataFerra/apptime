@@ -3,13 +3,13 @@ import React from "react";
 import { Poppins } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 
-import { ut } from "@/services";
+import ut from "@/services/Utilities";
 
 import { LocaleParams } from "@/types";
 
-import { Providers } from "@/providers";
+import Providers from "@/providers/Providers";
 
-import { cm } from "@/utils/helpers";
+import { cm } from "@/utils/helpers/styleMerger";
 
 import "@/app/globals.css";
 

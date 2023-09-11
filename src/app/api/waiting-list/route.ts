@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { object, string } from "zod";
 
-import { ErrorFactory } from "@/services";
+import ErrorFactory from "@/services/Error/factory";
 
 export async function GET() {
   const waitingList = await prisma?.waitingListDesktop.findMany();

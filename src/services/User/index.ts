@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
 
-import { TokenService } from "@/services";
+import TokenService from "@/services/Token";
 
 import { USER_ROLES } from "@/utils/constants";
 

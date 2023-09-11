@@ -4,7 +4,8 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
-import { AuthService, UserService } from "@/services";
+import AuthService from "@/services/Auth";
+import UserService from "@/services/User";
 
 export const authOptions: NextAuthOptions = {
   providers: [

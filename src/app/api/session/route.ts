@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { ErrorFactory, UserService } from "@/services";
+import ErrorFactory from "@/services/Error/factory";
+import UserService from "@/services/User";
 
 export async function GET(request: Request) {
   const user = await UserService.authenticatedUser();

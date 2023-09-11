@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-import { Text } from "@/components";
+import Text from "@/components/Text";
 
 interface Props {
   children: ReactElement;

@@ -2,7 +2,8 @@ import { HTMLAttributes } from "react";
 
 import { z } from "zod";
 
-import { PATH_NAMES, SUPPORTED_LOCALES } from "@/utils/constants";
+import { SUPPORTED_LOCALES } from "@/utils/constants";
+import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 import { SuscribeSchema } from ".";
 
