@@ -7,9 +7,9 @@ import ut from "@/services/Utilities/client";
 
 import { LocaleParams } from "@/types";
 
-import { Providers } from "@/providers";
+import Providers from "@/providers/Providers";
 
-import { cm } from "@/utils/helpers";
+import { cm } from "@/utils/helpers/styleMerger";
 
 import "@/app/globals.css";
 

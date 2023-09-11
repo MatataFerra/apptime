@@ -1,6 +1,6 @@
-import { NextRequest,NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-import { ErrorFactory } from "@/services";
+import ErrorFactory from "@/services/Error/factory";
 
 import { SearchParamsSchema } from "@/types";
 

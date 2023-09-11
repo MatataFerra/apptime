@@ -2,7 +2,7 @@ import { Shift } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { NextRequest, NextResponse } from "next/server";
 
-import { ErrorFactory } from "@/services";
+import ErrorFactory from "@/services/Error/factory";
 
 import { RouteParams, ShiftUpdateSchema } from "@/types";
 

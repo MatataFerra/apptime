@@ -1,9 +1,11 @@
 import { User } from "@prisma/client";
 import jwt from "jsonwebtoken";
-import { getServerSession,Session } from "next-auth";
+import { getServerSession, Session } from "next-auth";
 import { signIn, signOut } from "next-auth/react";
 
-import { ErrorFactory, PasswordService,UserService } from "@/services";
+import PasswordService from "@/services/Auth/password";
+import ErrorFactory from "@/services/Error/factory";
+import UserService from "@/services/User";
 
 import { authOptions } from "@/utils/auth";
 

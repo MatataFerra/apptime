@@ -1,8 +1,8 @@
 import { User } from "@prisma/client";
 import { PrismaClientValidationError } from "@prisma/client/runtime/library";
-import { NextRequest,NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-import { ErrorFactory } from "@/services";
+import ErrorFactory from "@/services/Error/factory";
 
 import { RouteParams, SearchParamsSchema, UserUpdateSchema } from "@/types";
 

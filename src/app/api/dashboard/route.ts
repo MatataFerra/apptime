@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { DashboardService, ErrorFactory } from "@/services";
+import DashboardService from "@/services/Dashboard";
+import ErrorFactory from "@/services/Error/factory";
 
 import { QUERY_PARAMS } from "@/utils/constants";
 

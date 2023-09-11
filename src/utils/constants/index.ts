@@ -1,6 +1,3 @@
-export * from "@/utils/constants/pathnames";
-export * from "@/utils/constants/tailwind";
-
 /* 
   @summary Contants for Routes
   @description This constants are used to handle routes

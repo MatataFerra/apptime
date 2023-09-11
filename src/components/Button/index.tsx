@@ -2,8 +2,8 @@ import { ReactElement } from "react";
 
 import { CSSClassNames } from "@/types";
 
-import { BUTTON_VARIANTS } from "@/utils/constants";
-import { cm } from "@/utils/helpers";
+import { BUTTON_VARIANTS } from "@/utils/constants/tailwind";
+import { cm } from "@/utils/helpers/styleMerger";
 
 type Variants = keyof typeof BUTTON_VARIANTS;
 
