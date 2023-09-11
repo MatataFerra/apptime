@@ -8,3 +8,14 @@
   background-size: cover;
   background-position: center;
 }
+
+.bg-login {
+  background-image: url("/assets/bg-login.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center 30%;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
