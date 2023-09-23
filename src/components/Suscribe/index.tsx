@@ -51,7 +51,7 @@ function Suscribe() {
         onKeyDown={onKeyPress}
       >
         <Input
-          variants="default"
+          variant="default"
           placeholder="username@email.com"
           classes="w-full"
           type="text"

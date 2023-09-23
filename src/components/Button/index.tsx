@@ -5,27 +5,27 @@ import { CSSClassNames } from "@/types";
 import { BUTTON_VARIANTS } from "@/utils/constants/tailwind";
 import { cm } from "@/utils/helpers/styleMerger";
 
-type Variants = keyof typeof BUTTON_VARIANTS;
+export const ButtonDefaultAsType = "button" as const;
 
-interface Props
-  extends Omit<
-    React.HTMLAttributes<HTMLButtonElement | HTMLAnchorElement | HTMLDivElement>,
-    "className"
-  > {
-  as?: "button" | "a" | "div";
+type ButtonOwnProps<E extends React.ElementType> = {
+  children?: (string | ReactElement)[] | string | ReactElement;
+  as?: E;
   classes?: CSSClassNames;
   variant?: Variants;
-  children?: (string | ReactElement)[] | string | ReactElement;
-}
+};
+type Variants = keyof typeof BUTTON_VARIANTS;
 
-function Button({
-  as = "button",
+type Props<E extends React.ElementType> = ButtonOwnProps<E> &
+  Omit<Omit<React.ComponentProps<E>, "className">, keyof ButtonOwnProps<E>>;
+
+function Button<E extends React.ElementType = typeof ButtonDefaultAsType>({
+  as,
   classes,
   variant = "primary",
   children = "Send",
   ...props
-}: Props): ReactElement {
-  const Component = as;
+}: Props<E>): ReactElement {
+  const Component = as || ButtonDefaultAsType;
 
   return (
     <Component

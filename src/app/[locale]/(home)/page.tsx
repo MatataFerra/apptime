@@ -17,10 +17,9 @@ export default async function Home({ params }: { params: LocaleParams }) {
 
   return (
     <main className="flex h-[100dvh] flex-col items-center justify-center p-2">
-      <Text variant="title" classes="mb-4">
-        Home
+      <Text variant="error" classes="mb-4">
+        Logout de la app ya que todavía no está implementada la home
       </Text>
-      <LoginScreen />
     </main>
   );
 }

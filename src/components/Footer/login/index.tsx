@@ -1,24 +1,26 @@
 "use client";
-import ut from "@/services/Utilities/client";
+import { CSSClassNames } from "@/types";
 
 import Button from "@/components/Button";
 import Img from "@/components/Image";
 import Text from "@/components/Text";
 
-function LoginFooter() {
-  function onClick() {
-    // eslint-disable-next-line no-console
-    console.log("click");
-  }
+import { cm } from "@/utils/helpers/styleMerger";
+
+interface Props extends Omit<React.HTMLAttributes<HTMLElement>, "className"> {
+  classes?: CSSClassNames;
+}
+
+function LoginFooter({ classes, ...props }: Props) {
   return (
-    <footer className="flex flex-col justify-center gap-2">
-      <Button variant="primary" classes="w-full text-2xl font-bold" onClick={onClick}>
+    <footer className={cm("flex flex-col justify-center gap-2", classes)} {...props}>
+      <Button type="submit" variant="primary" classes="w-full text-2xl font-bold">
         Login
       </Button>
       <Button
+        type="submit"
         variant="google"
         classes="mx-0 my-auto grid w-full grid-cols-1 items-center"
-        onClick={onClick}
       >
         <Img
           classes="col-start-1 col-end-2 row-start-1 row-end-2"
