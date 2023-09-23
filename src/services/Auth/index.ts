@@ -65,11 +65,11 @@ class Auth implements AuthServiceInterface {
     }
 
     // validate and hash password
-    const isValidPassword = PasswordService.validatePassword(this.user.password);
+    const isValidPassword = new PasswordService(this.user.password).validPassword();
 
     if (!isValidPassword.valid) {
       throw ErrorFactory.createError("PasswordIsNotValid", {
-        error: isValidPassword.error,
+        error: isValidPassword.errors,
       });
     }
     const password = await PasswordService.hashPassword(isValidPassword.password);

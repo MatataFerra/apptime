@@ -1,10 +1,33 @@
-import { PasswordAttemps } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import _ from "lodash";
+import { isEmpty, isEqual } from "lodash";
 
-import UserService from "@/services/User";
+import { PASSWORD_CODE_ERRORS, PASSWORD_MESSAGE_ERROR } from "@/utils/constants";
 
-import prisma from "#/prisma/client";
+type ErrorCodeType = {
+  errors: {
+    capital: {
+      code: number;
+      message: string;
+    };
+
+    len: {
+      code: number;
+      message: string;
+    };
+
+    number: {
+      code: number;
+      message: string;
+    };
+
+    specialChar: {
+      code: number;
+      message: string;
+    };
+  };
+
+  valid: boolean;
+};
 
 /**
  * Password class
@@ -15,15 +38,30 @@ import prisma from "#/prisma/client";
  * isValid and maxAttemps
  * @method isValid - Checks if the password is valid
  * @returns {Object} { valid: Boolean, error: String } - Returns an object with the valid property and the error
- * @method maxAttemps - Checks if the user has reached the maximum number of
- * attempts
  *
  *
  */
 export default class Password {
   password: string;
+  validations: ErrorCodeType;
   constructor(password: string) {
     this.password = password;
+    this.validations = {
+      errors: {} as ErrorCodeType["errors"],
+      valid: false,
+    };
+  }
+
+  addCode(type: string, code: keyof typeof PASSWORD_CODE_ERRORS) {
+    this.validations.errors = {
+      ...this.validations.errors,
+      [type]: {
+        code: PASSWORD_CODE_ERRORS[code],
+        message: this.getErrorMessages(code),
+      },
+    };
+
+    return this.validations;
   }
 
   private _hasOneCapital() {
@@ -35,70 +73,51 @@ export default class Password {
   }
 
   private _hasCorrectLenght() {
-    return this.password.length >= 8;
+    return this.password?.length >= 8;
   }
 
   private _hasOneSpecialCharacter() {
     return /[^A-Za-z0-9]/.test(this.password);
   }
 
-  async maxAttemps(max: number) {
-    const user = await UserService.authenticatedUser();
-    const maxAttemps: PasswordAttemps | null = await prisma.passwordAttemps.findFirst({
-      where: {
-        userId: user?.id,
-      },
-    });
+  getErrorMessages(code: keyof typeof PASSWORD_MESSAGE_ERROR) {
+    return PASSWORD_MESSAGE_ERROR[code];
   }
 
-  isValid(): { valid: boolean; error?: string } {
+  private runValidations() {
     if (!this._hasOneCapital()) {
-      return {
-        valid: false,
-        error: "Password must have at least one capital letter",
-      };
+      this.addCode("capital", "CAPITAL_LETTER");
     }
     if (!this._hasOneNumber()) {
-      return {
-        valid: false,
-        error: "Password must have at least one number",
-      };
+      this.addCode("number", "ONE_NUMBER");
     }
 
     if (!this._hasCorrectLenght()) {
-      return {
-        valid: false,
-        error: "Password must have at least 8 characters",
-      };
+      this.addCode("len", "MIN_LENGTH");
     }
 
     if (!this._hasOneSpecialCharacter()) {
-      return {
-        valid: false,
-        error: "Password must have at least one special character",
-      };
+      this.addCode("specialChar", "SPECIAL_CHAR");
     }
 
-    return {
-      valid: true,
-    };
+    return { ...this.validations, valid: isEmpty(this.validations), password: this.password };
   }
 
-  static validatePassword(password: string): {
-    valid: boolean;
-    error?: string;
-    password: string;
-  } {
+  private isValid() {
+    return this.runValidations();
+  }
+
+  public static validatePassword(password: string) {
     const isValidPassword = new Password(password).isValid();
     if (!isValidPassword.valid) {
-      return {
-        valid: false,
-        password,
-        error: isValidPassword.error,
-      };
+      return isValidPassword;
     }
 
     return { ...isValidPassword, password };
+  }
+
+  validPassword() {
+    return this.isValid();
   }
 
   static async hashPassword(password: string) {
@@ -110,6 +129,6 @@ export default class Password {
   }
 
   isSamePassword(password: string, confirmPassword: string): boolean {
-    return _.isEqual(password, confirmPassword);
+    return isEqual(password, confirmPassword);
   }
 }
