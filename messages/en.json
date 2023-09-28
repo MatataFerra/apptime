@@ -5,5 +5,8 @@
       "notifyMessage": "Do you want to get notice when the app is available for desktop?",
       "successMessage": "Thank you for subscribing!"
     }
+  },
+  "login": {
+    "wrongPassword": "User or password are not valid"
   }
 }
