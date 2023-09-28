@@ -41,7 +41,7 @@ type ErrorCodeType = {
  *
  *
  */
-export default class Password {
+class Password {
   password: string;
   validations: ErrorCodeType;
   constructor(password: string) {
@@ -100,7 +100,11 @@ export default class Password {
       this.addCode("specialChar", "SPECIAL_CHAR");
     }
 
-    return { ...this.validations, valid: isEmpty(this.validations), password: this.password };
+    return {
+      ...this.validations,
+      valid: isEmpty(this.validations.errors),
+      password: this.password,
+    };
   }
 
   private isValid() {
@@ -132,3 +136,5 @@ export default class Password {
     return isEqual(password, confirmPassword);
   }
 }
+
+export default Password;
