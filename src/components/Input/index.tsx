@@ -19,7 +19,7 @@ function Input(props: Props, ref: Ref<HTMLInputElement>): ReactElement<Props> {
   const { classes, variant = "default", type, label, labelClasses, ...rest } = props;
 
   return (
-    <section className="flex flex-col">
+    <section className={cm(label ? "flex flex-col" : "contents")}>
       {label ? (
         <label className={cm("text-2xl", labelClasses)} htmlFor={label}>
           {label}
