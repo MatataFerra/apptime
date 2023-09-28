@@ -2,7 +2,8 @@
 
 # Verificar si se proporcionó el puerto como argumento
 if [ $# -ne 1 ]; then
-  echo "Usage: $0 <port>"
+  echo "Please provide a port"
+  echo "Usage: bash $0 <port>"
   exit 1
 fi
 
@@ -22,6 +23,4 @@ if [ -z "$pid" ]; then
   exit 1
 fi
 
-# Matar el proceso
-sudo pkill -9 -P "$pid"
-echo "Killed process $pid on port $port"
+echo "Proccess with port: $port -> $pid"

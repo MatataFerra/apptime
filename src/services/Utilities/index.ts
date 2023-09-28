@@ -1,6 +1,5 @@
 import _ from "lodash";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 import { NextRequestWithAuth } from "next-auth/middleware";
 
@@ -15,7 +14,14 @@ class Utilities {
    * @returns {boolean} - Returns true if the user is using a mobile device.
    */
 
-  public static isMobile(nextHeaders: string): boolean {
+  public static isMobile({
+    request,
+    headers,
+  }: {
+    request?: NextRequest;
+    headers?: string;
+  }): boolean {
+    const nextHeaders = (request ? new Headers(request?.headers).get("user-agent") : headers) ?? "";
     const isMobile =
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Mobile Safari/i.test(
         nextHeaders
@@ -62,15 +68,6 @@ class Utilities {
     const url = req.nextUrl.clone();
     url.pathname = destination;
     return NextResponse.redirect(url);
-  }
-
-  /**
-   * @description Redirect the user to a specific page, doesn't require request object
-   * @param destination - The destination to redirect the user to.
-   */
-
-  public static redirectTo(destination: string) {
-    return redirect(destination);
   }
 }
 

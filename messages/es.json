@@ -5,5 +5,8 @@
       "notifyMessage": "¿Quieres que te avisemos cuando la versión de escritorio esté disponible?",
       "successMessage": "¡Gracias por suscribirte!"
     }
+  },
+  "login": {
+    "wrongPassword": "Usuario o contraseña incorrectos"
   }
 }

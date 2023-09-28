@@ -44,3 +44,8 @@ export type PathNamesPaths = {
 };
 
 export type Inputs = z.infer<typeof SuscribeSchema>;
+
+export type LoginInputs = {
+  email: string;
+  password: string;
+};

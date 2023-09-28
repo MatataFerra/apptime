@@ -51,14 +51,14 @@ function Suscribe() {
         onKeyDown={onKeyPress}
       >
         <Input
-          variants="default"
+          variant="default"
           placeholder="username@email.com"
           classes="w-full"
           type="text"
           {...register("email")}
         />
         <Button
-          variants="gradient"
+          variant="gradient"
           classes="transform animate-text p-1 transition-transform active:scale-75"
         >
           <div className="items-center justify-center rounded-[inherit] bg-gray-800 px-3 py-1 transition-all hover:bg-gray-900">
@@ -72,7 +72,7 @@ function Suscribe() {
         <Text classes="animate-shake text-sm text-red-700">{errors.email?.message}</Text>
       )}
 
-      {isSubmitSuccessful && <Text variants="success">{t("subscription.successMessage")}</Text>}
+      {isSubmitSuccessful && <Text variant="success">{t("subscription.successMessage")}</Text>}
     </article>
   );
 }

@@ -6,13 +6,12 @@ import i18n from "@/services/i18n";
 import TokenService from "@/services/Token";
 import ut from "@/services/Utilities";
 
-import { USER_ROLES } from "@/utils/constants";
+import { SUPPORTED_LOCALES, USER_ROLES } from "@/utils/constants";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-const locales = ["en", "es"];
 const localeDefault: any = {};
 const intlMiddleware = createIntlMiddleware({
-  locales,
+  locales: [...SUPPORTED_LOCALES],
   defaultLocale: "en",
   localePrefix: "always",
 });
@@ -43,34 +42,33 @@ export default withAuth(async function middleware(req: NextRequest) {
   }
 
   if (i18n.isRouteSupported(PATH_NAMES.HOME, nextPathName)) {
-    const headers = new Headers(req.headers).get("user-agent") ?? "";
-    const parsedPath = i18n.parsePathname(PATH_NAMES.NO_MOBILE, locale);
+    const noMobilePath = i18n.parsePathname(PATH_NAMES.NO_MOBILE, locale);
 
-    if (!ut.isMobile(headers)) {
-      return ut.redirect(req, parsedPath);
+    if (!ut.isMobile({ request: req })) {
+      return ut.redirect(req, noMobilePath);
     }
   }
 
   if (i18n.isRouteSupported(PATH_NAMES.NO_MOBILE, nextPathName)) {
-    const headers = new Headers(req.headers).get("user-agent") ?? "";
-    const parsedPath = i18n.parsePathname(PATH_NAMES.HOME, locale);
+    const homePath = i18n.parsePathname(PATH_NAMES.HOME, locale);
 
-    if (ut.isMobile(headers)) {
-      return ut.redirect(req, parsedPath);
+    if (ut.isMobile({ request: req })) {
+      return ut.redirect(req, homePath);
     }
   }
 });
 
 export const config = {
+  //! tratar de reemplazar con un array de rutas para evitar escribirlas a mano
   matcher: [
     "/",
-    "/no-mobile",
+    "/es",
+    "/en",
     "/admin",
     "/es/admin",
-    "/es",
-    "/es/no-mobile",
-    "/en",
-    "/en/no-mobile",
     "/en/admin",
+    "/no-mobile",
+    "/es/no-mobile",
+    "/en/no-mobile",
   ],
 };

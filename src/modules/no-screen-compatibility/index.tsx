@@ -2,22 +2,24 @@ import Background from "@/components/Background";
 import Suscribe from "@/components/Suscribe";
 import Text from "@/components/Text";
 
+import { GRADIENTS } from "@/utils/constants/tailwind";
+
 function NoScreenCompatibility() {
   return (
     <section className="grid h-full grid-cols-2 grid-rows-4">
       <aside className="z-50 col-start-2 row-start-1 row-end-[-1] flex flex-col items-end justify-between gap-1">
         <nav className="flex flex-col items-end gap-1">
-          <Text as="h1" variants="title">
+          <Text as="h1" variant="title">
             No screen
             <Text
               as="span"
-              variants="gradient"
-              classes="animate-text from-red-300 via-red-500 to-red-700 text-4xl font-bold"
+              variant="gradient"
+              classes={`animate-text  text-4xl font-bold ${GRADIENTS.error}`}
             >
               compatibility
             </Text>
           </Text>
-          <Text as="p" variants="default">
+          <Text as="p" variant="default">
             This app is only available for mobile devices
           </Text>
         </nav>

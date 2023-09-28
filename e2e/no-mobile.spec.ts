@@ -1,4 +1,6 @@
-import { expect,test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+
+import { ENTRY_URL, USER_CREDENTIALS } from "./constants";
 
 // Define the test environment
 // defineConfig({
@@ -17,12 +19,12 @@ import { expect,test } from "@playwright/test";
 
 test("should signin in desktop and goes to /no-mobile", async ({ page }) => {
   await page.goto("http://localhost:3000/");
-  await page.waitForURL("http://localhost:3000/api/auth/signin?callbackUrl=%2F");
+  await page.waitForURL(ENTRY_URL);
   // login
-  await page.getByRole("textbox").first().fill("usuario1@example.com");
-  await page.getByRole("textbox").last().fill("secreto1");
+  await page.getByRole("textbox").first().fill(USER_CREDENTIALS.email);
+  await page.getByRole("textbox").last().fill(USER_CREDENTIALS.password);
 
-  await page.click("button[type=submit]");
+  await page.getByText("Login").click();
   // check if we are on the home page
   await expect(page).toHaveURL("http://localhost:3000/en/no-mobile");
 });

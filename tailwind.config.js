@@ -17,10 +17,17 @@ module.exports = {
       colors: {
         aquatic: "#13EFA0",
         "light-gold": "#FEE954",
+        "hard-pink": "#FF2B91",
+        "common-orange": "#FF6A00"
       },
 
       fontSize: {
         "4xl": "2.25rem",
+      },
+
+      boxShadow: {
+        button: "box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+        input: "box-shadow: 0px 4px 9px 1px rgba(0, 0, 0, 0.25)        "
       },
 
       animation: {

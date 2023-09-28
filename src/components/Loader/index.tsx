@@ -8,6 +8,7 @@ interface Loader {
 
 interface Spinner {
   classes?: CSSClassNames;
+  containerClasses?: CSSClassNames;
 }
 
 function Loader(props: Loader) {
@@ -18,9 +19,9 @@ function Loader(props: Loader) {
   );
 }
 
-Loader.spinner = ({ classes }: Spinner) => {
+Loader.spinner = ({ classes, containerClasses }: Spinner) => {
   return (
-    <div role="status">
+    <div className={containerClasses} role="status">
       <svg
         aria-hidden="true"
         className={cm(

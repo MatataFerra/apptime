@@ -45,7 +45,7 @@ function addUsersMocked(): Omit<User, "id">[] {
       formCompleted: false,
       image: "https://placehold.co/100x100",
       online: false,
-      password: hashSync(`secreto${i}`, 10),
+      password: hashSync(`Secreto${i}!`, 10),
       type_account: "CREDENTIALS",
       role: i === 4 ? "ADMIN" : "USER",
       isActive: true,

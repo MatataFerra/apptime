@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import Password from "@/services/Auth/password";
+
 const ShiftModelSchema = z.object({
   id: z.number({
     required_error: "Id must be provided correctly",
@@ -102,6 +104,29 @@ const SuscribeSchema = z.object({
   email: z.string().email({ message: "Email is not valid" }),
 });
 
+/* 
+  Validate Password
+*/
+
+const PasswordSchema = z.object({
+  password: z.string().superRefine((data, ctx) => {
+    const passValidate = new Password(data).validPassword();
+
+    if (!passValidate.valid) {
+      const messages = {
+        CAPITAL_LETTER: passValidate.errors?.capital?.message,
+        MIN_LENGTH: passValidate.errors?.len?.message,
+        ONE_NUMBER: passValidate.errors?.number?.message,
+        SPECIAL_CHAR: passValidate.errors?.specialChar?.message,
+      };
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: JSON.stringify(messages, null, 2),
+      });
+    }
+  }),
+});
+
 /**
  * @description Enum to handle errors
  */
@@ -119,11 +144,13 @@ const HandleErrorTypeSchema = z.enum([
   "ProfileAlreadyExists",
   "PasswordIsNotValid",
   "DataProvidedIsNotValid",
+  "PasswordSchema",
   "CustomError",
 ]);
 
 export {
   HandleErrorTypeSchema,
+  PasswordSchema,
   ProfileCreateSchema,
   ProfileSchema,
   ProfileUpdateSchema,

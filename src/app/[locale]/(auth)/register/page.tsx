@@ -16,6 +16,7 @@ export default function Register() {
       method: "POST",
     });
     const result = await res.json();
+    // eslint-disable-next-line no-console
     console.log(result);
   }
 

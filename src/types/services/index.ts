@@ -47,3 +47,11 @@ export interface JWTDecodedType extends JWT {
   image: string;
   role: "USER" | "ADMIN" | "SUPER_USER";
 }
+
+// Password
+export type PassedErrors = {
+  CAPITAL_LETTER: boolean;
+  MIN_LENGTH: boolean;
+  ONE_NUMBER: boolean;
+  SPECIAL_CHAR: boolean;
+};

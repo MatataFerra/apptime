@@ -5,30 +5,36 @@ import { CSSClassNames } from "@/types";
 import { BUTTON_VARIANTS } from "@/utils/constants/tailwind";
 import { cm } from "@/utils/helpers/styleMerger";
 
+export const ButtonDefaultAsType = "button" as const;
+
+type ButtonOwnProps<E extends React.ElementType> = {
+  children?: (string | ReactElement)[] | string | ReactElement;
+  as?: E;
+  classes?: CSSClassNames;
+  variant?: Variants;
+};
 type Variants = keyof typeof BUTTON_VARIANTS;
 
-interface Props {
-  as?: "button" | "a" | "div";
-  classes?: CSSClassNames;
-  variants?: Variants;
-  children?: (string | ReactElement)[] | string | ReactElement;
-}
+type Props<E extends React.ElementType> = ButtonOwnProps<E> &
+  Omit<Omit<React.ComponentProps<E>, "className">, keyof ButtonOwnProps<E>>;
 
-function Button({
-  as = "button",
+function Button<E extends React.ElementType = typeof ButtonDefaultAsType>({
+  as,
   classes,
-  variants = "primary",
+  variant = "primary",
   children = "Send",
-}: Props): ReactElement {
-  const Component = as;
+  ...props
+}: Props<E>): ReactElement {
+  const Component = as || ButtonDefaultAsType;
 
   return (
     <Component
       className={cm(
-        "w-40 cursor-pointer rounded-lg px-2 py-1 text-center font-bold",
-        BUTTON_VARIANTS[variants],
+        "w-40 cursor-pointer rounded-lg px-2 py-1 text-center",
+        BUTTON_VARIANTS[variant],
         classes
       )}
+      {...props}
     >
       {children}
     </Component>
