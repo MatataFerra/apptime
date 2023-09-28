@@ -1,45 +1,84 @@
 "use client";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { useTranslations } from "next-intl";
 
-import pass from "@/services/Auth/password";
+import { LoginInputs } from "@/types";
 
 import LoginFooter from "@/components/Footer/login";
 import Form from "@/components/Form";
 import Input from "@/components/Input";
+import Loader from "@/components/Loader";
 
-import usePassword from "@/hooks/usePassword";
-
-import List from "./List";
-
-interface LoginInputs {
-  email: string;
-  password: string;
-}
+import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 export default function FormLogin() {
   const {
     handleSubmit,
     register,
-    formState: { touchedFields },
-    watch,
     setFocus,
+    setError,
+    formState: { errors },
   } = useForm<LoginInputs>();
-  const passWatched = watch("password");
-  const passwordChecks = usePassword(passWatched);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const t = useTranslations("login");
 
-  function onSubmit(data: LoginInputs) {
-    if (data.email.length === 0 || data.password.length === 0) {
-      return setFocus("email");
+  function onSubmit({ email, password }: LoginInputs) {
+    setLoading(true);
+    if (email.trim().length === 0) {
+      setFocus("email");
+      setLoading(false);
+
+      return;
     }
-    // eslint-disable-next-line no-console
-    console.log({ data });
+    if (password.trim().length === 0) {
+      setFocus("password");
+      setLoading(false);
+
+      return;
+    }
+
+    signIn("credentials", {
+      callbackUrl: PATH_NAMES.HOME,
+      password,
+      email,
+      redirect: false,
+    })
+      .then((res) => {
+        if (res?.error) {
+          return setError(
+            "password",
+            {
+              message: t("wrongPassword"),
+            },
+            {
+              shouldFocus: true,
+            }
+          );
+        }
+
+        if (res?.ok && !res.error) {
+          router.push(PATH_NAMES.HOME);
+        }
+      })
+      .finally(() => setLoading(false));
   }
 
   return (
     <>
+      {loading && (
+        <div className="absolute inset-0 bg-slate-500 bg-opacity-50">
+          <Loader.spinner
+            containerClasses="flex h-full justify-center items-center"
+            classes="h-12 w-12"
+          />
+        </div>
+      )}
+
       <Form
         classes="grid h-full grid-rows-[1fr,auto]"
         autoComplete="off"
@@ -56,7 +95,9 @@ export default function FormLogin() {
               {...register("email")}
             />
             <Input
-              classes="shadow-input h-[69px] w-full rounded-md border border-gray-900 bg-white text-2xl"
+              classes={`shadow-input h-[69px] w-full rounded-md border border-gray-900 bg-white text-2xl ${
+                errors.password?.message ? "focus:ring-red-600" : "focus:ring-blue-600"
+              }`}
               variant="default"
               type="password"
               label="password"
@@ -64,10 +105,9 @@ export default function FormLogin() {
               {...register("password")}
             />
           </fieldset>
-          <span className="mt-1 text-sm">
-            <span className="text-gray-500">Password must contain:</span>
-            <List touchedFields={touchedFields} errors={passwordChecks} />
-          </span>
+          {errors.password?.message && (
+            <span className="text-sm font-bold text-red-500">{errors.password?.message}</span>
+          )}
         </section>
         <LoginFooter classes="self-end" />
       </Form>
