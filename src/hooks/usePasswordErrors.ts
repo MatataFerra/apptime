@@ -4,16 +4,19 @@ import Password from "@/services/Auth/password";
 
 import { PassedErrors } from "@/types";
 
-function usePassword(password: string) {
+function usePasswordErrors(password: string) {
   const [passedErrors, setPassedErrors] = useState<PassedErrors>({
     CAPITAL_LETTER: false,
     MIN_LENGTH: false,
     ONE_NUMBER: false,
     SPECIAL_CHAR: false,
   });
+  const [isValid, setIsValid] = useState(false);
 
   useEffect(() => {
-    const { errors } = new Password(password).validPassword();
+    const { errors, valid } = new Password(password).validPassword();
+
+    setIsValid(valid);
 
     setPassedErrors((prev) => ({
       ...prev,
@@ -24,7 +27,7 @@ function usePassword(password: string) {
     }));
   }, [password]);
 
-  return passedErrors;
+  return { passedErrors, isValid };
 }
 
-export default usePassword;
+export default usePasswordErrors;
