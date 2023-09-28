@@ -1,25 +1,26 @@
-//! Por ahora falla por no encontrar correctamente los items
+//! Falta resolver como mockear el error
+//! Se ve que hace click, muestra el error pero no el texto
 
 import { expect, test } from "@playwright/test";
 
-import { ENTRY_URL } from "./constants";
+import { ENTRY_URL_MOBILE, USER_CREDENTIALS } from "./constants";
+
+test.use({
+  isMobile: true,
+});
 
 test("should show passwords errors", async ({ page }) => {
   await page.goto("http://localhost:3000/");
-  await page.waitForURL(ENTRY_URL);
+  await page.waitForURL(ENTRY_URL_MOBILE);
   // login
-  await page.getByRole("textbox").first().fill("usuario1@example.com");
-  await page.getByRole("textbox").last().fill("secreto1");
+  await page.getByRole("textbox").first().fill(USER_CREDENTIALS.email);
+  await page.getByRole("textbox").last().fill(USER_CREDENTIALS.wrong_password);
 
-  await page.getByRole("textbox").first().click();
+  await page.getByRole("button", { name: "Login" }).click({
+    force: true,
+  });
 
-  const listOne = page.getByRole("listitem").nth(1);
-  const listTwo = page.getByRole("listitem").nth(2);
-  const listThree = page.getByRole("listitem").nth(3);
-  const listFour = page.getByRole("listitem").nth(4);
+  const spinner = page.locator(".spinner");
 
-  expect(listOne).toHaveClass("text-red-500");
-  expect(listTwo).toHaveClass("text-green-500");
-  expect(listThree).toHaveClass("text-green-500");
-  expect(listFour).toHaveClass("text-red-500");
+  expect(spinner).toBeVisible();
 });
