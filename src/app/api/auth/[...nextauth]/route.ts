@@ -66,6 +66,7 @@ export async function GET(req: NextApiRequest & NextRequest, res: NextResponse &
 
     pages: {
       signIn: `/${locale}/login`,
+      newUser: `/${locale}/register`,
     },
 
     secret: process.env.NEXTAUTH_SECRET,
