@@ -26,6 +26,7 @@ const poppinsFont = Poppins({
   weight: ["200", "400", "700"],
   subsets: ["latin"],
   variable: "--font-poppins",
+  fallback: ["system-ui"],
 });
 
 export default async function RootLayout({
