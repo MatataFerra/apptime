@@ -7,6 +7,10 @@
     }
   },
   "login": {
-    "wrongPassword": "User or password are not valid"
+    "wrongPassword": "User or password are not valid",
+    "account": {
+      "hasAccount": "Don't you have an account?",
+      "register": "register"
+    }
   }
 }

@@ -7,6 +7,10 @@
     }
   },
   "login": {
-    "wrongPassword": "Usuario o contraseña incorrectos"
+    "wrongPassword": "Usuario o contraseña incorrectos",
+    "account": {
+      "hasAccount": "No tienes una cuenta?",
+      "register": "registro"
+    }
   }
 }
