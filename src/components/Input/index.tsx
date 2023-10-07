@@ -12,28 +12,46 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   labelClasses?: CSSClassNames;
   variant?: Variants;
   type?: HTMLInputTypeAttribute;
+  isError?: boolean;
   label?: string;
 }
 
 function Input(props: Props, ref: Ref<HTMLInputElement>): ReactElement<Props> {
-  const { classes, variant = "default", type, label, labelClasses, ...rest } = props;
+  const { classes, variant = "default", type, label, labelClasses, isError, ...rest } = props;
 
   return (
-    <section className={cm(label ? "flex flex-col" : "contents")}>
+    <>
       {label ? (
-        <label className={cm("text-2xl", labelClasses)} htmlFor={label}>
+        <label className={cm("text-2xl", labelClasses)}>
           {label}
+          <input
+            ref={ref}
+            type={type}
+            autoComplete="off"
+            className={cm(
+              INPUT_VARIANTS[variant],
+              classes,
+              "rounded-lg px-2 py-1",
+              isError && "border-red-600 focus:ring-red-600"
+            )}
+            {...rest}
+          />
         </label>
-      ) : null}
-      <input
-        id={label}
-        ref={ref}
-        type={type}
-        autoComplete="new-password"
-        className={cm(INPUT_VARIANTS[variant], classes, "rounded-lg px-2 py-1")}
-        {...rest}
-      />
-    </section>
+      ) : (
+        <input
+          ref={ref}
+          type={type}
+          autoComplete="off"
+          className={cm(
+            INPUT_VARIANTS[variant],
+            classes,
+            "rounded-lg px-2 py-1",
+            isError && "border-red-600 focus:ring-red-600"
+          )}
+          {...rest}
+        />
+      )}
+    </>
   );
 }
 
