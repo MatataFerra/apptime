@@ -18,6 +18,11 @@ const config: PlaywrightTestConfig = {
   retries: 1,
   // Artifacts folder where screenshots, videos, and traces are stored.
   outputDir: "test-results/",
+  reporter: [
+    ["list"],
+    ["json", { outputFile: "test-results/results.json" }],
+    ["html", { outputFile: "test-results/results.html" }],
+  ],
 
   // Run your local dev server before starting the tests:
   // https://playwright.dev/docs/test-advanced#launching-a-development-web-server-during-the-tests
@@ -50,33 +55,38 @@ const config: PlaywrightTestConfig = {
   projects: [
     {
       name: "Desktop Chrome",
+      testIgnore: [/.*login.spec.ts/],
       use: {
         ...devices["Desktop Chrome"],
       },
     },
-    // {
-    //   name: 'Desktop Firefox',
-    //   use: {
-    //     ...devices['Desktop Firefox'],
-    //   },
-    // },
-    // {
-    //   name: 'Desktop Safari',
-    //   use: {
-    //     ...devices['Desktop Safari'],
-    //   },
-    // },
-    // Test against mobile viewports.
-    // {
-    //   name: "Mobile Chrome",
-    //   use: {
-    //     ...devices["Pixel 5"],
-    //   },
-    // },
     {
-      name: "Mobile Safari",
-      use: devices["iPhone 12"],
+      name: "Desktop Firefox",
+      testIgnore: [/.*login.spec.ts/],
+      use: {
+        ...devices["Desktop Firefox"],
+      },
     },
+    {
+      name: "Desktop Safari",
+      testIgnore: [/.*login.spec.ts/],
+      use: {
+        ...devices["Desktop Safari"],
+      },
+    },
+    // Test against mobile viewports.
+    {
+      name: "Mobile Chrome",
+      testIgnore: /.*no-mobile.spec.ts/,
+      use: {
+        ...devices["Pixel 5"],
+      },
+    },
+    // {
+    //   name: "Mobile Safari",
+    //   testIgnore: /.*no-mobile.spec.ts/,
+    //   use: devices["iPhone 12"],
+    // },
   ],
 };
 export default config;

@@ -30,7 +30,7 @@ function RegisterFooter({ classes, idForm }: Props) {
         Register
       </Button>
       <Button
-        variant="noBorder"
+        variant="outlined"
         classes={cm("w-full text-2xl transition-all hover:bg-gray-200")}
         as="a"
         href={PATH_NAMES.LOGIN}

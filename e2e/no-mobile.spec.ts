@@ -1,30 +1,21 @@
 import { expect, test } from "@playwright/test";
 
-import { ENTRY_URL, USER_CREDENTIALS } from "./constants";
+import { USER_CREDENTIALS } from "./constants";
 
-// Define the test environment
-// defineConfig({
-//   testDir: "e2e",
-//   timeout: 60000,
-//   retries: 2,
-//   use: {
-//     headless: true,
-//     viewport: { width: 1600, height: 1200 },
-//     ignoreHTTPSErrors: true,
-//     screenshot: "on",
-//     video: "on",
-//     locale: "en",
-//   },
-// });
+test.use({
+  isMobile: false,
+  browserName: "chromium",
+});
 
 test("should signin in desktop and goes to /no-mobile", async ({ page }) => {
   await page.goto("http://localhost:3000/");
-  await page.waitForURL(ENTRY_URL);
-  // login
-  await page.getByRole("textbox").first().fill(USER_CREDENTIALS.email);
-  await page.getByRole("textbox").last().fill(USER_CREDENTIALS.password);
+  await page.waitForURL(/login/, {
+    waitUntil: "domcontentloaded",
+  });
 
-  await page.getByText("Login").click();
-  // check if we are on the home page
-  await expect(page).toHaveURL("http://localhost:3000/en/no-mobile");
+  const text = page.getByText("This app is only available for mobile devices");
+  const input = page.getByRole("textbox", { name: /email/ });
+
+  expect(text).toBeInViewport();
+  expect(input).toBeInViewport();
 });

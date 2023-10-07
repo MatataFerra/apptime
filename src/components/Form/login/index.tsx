@@ -75,7 +75,7 @@ export default function FormLogin() {
         <div className="absolute inset-0 bg-slate-500 bg-opacity-50">
           <Loader.spinner
             containerClasses="flex h-full justify-center items-center"
-            classes="h-12 w-12"
+            classes="spinner h-12 w-12"
           />
         </div>
       )}
