@@ -22,7 +22,7 @@ export const BUTTON_VARIANTS = {
   info: "bg-blue-500 text-white p-3 font-bold text-white shadow-button",
   gradient: "bg-gradient-to-r from-blue-600 p-3 via-purple-500 to-orange-500 text-white",
   google: "bg-white text-black p-3 border border-gray-300 shadow-button",
-  noBorder: "bg-white text-black p-3",
+  outlined: "bg-white text-black p-3",
 };
 
 export const INPUT_VARIANTS = {

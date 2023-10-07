@@ -30,7 +30,7 @@ function Button<E extends React.ElementType = typeof ButtonDefaultAsType>({
   return (
     <Component
       className={cm(
-        "w-40 cursor-pointer rounded-lg px-2 py-1 text-center",
+        "w-40 cursor-pointer rounded-lg text-center",
         BUTTON_VARIANTS[variant],
         classes
       )}
