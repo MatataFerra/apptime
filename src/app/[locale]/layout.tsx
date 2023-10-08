@@ -7,6 +7,8 @@ import ut from "@/services/Utilities/client";
 
 import { LocaleParams } from "@/types";
 
+import { Toaster } from "@/components/Toast/toaster";
+
 import Providers from "@/providers/Providers";
 
 import { cm } from "@/utils/helpers/styleMerger";
@@ -44,10 +46,11 @@ export default async function RootLayout({
   }
   return (
     <>
-      <html lang={params.locale} className={cm(poppinsFont.className, "bg-white")}>
+      <html lang={params.locale} className={cm(poppinsFont.className)}>
         <body>
           <NextIntlClientProvider locale={params.locale} messages={messages}>
             <Providers>{children}</Providers>
+            <Toaster />
           </NextIntlClientProvider>
         </body>
       </html>
