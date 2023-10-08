@@ -1,4 +1,4 @@
-import { clsx } from "clsx";
+import { type ClassValue, clsx } from "clsx";
 import { ClassNameValue, twMerge } from "tailwind-merge";
 
 /**
@@ -23,4 +23,8 @@ import { ClassNameValue, twMerge } from "tailwind-merge";
  */
 export function cm(...styles: ClassNameValue[]) {
   return clsx(twMerge(...styles));
+}
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
 }
