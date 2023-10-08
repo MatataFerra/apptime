@@ -1,6 +1,4 @@
 "use client";
-import { useContext } from "react";
-
 import { CSSClassNames } from "@/types";
 
 import Button from "@/components/Button";

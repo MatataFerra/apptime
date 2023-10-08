@@ -6,11 +6,11 @@ import { PASSWORD } from "@/utils/constants";
 import { generateRandomID } from "@/utils/helpers/generateRandomID";
 
 interface Props {
-  touchedFields: any;
   errors: PassedErrors;
+  password: string;
 }
 
-function List({ touchedFields, errors }: Props) {
+function List({ errors, password }: Props) {
   return (
     <ul className="list-inside list-none">
       {Object.entries(PASSWORD.PASSWORD_REQUIREMENTS).map((reqs) => {
@@ -21,13 +21,7 @@ function List({ touchedFields, errors }: Props) {
             <Icon.check
               width={15}
               height={15}
-              fill={
-                touchedFields.password
-                  ? touchedFields.password && !errors[type]
-                    ? "#00ff37"
-                    : "#aa0000"
-                  : "#1C274C"
-              }
+              fill={password?.length > 0 ? (!errors[type] ? "#00ff37" : "#aa0000") : "#1C274C"}
             />
             {requirement}
           </li>

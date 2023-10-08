@@ -1,15 +1,31 @@
 "use client";
 
-import { useContext, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+//import DOMPurify from "dompurify";
+import { z } from "zod";
+
+import db from "@/services/Database";
+
+import { FailureApiResponse } from "@/types/api_response";
 
 import Form from "@/components/Form";
 import Input from "@/components/Input";
 import List from "@/components/List/register";
 
-import { PasswordValidContext, usePasswordValid } from "@/providers/PasswordValid";
+import { usePasswordValid } from "@/providers/PasswordValid";
 
+import { REGISTER_ERROR_MESSAGE } from "@/utils/constants/api_response";
 import usePasswordErrors from "@/hooks/usePasswordErrors";
+
+const RegisterSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  fullname: z.string().min(2),
+});
 
 type RegisterInputs = {
   email: string;
@@ -18,13 +34,18 @@ type RegisterInputs = {
 };
 
 function RegisterForm() {
-  const {
-    handleSubmit,
-    register,
-    getFieldState,
-    watch,
-    formState: { errors, touchedFields, isValid },
-  } = useForm<RegisterInputs>();
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const { handleSubmit, register, setFocus, watch } = useForm<RegisterInputs>({
+    resolver: zodResolver(RegisterSchema),
+  });
+  const { mutate } = useMutation({
+    mutationFn: db.register,
+    onSuccess(data) {
+      if (!data.ok) {
+        setErrorMessage(REGISTER_ERROR_MESSAGE.invalid_body);
+      }
+    },
+  });
   const { updateIsPasswordValid } = usePasswordValid();
 
   const passwordWatched = watch("password");
@@ -35,9 +56,22 @@ function RegisterForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPasswordValid]);
 
-  function onSubmit(data: RegisterInputs) {
-    // eslint-disable-next-line no-console
-    console.log({ data, isValid });
+  async function onSubmit(data: RegisterInputs) {
+    if (data.fullname.length === 0) {
+      return setFocus("fullname");
+    }
+    if (data.email.length === 0) {
+      return setFocus("email");
+    }
+    if (data.password.length === 0) {
+      return setFocus("password");
+    }
+
+    mutate({
+      email: data.email,
+      password: data.password,
+      fullname: data.fullname,
+    });
   }
 
   return (
@@ -74,8 +108,9 @@ function RegisterForm() {
             {...register("password")}
           />
         </fieldset>
-        <List touchedFields={touchedFields} errors={passedErrors} />
+        <List errors={passedErrors} password={passwordWatched} />
       </Form>
+      <p className="text-red-500" dangerouslySetInnerHTML={{ __html: errorMessage }}></p>
     </>
   );
 }
