@@ -10,10 +10,10 @@ import LayoutDesktop from "@/components/Layout/LayoutDesktop";
 import LayoutMobile from "@/components/Layout/LayoutMobile";
 
 export default async function AuthLayout({ children }: { children: ReactElement }) {
-  const userAgent = headers().get("user-agent") ?? "";
-  const isMobileHeader = ut.isMobile({ headers: userAgent });
-  // const param = "false";
-  const isMobile = utClient.isTrutyValue(isMobileHeader);
+  // const userAgent = headers().get("user-agent") ?? "";
+  // const isMobileHeader = ut.isMobile({ headers: userAgent });
+  const param = "true";
+  const isMobile = utClient.isTrutyValue(param);
 
   if (!isMobile) {
     return (
