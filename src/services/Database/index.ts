@@ -21,7 +21,7 @@ class Database {
     try {
       const response = await fetch("/api/user/create", {
         method: "POST",
-        body: JSON.stringify({ email, password, fullname, emailVerified: null }),
+        body: JSON.stringify({ email, password, name: fullname, emailVerified: null }),
         headers: {
           "Content-Type": "application/json",
         },
