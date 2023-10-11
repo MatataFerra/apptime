@@ -44,23 +44,5 @@ export const PASSWORD = {
   },
 };
 
-// export const PASSWORD_CODE_ERRORS = {
-//   CAPITAL_LETTER: 1,
-//   ONE_NUMBER: 2,
-//   MIN_LENGTH: 3,
-//   SPECIAL_CHAR: 4,
-// } as const;
-
-// export const PASSWORD_MESSAGE_ERROR: Record<keyof typeof PASSWORD_CODE_ERRORS, string> = {
-//   CAPITAL_LETTER: "Password must have at least one capital letter",
-//   ONE_NUMBER: "Password must have at least one number",
-//   MIN_LENGTH: "Password must have at least minimun length",
-//   SPECIAL_CHAR: "Password must have at least one special character",
-// } as const;
-
-// export const PASSWORD_REQUIREMENTS: Record<keyof PassedErrors, string> = {
-//   CAPITAL_LETTER: "At least 1 uppercase letter",
-//   ONE_NUMBER: "At least 1 number",
-//   MIN_LENGTH: "At least 8 characters",
-//   SPECIAL_CHAR: "At least 1 special character",
-// } as const;
+export const MAX_ATTEMPTS_TO_REGISTER = 3;
+export const MAX_TIME_FOR_RETRY_REGISTER_IN_MS = 60000;
