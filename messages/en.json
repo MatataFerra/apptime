@@ -2,15 +2,22 @@
   "no-mobile": {
     "navigation": {},
     "subscription": {
-      "notifyMessage": "Do you want to get notice when the app is available for desktop?",
-      "successMessage": "Thank you for subscribing!"
+      "notify_message": "Do you want to get notice when the app is available for desktop?",
+      "success_message": "Thank you for subscribing!"
     }
   },
   "login": {
-    "wrongPassword": "User or password are not valid",
+    "wrong_password": "User or password are not valid",
     "account": {
-      "hasAccount": "Don't you have an account?",
+      "has_account": "Don't you have an account?",
       "register": "register"
     }
+  },
+  "register": {
+    "invalid_body": "An error ocurr during the registration, please try again",
+    "user_already_exist": "User already exist",
+    "successful": "User created succefully, will be redirected to main page",
+    "unexpected_error_after_register": "Something happend with the redirection, please try login again",
+    "max_attemps_to_register": "You have been tried to much times, please wait to try another time"
   }
 }
