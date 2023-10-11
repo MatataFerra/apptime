@@ -15,14 +15,14 @@ interface Props extends Omit<React.HTMLAttributes<HTMLElement>, "className"> {
 }
 
 function RegisterFooter({ classes, idForm }: Props) {
-  const { isPasswordValid } = usePasswordValid();
+  const { isButtonBloqued } = usePasswordValid();
   return (
     <Footer classes={classes}>
       <Button
         type="submit"
         variant="primary"
-        classes={cm("w-full text-2xl font-bold", !isPasswordValid && "bg-gray-400 text-gray-600")}
-        disabled={!isPasswordValid}
+        classes={cm("w-full text-2xl font-bold", isButtonBloqued && "bg-gray-400 text-gray-600")}
+        disabled={isButtonBloqued}
         form={idForm}
       >
         Register

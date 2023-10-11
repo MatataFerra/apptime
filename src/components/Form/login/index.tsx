@@ -45,16 +45,16 @@ export default function FormLogin() {
 
     signIn("credentials", {
       callbackUrl: PATH_NAMES.HOME,
+      redirect: false,
       password,
       email,
-      redirect: false,
     })
       .then((res) => {
         if (res?.error) {
           return setError(
             "password",
             {
-              message: t("wrongPassword"),
+              message: t("wrong_password"),
             },
             {
               shouldFocus: true,
@@ -71,14 +71,12 @@ export default function FormLogin() {
 
   return (
     <>
-      {loading && (
-        <div className="absolute inset-0 bg-slate-500 bg-opacity-50">
-          <Loader.spinner
-            containerClasses="flex h-full justify-center items-center"
-            classes="spinner h-12 w-12"
-          />
-        </div>
-      )}
+      <Loader loading={loading}>
+        <Loader.spinner
+          containerClasses="flex h-full justify-center items-center"
+          classes="spinner h-12 w-12"
+        />
+      </Loader>
 
       <Form
         classes="grid h-full grid-rows-[1fr,auto]"
@@ -89,7 +87,7 @@ export default function FormLogin() {
         <section className="grid grid-rows-[1fr,2rem,auto] gap-3 self-center">
           <fieldset className="flex flex-col gap-4">
             <Input
-              classes="shadow-input h-[69px] w-full rounded-md border border-gray-900 bg-white text-2xl"
+              classes="h-[69px] w-full rounded-md border border-gray-900 bg-white text-2xl shadow-input"
               variant="default"
               type="email"
               label="email"
@@ -98,7 +96,7 @@ export default function FormLogin() {
               {...register("email")}
             />
             <Input
-              classes={`shadow-input h-[69px] w-full rounded-md border border-gray-900 bg-white text-2xl`}
+              classes={`h-[69px] w-full rounded-md border border-gray-900 bg-white text-2xl shadow-input`}
               variant="default"
               type="password"
               label="password"
@@ -111,9 +109,9 @@ export default function FormLogin() {
             <span className="text-sm font-bold text-red-500">{errors.password?.message}</span>
           )}
           <p className="row-start-3 text-xl">
-            {t("account.hasAccount")}{" "}
+            {t("account.has_account")}{" "}
             <Link
-              className="text-blue-500 transition duration-300 hover:underline"
+              className="font-bold text-zinc-950 underline"
               href={`/${locale}/${PATH_NAMES.REGISTER}`}
             >
               {t("account.register")}

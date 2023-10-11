@@ -4,6 +4,8 @@ import { cm } from "@/utils/helpers/styleMerger";
 
 interface Loader {
   className?: CSSClassNames;
+  children?: React.ReactElement | React.ReactElement[];
+  loading?: boolean;
 }
 
 interface Spinner {
@@ -13,9 +15,11 @@ interface Spinner {
 
 function Loader(props: Loader) {
   return (
-    <div role="status">
-      <span className={props.className}>Loading...</span>
-    </div>
+    <>
+      {props.loading ? (
+        <div className="absolute inset-0 bg-slate-500 bg-opacity-50">{props.children}</div>
+      ) : null}
+    </>
   );
 }
 
