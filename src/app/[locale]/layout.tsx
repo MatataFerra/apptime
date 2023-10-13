@@ -7,7 +7,7 @@ import ut from "@/services/Utilities/client";
 
 import { LocaleParams } from "@/types";
 
-import { Toaster } from "@/components/Toast/toaster";
+import { Toaster } from "@/components/ui/Toast/toaster";
 
 import Providers from "@/providers/Providers";
 

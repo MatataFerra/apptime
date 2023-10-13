@@ -10,10 +10,10 @@ import db from "@/services/Database";
 
 import { Inputs, SuscribeSchema } from "@/types";
 
-import Button from "@/components/Button";
-import Input from "@/components/Input";
-import Loader from "@/components/Loader";
-import Text from "@/components/Text";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import Loader from "@/components/ui/Loader";
+import Text from "@/components/ui/Text";
 
 function Suscribe() {
   const t = useTranslations("no-mobile");

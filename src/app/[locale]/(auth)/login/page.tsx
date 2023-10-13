@@ -1,11 +1,11 @@
-import LoginFooter from "@/components/Footer/login";
-import FormLogin from "@/components/Form/login";
+import FooterLogin from "@/components/FooterLogin";
+import FormLogin from "@/components/FormLogin";
 
 export default async function Login() {
   return (
     <>
       <FormLogin />
-      <LoginFooter idForm="formLogin" />
+      <FooterLogin idForm="formLogin" />
     </>
   );
 }
