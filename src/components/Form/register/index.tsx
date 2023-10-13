@@ -70,11 +70,16 @@ function RegisterForm() {
         if (response.error.type_error === "UserAlreadyExists") {
           toast({
             title: t("user_already_exist"),
-            duration: 1500,
-            color: "#e6e6e6",
+            duration: 2000,
+            className: "bg-yellow-200",
+            action: <Loader.spinner bg="text-black" spinColor="fill-gray-50" />,
           });
 
-          return router.push(PATH_NAMES.LOGIN);
+          setTimeout(() => {
+            router.push(PATH_NAMES.LOGIN);
+          }, 500);
+
+          return;
         }
 
         return toast({
@@ -151,12 +156,12 @@ function RegisterForm() {
 
   return (
     <>
-      <Loader loading={isLoading}>
-        <Loader.spinner
-          containerClasses="flex h-full justify-center items-center"
-          classes="spinner h-12 w-12"
-        />
-      </Loader>
+      <Loader
+        loading={isLoading}
+        type="spinner"
+        loaderClasses="spinner h-12 w-12"
+        loaderContainerClasses="flex h-full justify-center items-center"
+      />
       <Form
         classes="mb-4 flex flex-col justify-center gap-4"
         id="registerForm"

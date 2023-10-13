@@ -71,12 +71,12 @@ export default function FormLogin() {
 
   return (
     <>
-      <Loader loading={loading}>
-        <Loader.spinner
-          containerClasses="flex h-full justify-center items-center"
-          classes="spinner h-12 w-12"
-        />
-      </Loader>
+      <Loader
+        loading={loading}
+        type="spinner"
+        loaderClasses="spinner h-12 w-12"
+        loaderContainerClasses="flex h-full justify-center items-center"
+      />
 
       <Form
         classes="grid h-full grid-rows-[1fr,auto]"
