@@ -16,8 +16,8 @@ interface Loader {
 interface Spinner {
   classes?: CSSClassNames;
   containerClasses?: CSSClassNames;
-  bg?: CSSClassNames;
-  spinColor?: CSSClassNames;
+  bg?: `text-${CSSClassNames}`;
+  spinColor?: `fill-${CSSClassNames}`;
 }
 
 function Loader(props: Loader) {
@@ -46,7 +46,7 @@ Loader.spinner = ({
   classes,
   containerClasses,
   bg = "text-gray-200",
-  spinColor = " fill-gray-600",
+  spinColor = "fill-gray-600",
 }: Spinner) => {
   return (
     <div className={containerClasses} role="status">
