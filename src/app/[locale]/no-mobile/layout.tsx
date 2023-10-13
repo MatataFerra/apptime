@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-import Header from "@/components/Header";
+import Header from "@/components/ui/Header";
 
 interface Props {
   children: ReactElement;

@@ -3,8 +3,8 @@ import ut from "@/services/Utilities/client";
 
 import { LocaleParams } from "@/types";
 
-import HomeModule from "@/modules/home";
-import Text from "@/components/Text";
+import HomeScreen from "@/components/Home";
+import Text from "@/components/ui/Text";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
@@ -20,7 +20,7 @@ export default async function Home({ params }: { params: LocaleParams }) {
       <Text variant="error" classes="mb-4">
         Logout de la app ya que todavía no está implementada la home
       </Text>
-      <HomeModule />
+      <HomeScreen />
     </main>
   );
 }

@@ -1,5 +1,5 @@
-import RegisterFooter from "@/components/Footer/register";
-import RegisterForm from "@/components/Form/register";
+import RegisterFooter from "@/components/FooterRegister";
+import RegisterForm from "@/components/FormRegister";
 
 import PasswordValidProvider from "@/providers/PasswordValid";
 
