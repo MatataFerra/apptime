@@ -69,7 +69,11 @@ const INITIAL_STATE: State = {
   isButtonBloqued: false,
 };
 
-function PasswordValidProvider({ children }: { children: React.ReactElement[] }) {
+function PasswordValidProvider({
+  children,
+}: {
+  children: React.ReactElement | React.ReactElement[];
+}) {
   const [state, dispatch] = useReducer(passwordValidationReducer, INITIAL_STATE);
 
   useEffect(() => {
