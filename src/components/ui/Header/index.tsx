@@ -1,6 +1,6 @@
 import { CSSClassNames } from "@/types";
 
-import Img from "@/components/ui/Image";
+import Logo from "@/components/ui/Logo";
 import Text from "@/components/ui/Text";
 
 import { GRADIENTS, HEADER_POSITION } from "@/utils/constants/tailwind";
@@ -16,7 +16,7 @@ function Header({ position = "start", classes }: Props) {
     <header
       className={cm("flex items-center justify-start gap-2", classes, HEADER_POSITION[position])}
     >
-      <Img src="/assets/apptime-logo.svg" alt="App time logo" width={50} height={50} />
+      <Logo />
       <Text as="h1" variant="gradient" classes={`text-2xl font-bold ${GRADIENTS.gradient_1}`}>
         App Time
       </Text>
