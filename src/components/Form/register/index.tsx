@@ -89,6 +89,7 @@ function RegisterForm() {
         title: t("successful"),
         color: "#00ff88",
         duration: 2000,
+        itemID: "success_register",
       });
 
       //Login with the credentials and redirect to the home

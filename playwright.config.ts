@@ -1,6 +1,10 @@
 import { devices, PlaywrightTestConfig } from "@playwright/test";
 import path from "path";
 
+// ignore test
+const IGNORE_TEST_DESKTOP = [/.*login.spec.ts/, /.*register.spec.ts/];
+const IGNORE_TEST_MOBILE = [/.*no-mobile.spec.ts/];
+
 // Use process.env.PORT by default and fallback to port 3000
 const PORT = process.env.PORT || 3000;
 
@@ -27,7 +31,7 @@ const config: PlaywrightTestConfig = {
   // Run your local dev server before starting the tests:
   // https://playwright.dev/docs/test-advanced#launching-a-development-web-server-during-the-tests
   webServer: {
-    command: "npm run dev",
+    command: "yarn dev",
     url: baseURL,
     timeout: 120 * 1000,
     reuseExistingServer: !process.env.CI,
@@ -55,21 +59,21 @@ const config: PlaywrightTestConfig = {
   projects: [
     {
       name: "Desktop Chrome",
-      testIgnore: [/.*login.spec.ts/],
+      testIgnore: IGNORE_TEST_DESKTOP,
       use: {
         ...devices["Desktop Chrome"],
       },
     },
     {
       name: "Desktop Firefox",
-      testIgnore: [/.*login.spec.ts/],
+      testIgnore: IGNORE_TEST_DESKTOP,
       use: {
         ...devices["Desktop Firefox"],
       },
     },
     {
       name: "Desktop Safari",
-      testIgnore: [/.*login.spec.ts/],
+      testIgnore: IGNORE_TEST_DESKTOP,
       use: {
         ...devices["Desktop Safari"],
       },
@@ -77,7 +81,7 @@ const config: PlaywrightTestConfig = {
     // Test against mobile viewports.
     {
       name: "Mobile Chrome",
-      testIgnore: /.*no-mobile.spec.ts/,
+      testIgnore: IGNORE_TEST_MOBILE,
       use: {
         ...devices["Pixel 5"],
       },
