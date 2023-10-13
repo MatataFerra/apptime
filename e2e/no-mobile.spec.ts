@@ -5,6 +5,10 @@ import { USER_CREDENTIALS } from "./constants";
 test.use({
   isMobile: false,
   browserName: "chromium",
+  viewport: {
+    width: 1920,
+    height: 1080,
+  },
 });
 
 test("should signin in desktop and goes to /no-mobile", async ({ page }) => {
@@ -16,6 +20,6 @@ test("should signin in desktop and goes to /no-mobile", async ({ page }) => {
   const text = page.getByText("This app is only available for mobile devices");
   const input = page.getByRole("textbox", { name: /email/ });
 
-  expect(text).toBeInViewport();
-  expect(input).toBeInViewport();
+  await expect(text).toBeVisible();
+  await expect(input).toBeVisible();
 });

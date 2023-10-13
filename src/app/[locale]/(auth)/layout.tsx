@@ -10,10 +10,10 @@ import LayoutMobile from "@/components/Layout/LayoutMobile";
 import NoScreenCompatibility from "@/components/NoScreenCompatibility";
 
 export default async function AuthLayout({ children }: { children: ReactElement }) {
-  // const userAgent = headers().get("user-agent") ?? "";
-  // const isMobileHeader = ut.isMobile({ headers: userAgent });
+  const userAgent = headers().get("user-agent") ?? "";
+  const isMobileHeader = ut.isMobile({ headers: userAgent });
   const param = "true";
-  const isMobile = utClient.isTrutyValue(param);
+  const isMobile = utClient.isTrutyValue(isMobileHeader);
 
   if (!isMobile) {
     return (
