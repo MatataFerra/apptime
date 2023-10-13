@@ -20,8 +20,8 @@ export async function GET(req: NextApiRequest & NextRequest, res: NextResponse &
   const headers = new Headers(req.headers).get("user-agent") ?? "";
   const noMobilePath = i18n.parsePathname(PATH_NAMES.NO_MOBILE, locale);
 
-  // if (!ut.isMobile(req)) {
-  //   return ut.redirect(req, noMobilePath);
+  // if (!ut.isMobile({ request: req })) {
+  //   console.log("is not mobile");
   // }
 
   return await NextAuth(req, res, {
@@ -66,6 +66,7 @@ export async function GET(req: NextApiRequest & NextRequest, res: NextResponse &
 
     pages: {
       signIn: `/${locale}/login`,
+      newUser: `/${locale}/register`,
     },
 
     secret: process.env.NEXTAUTH_SECRET,

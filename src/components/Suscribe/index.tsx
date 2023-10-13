@@ -43,7 +43,7 @@ function Suscribe() {
 
   return (
     <article className="h-44 space-y-4 rounded-lg bg-black bg-opacity-80 bg-clip-padding px-8 py-4 backdrop-blur-sm backdrop-filter">
-      <Text classes="text-lg text-white">{t("subscription.notifyMessage")}</Text>
+      <Text classes="text-lg text-white">{t("subscription.notify_message")}</Text>
 
       <form
         className="flex justify-between gap-2"
@@ -72,7 +72,7 @@ function Suscribe() {
         <Text classes="animate-shake text-sm text-red-700">{errors.email?.message}</Text>
       )}
 
-      {isSubmitSuccessful && <Text variant="success">{t("subscription.successMessage")}</Text>}
+      {isSubmitSuccessful && <Text variant="success">{t("subscription.success_message")}</Text>}
     </article>
   );
 }

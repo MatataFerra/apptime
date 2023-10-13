@@ -15,13 +15,14 @@ export const GRADIENTS = {
 
 export const BUTTON_VARIANTS = {
   primary: "shadow-button bg-aquatic p-3 font-bold text-black",
-  secondary: "bg-gray-200 text-gray-800 dark:bg-gray-800 dark:text-gray-100",
-  danger: "bg-red-500 text-white",
-  success: "bg-green-500 text-white",
-  warning: "bg-yellow-500 text-white",
+  secondary: "bg-gray-200 text-gray-800 dark:bg-gray-800 dark:text-gray-100 p-3",
+  danger: "bg-red-500 text-white p-3",
+  success: "bg-green-500 text-white p-3",
+  warning: "bg-yellow-500 text-white p-3",
   info: "bg-blue-500 text-white p-3 font-bold text-white shadow-button",
-  gradient: "bg-gradient-to-r from-blue-600 via-purple-500 to-orange-500 text-white",
+  gradient: "bg-gradient-to-r from-blue-600 p-3 via-purple-500 to-orange-500 text-white",
   google: "bg-white text-black p-3 border border-gray-300 shadow-button",
+  outlined: "bg-white text-black p-3",
 };
 
 export const INPUT_VARIANTS = {

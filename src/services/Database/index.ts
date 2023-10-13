@@ -8,6 +8,35 @@ class Database {
       },
     });
   }
+
+  static async register({
+    email,
+    password,
+    fullname,
+  }: {
+    email: string;
+    password: string;
+    fullname: string;
+  }) {
+    try {
+      const response = await fetch("/api/user/create", {
+        method: "POST",
+        body: JSON.stringify({ email, password, name: fullname, emailVerified: null }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const message = await response.json();
+        throw message;
+      }
+
+      return await response.json();
+    } catch (error) {
+      return error;
+    }
+  }
 }
 
 export default Database;

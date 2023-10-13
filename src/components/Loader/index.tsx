@@ -1,31 +1,61 @@
 import { CSSClassNames } from "@/types";
 
+import Text from "@/components/Text";
+
 import { cm } from "@/utils/helpers/styleMerger";
 
 interface Loader {
   className?: CSSClassNames;
+  children?: React.ReactElement | React.ReactElement[];
+  loading?: boolean;
+  type?: "spinner" | "text";
+  loaderClasses?: CSSClassNames;
+  loaderContainerClasses?: CSSClassNames;
 }
 
 interface Spinner {
   classes?: CSSClassNames;
   containerClasses?: CSSClassNames;
+  bg?: `text-${CSSClassNames}`;
+  spinColor?: `fill-${CSSClassNames}`;
 }
 
 function Loader(props: Loader) {
   return (
-    <div role="status">
-      <span className={props.className}>Loading...</span>
-    </div>
+    <>
+      {props.loading ? (
+        <div className="absolute inset-0 bg-slate-500 bg-opacity-50">
+          {props.type === "spinner" && (
+            <Loader.spinner
+              classes={props.loaderClasses}
+              containerClasses={props.loaderContainerClasses}
+            />
+          )}
+          {props.type === "text" && (
+            <Text as="span" classes={props.loaderClasses}>
+              Loading...
+            </Text>
+          )}
+        </div>
+      ) : null}
+    </>
   );
 }
 
-Loader.spinner = ({ classes, containerClasses }: Spinner) => {
+Loader.spinner = ({
+  classes,
+  containerClasses,
+  bg = "text-gray-200",
+  spinColor = "fill-gray-600",
+}: Spinner) => {
   return (
     <div className={containerClasses} role="status">
       <svg
         aria-hidden="true"
         className={cm(
-          "mr-2 inline h-4 w-4 animate-spin fill-gray-600 text-gray-200 dark:text-gray-600",
+          "mr-2 inline h-4 w-4 animate-spin dark:text-gray-600",
+          bg,
+          spinColor,
           classes
         )}
         viewBox="0 0 100 101"

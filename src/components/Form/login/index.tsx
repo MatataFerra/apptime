@@ -2,13 +2,13 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { LoginInputs } from "@/types";
 
-import LoginFooter from "@/components/Footer/login";
 import Form from "@/components/Form";
 import Input from "@/components/Input";
 import Loader from "@/components/Loader";
@@ -25,6 +25,7 @@ export default function FormLogin() {
   } = useForm<LoginInputs>();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const locale = useLocale();
   const t = useTranslations("login");
 
   function onSubmit({ email, password }: LoginInputs) {
@@ -44,16 +45,16 @@ export default function FormLogin() {
 
     signIn("credentials", {
       callbackUrl: PATH_NAMES.HOME,
+      redirect: false,
       password,
       email,
-      redirect: false,
     })
       .then((res) => {
         if (res?.error) {
           return setError(
             "password",
             {
-              message: t("wrongPassword"),
+              message: t("wrong_password"),
             },
             {
               shouldFocus: true,
@@ -70,46 +71,53 @@ export default function FormLogin() {
 
   return (
     <>
-      {loading && (
-        <div className="absolute inset-0 bg-slate-500 bg-opacity-50">
-          <Loader.spinner
-            containerClasses="flex h-full justify-center items-center"
-            classes="h-12 w-12"
-          />
-        </div>
-      )}
+      <Loader
+        loading={loading}
+        type="spinner"
+        loaderClasses="spinner h-12 w-12"
+        loaderContainerClasses="flex h-full justify-center items-center"
+      />
 
       <Form
         classes="grid h-full grid-rows-[1fr,auto]"
         autoComplete="off"
         onSubmit={handleSubmit(onSubmit)}
+        id="formLogin"
       >
-        <section className="grid grid-rows-[1fr,8rem] gap-3 self-center">
+        <section className="grid grid-rows-[1fr,2rem,auto] gap-3 self-center">
           <fieldset className="flex flex-col gap-4">
             <Input
-              classes="shadow-input h-[69px] w-full rounded-md border border-gray-900 bg-white text-2xl"
+              classes="h-[69px] w-full rounded-md border border-gray-900 bg-white text-2xl shadow-input"
               variant="default"
               type="email"
               label="email"
               labelClasses="m-0 text-sm"
+              isError={!!errors.password?.message?.trim()}
               {...register("email")}
             />
             <Input
-              classes={`shadow-input h-[69px] w-full rounded-md border border-gray-900 bg-white text-2xl ${
-                errors.password?.message ? "focus:ring-red-600" : "focus:ring-blue-600"
-              }`}
+              classes={`h-[69px] w-full rounded-md border border-gray-900 bg-white text-2xl shadow-input`}
               variant="default"
               type="password"
               label="password"
               labelClasses="m-0 text-sm"
+              isError={!!errors.password?.message?.trim()}
               {...register("password")}
             />
           </fieldset>
           {errors.password?.message && (
             <span className="text-sm font-bold text-red-500">{errors.password?.message}</span>
           )}
+          <p className="row-start-3 text-xl">
+            {t("account.has_account")}{" "}
+            <Link
+              className="font-bold text-zinc-950 underline"
+              href={`/${locale}/${PATH_NAMES.REGISTER}`}
+            >
+              {t("account.register")}
+            </Link>
+          </p>
         </section>
-        <LoginFooter classes="self-end" />
       </Form>
     </>
   );

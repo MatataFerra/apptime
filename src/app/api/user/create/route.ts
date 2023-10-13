@@ -3,27 +3,21 @@ import _ from "lodash";
 import { NextRequest, NextResponse } from "next/server";
 
 import AuthService from "@/services/Auth";
-import ErrorFactory, { type Exception } from "@/services/Error/factory";
+import ErrorFactory from "@/services/Error/factory";
 
 import { UserCreateSchema } from "@/types";
 
 export async function POST(req: NextRequest) {
   const body: User = await req.json();
-  const parsedBody = UserCreateSchema.safeParse(body);
-
-  if (!parsedBody.success) {
-    return NextResponse.json(
-      {
-        ...ErrorFactory.createError("DataProvidedIsNotValid", {
-          error: parsedBody.error,
-        }),
-        response: false,
-      },
-      { status: 400 }
-    );
-  }
-
   try {
+    const parsedBody = UserCreateSchema.safeParse(body);
+
+    if (!parsedBody.success) {
+      throw ErrorFactory.createError("DataProvidedIsNotValid", {
+        error: parsedBody.error,
+      });
+    }
+
     const newUser = await new AuthService({
       ...parsedBody.data,
     }).register();
@@ -38,13 +32,12 @@ export async function POST(req: NextRequest) {
     );
   } catch (error: unknown) {
     if (_.has(error, "type_error")) {
-      const exception = _.cloneDeep(error) as Exception;
       return NextResponse.json(
         {
-          ...ErrorFactory.findAndCreateError(exception.type_error).handleError(error),
+          error,
           response: false,
         },
-        { status: 409 }
+        { status: 400 }
       );
     }
 

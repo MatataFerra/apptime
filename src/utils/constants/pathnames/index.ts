@@ -3,4 +3,5 @@ export const PATH_NAMES = {
   ADMIN: "/admin",
   NO_MOBILE: "/no-mobile",
   LOGIN: "/login",
+  REGISTER: "/register",
 } as const;

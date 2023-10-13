@@ -1,6 +1,6 @@
 import Password from "@/services/Auth/password";
 
-import { PASSWORD_CODE_ERRORS, PASSWORD_MESSAGE_ERROR } from "@/utils/constants";
+import { PASSWORD } from "@/utils/constants";
 
 describe("Password service", () => {
   test("Should add specialChar error code", () => {
@@ -9,9 +9,9 @@ describe("Password service", () => {
 
     const expectedObj = {
       errors: {
-        specialChar: {
-          code: PASSWORD_CODE_ERRORS.SPECIAL_CHAR,
-          message: PASSWORD_MESSAGE_ERROR.SPECIAL_CHAR,
+        SPECIAL_CHAR: {
+          code: PASSWORD.PASSWORD_CODE_ERRORS.SPECIAL_CHAR,
+          message: PASSWORD.PASSWORD_MESSAGE_ERROR.SPECIAL_CHAR,
         },
       },
       valid: false,

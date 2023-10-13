@@ -1,26 +1,26 @@
 import bcrypt from "bcryptjs";
 import { isEmpty, isEqual } from "lodash";
 
-import { PASSWORD_CODE_ERRORS, PASSWORD_MESSAGE_ERROR } from "@/utils/constants";
+import { PASSWORD } from "@/utils/constants";
 
 type ErrorCodeType = {
   errors: {
-    capital: {
+    CAPITAL_LETTER: {
       code: number;
       message: string;
     };
 
-    len: {
+    MIN_LENGTH: {
       code: number;
       message: string;
     };
 
-    number: {
+    ONE_NUMBER: {
       code: number;
       message: string;
     };
 
-    specialChar: {
+    SPECIAL_CHAR: {
       code: number;
       message: string;
     };
@@ -52,11 +52,11 @@ class Password {
     };
   }
 
-  addCode(type: string, code: keyof typeof PASSWORD_CODE_ERRORS) {
+  addCode(type: string, code: keyof typeof PASSWORD.PASSWORD_CODE_ERRORS) {
     this.validations.errors = {
       ...this.validations.errors,
       [type]: {
-        code: PASSWORD_CODE_ERRORS[code],
+        code: PASSWORD.PASSWORD_CODE_ERRORS[code],
         message: this.getErrorMessages(code),
       },
     };
@@ -80,24 +80,24 @@ class Password {
     return /[^A-Za-z0-9]/.test(this.password);
   }
 
-  getErrorMessages(code: keyof typeof PASSWORD_MESSAGE_ERROR) {
-    return PASSWORD_MESSAGE_ERROR[code];
+  getErrorMessages(code: keyof typeof PASSWORD.PASSWORD_MESSAGE_ERROR) {
+    return PASSWORD.PASSWORD_MESSAGE_ERROR[code];
   }
 
   private runValidations() {
     if (!this._hasOneCapital()) {
-      this.addCode("capital", "CAPITAL_LETTER");
+      this.addCode("CAPITAL_LETTER", "CAPITAL_LETTER");
     }
     if (!this._hasOneNumber()) {
-      this.addCode("number", "ONE_NUMBER");
+      this.addCode("ONE_NUMBER", "ONE_NUMBER");
     }
 
     if (!this._hasCorrectLenght()) {
-      this.addCode("len", "MIN_LENGTH");
+      this.addCode("MIN_LENGTH", "MIN_LENGTH");
     }
 
     if (!this._hasOneSpecialCharacter()) {
-      this.addCode("specialChar", "SPECIAL_CHAR");
+      this.addCode("SPECIAL_CHAR", "SPECIAL_CHAR");
     }
 
     return {

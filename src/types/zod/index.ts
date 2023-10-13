@@ -114,10 +114,10 @@ const PasswordSchema = z.object({
 
     if (!passValidate.valid) {
       const messages = {
-        CAPITAL_LETTER: passValidate.errors?.capital?.message,
-        MIN_LENGTH: passValidate.errors?.len?.message,
-        ONE_NUMBER: passValidate.errors?.number?.message,
-        SPECIAL_CHAR: passValidate.errors?.specialChar?.message,
+        CAPITAL_LETTER: passValidate.errors?.CAPITAL_LETTER?.message,
+        MIN_LENGTH: passValidate.errors?.MIN_LENGTH?.message,
+        ONE_NUMBER: passValidate.errors?.ONE_NUMBER?.message,
+        SPECIAL_CHAR: passValidate.errors?.SPECIAL_CHAR?.message,
       };
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

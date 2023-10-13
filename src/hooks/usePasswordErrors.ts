@@ -20,10 +20,10 @@ function usePasswordErrors(password: string) {
 
     setPassedErrors((prev) => ({
       ...prev,
-      CAPITAL_LETTER: !!errors.capital?.code,
-      MIN_LENGTH: !!errors.len?.code,
-      ONE_NUMBER: !!errors.number?.code,
-      SPECIAL_CHAR: !!errors.specialChar?.code,
+      CAPITAL_LETTER: !!errors.CAPITAL_LETTER?.code,
+      MIN_LENGTH: !!errors.MIN_LENGTH?.code,
+      ONE_NUMBER: !!errors.ONE_NUMBER?.code,
+      SPECIAL_CHAR: !!errors.SPECIAL_CHAR?.code,
     }));
   }, [password]);
 

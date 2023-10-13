@@ -1,6 +1,10 @@
 import { devices, PlaywrightTestConfig } from "@playwright/test";
 import path from "path";
 
+// ignore test
+const IGNORE_TEST_DESKTOP = [/.*login.spec.ts/, /.*register.spec.ts/];
+const IGNORE_TEST_MOBILE = [/.*no-mobile.spec.ts/];
+
 // Use process.env.PORT by default and fallback to port 3000
 const PORT = process.env.PORT || 3000;
 
@@ -18,11 +22,16 @@ const config: PlaywrightTestConfig = {
   retries: 1,
   // Artifacts folder where screenshots, videos, and traces are stored.
   outputDir: "test-results/",
+  reporter: [
+    ["list"],
+    ["json", { outputFile: "test-results/results.json" }],
+    ["html", { outputFile: "test-results/results.html" }],
+  ],
 
   // Run your local dev server before starting the tests:
   // https://playwright.dev/docs/test-advanced#launching-a-development-web-server-during-the-tests
   webServer: {
-    command: "npm run dev",
+    command: "yarn dev",
     url: baseURL,
     timeout: 120 * 1000,
     reuseExistingServer: !process.env.CI,
@@ -50,33 +59,38 @@ const config: PlaywrightTestConfig = {
   projects: [
     {
       name: "Desktop Chrome",
+      testIgnore: IGNORE_TEST_DESKTOP,
       use: {
         ...devices["Desktop Chrome"],
       },
     },
-    // {
-    //   name: 'Desktop Firefox',
-    //   use: {
-    //     ...devices['Desktop Firefox'],
-    //   },
-    // },
-    // {
-    //   name: 'Desktop Safari',
-    //   use: {
-    //     ...devices['Desktop Safari'],
-    //   },
-    // },
-    // Test against mobile viewports.
-    // {
-    //   name: "Mobile Chrome",
-    //   use: {
-    //     ...devices["Pixel 5"],
-    //   },
-    // },
     {
-      name: "Mobile Safari",
-      use: devices["iPhone 12"],
+      name: "Desktop Firefox",
+      testIgnore: IGNORE_TEST_DESKTOP,
+      use: {
+        ...devices["Desktop Firefox"],
+      },
     },
+    {
+      name: "Desktop Safari",
+      testIgnore: IGNORE_TEST_DESKTOP,
+      use: {
+        ...devices["Desktop Safari"],
+      },
+    },
+    // Test against mobile viewports.
+    {
+      name: "Mobile Chrome",
+      testIgnore: IGNORE_TEST_MOBILE,
+      use: {
+        ...devices["Pixel 5"],
+      },
+    },
+    // {
+    //   name: "Mobile Safari",
+    //   testIgnore: /.*no-mobile.spec.ts/,
+    //   use: devices["iPhone 12"],
+    // },
   ],
 };
 export default config;

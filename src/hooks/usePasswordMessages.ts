@@ -3,12 +3,11 @@ import { FieldErrors } from "react-hook-form";
 
 import { PassedErrors } from "@/types";
 
-interface LoginInputs {
-  email: string;
+interface Inputs {
   password: string;
 }
 
-function usePasswordMessages(errors: FieldErrors<LoginInputs>) {
+function usePasswordMessages<T extends Inputs>(errors: FieldErrors<T>) {
   const parseErrors = useMemo(() => {
     if (errors?.password?.message) {
       const errorToParse = errors?.password?.message as unknown as PassedErrors;
