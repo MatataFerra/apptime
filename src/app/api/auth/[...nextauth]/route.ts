@@ -11,18 +11,8 @@ import i18n from "@/services/i18n";
 import UserService from "@/services/User";
 import ut from "@/services/Utilities";
 
-import { authOptions } from "@/utils/auth";
-import { PATH_NAMES } from "@/utils/constants/pathnames";
-
 export async function GET(req: NextApiRequest & NextRequest, res: NextResponse & NextApiResponse) {
   const locale = new i18n("en").getLocale(req);
-
-  const headers = new Headers(req.headers).get("user-agent") ?? "";
-  const noMobilePath = i18n.parsePathname(PATH_NAMES.NO_MOBILE, locale);
-
-  // if (!ut.isMobile({ request: req })) {
-  //   console.log("is not mobile");
-  // }
 
   return await NextAuth(req, res, {
     providers: [
@@ -157,6 +147,7 @@ export async function POST(req: NextApiRequest & NextRequest, res: NextResponse 
 
     pages: {
       signIn: `/${locale}/login`,
+      newUser: `/${locale}/register`,
     },
 
     secret: process.env.NEXTAUTH_SECRET,

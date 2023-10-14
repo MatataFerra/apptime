@@ -1,25 +1,21 @@
 import { CSSClassNames } from "@/types";
 
 import Logo from "@/components/ui/Logo";
-import Text from "@/components/ui/Text";
 
-import { GRADIENTS, HEADER_POSITION } from "@/utils/constants/tailwind";
+import { HEADER_POSITION } from "@/utils/constants/tailwind";
 import { cm } from "@/utils/helpers/styleMerger";
 
 interface Props {
-  position?: "start" | "center" | "end";
+  position?: "start" | "center" | "end" | "between";
   classes?: CSSClassNames;
+  children?: React.ReactElement | React.ReactElement[];
 }
 
-function Header({ position = "start", classes }: Props) {
+function Header({ position = "start", classes, children }: Props) {
   return (
-    <header
-      className={cm("flex items-center justify-start gap-2", classes, HEADER_POSITION[position])}
-    >
-      <Logo />
-      <Text as="h1" variant="gradient" classes={`text-2xl font-bold ${GRADIENTS.gradient_1}`}>
-        App Time
-      </Text>
+    <header className={cm("flex items-center", classes, HEADER_POSITION[position])}>
+      {children}
+      <Logo withText />
     </header>
   );
 }

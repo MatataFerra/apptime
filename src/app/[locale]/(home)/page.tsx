@@ -3,8 +3,7 @@ import ut from "@/services/Utilities/client";
 
 import { LocaleParams } from "@/types";
 
-import HomeScreen from "@/components/Home";
-import Text from "@/components/ui/Text";
+import WelcomeTitle from "@/components/WelcomeTitle";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
@@ -16,11 +15,8 @@ export default async function Home({ params }: { params: LocaleParams }) {
   }
 
   return (
-    <main className="flex h-[100dvh] flex-col items-center justify-center p-2">
-      <Text variant="error" classes="mb-4">
-        Logout de la app ya que todavía no está implementada la home
-      </Text>
-      <HomeScreen />
-    </main>
+    <>
+      <WelcomeTitle />
+    </>
   );
 }

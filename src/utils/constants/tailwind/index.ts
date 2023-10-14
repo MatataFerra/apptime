@@ -41,4 +41,5 @@ export const HEADER_POSITION = {
   start: "justify-start",
   center: "justify-center",
   end: "justify-end",
+  between: "justify-between",
 };
