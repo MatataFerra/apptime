@@ -44,7 +44,7 @@
     "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
     "negotiator": "^0.6.3",
-    "next": "13.4.5",
+    "next": "^13.5.4",
     "next-auth": "4.22.1",
     "next-intl": "^2.19.1",
     "next-swagger-doc": "^0.3.6",
