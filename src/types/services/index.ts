@@ -55,3 +55,6 @@ export type PassedErrors = {
   ONE_NUMBER: boolean;
   SPECIAL_CHAR: boolean;
 };
+
+// Date Humanizer
+export type DateHumanizerStrategy = "today" | "distanceToNow";
