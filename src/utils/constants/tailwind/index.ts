@@ -43,3 +43,8 @@ export const HEADER_POSITION = {
   end: "justify-end",
   between: "justify-between",
 };
+
+export const STACK_ORIENTATION = {
+  horizontal: "flex",
+  vertical: "flex flex-col",
+} as const;
