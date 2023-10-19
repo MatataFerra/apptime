@@ -3,6 +3,9 @@ import ut from "@/services/Utilities/client";
 
 import { LocaleParams } from "@/types";
 
+import DateComponent from "@/components/Date";
+import Stack from "@/components/ui/Stack";
+import Text from "@/components/ui/Text";
 import WelcomeTitle from "@/components/WelcomeTitle";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
@@ -16,7 +19,10 @@ export default async function Home({ params }: { params: LocaleParams }) {
 
   return (
     <>
-      <WelcomeTitle />
+      <Stack orientation="vertical" spacing={4}>
+        <WelcomeTitle />
+        <DateComponent />
+      </Stack>
     </>
   );
 }
