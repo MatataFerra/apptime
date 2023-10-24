@@ -1,7 +1,7 @@
 export const TEXT_VARIANTS = {
   default: "text-base text-gray-800 dark:text-gray-100",
   title: "text-4xl font-bold text-gray-800 dark:text-gray-100",
-  gradient: "bg-gradient-to-r text-transparent bg-clip-text",
+  gradient: "text-transparent bg-gradient-to-r bg-clip-text",
   subtitle: "text-xl font-bold text-gray-800 dark:text-gray-100",
   error: "text-red-600 dark:text-red-400",
   success: "text-green-600 dark:text-green-400",
@@ -23,6 +23,9 @@ export const BUTTON_VARIANTS = {
   gradient: "bg-gradient-to-r from-blue-600 p-3 via-purple-500 to-orange-500 text-white",
   google: "bg-white text-black p-3 border border-gray-300 shadow-button",
   outlined: "bg-white text-black p-3",
+  white:
+    "bg-white text-black p-3 border border-black shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px] active:shadow-[inset_-12px_-8px_40px_#46464620]",
+  disabled: "bg-gray-200 text-gray-800 dark:bg-gray-800 dark:text-gray-100 p-3",
 };
 
 export const INPUT_VARIANTS = {
@@ -47,4 +50,17 @@ export const HEADER_POSITION = {
 export const STACK_ORIENTATION = {
   horizontal: "flex",
   vertical: "flex flex-col",
+} as const;
+
+export const STACK_JUSTIFY = {
+  start: "justify-start",
+  center: "justify-center",
+  end: "justify-end",
+  between: "justify-between",
+} as const;
+
+export const STACK_ALIGN = {
+  start: "items-start",
+  center: "items-center",
+  end: "items-end",
 } as const;
