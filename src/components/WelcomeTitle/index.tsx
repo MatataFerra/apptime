@@ -24,7 +24,10 @@ async function WelcomeTitle({ username }: Props) {
         <Text variant="title" classes="text-5xl">
           Welcome
         </Text>
-        <Text variant="gradient" classes={`fit-text text-5xl font-bold ${GRADIENTS.gradient_2}`}>
+        <Text
+          variant="gradient"
+          classes={`balance_text text-5xl font-bold ${GRADIENTS.gradient_2}`}
+        >
           {username ? username.split(" ")[0] : session?.user.name.split(" ")[0]}
         </Text>
       </div>
