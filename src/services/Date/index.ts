@@ -22,8 +22,8 @@ export default class DateHumanizer {
     };
     this.strategies = {
       today: (date: Date, locale?: possibleLocale) =>
-        format(date, "eee, MMMM yyyy", { locale: this.locale[locale || "en"] }),
-      distanceToNow: (date: Date, locale?: "es" | "en") =>
+        format(date, "eee do, MMMM yyyy", { locale: this.locale[locale || "en"] }),
+      distanceToNow: (date: Date, locale?: possibleLocale) =>
         formatDistanceToNow(date, { addSuffix: true, locale: this.locale[locale || "en"] }),
     };
   }
