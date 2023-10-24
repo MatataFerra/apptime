@@ -1,6 +1,6 @@
 import React, { ReactElement } from "react";
 
-import _ from "lodash";
+import { isArray } from "lodash";
 
 import { CSSClassNames } from "@/types";
 
@@ -42,7 +42,7 @@ function Text({ children, as = "p", classes, variant = "default", ...props }: Pr
 
   return (
     <Component
-      className={cm(TEXT_VARIANTS[variant], classes, _.isArray(children) && "inline-flex gap-2")}
+      className={cm(TEXT_VARIANTS[variant], classes, isArray(children) && "inline-flex gap-2")}
       {...props}
     >
       {children}
