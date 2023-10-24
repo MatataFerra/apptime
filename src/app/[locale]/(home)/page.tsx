@@ -4,6 +4,10 @@ import ut from "@/services/Utilities/client";
 import { LocaleParams } from "@/types";
 
 import DateComponent from "@/components/Date";
+import HomeButtons from "@/components/HomeButtons";
+import PopoverHome from "@/components/Popover/home";
+import ShiftStatus from "@/components/ShiftStatus";
+import Button from "@/components/ui/Button";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 import WelcomeTitle from "@/components/WelcomeTitle";
@@ -19,9 +23,17 @@ export default async function Home({ params }: { params: LocaleParams }) {
 
   return (
     <>
-      <Stack orientation="vertical" spacing={4}>
-        <WelcomeTitle />
-        <DateComponent />
+      <Stack orientation="vertical" spacing={8}>
+        <Stack as="div" orientation="vertical" spacing={4}>
+          <WelcomeTitle />
+          <DateComponent locale={params.locale} />
+        </Stack>
+        <Text as="h2" classes="text-2xl">
+          State: <span className="text-green-500">online</span>
+          <PopoverHome />
+        </Text>
+        <ShiftStatus />
+        <HomeButtons />
       </Stack>
     </>
   );
