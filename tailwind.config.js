@@ -68,9 +68,14 @@ module.exports = {
         "4xl": "2.25rem",
       },
 
+      dropShadow: {
+        button: "0px 4px 4px rgba(0, 0, 0, 0.25)"
+      },
+
       boxShadow: {
-        button: "box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
-        input: "box-shadow: 0px 4px 9px 1px rgba(0, 0, 0, 0.25)        "
+        button: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+        "button-inner": "inset 0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+        input: "0px 4px 9px 1px rgba(0, 0, 0, 0.25)"
       },
       borderRadius: {
         lg: "var(--radius)",
