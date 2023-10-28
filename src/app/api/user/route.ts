@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import ErrorFactory from "@/services/Error/factory";
+import UserService from "@/services/User";
 
 import { SearchParamsSchema } from "@/types";
 
@@ -12,19 +13,22 @@ export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const shifts = searchParams.get(QUERY_PARAMS.SHIFTS);
   const profile = searchParams.get(QUERY_PARAMS.PROFILE);
+  const email = searchParams.get(QUERY_PARAMS.EMAIL);
+  const only = searchParams.get(QUERY_PARAMS.ONLY);
 
   const parsedSearchParams = SearchParamsSchema.safeParse({
     shifts,
     profile,
+    email,
+    only,
   });
 
   if (!parsedSearchParams.success) {
     return NextResponse.json(
       {
-        message: parsedSearchParams.error.issues.map((issue) => ({
-          error: issue.message,
-          input: issue.path,
-        })),
+        error: ErrorFactory.createError("DataProvidedIsNotValid", {
+          error: parsedSearchParams.error,
+        }),
         response: false,
       },
       { status: 400 }
@@ -32,6 +36,71 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    const { only } = parsedSearchParams.data;
+    const onlyParam = only ? only?.split(",") : [];
+
+    if (parsedSearchParams.data.email && onlyParam.length === 0) {
+      const user = await prisma.user.findUnique({
+        where: {
+          email: parsedSearchParams.data.email,
+        },
+        include: {
+          shifts: !!parsedSearchParams.data.shifts,
+          profile: !!parsedSearchParams.data.profile,
+        },
+      });
+
+      if (!user) {
+        return NextResponse.json(
+          {
+            error: ErrorFactory.createError("UserNotFound"),
+            response: false,
+          },
+          { status: 400 }
+        );
+      }
+
+      return NextResponse.json(
+        {
+          message: "success",
+          response: true,
+          user,
+        },
+        { status: 200 }
+      );
+    }
+
+    if (parsedSearchParams.data.email && onlyParam.length > 0) {
+      const selectObj = onlyParam.reduce((acc, curr) => ({ ...acc, [curr]: true }), {});
+      const user = await prisma.user.findUnique({
+        where: {
+          email: parsedSearchParams.data.email,
+        },
+        select: selectObj,
+      });
+
+      if (!user) {
+        return NextResponse.json(
+          {
+            error: ErrorFactory.createError("UserNotFound"),
+            response: false,
+          },
+          { status: 400 }
+        );
+      }
+
+      const userFiltered = await UserService.filterUserProps(user, onlyParam);
+
+      return NextResponse.json(
+        {
+          message: "success",
+          response: true,
+          user: userFiltered,
+        },
+        { status: 200 }
+      );
+    }
+
     const user = await prisma.user.findMany({
       include: {
         shifts: !!parsedSearchParams.data.shifts,
@@ -42,7 +111,7 @@ export async function GET(req: NextRequest) {
     if (!user) {
       return NextResponse.json(
         {
-          ...ErrorFactory.createError("UserNotFound"),
+          error: ErrorFactory.createError("UserNotFound"),
           response: false,
         },
         { status: 400 }
@@ -60,7 +129,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       {
-        ...ErrorFactory.createError("InternalServer", { error }),
+        error: ErrorFactory.createError("InternalServer", { error }),
         response: false,
       },
       { status: 500 }

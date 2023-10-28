@@ -1,6 +1,12 @@
+import { User } from "@prisma/client";
+
+import { FailureApiResponse, SuccessUserApiResponse } from "@/types/api_response";
+
+import { API_ENDPOINTS } from "@/utils/constants/endpoints";
+
 class Database {
   static async createWaitingList(email: string) {
-    return fetch("/api/waiting-list", {
+    return fetch(API_ENDPOINTS.WAITING_LIST, {
       method: "POST",
       body: JSON.stringify({ email }),
       headers: {
@@ -19,7 +25,7 @@ class Database {
     fullname: string;
   }) {
     try {
-      const response = await fetch("/api/user/create", {
+      const response = await fetch(API_ENDPOINTS.REGISTER, {
         method: "POST",
         body: JSON.stringify({ email, password, name: fullname, emailVerified: null }),
         headers: {
@@ -36,6 +42,21 @@ class Database {
     } catch (error) {
       return error;
     }
+  }
+
+  static async getUserByEmail({
+    email,
+    filters,
+  }: {
+    email?: string | null;
+    filters?: keyof User | (keyof User)[];
+  }): Promise<SuccessUserApiResponse> {
+    const parseFilters = Array.isArray(filters) ? filters.join(",") : filters;
+
+    const response = await fetch(`${API_ENDPOINTS.GET_USER}?email=${email}&only=${parseFilters}`);
+    const data: SuccessUserApiResponse = await response.json();
+
+    return data;
   }
 }
 
