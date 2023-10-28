@@ -4,17 +4,16 @@ import ut from "@/services/Utilities/client";
 import { LocaleParams } from "@/types";
 
 import DateComponent from "@/components/Date";
-import HomeButtons from "@/components/HomeButtons";
+import HomeButtons from "@/components/HomeButtons/container";
 import PopoverHome from "@/components/Popover/home";
 import ShiftStatus from "@/components/ShiftStatus";
-import Button from "@/components/ui/Button";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 import WelcomeTitle from "@/components/WelcomeTitle";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-export default async function Home({ params }: { params: LocaleParams }) {
+export default function Home({ params }: { params: LocaleParams }) {
   const isLocaleSupported = new i18n(params.locale).isLocaleSupported();
 
   if (!isLocaleSupported) {

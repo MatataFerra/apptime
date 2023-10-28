@@ -1,9 +1,17 @@
+import { getServerSession } from "next-auth";
+
+import db from "@/services/Database";
+import UserService from "@/services/User";
+
 import ShiftRecorded from "@/components/ShiftRecorded";
 import UnfilledForm from "@/components/ShiftStatus/UnfilledForm";
 import ShiftTrack from "@/components/ShiftTrack";
 import Stack from "@/components/ui/Stack";
 
-function Status() {
+async function Status() {
+  const session = await getServerSession();
+  const user = await UserService.findUniqueUser({ email: session?.user?.email });
+
   return (
     <Stack
       orientation="vertical"
@@ -12,7 +20,8 @@ function Status() {
       spacing={6}
       justifyContent="center"
     >
-      <UnfilledForm />
+      {!user?.formCompleted ? <UnfilledForm /> : <ShiftTrack />}
+
       {/* <ShiftTrack /> */}
       {/* <ShiftRecorded /> */}
     </Stack>
