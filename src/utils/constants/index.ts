@@ -6,6 +6,8 @@ export const QUERY_PARAMS = {
   USER_ID: "userId",
   PROFILE: "profile",
   SHIFTS: "shifts",
+  EMAIL: "email",
+  ONLY: "only",
 };
 
 export const now = Date.now();

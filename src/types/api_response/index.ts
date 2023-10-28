@@ -1,3 +1,5 @@
+import { User } from "@prisma/client";
+
 import { HandleErrorType } from "@/types/services";
 
 export type FailureApiResponse = {
@@ -8,4 +10,10 @@ export type FailureApiResponse = {
     response: boolean;
     type_error: HandleErrorType;
   };
+};
+
+export type SuccessUserApiResponse = {
+  message: string;
+  response: boolean;
+  user: User;
 };

@@ -94,6 +94,8 @@ const ShiftUpdateSchema = ShiftModelSchema.partial().refine(
 const SearchParamsSchema = z.object({
   shifts: z.string().nullable(),
   profile: z.string().nullable(),
+  email: z.string().nullable(),
+  only: z.string().nullable(),
 });
 
 /* 

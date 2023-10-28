@@ -24,8 +24,10 @@ export const BUTTON_VARIANTS = {
   google: "bg-white text-black p-3 border border-gray-300 shadow-button",
   outlined: "bg-white text-black p-3",
   white:
-    "bg-white text-black p-3 border border-black shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px] active:shadow-[inset_-12px_-8px_40px_#46464620]",
+    "bg-white text-black p-3 border border-black shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px]",
   disabled: "bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-100 p-3",
+  black:
+    "bg-black text-white p-3 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px]",
 };
 
 export const INPUT_VARIANTS = {
