@@ -1,9 +1,14 @@
+import FormHomeButton from "@/components/FormHome/Button";
+import FormHomeContent from "@/components/FormHome/Content";
+import Stack from "@/components/ui/Stack";
+import Stepper from "@/components/ui/Stepper";
+
 export default async function Form() {
   return (
-    <>
-      <div className="flex flex-col items-center justify-center">
-        <h1 className="text-5xl font-bold">Form</h1>
-      </div>
-    </>
+    <Stack grid classes="grid-rows-[auto,60%,40%]">
+      <Stepper />
+      <FormHomeContent />
+      <FormHomeButton />
+    </Stack>
   );
 }
