@@ -11,7 +11,7 @@ import {
 export const StackDefaultAsType = "section" as const;
 
 type StackOwnProps<E extends React.ElementType> = {
-  children?: (string | React.ReactElement)[] | string | React.ReactElement;
+  children?: (string | React.ReactElement | boolean)[] | string | React.ReactElement | boolean;
   as?: E;
   classes?: CSSClassNames;
   orientation?: keyof typeof STACK_ORIENTATION;
@@ -41,10 +41,10 @@ async function Stack<E extends React.ElementType = typeof StackDefaultAsType>({
     <>
       <Component
         className={cn(
-          classes,
           grid ? "grid" : STACK_ORIENTATION[orientation],
           STACK_JUSTIFY[justifyContent],
-          STACK_ALIGN[alignItems]
+          STACK_ALIGN[alignItems],
+          classes
         )}
         style={{ gap: `${spacing * 0.25}rem` }}
         {...props}
