@@ -25,7 +25,7 @@ describe("DateHumanizer", () => {
     test("should humanize the date using the 'today' strategy", () => {
       const humanizer = new DateHumanizer("today");
       const date = new Date("2022-01-01T00:00:00Z");
-      expect(humanizer.humanizeDate(date, "es")).toBe("sáb, enero 2022");
+      expect(humanizer.humanizeDate(date, "es")).toBe("sáb 1º, enero 2022");
     });
 
     test("should humanize the date using the 'distanceToNow' strategy", () => {

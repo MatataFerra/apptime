@@ -30,6 +30,7 @@ module.exports = {
         "light-gold": "#FEE954",
         "hard-pink": "#FF2B91",
         "common-orange": "#FF6A00",
+        "light-blue": "#64C2DB",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

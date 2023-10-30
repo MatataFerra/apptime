@@ -28,11 +28,12 @@ export const BUTTON_VARIANTS = {
   disabled: "bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-100 p-3",
   black:
     "bg-black text-white p-3 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px]",
+  teal: "bg-light-blue text-white p-3 text-black shadow-button active:shadow-button-inner",
 };
 
 export const INPUT_VARIANTS = {
   default:
-    "bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent",
+    "h-[69px] w-full rounded-md bg-white text-2xl shadow-input focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent",
   error:
     "bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent",
   success:
@@ -65,4 +66,9 @@ export const STACK_ALIGN = {
   start: "items-start",
   center: "items-center",
   end: "items-end",
+} as const;
+
+export const BADGE_STATUS = {
+  active: "bg-black text-white",
+  inactive: "border border-stone-300 text-stone-400",
 } as const;
