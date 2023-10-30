@@ -1,6 +1,5 @@
 import { ReactElement } from "react";
 
-import Button from "@/components/ui/Button";
 import Header from "@/components/ui/Header";
 import Img from "@/components/ui/Image";
 

@@ -53,8 +53,22 @@ class Database {
   }): Promise<SuccessUserApiResponse> {
     const parseFilters = Array.isArray(filters) ? filters.join(",") : filters;
 
-    const response = await fetch(`${API_ENDPOINTS.GET_USER}?email=${email}&only=${parseFilters}`);
+    const response = await fetch(`${API_ENDPOINTS.USER}?email=${email}&only=${parseFilters}`);
     const data: SuccessUserApiResponse = await response.json();
+
+    return data;
+  }
+
+  static async updateUser(user: Partial<User>) {
+    const response = await fetch(`${API_ENDPOINTS.USER}/${user.id}`, {
+      method: "PUT",
+      body: JSON.stringify(user),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
 
     return data;
   }

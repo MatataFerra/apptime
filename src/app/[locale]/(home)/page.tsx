@@ -4,7 +4,7 @@ import ut from "@/services/Utilities/client";
 import { LocaleParams } from "@/types";
 
 import DateComponent from "@/components/Date";
-import HomeButtons from "@/components/HomeButtons/container";
+import HomeButtons from "@/components/Home/Buttons/container";
 import PopoverHome from "@/components/Popover/home";
 import ShiftStatus from "@/components/ShiftStatus";
 import Stack from "@/components/ui/Stack";
