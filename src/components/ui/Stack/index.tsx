@@ -24,7 +24,7 @@ type StackOwnProps<E extends React.ElementType> = {
 type Props<E extends React.ElementType> = StackOwnProps<E> &
   Omit<Omit<React.ComponentProps<E>, "className">, keyof StackOwnProps<E>>;
 
-async function Stack<E extends React.ElementType = typeof StackDefaultAsType>({
+function Stack<E extends React.ElementType = typeof StackDefaultAsType>({
   as,
   classes,
   children,
@@ -34,7 +34,7 @@ async function Stack<E extends React.ElementType = typeof StackDefaultAsType>({
   spacing = 2,
   grid,
   ...props
-}: Props<E>): Promise<React.ReactElement> {
+}: Props<E>): React.ReactElement {
   const Component = as || StackDefaultAsType;
 
   return (

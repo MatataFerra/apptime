@@ -2,9 +2,9 @@
 
 import { useTranslations } from "next-intl";
 
-import Icon from "../ui/Icons";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
-import Text from "../ui/Text";
+import Icon from "@/components/ui/Icons";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
+import Text from "@/components/ui/Text";
 
 function PopoverHome() {
   const t = useTranslations("home");

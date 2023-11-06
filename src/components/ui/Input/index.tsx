@@ -1,55 +1,34 @@
-import { forwardRef, HTMLInputTypeAttribute, ReactElement, Ref } from "react";
+import { forwardRef, ReactElement, Ref } from "react";
 
-import { CSSClassNames } from "@/types";
+import { InputProps } from "@/types/forms";
 
-import { INPUT_VARIANTS } from "@/utils/constants/tailwind";
-import { cm } from "@/utils/helpers/styleMerger";
+import InputBase from "@/components/ui/Input/InputBase";
+import Stack from "@/components/ui/Stack";
 
-type Variants = keyof typeof INPUT_VARIANTS;
+import { cn } from "@/utils/helpers/styleMerger";
 
-interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
-  classes?: CSSClassNames;
-  labelClasses?: CSSClassNames;
-  variant?: Variants;
-  type?: HTMLInputTypeAttribute;
-  isError?: boolean;
-  label?: string;
-}
-
-function Input(props: Props, ref: Ref<HTMLInputElement>): ReactElement<Props> {
-  const { classes, variant = "default", type, label, labelClasses, isError, ...rest } = props;
+function Input(props: InputProps, ref: Ref<HTMLInputElement>): ReactElement<InputProps> {
+  const { label, labelClasses, isRequired, containerClasses, ...rest } = props;
 
   return (
     <>
       {label ? (
-        <label className={cm("text-2xl", labelClasses)}>
-          {label}
-          <input
-            ref={ref}
-            type={type}
-            autoComplete="off"
-            className={cm(
-              INPUT_VARIANTS[variant],
-              classes,
-              "rounded-lg px-2 py-1",
-              isError && "border-red-600 focus:ring-red-600"
-            )}
-            {...rest}
-          />
-        </label>
+        <Stack
+          as="div"
+          orientation="vertical"
+          classes={`${containerClasses ? containerClasses : ""}`}
+        >
+          <label className={cn("text-sm", labelClasses)}>
+            <span className="flex gap-1">
+              {label} {isRequired && <span className="font-bold text-red-500">*</span>}
+            </span>
+          </label>
+          <InputBase {...rest} ref={ref} />
+        </Stack>
       ) : (
-        <input
-          ref={ref}
-          type={type}
-          autoComplete="off"
-          className={cm(
-            INPUT_VARIANTS[variant],
-            classes,
-            "rounded-lg px-2 py-1",
-            isError && "border-red-600 focus:ring-red-600"
-          )}
-          {...rest}
-        />
+        <>
+          <InputBase {...rest} ref={ref} />
+        </>
       )}
     </>
   );

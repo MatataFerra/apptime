@@ -1,15 +1,10 @@
-"use client";
-
 import { Fragment } from "react";
 
 import { FormStep } from "@/types/forms";
 
-import Badge from "@/components/ui/Badge";
+import NumberRoundBadge from "@/components/NumberRoundBadge";
 import Line from "@/components/ui/Line";
 import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
-
-import { useFormStepStore } from "@/store/useFormStepStore";
 
 const ARRAY = [
   {
@@ -34,8 +29,6 @@ type Props = {
 };
 
 function Stepper({ steps = ARRAY }: Props) {
-  const { currentStep } = useFormStepStore();
-
   return (
     <>
       <nav className="flex w-full flex-row items-center justify-between gap-4">
@@ -46,20 +39,9 @@ function Stepper({ steps = ARRAY }: Props) {
               justifyContent="center"
               classes="flex w-full flex-row gap-2 text-xs"
             >
-              <Badge
-                text={(index + 1).toString()}
-                state={id === currentStep ? "active" : "inactive"}
-              />
-              <Text
-                as="span"
-                classes={id === currentStep ? "font-bold text-black" : "text-stone-300"}
-              >
-                {title}
-              </Text>
+              <NumberRoundBadge index={index} id={id} title={title} />
             </Stack>
-            {index !== steps.length - 1 && (
-              <Line color={id === currentStep ? "bg-black" : "bg-stone-300"} />
-            )}
+            {index !== steps.length - 1 && <Line id={id} />}
           </Fragment>
         ))}
       </nav>
