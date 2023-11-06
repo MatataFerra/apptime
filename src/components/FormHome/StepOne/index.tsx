@@ -1,7 +1,7 @@
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 
-function FormContent() {
+function StepOne() {
   return (
     <>
       <Stack orientation="vertical" classes="mt-16" spacing={8}>
@@ -12,4 +12,4 @@ function FormContent() {
   );
 }
 
-export default FormContent;
+export default StepOne;
