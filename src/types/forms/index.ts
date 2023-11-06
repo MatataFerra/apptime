@@ -1,10 +1,33 @@
+import { HTMLInputTypeAttribute } from "react";
+
+import { CSSClassNames } from "@/types";
+
+import { INPUT_VARIANTS } from "@/utils/constants/tailwind";
 export enum FormStep {
-  PERSONAL_INFO = "personalInfo",
-  PAY_INFO = "payInfo",
-  SHIFT_INFO = "shiftInfo",
+  PERSONAL_INFO,
+  PAY_INFO,
+  SHIFT_INFO,
 }
 
 export type FormStepStore = {
   currentStep: FormStep;
   setCurrentStep: (step: FormStep) => void;
 };
+
+// Inputs
+
+export type Variants = keyof typeof INPUT_VARIANTS;
+
+export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "className"> {
+  classes?: CSSClassNames;
+  containerClasses?: CSSClassNames;
+  labelClasses?: CSSClassNames;
+  variant?: Variants;
+  type?: HTMLInputTypeAttribute;
+  isError?: boolean;
+  isRequired?: boolean;
+  label?: string;
+  description?: string;
+  measure?: string;
+  measurePlace?: "left" | "right";
+}

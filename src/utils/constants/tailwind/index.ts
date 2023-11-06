@@ -41,6 +41,8 @@ export const INPUT_VARIANTS = {
   warning:
     "bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent",
   info: "bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent",
+  plane: "h-[69px] w-full rounded-md bg-white text-2xl",
+  radio: "",
 };
 
 export const HEADER_POSITION = {

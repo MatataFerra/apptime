@@ -57,4 +57,4 @@ export type PassedErrors = {
 };
 
 // Date Humanizer
-export type DateHumanizerStrategy = "today" | "distanceToNow";
+export type DateHumanizerStrategy = "today" | "distanceToNow" | "parseString";

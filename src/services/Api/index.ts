@@ -1,10 +1,10 @@
 import { User } from "@prisma/client";
 
-import { FailureApiResponse, SuccessUserApiResponse } from "@/types/api_response";
+import { SuccessUserApiResponse } from "@/types/api_response";
 
 import { API_ENDPOINTS } from "@/utils/constants/endpoints";
 
-class Database {
+class ApiService {
   static async createWaitingList(email: string) {
     return fetch(API_ENDPOINTS.WAITING_LIST, {
       method: "POST",
@@ -74,4 +74,4 @@ class Database {
   }
 }
 
-export default Database;
+export default ApiService;
