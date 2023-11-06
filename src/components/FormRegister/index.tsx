@@ -9,7 +9,7 @@ import { signIn } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import db from "@/services/Database";
+import api from "@/services/Api";
 
 import { FailureApiResponse } from "@/types/api_response";
 
@@ -53,7 +53,7 @@ function RegisterForm() {
   const { passedErrors } = usePasswordErrors(passwordWatched);
 
   const { mutate, isLoading } = useMutation({
-    mutationFn: db.register,
+    mutationFn: api.register,
 
     onMutate() {
       //Blocking the register button

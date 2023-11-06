@@ -1,9 +1,7 @@
 import { getServerSession } from "next-auth";
 
-import db from "@/services/Database";
 import UserService from "@/services/User";
 
-import ShiftRecorded from "@/components/ShiftRecorded";
 import UnfilledForm from "@/components/ShiftStatus/UnfilledForm";
 import ShiftTrack from "@/components/ShiftTrack";
 import Stack from "@/components/ui/Stack";

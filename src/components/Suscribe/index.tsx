@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
-import db from "@/services/Database";
+import api from "@/services/Api";
 
 import { Inputs, SuscribeSchema } from "@/types";
 
@@ -19,7 +19,7 @@ function Suscribe() {
   const t = useTranslations("no-mobile");
 
   const mutation = useMutation({
-    mutationFn: db.createWaitingList,
+    mutationFn: api.createWaitingList,
   });
   const {
     register,

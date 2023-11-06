@@ -13,7 +13,7 @@ function Badge({ classes, state = "active", text }: Props) {
   return (
     <span
       className={cn(
-        "flex h-5 w-5 items-center justify-center rounded-full p-3 text-xs font-bold",
+        "flex h-3 w-3 items-center justify-center rounded-full p-2 text-[0.5rem] font-bold",
         BADGE_STATUS[state],
         classes
       )}
