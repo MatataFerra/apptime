@@ -93,6 +93,25 @@ module.exports = {
           to: { height: 0 },
         },
 
+        "fade_in": {
+          "0%": {
+            opacity: 0,
+          },
+          "100%": {
+            opacity: 1,
+          },
+        
+        },
+
+        "fade_out": {
+          "0%": {
+            opacity: 1,
+          },
+          "100%": {
+            opacity: 0,
+          },
+        },
+
         text: {
           "0%, 100%": {
             "background-size": "300% 300%",
@@ -121,6 +140,8 @@ module.exports = {
         "accordion-up": "accordion-up 0.2s ease-out",
         text: "text 5s ease infinite",
         shake: "shake 1s ease 1",
+        "fade-in": "fade_in 0.5s ease-in-out",
+        "fade-out": "fade_out 0.5s ease-in-out",
       },
     },
   },
