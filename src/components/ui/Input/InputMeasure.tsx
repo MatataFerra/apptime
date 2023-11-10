@@ -15,9 +15,9 @@ function InputMeasure(props: InputProps, ref: Ref<HTMLInputElement>) {
       <Stack
         as="fieldset"
         alignItems="center"
-        classes={`${
-          isError ? "border-red-600 focus:ring-red-600" : ""
-        } ${classes} rounded-md bg-white p-3 px-2 py-1 text-2xl shadow-input focus-within:border-transparent focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-600`}
+        classes={`${isError ? "border-red-600 focus:ring-red-600" : ""} ${
+          classes ? classes : ""
+        } rounded-md bg-white p-3 px-2 py-1 text-2xl shadow-input focus-within:border-transparent focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-600`}
       >
         <input
           ref={ref}

@@ -20,7 +20,7 @@ interface Props
   classes?: CSSClassNames;
   variant?: Variants;
   color?: TAILWIND_COLOR;
-  children: (string | ReactElement)[] | string | ReactElement | undefined;
+  children: (string | ReactElement | boolean)[] | string | ReactElement | undefined;
 }
 
 /**

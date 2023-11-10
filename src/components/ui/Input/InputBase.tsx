@@ -31,7 +31,7 @@ function InputBase(props: InputProps, ref: Ref<HTMLInputElement>): ReactElement<
         />
       )}
       {description && (
-        <Text classes="mt-2 text-xs" as="small">
+        <Text classes="mt-2 block text-xs" as="small">
           {description}
         </Text>
       )}
