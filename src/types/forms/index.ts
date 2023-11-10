@@ -31,3 +31,7 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
   measure?: string;
   measurePlace?: "left" | "right";
 }
+
+export interface InputMeasureProps extends InputProps {
+  inputClasses?: CSSClassNames;
+}
