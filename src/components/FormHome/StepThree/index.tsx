@@ -1,37 +1,30 @@
-import Input from "@/components/ui/Input";
+import RadioWithInput from "@/components/RadioWithInput";
+import RadioWithInputBreaks from "@/components/RadioWithInput/breaks";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
 function StepThree() {
   return (
     <>
-      <Stack grid classes="grid-cols-2">
-        <Stack as="div" orientation="vertical">
-          <Text classes="font-bold">Night shift? *</Text>
-          <Stack as="fieldset">
-            <Input
-              label="yes"
-              containerClasses="items-center "
-              labelClasses="order-2"
-              type="radio"
-              name="night"
-              id="night-yes"
-              classes="input_control order-1"
-            />
-            <Input
-              label="no"
-              containerClasses="items-center "
-              labelClasses="order-2"
-              type="radio"
-              name="night"
-              id="night-no"
-              classes="input_control order-1"
-            />
-          </Stack>
-        </Stack>
-        <Stack>
-          <Input type="number" label="value of night hour" measure="$" measurePlace="left" />
-        </Stack>
+      <Stack grid classes="w-full grid-cols-1" spacing={4}>
+        <RadioWithInput
+          radioLabel="Night shift?"
+          isRadioRequired
+          radioGroupName="night"
+          inputLabel="value of night hour"
+          measure="$"
+          measurePlace="left"
+        />
+        <RadioWithInput
+          radioLabel="Holiday pay?"
+          isRadioRequired
+          radioGroupName="pay"
+          inputLabel="rate of holiday pay"
+          measure="%"
+          measurePlace="right"
+          inputDescription="By default is 8%"
+        />
+        <RadioWithInputBreaks />
       </Stack>
     </>
   );
