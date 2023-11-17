@@ -22,7 +22,7 @@ function Buttons() {
   }
   return (
     <Form
-      classes={`flex flex-row ${
+      classes={`flex h-16 flex-row self-end ${
         currentStep === FormStep.PERSONAL_INFO ? "justify-end" : "justify-between"
       }`}
     >

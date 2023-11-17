@@ -22,8 +22,8 @@ function InputRadio({ label, description, ...props }: Props) {
             classes="[&>input]:h-14"
             label={label}
             description={description}
-            {...props}
             min={1}
+            {...props}
           />
         </Stack>
       ) : null}

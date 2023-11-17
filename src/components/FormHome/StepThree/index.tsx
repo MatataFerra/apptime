@@ -1,12 +1,11 @@
 import RadioWithInput from "@/components/RadioWithInput";
 import RadioWithInputBreaks from "@/components/RadioWithInput/breaks";
 import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
 
 function StepThree() {
   return (
     <>
-      <Stack grid classes="w-full grid-cols-1" spacing={4}>
+      <Stack grid cols={1} classes="w-full" spacing={4}>
         <RadioWithInput
           radioLabel="Night shift?"
           isRadioRequired

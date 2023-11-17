@@ -1,36 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 
-import { useRadioInput } from "@/store/useRadioInput";
+import { RadioInputsState, useRadioInput } from "@/store/useRadioInput";
 
 type Props = {
-  radioGroupName: string;
+  radioGroupName: keyof RadioInputsState;
 };
 
 function RadioGroup({ radioGroupName }: Props) {
   const { register } = useForm();
-  const { radioInputValue, setRadioInputValue } = useRadioInput();
-  const [isActive, setIsActive] = useState(false);
+  const { radioInputValue, setRadioInputValue, isInputActive, __INPUT_VALUE_MATCHER } =
+    useRadioInput();
 
-  function onChangeInput(e: any) {
+  const matcher =
+    __INPUT_VALUE_MATCHER[
+      String(isInputActive(radioGroupName)) as unknown as keyof typeof __INPUT_VALUE_MATCHER
+    ];
+
+  function onChangeInput(e: React.ChangeEvent<HTMLInputElement>) {
     const { value } = e.target;
 
     setRadioInputValue({
       ...radioInputValue,
       [radioGroupName]: !!Number(value),
     });
-
-    setIsActive(!!Number(value));
   }
 
   return (
-    <Stack orientation="vertical" as="fieldset" data-radio-state={`${isActive}`}>
+    <Stack orientation="vertical" as="fieldset">
       <Input
+        checked={matcher === "1"}
         label="Yes"
         value={1}
         containerClasses="items-center flex flex-row"
@@ -44,7 +48,7 @@ function RadioGroup({ radioGroupName }: Props) {
         })}
       />
       <Input
-        defaultChecked
+        checked={matcher === "0"}
         label="No"
         value={0}
         containerClasses="items-center flex flex-row"
