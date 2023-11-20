@@ -1,5 +1,7 @@
 "use client";
 
+import { forwardRef } from "react";
+
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 
@@ -10,7 +12,7 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   description?: string;
 }
 
-function InputRadio({ label, description, ...props }: Props) {
+function InputRadio({ label, description, ...props }: Props, ref: React.Ref<HTMLInputElement>) {
   const { isInputActive } = useRadioInput();
 
   return (
@@ -18,6 +20,7 @@ function InputRadio({ label, description, ...props }: Props) {
       {isInputActive(props?.id) ? (
         <Stack as="div" orientation="vertical" classes="animate-fade-in">
           <Input
+            ref={ref}
             type="number"
             classes="[&>input]:h-14"
             label={label}
@@ -31,4 +34,4 @@ function InputRadio({ label, description, ...props }: Props) {
   );
 }
 
-export default InputRadio;
+export default forwardRef(InputRadio);

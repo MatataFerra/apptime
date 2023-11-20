@@ -1,3 +1,5 @@
+import { forwardRef } from "react";
+
 import PopoverBase from "@/components/Popover";
 import InputRadio from "@/components/RadioWithInput/input";
 import RadioGroup from "@/components/RadioWithInput/radio";
@@ -18,15 +20,18 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   popoverContent?: string | React.ReactElement;
 }
 
-function RadioWithInput({
-  radioLabel,
-  isRadioRequired = false,
-  radioGroupName,
-  inputLabel,
-  inputDescription,
-  popoverContent,
-  ...props
-}: Props) {
+function RadioWithInput(
+  {
+    radioLabel,
+    isRadioRequired = false,
+    radioGroupName,
+    inputLabel,
+    inputDescription,
+    popoverContent,
+    ...props
+  }: Props,
+  ref: React.Ref<HTMLInputElement>
+) {
   return (
     <Stack orientation="vertical" spacing={1}>
       <Stack grid cols={2} classes="mb-4 mt-2 h-32 w-full">
@@ -48,6 +53,7 @@ function RadioWithInput({
           id={radioGroupName}
           label={inputLabel}
           description={inputDescription}
+          ref={ref}
           {...props}
         />
       </Stack>
@@ -56,4 +62,4 @@ function RadioWithInput({
   );
 }
 
-export default RadioWithInput;
+export default forwardRef(RadioWithInput);

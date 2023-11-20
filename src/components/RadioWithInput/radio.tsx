@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 
+import { useFormStore } from "@/store/useFormStore";
 import { RadioInputsState, useRadioInput } from "@/store/useRadioInput";
 
 type Props = {
@@ -16,6 +16,7 @@ function RadioGroup({ radioGroupName }: Props) {
   const { register } = useForm();
   const { radioInputValue, setRadioInputValue, isInputActive, __INPUT_VALUE_MATCHER } =
     useRadioInput();
+  const { setProfile } = useFormStore();
 
   const matcher =
     __INPUT_VALUE_MATCHER[
@@ -29,6 +30,10 @@ function RadioGroup({ radioGroupName }: Props) {
       ...radioInputValue,
       [radioGroupName]: !!Number(value),
     });
+
+    if (radioGroupName === "pay") setProfile({ holidayPay: !!Number(value) });
+    if (radioGroupName === "night") setProfile({ nightShift: !!Number(value) });
+    if (radioGroupName === "breaks") return;
   }
 
   return (
@@ -42,9 +47,7 @@ function RadioGroup({ radioGroupName }: Props) {
         type="radio"
         classes="order-1"
         {...register(radioGroupName, {
-          onChange(e) {
-            onChangeInput(e);
-          },
+          onChange: onChangeInput,
         })}
       />
       <Input
