@@ -10,6 +10,8 @@ export type FailureApiResponse = {
     response: boolean;
     type_error: HandleErrorType;
   };
+
+  response?: boolean;
 };
 
 export type SuccessUserApiResponse = {
