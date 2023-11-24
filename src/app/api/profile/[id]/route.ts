@@ -15,10 +15,9 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
   if (!parsedBody.success) {
     return NextResponse.json(
       {
-        error: parsedBody.error.issues.map((issue) => ({
-          error: issue.message,
-          input: issue.path,
-        })),
+        error: ErrorFactory.createError("DataProvidedIsNotValid", {
+          error: parsedBody.error,
+        }),
         response: false,
       },
       { status: 400 }
@@ -47,7 +46,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     if (error instanceof PrismaClientKnownRequestError) {
       return NextResponse.json(
         {
-          ...ErrorFactory.createError("PrismaClientUpdateRecord"),
+          error: ErrorFactory.createError("PrismaClientUpdateRecord"),
           response: false,
         },
         { status: 404 }
@@ -55,7 +54,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     }
     return NextResponse.json(
       {
-        ...ErrorFactory.createError("InternalServer"),
+        error: ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }
