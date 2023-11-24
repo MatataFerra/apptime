@@ -1,25 +1,39 @@
 "use client";
 
-import { MouseEvent } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
+import { FailureApiResponse } from "@/types/api_response";
 import { FormStep } from "@/types/forms";
+import { FormStoreData } from "@/types/store";
 
 import Button from "@/components/ui/Button";
 import Form from "@/components/ui/Form";
+import Loader from "@/components/ui/Loader";
+import { useToast } from "@/components/ui/Toast/use-toast";
 
+import onSubmitServerAction from "@/server-actions/home-form";
 import { useFormStepStore } from "@/store/useFormStepStore";
 import { useFormStore } from "@/store/useFormStore";
 
 function Buttons() {
   const { setCurrentStep, currentStep } = useFormStepStore();
-  const { user, profile } = useFormStore();
-  const { handleSubmit } = useForm({
+  const { toast } = useToast();
+  const { user, profile, setFormErrors, formErrors, isFormErrorsInitialized, hasErrors } =
+    useFormStore();
+  const { handleSubmit } = useForm<FormStoreData>({
     values: {
       user,
       profile,
     },
   });
+
+  useEffect(() => {
+    if (!isFormErrorsInitialized) return;
+    if (!hasErrors()) return;
+    if (formErrors.name) return setCurrentStep(FormStep.PERSONAL_INFO);
+    return setCurrentStep(FormStep.PAY_INFO);
+  }, [formErrors, hasErrors, isFormErrorsInitialized, setCurrentStep]);
 
   function OnNextStep() {
     setCurrentStep(currentStep + 1);
@@ -29,8 +43,44 @@ function Buttons() {
     setCurrentStep(currentStep - 1);
   }
 
-  function OnSubmit(data: any) {
-    throw new Error("Function not implemented.");
+  function OnSubmit(data: FormStoreData) {
+    setFormErrors({ data: { user: data.user, profile: data.profile } });
+
+    if (hasErrors()) {
+      return toast({
+        title: "😮 Something has gone wrong",
+        description: "Please check the form and try again",
+        variant: "destructive",
+        duration: 2000,
+        className: "[&>div>div]:text-xl",
+      });
+    }
+
+    toast({
+      title: "⏳ We are creating your profile",
+      action: <Loader.spinner />,
+      duration: 5000,
+    });
+
+    onSubmitServerAction(data)
+      .then((res) => res)
+      .then((message: FailureApiResponse) => {
+        if (!message.response) {
+          toast({
+            title: `😮 ${message.error.message}`,
+            variant: "destructive",
+            duration: 2000,
+          });
+        }
+
+        if (message.response) {
+          toast({
+            title: "😎 Your profile has been created",
+            duration: 2000,
+            className: "bg-green-200",
+          });
+        }
+      });
   }
 
   return (
