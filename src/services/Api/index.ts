@@ -1,4 +1,6 @@
-import { User } from "@prisma/client";
+import { Profile, User } from "@prisma/client";
+
+import api from "@/services/Api/base";
 
 import { SuccessUserApiResponse } from "@/types/api_response";
 
@@ -6,12 +8,9 @@ import { API_ENDPOINTS } from "@/utils/constants/endpoints";
 
 class ApiService {
   static async createWaitingList(email: string) {
-    return fetch(API_ENDPOINTS.WAITING_LIST, {
-      method: "POST",
-      body: JSON.stringify({ email }),
-      headers: {
-        "Content-Type": "application/json",
-      },
+    return api.post({
+      endpoint: API_ENDPOINTS.WAITING_LIST,
+      body: { email },
     });
   }
 
@@ -25,12 +24,10 @@ class ApiService {
     fullname: string;
   }) {
     try {
-      const response = await fetch(API_ENDPOINTS.REGISTER, {
-        method: "POST",
-        body: JSON.stringify({ email, password, name: fullname, emailVerified: null }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const response = await api.post({
+        endpoint: API_ENDPOINTS.REGISTER,
+        body: { email, password, name: fullname, emailVerified: null },
+        hasEnvUrl: false,
       });
 
       if (!response.ok) {
@@ -38,7 +35,7 @@ class ApiService {
         throw message;
       }
 
-      return await response.json();
+      return await response;
     } catch (error) {
       return error;
     }
@@ -47,30 +44,52 @@ class ApiService {
   static async getUserByEmail({
     email,
     filters,
+    hasEnvUrl = true,
   }: {
     email?: string | null;
     filters?: keyof User | (keyof User)[];
+    hasEnvUrl?: boolean;
   }): Promise<SuccessUserApiResponse> {
     const parseFilters = Array.isArray(filters) ? filters.join(",") : filters;
 
-    const response = await fetch(`${API_ENDPOINTS.USER}?email=${email}&only=${parseFilters}`);
-    const data: SuccessUserApiResponse = await response.json();
-
-    return data;
-  }
-
-  static async updateUser(user: Partial<User>) {
-    const response = await fetch(`${API_ENDPOINTS.USER}/${user.id}`, {
-      method: "PUT",
-      body: JSON.stringify(user),
-      headers: {
-        "Content-Type": "application/json",
-      },
+    const response: SuccessUserApiResponse = await api.get({
+      endpoint: `${API_ENDPOINTS.USER}?email=${email}&filters=${parseFilters}`,
+      hasEnvUrl,
     });
 
-    const data = await response.json();
+    return response;
+  }
 
-    return data;
+  static async updateUser({
+    user,
+    hasEnvUrl = true,
+  }: {
+    user: Partial<User>;
+    hasEnvUrl?: boolean;
+  }) {
+    const response = await api.put({
+      endpoint: `${API_ENDPOINTS.USER}/${user.id}`,
+      body: user,
+      hasEnvUrl,
+    });
+
+    return response;
+  }
+
+  static async createProfile({
+    profile,
+    hasEnvUrl = true,
+  }: {
+    profile: Omit<Profile, "id">;
+    hasEnvUrl?: boolean;
+  }) {
+    const response = await api.post({
+      endpoint: API_ENDPOINTS.PROFILE,
+      body: profile,
+      hasEnvUrl,
+    });
+
+    return response;
   }
 }
 
