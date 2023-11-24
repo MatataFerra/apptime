@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import Input from "@/components/ui/Input";
@@ -8,8 +9,12 @@ import Stack from "@/components/ui/Stack";
 import { useFormStore } from "@/store/useFormStore";
 
 function StepOne() {
-  const { register } = useForm();
-  const { setUser, user } = useFormStore();
+  const { register, setFocus } = useForm();
+  const { setUser, user, formErrors } = useFormStore();
+
+  useEffect(() => {
+    if (formErrors.name) return setFocus("name");
+  }, [formErrors.name, setFocus]);
 
   function onInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
@@ -21,6 +26,8 @@ function StepOne() {
     <>
       <Stack orientation="vertical" classes="mt-16" spacing={8}>
         <Input
+          isRequired
+          isError={formErrors.name}
           label="name"
           labelClasses="text-sm"
           {...register("name", {

@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import { Profile } from "@prisma/client";
@@ -12,8 +13,14 @@ import Text from "@/components/ui/Text";
 import { useFormStore } from "@/store/useFormStore";
 
 function StepTwo() {
-  const { register } = useForm();
-  const { profile, setProfile, detectInputType } = useFormStore();
+  const { register, setFocus } = useForm();
+  const { profile, setProfile, detectInputType, formErrors } = useFormStore();
+
+  useEffect(() => {
+    if (formErrors.hourlyRate) return setFocus("hourlyRate");
+    if (formErrors.startHour) return setFocus("startHour");
+    if (formErrors.endHour) return setFocus("endHour");
+  }, [formErrors.endHour, formErrors.hourlyRate, formErrors.startHour, setFocus]);
 
   function onInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
@@ -27,6 +34,8 @@ function StepTwo() {
         <Input
           classes="w-2/6"
           isRequired
+          isError={formErrors.hourlyRate}
+          min={0}
           type="number"
           label="Hour value"
           measure="$"
@@ -36,17 +45,6 @@ function StepTwo() {
             value: !!profile.hourlyRate && profile.hourlyRate,
           })}
         />
-        {/* <Input
-          type="number"
-          label="Extra for shift?"
-          description="By default is 0"
-          measure="$"
-          measurePlace="left"
-          {...register("extraNightShiftPay", {
-            onChange: onInputChange,
-            value: !!profile.extraNightShiftPay && profile.extraNightShiftPay,
-          })}
-        /> */}
       </Stack>
 
       <Stack orientation="horizontal">
@@ -55,6 +53,7 @@ function StepTwo() {
       <Stack classes="w-3/4">
         <Input
           isRequired
+          isError={formErrors.startHour}
           type="time"
           label="Start time"
           {...register("startHour", {
@@ -64,6 +63,7 @@ function StepTwo() {
         />
         <Input
           isRequired
+          isError={formErrors.endHour}
           type="time"
           label="Finish time"
           {...register("endHour", {

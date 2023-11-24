@@ -33,9 +33,9 @@ function StepThree() {
     <>
       <Stack grid cols={1} classes="w-full" spacing={4}>
         <RadioWithInput
+          min={0}
           radioLabel="Night shift?"
-          isRadioRequired
-          radioGroupName="night"
+          radioGroupName="extraNightShiftPay"
           inputLabel="extra for night hour"
           measure="$"
           measurePlace="left"
@@ -51,9 +51,9 @@ function StepThree() {
           })}
         />
         <RadioWithInput
+          min={0}
           radioLabel="Holiday pay?"
-          isRadioRequired
-          radioGroupName="pay"
+          radioGroupName="holidayPay"
           inputLabel="rate of holiday pay"
           measure="%"
           measurePlace="right"
@@ -64,10 +64,10 @@ function StepThree() {
           })}
         />
         <RadioWithInput
+          min={0}
           max={10}
           radioLabel="Unpaid breaks?"
-          isRadioRequired
-          radioGroupName="breaks"
+          radioGroupName="unpaidBreaks"
           popoverContent={
             <Text classes="flex flex-col">
               Normally you could have 2 or 3 breaks, 2 of 30 min or 2 of 15 min and 1 of 30 min. The
