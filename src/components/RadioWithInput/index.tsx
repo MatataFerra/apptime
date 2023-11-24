@@ -44,13 +44,13 @@ function RadioWithInput(
               </Text>
             )}
             {!!popoverContent && (
-              <PopoverBase triggerClasses="absolute -right-[15%]" content={popoverContent} />
+              <PopoverBase triggerClasses="absolute -right-[20%]" content={popoverContent} />
             )}
           </Text>
-          <RadioGroup radioGroupName={radioGroupName} />
+          <RadioGroup radioGroupName={props?.name as any} />
         </Stack>
         <InputRadio
-          id={radioGroupName}
+          id={props.name}
           label={inputLabel}
           description={inputDescription}
           ref={ref}

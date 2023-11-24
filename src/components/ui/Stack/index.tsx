@@ -7,7 +7,12 @@ import { cn } from "@/utils/helpers/styleMerger";
 export const StackDefaultAsType = "section" as const;
 
 type StackOwnProps<E extends React.ElementType> = {
-  children?: (string | React.ReactElement | boolean)[] | string | React.ReactElement | boolean;
+  children?:
+    | (string | boolean | React.ReactElement | React.ReactNode)[]
+    | string
+    | boolean
+    | React.ReactElement
+    | React.ReactNode;
   as?: E;
   classes?: CSSClassNames;
   orientation?: keyof typeof STACK_ORIENTATION;

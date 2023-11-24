@@ -18,7 +18,7 @@ function InputRadio({ label, description, ...props }: Props, ref: React.Ref<HTML
   return (
     <>
       {isInputActive(props?.id) ? (
-        <Stack as="div" orientation="vertical" classes="animate-fade-in">
+        <Stack as="div" orientation="vertical">
           <Input
             ref={ref}
             type="number"

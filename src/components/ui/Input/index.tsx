@@ -18,7 +18,10 @@ function Input(props: InputProps, ref: Ref<HTMLInputElement>): ReactElement<Inpu
           orientation="vertical"
           classes={`${containerClasses ? containerClasses : ""}`}
         >
-          <label className={cn("text-sm", labelClasses ? labelClasses : "")}>
+          <label
+            htmlFor={rest.type === "radio" ? `${rest.name}-${label}` : rest.name}
+            className={cn("text-sm", labelClasses ? labelClasses : "")}
+          >
             <span className="flex gap-1">
               {label} {isRequired && <span className="font-bold text-red-500">*</span>}
             </span>

@@ -12,10 +12,14 @@ type Props = {
   radioGroupName: keyof RadioInputsState;
 };
 
+const __INPUT_VALUE_MATCHER = {
+  true: "1",
+  false: "0",
+};
+
 function RadioGroup({ radioGroupName }: Props) {
   const { register } = useForm();
-  const { radioInputValue, setRadioInputValue, isInputActive, __INPUT_VALUE_MATCHER } =
-    useRadioInput();
+  const { radioInputValue, setRadioInputValue, isInputActive } = useRadioInput();
   const { setProfile } = useFormStore();
 
   const matcher =
@@ -31,14 +35,15 @@ function RadioGroup({ radioGroupName }: Props) {
       [radioGroupName]: !!Number(value),
     });
 
-    if (radioGroupName === "pay") setProfile({ holidayPay: !!Number(value) });
-    if (radioGroupName === "night") setProfile({ nightShift: !!Number(value) });
-    if (radioGroupName === "breaks") return;
+    if (radioGroupName === "holidayPay") setProfile({ holidayPay: !!Number(value) });
+    if (radioGroupName === "extraNightShiftPay") setProfile({ nightShift: !!Number(value) });
+    if (radioGroupName === "unpaidBreaks") return;
   }
 
   return (
     <Stack orientation="vertical" as="fieldset">
       <Input
+        id={`${radioGroupName}-Yes`}
         checked={matcher === "1"}
         label="Yes"
         value={1}
@@ -51,6 +56,7 @@ function RadioGroup({ radioGroupName }: Props) {
         })}
       />
       <Input
+        id={`${radioGroupName}-No`}
         checked={matcher === "0"}
         label="No"
         value={0}
