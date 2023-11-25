@@ -11,6 +11,7 @@ function UnfilledForm() {
         Please fill the form before start
       </Text>
       <Button
+        role="button"
         as="a"
         href={PATH_NAMES.FORM}
         variant="white"

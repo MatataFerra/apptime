@@ -20,6 +20,7 @@ function InputRadio({ label, description, ...props }: Props, ref: React.Ref<HTML
       {isInputActive(props?.id) ? (
         <Stack as="div" orientation="vertical">
           <Input
+            data-testid={`input-${props?.id}`}
             ref={ref}
             type="number"
             classes="[&>input]:h-14"
