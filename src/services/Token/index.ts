@@ -41,4 +41,53 @@ class TokenService implements TokenServiceInterface {
   }
 }
 
+/**
+ * @class Token Service
+ * @description This class is responsible for all the logic related to the Token model based on Builder pattern
+ * @param {string} cookie - The cookie that the user wants to get.
+ *
+ * @returns {Token} - Returns the token
+ *
+ */
+export class Token {
+  cookie: string;
+  session: {
+    cookie: RequestCookie | undefined;
+    token: JWTDecodedType | null;
+  };
+  constructor(cookie: string = "next-auth.session-token") {
+    this.cookie = cookie;
+    this.session = {
+      cookie: undefined,
+      token: null,
+    };
+  }
+
+  private async decodedCookieData() {
+    if (!this.session || !this.session.cookie) return this;
+
+    const result = (await decode({
+      token: this.session.cookie.value,
+      secret: process.env.NEXTAUTH_SECRET,
+    })) as JWTDecodedType;
+
+    this.session.token = result;
+
+    return this;
+  }
+
+  private async getCookie() {
+    const getCookie = cookieStore().get(this.cookie);
+    this.session.cookie = getCookie || undefined;
+    return this;
+  }
+
+  async build() {
+    await this.getCookie();
+    await this.decodedCookieData();
+
+    return this.session.token;
+  }
+}
+
 export default TokenService;
