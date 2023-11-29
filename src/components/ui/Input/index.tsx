@@ -8,14 +8,14 @@ import Stack from "@/components/ui/Stack";
 import { cn } from "@/utils/helpers/styleMerger";
 
 function Input(props: InputProps, ref: Ref<HTMLInputElement>): ReactElement<InputProps> {
-  const { label, labelClasses, isRequired, containerClasses, ...rest } = props;
+  const { label, labelClasses, isRequired, containerClasses, spacing, ...rest } = props;
 
   return (
     <>
       {label ? (
         <Stack
           as="div"
-          spacing={0}
+          spacing={spacing ? spacing : 0}
           orientation="vertical"
           classes={`${containerClasses ? containerClasses : ""}`}
         >

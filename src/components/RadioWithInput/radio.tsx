@@ -47,6 +47,7 @@ function RadioGroup({ radioGroupName }: Props) {
         checked={matcher === "1"}
         label="Yes"
         value={1}
+        spacing={1}
         containerClasses="items-center flex flex-row"
         labelClasses="order-2 text-base"
         type="radio"
@@ -60,6 +61,7 @@ function RadioGroup({ radioGroupName }: Props) {
         checked={matcher === "0"}
         label="No"
         value={0}
+        spacing={1}
         containerClasses="items-center flex flex-row"
         labelClasses="order-2 text-base"
         type="radio"

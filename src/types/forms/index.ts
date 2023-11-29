@@ -24,6 +24,7 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
   labelClasses?: CSSClassNames;
   variant?: Variants;
   type?: HTMLInputTypeAttribute;
+  spacing?: number;
   isError?: boolean;
   isRequired?: boolean;
   label?: string;

@@ -34,5 +34,5 @@ export default async function onSubmitServerAction({ user, profile }: FormStoreD
     },
   });
 
-  return response;
+  return await response.json();
 }

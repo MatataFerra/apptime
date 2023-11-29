@@ -3,6 +3,8 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
+import Link from "next/link";
+
 import { FailureApiResponse } from "@/types/api_response";
 import { FormStep } from "@/types/forms";
 import { FormStoreData } from "@/types/store";
@@ -62,25 +64,29 @@ function Buttons() {
       duration: 5000,
     });
 
-    onSubmitServerAction(data)
-      .then((res) => res.json())
-      .then((message: FailureApiResponse) => {
-        if (!message.response) {
-          toast({
-            title: `😮 ${message.error.message}`,
-            variant: "destructive",
-            duration: 2000,
-          });
-        }
+    onSubmitServerAction(data).then((message: FailureApiResponse) => {
+      if (!message.response) {
+        toast({
+          title: `😮 ${message.error.message}`,
+          variant: "destructive",
+          duration: 3000,
 
-        if (message.response) {
-          toast({
-            title: "😎 Your profile has been created",
-            duration: 2000,
-            className: "bg-green-200",
-          });
-        }
-      });
+          action: (
+            <Button as="div" variant="white" classes="border-none">
+              <Link href="/">Go Home</Link>
+            </Button>
+          ),
+        });
+      }
+
+      if (message.response) {
+        toast({
+          title: "😎 Your profile has been created",
+          duration: 2000,
+          className: "bg-green-200",
+        });
+      }
+    });
   }
 
   return (
