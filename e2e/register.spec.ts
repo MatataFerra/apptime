@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import randomEmail from "../src/utils/helpers/generateRandomEmail";
-import { createUser, USER_CREDENTIALS } from "./constants";
+import { createUser } from "./constants";
 
 test.use({
   isMobile: true,
@@ -24,7 +24,6 @@ test.beforeEach(async ({ page }) => {
   const { email, password } = createUser({ email: randomEmail() });
 
   // buttons
-  await page.locator("[name=fullname]").fill("User testing");
   await page.locator("[name=email]").fill(email);
   await page.locator("[name=password]").fill(password);
 
