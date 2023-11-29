@@ -11,12 +11,11 @@ import { z } from "zod";
 
 import api from "@/services/Api";
 
-import { FailureApiResponse } from "@/types/api_response";
-
 import List from "@/components/ListRegister";
 import Form from "@/components/ui/Form";
 import Input from "@/components/ui/Input";
 import Loader from "@/components/ui/Loader";
+import Stack from "@/components/ui/Stack";
 import { useToast } from "@/components/ui/Toast/use-toast";
 
 import { usePasswordValid } from "@/providers/PasswordValid";
@@ -28,13 +27,11 @@ import usePasswordErrors from "@/hooks/usePasswordErrors";
 const RegisterSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  fullname: z.string().min(2),
 });
 
 type RegisterInputs = {
   email: string;
   password: string;
-  fullname: string;
 };
 
 function RegisterForm() {
@@ -66,7 +63,7 @@ function RegisterForm() {
     onSuccess(data) {
       if (!data.response) {
         // Error handling
-        const response: FailureApiResponse = data;
+        const response = data;
         if (response.error.type_error === "UserAlreadyExists") {
           toast({
             title: t("user_already_exist"),
@@ -77,7 +74,7 @@ function RegisterForm() {
 
           setTimeout(() => {
             router.push(PATH_NAMES.LOGIN);
-          }, 500);
+          }, 1500);
 
           return;
         }
@@ -92,7 +89,7 @@ function RegisterForm() {
       // ui notif
       toast({
         title: t("successful"),
-        color: "#00ff88",
+        className: "bg-green-400",
         duration: 2000,
         itemID: "success_register",
       });
@@ -127,9 +124,6 @@ function RegisterForm() {
   });
 
   async function onSubmit(data: RegisterInputs) {
-    if (data.fullname.length === 0) {
-      return setFocus("fullname");
-    }
     if (data.email.length === 0) {
       return setFocus("email");
     }
@@ -150,7 +144,6 @@ function RegisterForm() {
     mutate({
       email: data.email,
       password: data.password,
-      fullname: data.fullname,
     });
   }
 
@@ -168,15 +161,7 @@ function RegisterForm() {
         autoComplete="off"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <fieldset>
-          <Input
-            classes="h-[69px] w-full rounded-md border border-gray-900 bg-white text-2xl shadow-input"
-            variant="default"
-            type="fullname"
-            label="fullname"
-            labelClasses="m-0 text-sm"
-            {...register("fullname")}
-          />
+        <Stack as="fieldset" spacing={4} orientation="vertical">
           <Input
             classes="h-[69px] w-full rounded-md border border-gray-900 bg-white text-2xl shadow-input"
             variant="default"
@@ -193,7 +178,7 @@ function RegisterForm() {
             labelClasses="m-0 text-sm"
             {...register("password")}
           />
-        </fieldset>
+        </Stack>
         <List errors={passedErrors} password={passwordWatched} />
       </Form>
     </>

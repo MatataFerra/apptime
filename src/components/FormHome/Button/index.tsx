@@ -63,7 +63,7 @@ function Buttons() {
     });
 
     onSubmitServerAction(data)
-      .then((res) => res)
+      .then((res) => res.json())
       .then((message: FailureApiResponse) => {
         if (!message.response) {
           toast({

@@ -14,8 +14,8 @@ export type FailureApiResponse = {
   response?: boolean;
 };
 
-export type SuccessUserApiResponse = {
+export interface SuccessUserApiResponse extends Response {
   message: string;
   response: boolean;
   user: User;
-};
+}

@@ -1,5 +1,5 @@
 import { compare } from "bcryptjs";
-import _ from "lodash";
+import { assign, cloneDeep } from "lodash";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextRequest, NextResponse } from "next/server";
 import NextAuth from "next-auth";
@@ -52,6 +52,12 @@ export async function GET(req: NextApiRequest & NextRequest, res: NextResponse &
 
     session: {
       strategy: "jwt",
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+    },
+
+    jwt: {
+      secret: process.env.NEXTAUTH_SECRET,
+      maxAge: 7 * 24 * 60 * 60,
     },
 
     pages: {
@@ -62,18 +68,20 @@ export async function GET(req: NextApiRequest & NextRequest, res: NextResponse &
     secret: process.env.NEXTAUTH_SECRET,
 
     callbacks: {
-      async session({ session, token, user }) {
-        const sessionDeepClone = _.cloneDeep(session);
-        const sessionAccessToken = _.assign(sessionDeepClone, {
+      async session({ session, token }) {
+        const sessionDeepClone = cloneDeep(session);
+        const sessionAccessToken = assign(sessionDeepClone, {
           accessToken: token.accessToken,
           type_account: token.type_account,
         });
 
-        AuthService.oauthUser({
-          email: sessionAccessToken.user?.email ?? "",
-          name: sessionAccessToken.user?.name ?? "",
-          image: sessionAccessToken.user?.image ?? "",
-        });
+        if (sessionAccessToken.type_account === "google") {
+          AuthService.oauthUser({
+            email: sessionAccessToken.user?.email ?? "",
+            name: sessionAccessToken.user?.name ?? "",
+            image: sessionAccessToken.user?.image ?? "",
+          });
+        }
 
         return sessionAccessToken;
       },
@@ -86,7 +94,7 @@ export async function GET(req: NextApiRequest & NextRequest, res: NextResponse &
           token.type_account = account.provider;
           token.role = userFounded?.role ?? "NOT_FOUND";
         }
-        const tokenClone = _.cloneDeep(token);
+        const tokenClone = cloneDeep(token);
 
         return tokenClone;
       },
@@ -153,9 +161,9 @@ export async function POST(req: NextApiRequest & NextRequest, res: NextResponse 
     secret: process.env.NEXTAUTH_SECRET,
 
     callbacks: {
-      async session({ session, token, user }) {
-        const sessionDeepClone = _.cloneDeep(session);
-        const sessionAccessToken = _.assign(sessionDeepClone, {
+      async session({ session, token }) {
+        const sessionDeepClone = cloneDeep(session);
+        const sessionAccessToken = assign(sessionDeepClone, {
           accessToken: token.accessToken,
           type_account: token.type_account,
         });
@@ -168,7 +176,7 @@ export async function POST(req: NextApiRequest & NextRequest, res: NextResponse 
 
         return sessionAccessToken;
       },
-      async jwt({ token, account, session }) {
+      async jwt({ token, account }) {
         if (account) {
           const userFounded = await UserService.findUniqueUser({
             email: token.email,
@@ -177,7 +185,7 @@ export async function POST(req: NextApiRequest & NextRequest, res: NextResponse 
           token.type_account = account.provider;
           token.role = userFounded?.role ?? "NOT_FOUND";
         }
-        const tokenClone = _.cloneDeep(token);
+        const tokenClone = cloneDeep(token);
 
         return tokenClone;
       },

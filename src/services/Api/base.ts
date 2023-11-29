@@ -29,9 +29,7 @@ class ApiBaseService {
       },
     });
 
-    const data = await response.json();
-
-    return data;
+    return response;
   }
 
   static async put({

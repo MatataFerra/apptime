@@ -14,28 +14,15 @@ class ApiService {
     });
   }
 
-  static async register({
-    email,
-    password,
-    fullname,
-  }: {
-    email: string;
-    password: string;
-    fullname: string;
-  }) {
+  static async register({ email, password }: { email: string; password: string }) {
     try {
       const response = await api.post({
         endpoint: API_ENDPOINTS.REGISTER,
-        body: { email, password, name: fullname, emailVerified: null },
+        body: { email, password, emailVerified: null },
         hasEnvUrl: false,
       });
 
-      if (!response.ok) {
-        const message = await response.json();
-        throw message;
-      }
-
-      return await response;
+      return await response.json();
     } catch (error) {
       return error;
     }
