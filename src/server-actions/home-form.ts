@@ -6,7 +6,8 @@ import ApiService from "@/services/Api";
 
 import { FormStoreData } from "@/types/store";
 
-export default async function onSubmitServerAction({ user, profile }: FormStoreData) {
+export default async function onSubmitServerAction(data: FormStoreData) {
+  const { user, profile } = data;
   // holiday pay en profile por default es 8
   const session = await getServerSession();
   const fullname = `${user.name} ${user.surname}`;
@@ -16,6 +17,10 @@ export default async function onSubmitServerAction({ user, profile }: FormStoreD
     filters: "id",
   });
 
+  if (!userByEmail.response) {
+    return userByEmail;
+  }
+
   const userUpdated = await ApiService.updateUser({
     user: {
       id: userByEmail.user.id,
@@ -24,7 +29,7 @@ export default async function onSubmitServerAction({ user, profile }: FormStoreD
   });
 
   if (!userUpdated.response) {
-    throw userUpdated;
+    return userUpdated;
   }
 
   const response = await ApiService.createProfile({

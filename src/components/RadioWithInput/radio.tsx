@@ -35,7 +35,7 @@ function RadioGroup({ radioGroupName }: Props) {
       [radioGroupName]: !!Number(value),
     });
 
-    if (radioGroupName === "holidayPay") setProfile({ holidayPay: !!Number(value) });
+    if (radioGroupName === "holidayPayRate") setProfile({ holidayPay: !!Number(value) });
     if (radioGroupName === "extraNightShiftPay") setProfile({ nightShift: !!Number(value) });
     if (radioGroupName === "unpaidBreaks") return;
   }

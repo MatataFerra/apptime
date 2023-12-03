@@ -53,14 +53,14 @@ function StepThree() {
         <RadioWithInput
           min={0}
           radioLabel="Holiday pay?"
-          radioGroupName="holidayPay"
+          radioGroupName="holidayPayRate"
           inputLabel="rate of holiday pay"
           measure="%"
           measurePlace="right"
           inputDescription="By default is 8%"
-          {...register("holidayPay", {
+          {...register("holidayPayRate", {
             onChange: onInputChange,
-            value: !!profile.holidayPay && profile.holidayPay,
+            value: !!profile.holidayPayRate && profile.holidayPayRate,
           })}
         />
         <RadioWithInput

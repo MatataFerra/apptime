@@ -2,7 +2,7 @@ import { Profile, User } from "@prisma/client";
 
 import api from "@/services/Api/base";
 
-import { SuccessUserApiResponse } from "@/types/api_response";
+import type { ApiResponse } from "@/types/api_response";
 
 import { API_ENDPOINTS } from "@/utils/constants/endpoints";
 
@@ -36,10 +36,10 @@ class ApiService {
     email?: string | null;
     filters?: keyof User | (keyof User)[];
     hasEnvUrl?: boolean;
-  }): Promise<SuccessUserApiResponse> {
+  }): Promise<ApiResponse<User>> {
     const parseFilters = Array.isArray(filters) ? filters.join(",") : filters;
 
-    const response: SuccessUserApiResponse = await api.get({
+    const response: ApiResponse<User> = await api.get({
       endpoint: `${API_ENDPOINTS.USER}?email=${email}&filters=${parseFilters}`,
       hasEnvUrl,
     });

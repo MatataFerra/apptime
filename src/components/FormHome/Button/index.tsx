@@ -3,9 +3,10 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
+import { Profile } from "@prisma/client";
 import Link from "next/link";
 
-import { FailureApiResponse } from "@/types/api_response";
+import { ApiResponse } from "@/types/api_response";
 import { FormStep } from "@/types/forms";
 import { FormStoreData } from "@/types/store";
 
@@ -64,22 +65,22 @@ function Buttons() {
       duration: 5000,
     });
 
-    onSubmitServerAction(data).then((message: FailureApiResponse) => {
-      if (!message.response) {
-        toast({
-          title: `😮 ${message.error.message}`,
+    onSubmitServerAction(data).then((data: ApiResponse<Profile>) => {
+      if (!data.response) {
+        return toast({
+          title: `😮 ${data.error.message}`,
           variant: "destructive",
           duration: 3000,
 
           action: (
-            <Button as="div" variant="white" classes="border-none">
+            <Button as="div" variant="white" classes="remove_button_highlight border-none">
               <Link href="/">Go Home</Link>
             </Button>
           ),
         });
       }
 
-      if (message.response) {
+      if (data.response) {
         toast({
           title: "😎 Your profile has been created",
           duration: 2000,

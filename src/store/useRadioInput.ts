@@ -3,7 +3,7 @@ import { devtools } from "zustand/middleware";
 
 export type RadioInputsState = {
   extraNightShiftPay: boolean;
-  holidayPay: boolean;
+  holidayPayRate: boolean;
   unpaidBreaks: boolean;
 };
 
