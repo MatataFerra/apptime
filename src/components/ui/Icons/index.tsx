@@ -21,4 +21,36 @@ Icon.check = function ({ fill = "#1C274C", ...props }: SVGProps<SVGSVGElement>) 
   );
 };
 
+Icon.mark = function ({ ...props }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width={props.width || "16"}
+      height={props.height || "16"}
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="M7.91132 14.8226C11.7283 14.8226 14.8226 11.7283 14.8226 7.91132C14.8226 4.0943 11.7283 1 7.91132 1C4.0943 1 1 4.0943 1 7.91132C1 11.7283 4.0943 14.8226 7.91132 14.8226Z"
+        stroke="black"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M5.83795 5.83793C5.83795 3.41894 9.63918 3.41896 9.63918 5.83793C9.63918 7.56576 7.91135 7.22012 7.91135 9.29352"
+        stroke="black"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M7.91132 12.065L7.91823 12.0574"
+        stroke="black"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+};
+
 export default Icon;

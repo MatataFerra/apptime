@@ -30,6 +30,7 @@ module.exports = {
         "light-gold": "#FEE954",
         "hard-pink": "#FF2B91",
         "common-orange": "#FF6A00",
+        "light-blue": "#64C2DB",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -68,9 +69,14 @@ module.exports = {
         "4xl": "2.25rem",
       },
 
+      dropShadow: {
+        button: "0px 4px 4px rgba(0, 0, 0, 0.25)"
+      },
+
       boxShadow: {
-        button: "box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
-        input: "box-shadow: 0px 4px 9px 1px rgba(0, 0, 0, 0.25)        "
+        button: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+        "button-inner": "inset 0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+        input: "0px 4px 9px 1px rgba(0, 0, 0, 0.25)"
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -85,6 +91,25 @@ module.exports = {
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: 0 },
+        },
+
+        "fade_in": {
+          "0%": {
+            opacity: 0,
+          },
+          "100%": {
+            opacity: 1,
+          },
+        
+        },
+
+        "fade_out": {
+          "0%": {
+            opacity: 1,
+          },
+          "100%": {
+            opacity: 0,
+          },
         },
 
         text: {
@@ -115,6 +140,8 @@ module.exports = {
         "accordion-up": "accordion-up 0.2s ease-out",
         text: "text 5s ease infinite",
         shake: "shake 1s ease 1",
+        "fade-in": "fade_in 0.5s ease-in-out",
+        "fade-out": "fade_out 0.5s ease-in-out",
       },
     },
   },

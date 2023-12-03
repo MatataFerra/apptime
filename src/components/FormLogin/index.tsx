@@ -87,7 +87,7 @@ export default function FormLogin() {
         <section className="grid grid-rows-[1fr,2rem,auto] gap-3 self-center">
           <fieldset className="flex flex-col gap-4">
             <Input
-              classes="h-[69px] w-full rounded-md border border-gray-900 bg-white text-2xl shadow-input"
+              classes="border border-gray-900"
               variant="default"
               type="email"
               label="email"
@@ -96,7 +96,7 @@ export default function FormLogin() {
               {...register("email")}
             />
             <Input
-              classes={`h-[69px] w-full rounded-md border border-gray-900 bg-white text-2xl shadow-input`}
+              classes="border border-gray-900"
               variant="default"
               type="password"
               label="password"

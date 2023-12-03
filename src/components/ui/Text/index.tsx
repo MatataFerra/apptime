@@ -1,13 +1,14 @@
 import React, { ReactElement } from "react";
 
-import _ from "lodash";
+import { isArray } from "lodash";
 
 import { CSSClassNames } from "@/types";
+import { TAILWIND_COLOR } from "@/types/tailwind";
 
 import { TEXT_VARIANTS } from "@/utils/constants/tailwind";
 import { cm } from "@/utils/helpers/styleMerger";
 
-type As = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span";
+type As = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span" | "small";
 type Variants = keyof typeof TEXT_VARIANTS;
 
 interface Props
@@ -18,7 +19,8 @@ interface Props
   as?: As;
   classes?: CSSClassNames;
   variant?: Variants;
-  children: (string | ReactElement)[] | string | ReactElement | undefined;
+  color?: TAILWIND_COLOR;
+  children: (string | ReactElement | boolean)[] | string | ReactElement | undefined;
 }
 
 /**
@@ -37,12 +39,24 @@ interface Props
  * @default "default"
  */
 
-function Text({ children, as = "p", classes, variant = "default", ...props }: Props): ReactElement {
+function Text({
+  children,
+  as = "p",
+  classes,
+  variant = "default",
+  color,
+  ...props
+}: Props): ReactElement {
   const Component = as;
 
   return (
     <Component
-      className={cm(TEXT_VARIANTS[variant], classes, _.isArray(children) && "inline-flex gap-2")}
+      className={cm(
+        TEXT_VARIANTS[variant],
+        classes,
+        color,
+        isArray(children) && "inline-flex gap-2"
+      )}
       {...props}
     >
       {children}

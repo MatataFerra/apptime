@@ -12,7 +12,6 @@ import NoScreenCompatibility from "@/components/NoScreenCompatibility";
 export default async function AuthLayout({ children }: { children: ReactElement }) {
   const userAgent = headers().get("user-agent") ?? "";
   const isMobileHeader = ut.isMobile({ headers: userAgent });
-  const param = "true";
   const isMobile = utClient.isTrutyValue(isMobileHeader);
 
   if (!isMobile) {

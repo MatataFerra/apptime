@@ -32,7 +32,7 @@ function Button<E extends React.ElementType = typeof ButtonDefaultAsType>({
       className={cm(
         "w-40 cursor-pointer rounded-lg text-center",
         BUTTON_VARIANTS[variant],
-        classes
+        classes?.trim()
       )}
       {...props}
     >

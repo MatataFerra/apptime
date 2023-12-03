@@ -6,20 +6,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
-import db from "@/services/Database";
+import api from "@/services/Api";
 
 import { Inputs, SuscribeSchema } from "@/types";
 
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Loader from "@/components/ui/Loader";
+import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
 function Suscribe() {
   const t = useTranslations("no-mobile");
 
   const mutation = useMutation({
-    mutationFn: db.createWaitingList,
+    mutationFn: api.createWaitingList,
   });
   const {
     register,
@@ -45,15 +46,17 @@ function Suscribe() {
     <article className="h-44 space-y-4 rounded-lg bg-black bg-opacity-80 bg-clip-padding px-8 py-4 backdrop-blur-sm backdrop-filter">
       <Text classes="text-lg text-white">{t("subscription.notify_message")}</Text>
 
-      <form
-        className="flex justify-between gap-2"
+      <Stack
+        as="form"
+        grid
+        cols={"1fr auto"}
         onSubmit={handleSubmit(onSubmit)}
         onKeyDown={onKeyPress}
       >
         <Input
           variant="default"
           placeholder="username@email.com"
-          classes="w-full"
+          classes="h-full w-full text-sm shadow-sm"
           type="text"
           {...register("email")}
         />
@@ -65,7 +68,7 @@ function Suscribe() {
             <Text classes="font-black text-white">Notify Me</Text>
           </div>
         </Button>
-      </form>
+      </Stack>
       {isSubmitting && <Loader.spinner />}
 
       {!isValid && (

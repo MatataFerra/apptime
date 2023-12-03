@@ -1,5 +1,6 @@
 import { Shift } from "@prisma/client";
-import { differenceInMinutes } from "date-fns";
+import { differenceInMinutes, parse } from "date-fns";
+import { enUS, es } from "date-fns/locale";
 import _ from "lodash";
 
 type ShiftServiceType = Omit<Shift, "id">;
@@ -26,6 +27,16 @@ class ShiftService implements ShiftServiceInterface {
   shift: ShiftServiceType;
   constructor(shift: ShiftServiceType) {
     this.shift = shift;
+  }
+
+  static transformDateFromString(date: string, locale: "es" | "en" = "en") {
+    const LOCALES = {
+      en: enUS,
+      es: es,
+    };
+    return parse(date, "HH:mm", new Date(), {
+      locale: LOCALES[locale],
+    });
   }
 
   differenceInMinsBetweenStartAndEnd() {

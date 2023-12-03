@@ -5,7 +5,6 @@ import Text from "@/components/ui/Text";
 import { cm } from "@/utils/helpers/styleMerger";
 
 interface Loader {
-  className?: CSSClassNames;
   children?: React.ReactElement | React.ReactElement[];
   loading?: boolean;
   type?: "spinner" | "text";
@@ -20,19 +19,16 @@ interface Spinner {
   spinColor?: `fill-${CSSClassNames}`;
 }
 
-function Loader(props: Loader) {
+function Loader({ loaderClasses, loading, loaderContainerClasses, type }: Loader) {
   return (
     <>
-      {props.loading ? (
+      {loading ? (
         <div className="absolute inset-0 bg-slate-500 bg-opacity-50">
-          {props.type === "spinner" && (
-            <Loader.spinner
-              classes={props.loaderClasses}
-              containerClasses={props.loaderContainerClasses}
-            />
+          {type === "spinner" && (
+            <Loader.spinner classes={loaderClasses} containerClasses={loaderContainerClasses} />
           )}
-          {props.type === "text" && (
-            <Text as="span" classes={props.loaderClasses}>
+          {type === "text" && (
+            <Text role="status" as="span" classes={loaderClasses}>
               Loading...
             </Text>
           )}

@@ -2,7 +2,7 @@ import { devices, PlaywrightTestConfig } from "@playwright/test";
 import path from "path";
 
 // ignore test
-const IGNORE_TEST_DESKTOP = [/.*login.spec.ts/, /.*register.spec.ts/];
+const IGNORE_TEST_DESKTOP = [/.*login.spec.ts/, /.*register.spec.ts/, /.*home-form.spec.ts/];
 const IGNORE_TEST_MOBILE = [/.*no-mobile.spec.ts/];
 
 // Use process.env.PORT by default and fallback to port 3000

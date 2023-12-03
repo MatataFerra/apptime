@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
   if (!parsedBody.success) {
     return NextResponse.json(
       {
-        ...ErrorFactory.createError("DataProvidedIsNotValid", {
+        error: ErrorFactory.createError("DataProvidedIsNotValid", {
           error: parsedBody.error,
         }),
         response: false,
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
   if (!parsedBody.data.userId) {
     return NextResponse.json(
       {
-        ...ErrorFactory.createError("BodyNotProvided"),
+        error: ErrorFactory.createError("BodyNotProvided"),
         response: false,
       },
       { status: 400 }
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json(
         {
-          ...ErrorFactory.createError("UserNotFound"),
+          error: ErrorFactory.createError("UserNotFound"),
           response: false,
         },
         { status: 404 }
@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
     if (user.profile) {
       return NextResponse.json(
         {
-          ...ErrorFactory.createError("ProfileAlreadyExists"),
+          error: ErrorFactory.createError("ProfileAlreadyExists"),
           response: false,
         },
         { status: 400 }
@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
     if (error instanceof PrismaClientValidationError) {
       return NextResponse.json(
         {
-          ...ErrorFactory.createError("PrismaClientFields"),
+          error: ErrorFactory.createError("PrismaClientFields"),
           response: false,
         },
         { status: 400 }
@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       {
-        ...ErrorFactory.createError("InternalServer"),
+        error: ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }

@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { Profile, Shift, User } from "@prisma/client";
 
 import TokenService from "@/services/Token";
 
@@ -10,6 +10,11 @@ type FindUniqueUserType = {
   id?: string | null;
   email?: string | null;
 };
+
+interface UserWithProfileAndShifts extends User {
+  profile: Profile | null;
+  shifts: Shift[];
+}
 
 /**
  * @class UserService
@@ -35,6 +40,25 @@ class UserService {
     });
 
     return user;
+  }
+
+  static async filterUserProps(
+    user: User | Partial<UserWithProfileAndShifts>,
+    params: (string | null)[]
+  ) {
+    if (!user) return null;
+    if (!params) return user;
+
+    return Object.keys(user).reduce((acc, current) => {
+      if (params.includes(current)) {
+        return {
+          ...acc,
+          [current]: user[current as keyof typeof user],
+        };
+      }
+
+      return acc;
+    }, {});
   }
 
   static async authenticatedUser() {

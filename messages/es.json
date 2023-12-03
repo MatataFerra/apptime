@@ -19,5 +19,8 @@
     "successful": "Usuario creado con éxito, serás redireccionado a la página principal",
     "unexpected_error_after_register": "Algo ocurrió durante la redirección, por favor intente logearse de nuevo",
     "max_attemps_to_register": "Has intentado demasiadas veces, por favor esperá hasta intentar de nuevo"
+  },
+  "home": {
+    "popover": "Cuando el estado es offline, significa que el usuario no inició ningún turno todavía"
   }
 }

@@ -38,7 +38,7 @@ const UserModelSchema = z.object({
   email: z.string().email(),
   emailVerified: z.date().nullable(),
   image: z.string().nullable().default("https://i.imgur.com/6VBx3io.png"),
-  name: z.string(),
+  name: z.string().default("User"),
   password: z.string(),
   online: z.boolean().default(false),
   formCompleted: z.boolean().default(false),
@@ -94,6 +94,8 @@ const ShiftUpdateSchema = ShiftModelSchema.partial().refine(
 const SearchParamsSchema = z.object({
   shifts: z.string().nullable(),
   profile: z.string().nullable(),
+  email: z.string().nullable(),
+  only: z.string().nullable(),
 });
 
 /* 

@@ -6,6 +6,7 @@ import { cm } from "@/utils/helpers/styleMerger";
 
 interface Props {
   img?: string;
+  width?: `w-${string}`;
   backgroundImage?: string;
   classes?: CSSClassNames;
 }
@@ -21,7 +22,7 @@ interface WavesProps extends SVGProps<SVGSVGElement> {
  * @param {TailwindCSS} classes - HTML class attribute
  */
 
-function Background({ img, backgroundImage, classes = "w-96 h-96" }: Props) {
+function Background({ img, backgroundImage, classes = "w-96 h-96", width }: Props) {
   function getFormat(image: string) {
     const format = image.split(".").pop();
 
@@ -35,7 +36,7 @@ function Background({ img, backgroundImage, classes = "w-96 h-96" }: Props) {
         <picture className={cm(classes)}>
           <source srcSet={img} type={`image/${format}`} />
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={img} alt="Background app" />
+          <img className={width} src={img} alt="Background app" />
         </picture>
       )}
 

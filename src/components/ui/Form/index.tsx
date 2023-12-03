@@ -2,7 +2,7 @@ import { cm } from "@/utils/helpers/styleMerger";
 
 interface Props extends Omit<React.FormHTMLAttributes<HTMLFormElement>, "className"> {
   classes?: string;
-  children: React.ReactElement | React.ReactElement[];
+  children: (string | React.ReactElement | boolean)[] | string | React.ReactElement | boolean;
 }
 
 function Form({ children, classes, ...props }: Props) {
