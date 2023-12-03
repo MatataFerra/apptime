@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 
 import { Profile } from "@prisma/client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { ApiResponse } from "@/types/api_response";
 import { FormStep } from "@/types/forms";
@@ -21,6 +22,7 @@ import { useFormStore } from "@/store/useFormStore";
 
 function Buttons() {
   const { setCurrentStep, currentStep } = useFormStepStore();
+  const { replace } = useRouter();
   const { toast } = useToast();
   const { user, profile, setFormErrors, formErrors, isFormErrorsInitialized, hasErrors } =
     useFormStore();
@@ -83,8 +85,11 @@ function Buttons() {
       if (data.response) {
         toast({
           title: "😎 Your profile has been created",
-          duration: 2000,
+          description: "You will be redirected to the home page",
+          duration: 3000,
           className: "bg-green-200",
+          action: <Loader.spinner />,
+          onAnimationEnd: () => replace("/"),
         });
       }
     });
