@@ -1,24 +1,35 @@
+import { getServerSession } from "next-auth";
+
 import i18n from "@/services/i18n";
+import UserService from "@/services/User";
 import ut from "@/services/Utilities/client";
 
 import { LocaleParams } from "@/types";
 
 import DateComponent from "@/components/Date";
-import HomeButtons from "@/components/Home/Buttons/container";
-import PopoverHome from "@/components/Popover/home";
+import HomeButtons from "@/components/Home/Buttons";
 import ShiftStatus from "@/components/ShiftStatus";
+import ShiftTextState from "@/components/ShiftTextState";
 import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
 import WelcomeTitle from "@/components/WelcomeTitle";
+
+import ShiftStatusProvider from "@/providers/ShiftStatus";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-export default function Home({ params }: { params: LocaleParams }) {
+export default async function Home({ params }: { params: LocaleParams }) {
   const isLocaleSupported = new i18n(params.locale).isLocaleSupported();
 
   if (!isLocaleSupported) {
     return ut.redirectTo(PATH_NAMES.HOME);
   }
+
+  const session = await getServerSession();
+  const user = await UserService.findUniqueUser({
+    email: session?.user?.email,
+    shifts: true,
+    profile: true,
+  });
 
   return (
     <>
@@ -27,12 +38,11 @@ export default function Home({ params }: { params: LocaleParams }) {
           <WelcomeTitle />
           <DateComponent locale={params.locale} />
         </Stack>
-        <Text as="h2" classes="text-2xl">
-          State: <span className="text-green-500">online</span>
-          <PopoverHome />
-        </Text>
-        <ShiftStatus />
-        <HomeButtons />
+        <ShiftStatusProvider user={user}>
+          <ShiftTextState />
+          <ShiftStatus />
+          <HomeButtons />
+        </ShiftStatusProvider>
       </Stack>
     </>
   );

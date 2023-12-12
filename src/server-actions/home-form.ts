@@ -2,7 +2,7 @@
 
 import { getServerSession } from "next-auth";
 
-import ApiService from "@/services/Api";
+import api from "@/services/Api";
 
 import { FormStoreData } from "@/types/store";
 
@@ -12,7 +12,7 @@ export default async function onSubmitServerAction(data: FormStoreData) {
   const session = await getServerSession();
   const fullname = `${user.name} ${user.surname}`;
 
-  const userByEmail = await ApiService.getUserByEmail({
+  const userByEmail = await api.getUserByEmail({
     email: session?.user?.email,
     filters: "id",
   });
@@ -21,7 +21,7 @@ export default async function onSubmitServerAction(data: FormStoreData) {
     return userByEmail;
   }
 
-  const userUpdated = await ApiService.updateUser({
+  const userUpdated = await api.updateUser({
     user: {
       id: userByEmail.user.id,
       name: fullname,
@@ -33,12 +33,12 @@ export default async function onSubmitServerAction(data: FormStoreData) {
     return userUpdated;
   }
 
-  const response = await ApiService.createProfile({
+  const response = await api.createProfile({
     profile: {
       userId: userByEmail.user.id,
       ...profile,
     },
   });
 
-  return await response.json();
+  return response;
 }

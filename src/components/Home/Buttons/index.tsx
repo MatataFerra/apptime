@@ -2,16 +2,17 @@
 
 import { useMemo, useState } from "react";
 
-import { User } from "@prisma/client";
+import ShiftService from "@/services/Shift";
 
 import Button from "@/components/ui/Button";
+import Stack from "@/components/ui/Stack";
 
-type Props = {
-  user: User | null;
-};
+import { useShiftStateContext } from "@/store/useShiftStatusStore";
 
-function HomeButtons({ user }: Props) {
-  const [userIsActive, setUserIsActive] = useState(user?.isActive);
+function HomeButtons() {
+  const { user, updateShift } = useShiftStateContext((state) => state);
+  const shiftUnclosed = ShiftService.findUnClosedShift(user?.shifts);
+  const [userIsActive, setUserIsActive] = useState(!shiftUnclosed?.isClosed);
   const buttonStatus = useMemo(() => {
     if (!user?.formCompleted)
       return {
@@ -57,11 +58,34 @@ function HomeButtons({ user }: Props) {
   }
 
   function onFinishShift() {
+    /*
+    Cuando termina el turno:
+      1. Se actualiza el shift y se lo cierra: endDate e isClosed cambian de estado
+      2. El título de la home pasa de Online a Offline
+      3. La información del último shift guardado se actualiza en ShiftInfo
+      4. El botón se desactiva 
+    */
+    const closed = {
+      endDate: new Date().toString(),
+      isClosed: true,
+    };
+
+    const open = {
+      endDate: null,
+      isClosed: false,
+    };
+
+    updateShift({
+      ...closed,
+      id: 4,
+    });
+
+    // const response = api.updateShift(open, /*shiftUnclosed?.id*/ 4);
     setUserIsActive(false);
   }
 
   return (
-    <>
+    <Stack classes="h-full w-full" spacing={10} alignItems="center" justifyContent="between">
       <Button
         classes={`remove_button_highlight w-full shadow-button ${
           buttonStatus?.startButton.apply_variant ? "active:shadow-button-inner" : ""
@@ -82,7 +106,7 @@ function HomeButtons({ user }: Props) {
       >
         Finish Shift
       </Button>
-    </>
+    </Stack>
   );
 }
 
