@@ -4,7 +4,7 @@ import { HandleErrorType } from "@/types/services";
 
 export type ApiResponse<T> = SuccessApiResponse<T> | FailureApiResponse;
 
-type SuccessApiResponse<T> = {
+export type SuccessApiResponse<T> = {
   [key: string]: {
     [k in keyof T]: T[k];
   };
