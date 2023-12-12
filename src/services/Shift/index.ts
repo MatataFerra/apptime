@@ -1,5 +1,5 @@
 import { Shift } from "@prisma/client";
-import { differenceInMinutes, parse } from "date-fns";
+import { differenceInMinutes, format, parse } from "date-fns";
 import { enUS, es } from "date-fns/locale";
 import _ from "lodash";
 
@@ -29,14 +29,36 @@ class ShiftService implements ShiftServiceInterface {
     this.shift = shift;
   }
 
-  static transformDateFromString(date: string, locale: "es" | "en" = "en") {
-    const LOCALES = {
-      en: enUS,
-      es: es,
+  static differenceInHHmm(start: string | number | Date, end?: string | number | Date) {
+    let startDate: Date;
+    let endDate: Date;
+    if (typeof start === "string" || typeof start === "number") {
+      startDate = new Date(start);
+    } else {
+      startDate = start;
+    }
+
+    if (typeof end === "string" || typeof end === "number") {
+      endDate = new Date(end);
+    } else {
+      endDate = end ?? new Date();
+    }
+
+    const difference = Math.abs(differenceInMinutes(startDate, endDate));
+    const getHours = difference / 60;
+    const getDecimals = Math.floor(Number("0." + String(getHours).split(".")[1]) * 60);
+
+    return {
+      text: `${Math.floor(getHours)}h ${getDecimals}m`,
+      hours: getHours,
+      minutes: getDecimals,
+      diff: difference,
     };
-    return parse(date, "HH:mm", new Date(), {
-      locale: LOCALES[locale],
-    });
+  }
+
+  static findUnClosedShift(shifts: Shift[] | undefined) {
+    if (!shifts) return null;
+    return shifts.find((shift) => !shift.isClosed);
   }
 
   differenceInMinsBetweenStartAndEnd() {

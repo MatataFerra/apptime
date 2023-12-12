@@ -1,6 +1,9 @@
 import { Profile, Shift, User } from "@prisma/client";
+import { getServerSession } from "next-auth";
 
 import TokenService from "@/services/Token";
+
+import { UserType } from "@/types";
 
 import { USER_ROLES } from "@/utils/constants";
 
@@ -9,12 +12,9 @@ import prisma from "#/prisma/client";
 type FindUniqueUserType = {
   id?: string | null;
   email?: string | null;
+  profile?: boolean;
+  shifts?: boolean;
 };
-
-interface UserWithProfileAndShifts extends User {
-  profile: Profile | null;
-  shifts: Shift[];
-}
 
 /**
  * @class UserService
@@ -28,7 +28,7 @@ class UserService {
     this.user = user;
   }
 
-  static async findUniqueUser(options: FindUniqueUserType): Promise<User | null> {
+  static async findUniqueUser(options: FindUniqueUserType): Promise<UserType | null> {
     let fieldSelected: "id" | "email" = "email";
     if (options.id) fieldSelected = "id";
     if (options.email) fieldSelected = "email";
@@ -37,19 +37,39 @@ class UserService {
       where: {
         [fieldSelected]: options[fieldSelected],
       },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        type_account: true,
+        role: true,
+        shifts: options.shifts,
+        profile: options.profile,
+        emailVerified: true,
+        formCompleted: true,
+        image: true,
+        isActive: true,
+        online: true,
+        passwordAttemps: true,
+        password: true,
+      },
     });
 
     return user;
   }
 
-  static async filterUserProps(
-    user: User | Partial<UserWithProfileAndShifts>,
-    params: (string | null)[]
-  ) {
+  static async filterUserProps(user: User | Partial<UserType>, params: (string | null)[]) {
     if (!user) return null;
     if (!params) return user;
 
     return Object.keys(user).reduce((acc, current) => {
+      if (current === "shifts" || current === "profile") {
+        return {
+          ...acc,
+          [current]: user[current as keyof typeof user],
+        };
+      }
+
       if (params.includes(current)) {
         return {
           ...acc,
@@ -68,6 +88,17 @@ class UserService {
     if (!token) return null;
 
     const user = await UserService.findUniqueUser({ email: token.email });
+
+    return user;
+  }
+
+  static async getSessionUser() {
+    const session = await getServerSession();
+    const user = await UserService.findUniqueUser({
+      email: session?.user?.email,
+      shifts: true,
+      profile: true,
+    });
 
     return user;
   }
