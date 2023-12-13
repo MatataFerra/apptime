@@ -118,6 +118,25 @@ async function main() {
     },
   });
 
+  // update first user and second user who have form completed
+  await prisma.user.update({
+    where: {
+      id: firstUser.id,
+    },
+    data: {
+      formCompleted: true,
+    },
+  });
+
+  await prisma.user.update({
+    where: {
+      id: secondUser.id,
+    },
+    data: {
+      formCompleted: true,
+    },
+  });
+
   const emails = (await prisma.user.findMany({})).map((user) => user.email);
   console.log("users with these emails have been created ", emails);
 }
