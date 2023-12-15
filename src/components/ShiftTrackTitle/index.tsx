@@ -14,7 +14,7 @@ function ShiftTrackTitle({ shift }: Props) {
   return (
     <>
       <Text classes="text-2xl">
-        {shift?.isClosed ? "No shift is tracked" : `Current shift time: ${text}`}
+        {!!shift ? `Current shift time: ${text}` : "No shift is tracked"}
       </Text>
     </>
   );

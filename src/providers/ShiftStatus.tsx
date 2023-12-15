@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import type { UserStore } from "@/types/store";
 
@@ -13,6 +13,12 @@ type Props = {
 
 function ShiftStatusProvider({ children, user }: Props) {
   const store = useRef(createShiftStatusStore({ user: user })).current;
+
+  useEffect(() => {
+    const { updateShiftsInfo } = store.getState();
+    updateShiftsInfo();
+  }, [store]);
+
   return <ShiftStatusContext.Provider value={store}>{children}</ShiftStatusContext.Provider>;
 }
 

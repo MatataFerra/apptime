@@ -16,7 +16,7 @@ function ShiftTrack() {
     <>
       <Stack
         orientation="vertical"
-        classes="h-full self-start"
+        classes="h-full w-full self-start"
         alignItems="start"
         justifyContent="between"
       >

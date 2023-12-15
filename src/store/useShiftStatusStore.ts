@@ -3,14 +3,24 @@ import { createContext, useContext } from "react";
 import { Shift } from "@prisma/client";
 import { createStore, useStore } from "zustand";
 
+import DateHumanizer from "@/services/Date";
+import ShiftService from "@/services/Shift";
+
 import type { UserStore } from "@/types/store";
 
 interface ShiftStateProps {
   user: UserStore;
+  shiftsInfo: {
+    date: string;
+    earns: number;
+    text: string;
+    isLoading: boolean;
+  };
 }
 
 interface ShiftState extends ShiftStateProps {
   updateShift: (shift: Partial<Shift>) => void;
+  updateShiftsInfo: () => void;
 }
 
 type ShiftStateStore = ReturnType<typeof createShiftStatusStore>;
@@ -32,8 +42,14 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
       shifts: [],
       profile: null,
     },
+    shiftsInfo: {
+      date: "",
+      earns: 0,
+      text: "",
+      isLoading: true,
+    },
   };
-  return createStore<ShiftState>()((set) => ({
+  return createStore<ShiftState>()((set, get) => ({
     ...DEFAULT_PROPS,
     ...initProps,
     updateShift: (shift: Partial<Shift>) => {
@@ -46,6 +62,54 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
               if (s.id === shift.id) return { ...s, ...shift };
               return s;
             }),
+          },
+        };
+      });
+    },
+    updateShiftsInfo: () => {
+      set((state) => {
+        state.shiftsInfo.isLoading = true;
+        const getter = get()?.user;
+        const costMinute = getter?.profile?.hourlyRate ?? 60 / 60;
+
+        const lastShiftClosed = ShiftService.shiftsSorted(getter?.shifts)?.find((shift) => {
+          return shift?.endDate !== null;
+        });
+
+        if (!lastShiftClosed) return state;
+
+        const humanizeDate = new DateHumanizer("today").humanizeDate(
+          new Date(lastShiftClosed?.startDate ?? "") ?? Date.now()
+        );
+
+        const dateHumanized = get().user?.shifts?.reduce(
+          (acc, _) => {
+            const { diff, text } = ShiftService.differenceInHHmm(
+              new Date(lastShiftClosed?.startDate ?? ""),
+              new Date(lastShiftClosed?.endDate ?? "")
+            );
+
+            const earns = acc.earns + diff * costMinute;
+
+            return {
+              earns: earns,
+              text: text,
+            };
+          },
+          {
+            earns: 0,
+            text: "",
+          }
+        );
+
+        return {
+          ...state,
+          shiftsInfo: {
+            ...state.shiftsInfo,
+            date: humanizeDate,
+            earns: dateHumanized?.earns ?? 0,
+            text: dateHumanized?.text ?? "",
+            isLoading: false,
           },
         };
       });
