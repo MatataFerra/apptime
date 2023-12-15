@@ -3,6 +3,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { NextRequest, NextResponse } from "next/server";
 
 import ErrorFactory from "@/services/Error/factory";
+import ShiftService from "@/services/Shift";
 
 import { RouteParams, ShiftUpdateSchema } from "@/types";
 
@@ -25,11 +26,19 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
   }
 
   try {
+    const buildShift = new ShiftService(parsedBody.data)
+      .updateStatus()
+      .checkPublicHoliday()
+      .updateEndDate()
+      .differenceInMinsBetweenStartAndEnd()
+      .build();
+
     const updatedShift = await prisma.shift.update({
       where: {
         id: Number(params.id),
       },
       data: {
+        ...buildShift,
         ...parsedBody.data,
       },
     });
