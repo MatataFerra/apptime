@@ -21,9 +21,7 @@ describe("ShiftService", () => {
       endDate: end,
     };
 
-    const shift = new ShiftService(mock)
-      .differenceInMinsBetweenStartAndEnd()
-      .build();
+    const shift = new ShiftService(mock).differenceInMinsBetweenStartAndEnd().build();
 
     expect(shift.amount).toBe(480);
   });
@@ -51,7 +49,7 @@ describe("ShiftService", () => {
     const shift = new ShiftService(mock)
       .differenceInMinsBetweenStartAndEnd()
       .checkPublicHoliday()
-      .build();
+      .build() as Shift;
 
     const publicHoliday = PayService.publicHolidayPay({
       profile: profileMock.profile,
@@ -82,7 +80,12 @@ describe("ShiftService", () => {
       Total: 0.175 * 480 = 84 -> 84 * 1.5 = 126
     */
 
-    const shift = new ShiftService(mock).create();
+    const shift = new ShiftService(mock)
+      .checkPublicHoliday()
+      .differenceInMinsBetweenStartAndEnd()
+      .updateEndDate()
+      .updateStatus()
+      .build() as Shift;
 
     const publicHoliday = PayService.publicHolidayPay({
       profile: profileMock.profile,
