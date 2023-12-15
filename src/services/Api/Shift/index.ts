@@ -9,12 +9,19 @@ class ApiShiftService extends ApiBaseService {
     super();
   }
 
-  static async updateShift(body: Partial<Omit<Shift, "id">>, id: Shift["id"] | null | undefined) {
-    return this.put<Shift>({
+  static async updateShift({
+    body,
+    id,
+  }: {
+    body: Partial<Omit<Shift, "id">>;
+    id: number | null | undefined;
+  }) {
+    const response = await this.put({
       endpoint: `${API_ENDPOINTS.SHIFT}/${id}`,
       body,
       hasEnvUrl: false,
     });
+    return response;
   }
 }
 

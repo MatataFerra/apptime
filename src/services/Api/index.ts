@@ -15,6 +15,7 @@ class ApiService extends ApiBaseService {
     return this.post({
       endpoint: API_ENDPOINTS.WAITING_LIST,
       body: { email },
+      hasEnvUrl: false,
     });
   }
 
