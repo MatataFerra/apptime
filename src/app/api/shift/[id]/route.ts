@@ -1,5 +1,6 @@
 import { Shift } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 import ErrorFactory from "@/services/Error/factory";
@@ -10,7 +11,7 @@ import { RouteParams, ShiftUpdateSchema } from "@/types";
 import prisma from "#/prisma/client";
 
 export async function PUT(req: NextRequest, { params }: RouteParams) {
-  const body: Shift = await req.json();
+  const body: Omit<Shift, "id"> = await req.json();
   const parsedBody = ShiftUpdateSchema.safeParse(body);
 
   if (!parsedBody.success) {
@@ -26,10 +27,9 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
   }
 
   try {
-    const buildShift = new ShiftService(parsedBody.data)
-      .updateStatus()
+    const buildShift = new ShiftService({ ...parsedBody.data })
+      .closeShift()
       .checkPublicHoliday()
-      .updateEndDate()
       .differenceInMinsBetweenStartAndEnd()
       .build();
 
@@ -39,7 +39,6 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       },
       data: {
         ...buildShift,
-        ...parsedBody.data,
       },
     });
 
@@ -52,6 +51,8 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
         { status: 404 }
       );
     }
+
+    revalidatePath("/", "page");
 
     return NextResponse.json(
       {

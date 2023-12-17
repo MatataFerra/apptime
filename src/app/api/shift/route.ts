@@ -85,7 +85,11 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-  const shiftTransform = new ShiftService(parsedBody.data).create();
+  const shiftTransform = new ShiftService(parsedBody.data)
+    .closeShift()
+    .checkPublicHoliday()
+    .differenceInMinsBetweenStartAndEnd()
+    .build();
 
   try {
     const shift = await prisma.shift.create({
