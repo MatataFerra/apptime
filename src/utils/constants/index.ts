@@ -10,7 +10,7 @@ export const QUERY_PARAMS = {
   ONLY: "only",
 };
 
-export const now = Date.now();
+export const now = new Date(Date.now());
 
 export const SALT = 10;
 

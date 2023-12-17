@@ -2,12 +2,14 @@ import { Shift } from "@prisma/client";
 import { differenceInMinutes } from "date-fns";
 import _ from "lodash";
 
-type ShiftWithoutId = Partial<Shift>;
+type ShiftWithoutId = Omit<Shift, "id">;
 
 interface ShiftServiceInterface {
   shift: ShiftWithoutId;
   differenceInMinsBetweenStartAndEnd: () => void;
-  updateStatus: () => void;
+  closeShift: () => void;
+  checkPublicHoliday: () => void;
+  build: () => Omit<Shift, "id">;
 }
 
 /**
@@ -42,12 +44,19 @@ class ShiftService implements ShiftServiceInterface {
 
     const difference = Math.abs(differenceInMinutes(startDate, endDate));
     const getHours = difference / 60;
-    const getDecimals = Math.floor(Number("0." + String(getHours).split(".")[1]) * 60);
+
+    function decimals(hours: number) {
+      const getDecimals = Math.floor(Number("0." + String(hours).split(".")[1]) * 60);
+
+      if (isNaN(getDecimals)) return 0;
+
+      return getDecimals;
+    }
 
     return {
-      text: `${Math.floor(getHours)}h ${getDecimals}m`,
+      text: `${Math.floor(getHours)}h ${decimals(getHours)}m`,
       hours: getHours,
-      minutes: getDecimals,
+      minutes: decimals(getHours),
       diff: difference,
     };
   }
@@ -70,10 +79,14 @@ class ShiftService implements ShiftServiceInterface {
     return Math.round((validAmount / 60) * 100) / 100;
   }
 
-  updateEndDate() {
-    if (!this.shift.endDate) {
-      this.shift.endDate = new Date(Date.now()).toString();
-    }
+  closeShift() {
+    this.updateEndDate().updateStatus();
+
+    return this;
+  }
+
+  private updateEndDate() {
+    this.shift.endDate = new Date(Date.now()).toString();
 
     return this;
   }
@@ -94,7 +107,7 @@ class ShiftService implements ShiftServiceInterface {
     return this;
   }
 
-  updateStatus() {
+  private updateStatus() {
     if (!this.shift.endDate) {
       this.shift.isClosed = false;
 
@@ -102,6 +115,7 @@ class ShiftService implements ShiftServiceInterface {
     }
 
     this.shift.isClosed = true;
+
     return this;
   }
 

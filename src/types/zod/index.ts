@@ -86,7 +86,9 @@ const ShiftCreateSchema = ShiftModelSchema.omit({
   message: "One of the fields must be defined",
 });
 
-const ShiftUpdateSchema = ShiftModelSchema.partial();
+const ShiftUpdateSchema = ShiftModelSchema.omit({
+  id: true,
+});
 
 const SearchParamsSchema = z.object({
   shifts: z.string().nullable(),

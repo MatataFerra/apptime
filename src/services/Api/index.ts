@@ -1,4 +1,4 @@
-import { Profile, Shift, User } from "@prisma/client";
+import { Profile, User } from "@prisma/client";
 
 import ApiBaseService from "@/services/Api/base";
 
@@ -39,18 +39,21 @@ class ApiService extends ApiBaseService {
     shifts = false,
     profile = false,
     hasEnvUrl = true,
+    options,
   }: {
     email?: string | null;
     filters?: keyof User | (keyof User)[];
     shifts?: boolean;
     profile?: boolean;
     hasEnvUrl?: boolean;
+    options?: NextFetchRequestConfig;
   }) {
     const parseFilters = Array.isArray(filters) ? filters.join(",") : "";
 
     const response: ApiResponse<UserType> = await this.get({
       endpoint: `${API_ENDPOINTS.USER}?email=${email}&only=${parseFilters}&shifts=${shifts}&profile=${profile}`,
       hasEnvUrl,
+      options,
     });
 
     return response;
