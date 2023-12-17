@@ -13,7 +13,7 @@ import ShiftTextState from "@/components/ShiftTextState";
 import Stack from "@/components/ui/Stack";
 import WelcomeTitle from "@/components/WelcomeTitle";
 
-import ShiftStatusProvider from "@/providers/ShiftStatus";
+import ShiftStatusProvider from "@/providers/ShiftStatusProvider";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 

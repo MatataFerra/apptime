@@ -18,7 +18,7 @@ import Loader from "@/components/ui/Loader";
 import Stack from "@/components/ui/Stack";
 import { useToast } from "@/components/ui/Toast/use-toast";
 
-import { usePasswordValid } from "@/providers/PasswordValid";
+import { usePasswordValid } from "@/providers/PasswordValidProvider";
 
 import { MAX_ATTEMPTS_TO_REGISTER } from "@/utils/constants";
 import { PATH_NAMES } from "@/utils/constants/pathnames";

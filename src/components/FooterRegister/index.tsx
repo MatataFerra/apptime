@@ -4,7 +4,7 @@ import { CSSClassNames } from "@/types";
 import Button from "@/components/ui/Button";
 import Footer from "@/components/ui/Footer";
 
-import { usePasswordValid } from "@/providers/PasswordValid";
+import { usePasswordValid } from "@/providers/PasswordValidProvider";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 import { cm } from "@/utils/helpers/styleMerger";
