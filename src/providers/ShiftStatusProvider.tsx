@@ -17,7 +17,8 @@ function ShiftStatusProvider({ children, user }: Props) {
   useEffect(() => {
     const { updateShiftsInfo } = store.getState();
     updateShiftsInfo();
-  }, [store]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return <ShiftStatusContext.Provider value={store}>{children}</ShiftStatusContext.Provider>;
 }
