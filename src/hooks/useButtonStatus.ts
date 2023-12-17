@@ -4,7 +4,7 @@ import { User } from "@prisma/client";
 
 import { UserStore } from "@/types/store";
 
-function useButtonStatus(user: UserStore, userIsActive: User["isActive"]) {
+function useButtonStatus(user: UserStore, userIsActive: User["isActive"] | undefined) {
   const buttonStatus = useMemo(() => {
     if (!user?.formCompleted)
       return {
@@ -19,29 +19,31 @@ function useButtonStatus(user: UserStore, userIsActive: User["isActive"]) {
       };
 
     if (user?.formCompleted) {
-      if (userIsActive)
+      if (userIsActive || typeof userIsActive === "undefined") {
         return {
           startButton: {
-            disabled: true,
-            apply_variant: false,
-          },
-          finishButton: {
             disabled: false,
             apply_variant: true,
           },
+          finishButton: {
+            disabled: true,
+            apply_variant: false,
+          },
         };
+      }
 
-      if (!userIsActive)
+      if (!userIsActive) {
         return {
           startButton: {
-            disabled: false,
-            apply_variant: true,
-          },
-          finishButton: {
             disabled: true,
             apply_variant: false,
           },
+          finishButton: {
+            disabled: false,
+            apply_variant: true,
+          },
         };
+      }
     }
   }, [user?.formCompleted, userIsActive]);
 

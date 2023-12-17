@@ -17,9 +17,9 @@ import { useShiftStateContext } from "@/store/useShiftStatusStore";
 function HomeButtons() {
   const { user, updateShift, updateShiftsInfo } = useShiftStateContext((state) => state);
   const shiftUnclosed = ShiftService.findUnClosedShift(user?.shifts);
-  const [userIsActive, setUserIsActive] = useState(!shiftUnclosed?.isClosed);
-  const buttonStatus = useButtonStatus(user, userIsActive);
-  const mutate = useMutation({
+  const [shiftIsActive, setShiftIsActive] = useState(shiftUnclosed?.isClosed);
+  const buttonStatus = useButtonStatus(user, shiftIsActive);
+  const mutateShiftEnd = useMutation({
     mutationFn: api.updateShift.bind(api),
     onSuccess: (_) => {
       updateShiftsInfo();
@@ -27,7 +27,14 @@ function HomeButtons() {
   });
 
   function onStartShift() {
-    setUserIsActive(true);
+    /* 
+      1. se crea un nuevo shift
+      2. se actualiza el usuario con el nuevo shift
+      3. se actualiza el estado de los botones
+      4. cambia de offline a online
+      5. Cambia el estado del  shift de No Shift tracked a mostrar cuanto tiempo va
+    */
+    setShiftIsActive(true);
   }
 
   function onFinishShift() {
@@ -37,13 +44,13 @@ function HomeButtons() {
       id: shiftUnclosed?.id,
     });
 
-    mutate.mutate({
+    mutateShiftEnd.mutate({
       body: {
         ...shiftUnclosed,
       },
       id: shiftUnclosed?.id,
     });
-    setUserIsActive(false);
+    setShiftIsActive(false);
   }
 
   return (
