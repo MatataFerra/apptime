@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { Shift } from "@prisma/client";
+import { useInterval } from "usehooks-ts";
 
 import ShiftService from "@/services/Shift";
 
@@ -19,17 +20,10 @@ function ShiftTrackTitle({ shift }: Props) {
   }, [shift?.endDate, shift?.startDate]);
   const [shiftTime, setShiftTime] = useState(textMemo);
 
-  useEffect(() => {
-    const MINUTE = 30000;
-
-    const interval = setInterval(() => {
-      const { text } = ShiftService.differenceInHHmm(shift?.startDate ?? "", shift?.endDate ?? "");
-
-      setShiftTime(text);
-    }, MINUTE);
-
-    return () => clearInterval(interval);
-  }, [shift?.endDate, shift?.startDate, shiftTime]);
+  useInterval(() => {
+    const { text } = ShiftService.differenceInHHmm(shift?.startDate ?? "", shift?.endDate ?? "");
+    setShiftTime(text);
+  }, 30000);
 
   return (
     <>
