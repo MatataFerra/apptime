@@ -23,6 +23,15 @@ class ApiShiftService extends ApiBaseService {
     });
     return response;
   }
+
+  static async createShift({ body }: { body: Omit<Shift, "id"> }) {
+    const response = await this.post({
+      endpoint: `${API_ENDPOINTS.SHIFT}`,
+      body,
+      hasEnvUrl: false,
+    });
+    return response;
+  }
 }
 
 export default ApiShiftService;
