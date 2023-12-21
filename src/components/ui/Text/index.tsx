@@ -8,20 +8,23 @@ import { TAILWIND_COLOR } from "@/types/tailwind";
 import { TEXT_VARIANTS } from "@/utils/constants/tailwind";
 import { cm } from "@/utils/helpers/styleMerger";
 
-type As = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span" | "small";
 type Variants = keyof typeof TEXT_VARIANTS;
 
-interface Props
-  extends Omit<
-    React.HTMLAttributes<HTMLHeadingElement | HTMLParagraphElement | HTMLSpanElement>,
-    "className"
-  > {
-  as?: As;
+export const TextDefaultAsType = "p" as const;
+type As = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span" | "small" | "label";
+type ValidElement<Props = any> =
+  | keyof Pick<HTMLElementTagNameMap, As>
+  | ((props: Props) => ReactElement);
+type TextOwnProps<E extends ValidElement> = {
+  as?: E;
   classes?: CSSClassNames;
   variant?: Variants;
   color?: TAILWIND_COLOR;
   children: (string | ReactElement | boolean)[] | string | ReactElement | undefined;
-}
+};
+
+type TextProps<E extends ValidElement> = TextOwnProps<E> &
+  Omit<Omit<React.ComponentProps<E>, "className">, keyof TextOwnProps<E>>;
 
 /**
  * @component Title
@@ -39,15 +42,15 @@ interface Props
  * @default "default"
  */
 
-function Text({
+function Text<E extends ValidElement = typeof TextDefaultAsType>({
   children,
-  as = "p",
+  as,
   classes,
   variant = "default",
   color,
   ...props
-}: Props): ReactElement {
-  const Component = as;
+}: TextProps<E>): ReactElement {
+  const Component = as || TextDefaultAsType;
 
   return (
     <Component

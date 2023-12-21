@@ -21,7 +21,7 @@ function ShiftTrack() {
         justifyContent="between"
       >
         <ShiftTrackTitle shift={shiftUnclosed} />
-        <ShiftInfo shifts={user?.shifts} profile={user?.profile} />
+        <ShiftInfo />
       </Stack>
     </>
   );

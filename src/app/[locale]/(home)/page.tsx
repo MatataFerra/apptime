@@ -7,7 +7,7 @@ import ut from "@/services/Utilities/client";
 import { LocaleParams } from "@/types";
 
 import DateComponent from "@/components/Date";
-import HomeButtons from "@/components/Home/Buttons";
+import ShiftButtons from "@/components/ShiftButtons";
 import ShiftStatus from "@/components/ShiftStatus";
 import ShiftTextState from "@/components/ShiftTextState";
 import Stack from "@/components/ui/Stack";
@@ -41,7 +41,7 @@ export default async function Home({ params }: { params: LocaleParams }) {
         <ShiftStatusProvider user={user}>
           <ShiftTextState />
           <ShiftStatus />
-          <HomeButtons />
+          <ShiftButtons />
         </ShiftStatusProvider>
       </Stack>
     </>
