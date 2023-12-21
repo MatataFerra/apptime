@@ -10,6 +10,7 @@ import type { UserStore } from "@/types/store";
 
 interface ShiftStateProps {
   user: UserStore;
+  isShiftActive: boolean;
   shiftsInfo: {
     date: string;
     earns: number;
@@ -21,6 +22,7 @@ interface ShiftStateProps {
 interface ShiftState extends ShiftStateProps {
   updateShift: (shift: Partial<Shift>) => void;
   updateShiftsInfo: () => void;
+  updateShiftStatus: (state: boolean | undefined) => void;
 }
 
 type ShiftStateStore = ReturnType<typeof createShiftStatusStore>;
@@ -48,6 +50,7 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
       text: "",
       isLoading: true,
     },
+    isShiftActive: true,
   };
   return createStore<ShiftState>()((set, get) => ({
     ...DEFAULT_PROPS,
@@ -79,13 +82,20 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
 
         if (!lastShiftClosed) return state;
 
-        const humanizeDate = new DateHumanizer("today").humanizeDate(
+        const humanizeDateLastShiftClosed = new DateHumanizer("today").humanizeDate(
           new Date(lastShiftClosed?.startDate ?? "") ?? Date.now()
+        );
+
+        const distanceLastShiftClosed = ShiftService.differenceInHHmm(
+          new Date(lastShiftClosed?.startDate ?? ""),
+          new Date(lastShiftClosed?.endDate ?? "")
         );
 
         const dateHumanized = getter?.shifts?.reduce(
           (acc, curr) => {
-            const { diff, text } = ShiftService.differenceInHHmm(
+            if (curr?.endDate === null) return acc;
+
+            const { diff } = ShiftService.differenceInHHmm(
               new Date(curr?.startDate ?? ""),
               new Date(curr?.endDate ?? "")
             );
@@ -94,12 +104,10 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
 
             return {
               earns: earns,
-              text: text,
             };
           },
           {
             earns: 0,
-            text: "",
           }
         );
 
@@ -107,11 +115,19 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
           ...state,
           shiftsInfo: {
             ...state.shiftsInfo,
-            date: humanizeDate,
+            date: humanizeDateLastShiftClosed,
             earns: dateHumanized?.earns ?? 0,
-            text: dateHumanized?.text ?? "",
+            text: distanceLastShiftClosed?.text ?? "",
             isLoading: false,
           },
+        };
+      });
+    },
+    updateShiftStatus: (newState: boolean | undefined) => {
+      set((state) => {
+        return {
+          ...state,
+          isShiftActive: newState,
         };
       });
     },

@@ -1,13 +1,25 @@
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 
-import { User } from "@prisma/client";
+import { useShiftStateContext } from "@/store/useShiftStatusStore";
 
-import { UserStore } from "@/types/store";
+function useButtonStatus() {
+  const { user, isShiftActive } = useShiftStateContext((state) => state);
 
-function useButtonStatus(user: UserStore, userIsActive: User["isActive"] | undefined) {
-  const buttonStatus = useMemo(() => {
+  const [btnStatus, setbtnStatus] = useState({
+    startButton: {
+      disabled: true,
+      apply_variant: false,
+    },
+    finishButton: {
+      disabled: true,
+      apply_variant: false,
+    },
+  });
+
+  useEffect(() => {
     if (!user?.formCompleted)
-      return {
+      return setbtnStatus((prev) => ({
+        ...prev,
         startButton: {
           disabled: true,
           apply_variant: false,
@@ -16,11 +28,12 @@ function useButtonStatus(user: UserStore, userIsActive: User["isActive"] | undef
           disabled: true,
           apply_variant: false,
         },
-      };
+      }));
 
     if (user?.formCompleted) {
-      if (userIsActive || typeof userIsActive === "undefined") {
-        return {
+      if (isShiftActive || typeof isShiftActive === "undefined") {
+        return setbtnStatus((prev) => ({
+          ...prev,
           startButton: {
             disabled: false,
             apply_variant: true,
@@ -29,11 +42,12 @@ function useButtonStatus(user: UserStore, userIsActive: User["isActive"] | undef
             disabled: true,
             apply_variant: false,
           },
-        };
+        }));
       }
 
-      if (!userIsActive) {
-        return {
+      if (!isShiftActive) {
+        return setbtnStatus((prev) => ({
+          ...prev,
           startButton: {
             disabled: true,
             apply_variant: false,
@@ -42,12 +56,12 @@ function useButtonStatus(user: UserStore, userIsActive: User["isActive"] | undef
             disabled: false,
             apply_variant: true,
           },
-        };
+        }));
       }
     }
-  }, [user?.formCompleted, userIsActive]);
+  }, [isShiftActive, user?.formCompleted]);
 
-  return buttonStatus;
+  return btnStatus;
 }
 
 export default useButtonStatus;
