@@ -1,5 +1,5 @@
 import { format, formatDistanceToNow } from "date-fns";
-import { enUS, es } from "date-fns/locale";
+import { enUS, es, Locale } from "date-fns/locale";
 
 import type { DateHumanizerStrategy, Locale as possibleLocale } from "@/types";
 

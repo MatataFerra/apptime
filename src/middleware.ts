@@ -9,6 +9,10 @@ import ut from "@/services/Utilities";
 import { SUPPORTED_LOCALES, USER_ROLES } from "@/utils/constants";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
+import { withAuthMiddleware } from "./middlewares/auth";
+import { chain } from "./middlewares/chain";
+import { i18nMiddleware } from "./middlewares/i18n";
+
 const localeDefault: any = {};
 const intlMiddleware = createIntlMiddleware({
   locales: [...SUPPORTED_LOCALES],
@@ -57,6 +61,8 @@ export default withAuth(async function middleware(req: NextRequest) {
     }
   }
 });
+
+// export default chain([withAuthMiddleware, i18nMiddleware])
 
 export const config = {
   //! tratar de reemplazar con un array de rutas para evitar escribirlas a mano

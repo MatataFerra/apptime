@@ -7,7 +7,7 @@ import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { enableFetchMocks } from "jest-fetch-mock";
-import { NextIntlProvider } from "next-intl";
+import { IntlProvider } from "next-intl";
 
 import Suscribe from "@/components/Suscribe"; // Ajusta la ruta según sea necesario
 
@@ -24,9 +24,9 @@ describe("Suscribe Component", () => {
 
     return (
       <QueryClientProvider client={queryClient}>
-        <NextIntlProvider messages={messages} locale={locale}>
+        <IntlProvider messages={messages} locale={locale}>
           {children}
-        </NextIntlProvider>
+        </IntlProvider>
       </QueryClientProvider>
     );
   }
