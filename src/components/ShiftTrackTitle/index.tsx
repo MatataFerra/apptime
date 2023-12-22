@@ -1,35 +1,45 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { Shift } from "@prisma/client";
 import { useInterval } from "usehooks-ts";
 
 import ShiftService from "@/services/Shift";
 
+import Skeleton from "@/components/ui/Skeleton";
 import Text from "@/components/ui/Text";
 
-type Props = {
-  shift: Shift | null | undefined;
-};
+import { useShiftStateContext } from "@/store/useShiftStatusStore";
 
-function ShiftTrackTitle({ shift }: Props) {
-  const textMemo = useMemo(() => {
-    const { text } = ShiftService.differenceInHHmm(shift?.startDate ?? "", shift?.endDate ?? "");
-    return text;
-  }, [shift?.endDate, shift?.startDate]);
-  const [shiftTime, setShiftTime] = useState(textMemo);
+function ShiftTrackTitle() {
+  const { shiftUnclosed } = useShiftStateContext((state) => state);
+  const [shiftTime, setShiftTime] = useState("");
+
+  useEffect(() => {
+    const { text } = ShiftService.differenceInHHmm(
+      shiftUnclosed.shift?.startDate ?? "",
+      shiftUnclosed.shift?.endDate ?? ""
+    );
+    setShiftTime(text);
+  }, [shiftUnclosed.shift?.endDate, shiftUnclosed.shift?.startDate]);
 
   useInterval(() => {
-    const { text } = ShiftService.differenceInHHmm(shift?.startDate ?? "", shift?.endDate ?? "");
+    const { text } = ShiftService.differenceInHHmm(
+      shiftUnclosed.shift?.startDate ?? "",
+      shiftUnclosed.shift?.endDate ?? ""
+    );
     setShiftTime(text);
   }, 30000);
 
   return (
     <>
-      <Text classes="text-2xl">
-        {!!shift ? `Current shift time: ${shiftTime}` : "No shift is tracked"}
-      </Text>
+      {shiftUnclosed.isLoading ? (
+        <Skeleton classes="h-8 w-2/3" />
+      ) : !!shiftUnclosed.shift ? (
+        <Text classes="text-2xl">{`Current shift time: ${shiftTime}`}</Text>
+      ) : (
+        <Text classes="text-2xl">No shift is tracked</Text>
+      )}
     </>
   );
 }

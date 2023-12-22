@@ -1,5 +1,6 @@
 "use client";
 
+import { Shift } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 
 import api from "@/services/Api/Shift";
@@ -11,12 +12,30 @@ import Text from "@/components/ui/Text";
 import { DialogClose } from "../ui/Dialog";
 import { useShiftStateContext } from "@/store/useShiftStatusStore";
 
+type SuccessShiftResponse = {
+  message: string;
+  response: boolean;
+  shift: Shift;
+};
+
+function checkData(data: unknown): data is SuccessShiftResponse {
+  return typeof data === "object" && data !== null;
+}
+
 function DialogButtons() {
-  const { user, updateShiftsInfo, updateShiftStatus } = useShiftStateContext((state) => state);
+  const { user, updateShiftsInfo, updateShiftStatus, createShift, updateShiftUnclosed } =
+    useShiftStateContext((state) => state);
   const mutate = useMutation({
     mutationFn: api.createShift.bind(api),
-    onSuccess: (_) => {
-      updateShiftsInfo();
+    onSuccess: (data) => {
+      if (checkData(data)) {
+        createShift({
+          ...data.shift,
+          id: data?.shift.id,
+        });
+        updateShiftsInfo();
+        updateShiftUnclosed();
+      }
     },
   });
 

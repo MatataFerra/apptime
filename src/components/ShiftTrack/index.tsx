@@ -1,17 +1,8 @@
-"use client";
-
-import ShiftService from "@/services/Shift";
-
 import ShiftInfo from "@/components/ShiftInfo";
 import ShiftTrackTitle from "@/components/ShiftTrackTitle";
 import Stack from "@/components/ui/Stack";
 
-import { useShiftStateContext } from "@/store/useShiftStatusStore";
-
 function ShiftTrack() {
-  const user = useShiftStateContext((state) => state.user);
-  const shiftUnclosed = ShiftService.findUnClosedShift(user?.shifts || []);
-
   return (
     <>
       <Stack
@@ -20,7 +11,7 @@ function ShiftTrack() {
         alignItems="start"
         justifyContent="between"
       >
-        <ShiftTrackTitle shift={shiftUnclosed} />
+        <ShiftTrackTitle />
         <ShiftInfo />
       </Stack>
     </>

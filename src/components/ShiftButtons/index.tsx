@@ -16,15 +16,15 @@ import useButtonStatus from "@/hooks/useButtonStatus";
 import { useShiftStateContext } from "@/store/useShiftStatusStore";
 
 function ShiftButtons() {
-  const { user, updateShift, updateShiftsInfo, updateShiftStatus } = useShiftStateContext(
-    (state) => state
-  );
+  const { user, updateShift, updateShiftsInfo, updateShiftStatus, updateShiftUnclosed } =
+    useShiftStateContext((state) => state);
   const shiftUnclosed = ShiftService.findUnClosedShift(user?.shifts);
   const buttonStatus = useButtonStatus();
   const mutate = useMutation({
     mutationFn: api.updateShift.bind(api),
     onSuccess: (_) => {
       updateShiftsInfo();
+      updateShiftUnclosed();
     },
   });
 

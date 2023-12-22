@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 
 import { Shift } from "@prisma/client";
-import { createStore, useStore } from "zustand";
+import { create, createStore, useStore } from "zustand";
 
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
@@ -10,6 +10,7 @@ import type { UserStore } from "@/types/store";
 
 interface ShiftStateProps {
   user: UserStore;
+  shiftUnclosed: { shift: Shift | null; isLoading: boolean };
   isShiftActive: boolean;
   shiftsInfo: {
     date: string;
@@ -21,8 +22,10 @@ interface ShiftStateProps {
 
 interface ShiftState extends ShiftStateProps {
   updateShift: (shift: Partial<Shift>) => void;
+  createShift: (shift: Shift) => void;
   updateShiftsInfo: () => void;
   updateShiftStatus: (state: boolean | undefined) => void;
+  updateShiftUnclosed: () => void;
 }
 
 type ShiftStateStore = ReturnType<typeof createShiftStatusStore>;
@@ -44,6 +47,10 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
       shifts: [],
       profile: null,
     },
+    shiftUnclosed: {
+      shift: null,
+      isLoading: true,
+    },
     shiftsInfo: {
       date: "",
       earns: 0,
@@ -52,7 +59,7 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
     },
     isShiftActive: true,
   };
-  return createStore<ShiftState>()((set, get) => ({
+  return create<ShiftState>()((set, get) => ({
     ...DEFAULT_PROPS,
     ...initProps,
     updateShift: (shift: Partial<Shift>) => {
@@ -65,6 +72,17 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
               if (s.id === shift.id) return { ...s, ...shift };
               return s;
             }),
+          },
+        };
+      });
+    },
+    createShift: (shift: Shift) => {
+      set((state) => {
+        return {
+          ...state,
+          user: {
+            ...state.user,
+            shifts: [...(state?.user?.shifts ?? []), shift],
           },
         };
       });
@@ -128,6 +146,20 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
         return {
           ...state,
           isShiftActive: newState,
+        };
+      });
+    },
+    updateShiftUnclosed: () => {
+      set((state) => {
+        const getter = get()?.user;
+        const lastShift = ShiftService.findUnClosedShift(getter?.shifts || []);
+
+        return {
+          ...state,
+          shiftUnclosed: {
+            shift: lastShift ?? null,
+            isLoading: false,
+          },
         };
       });
     },
