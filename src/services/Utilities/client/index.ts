@@ -23,6 +23,10 @@ class Utilities {
 
     return !!value;
   }
+
+  public static isFalsyValue(value: unknown): boolean {
+    return !Utilities.isTrutyValue(value);
+  }
 }
 
 export default Utilities;

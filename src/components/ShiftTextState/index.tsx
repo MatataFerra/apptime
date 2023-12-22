@@ -7,29 +7,23 @@ import Text from "@/components/ui/Text";
 import { useShiftStateContext } from "@/store/useShiftStatusStore";
 
 function ShiftTextState() {
-  const { shiftUnclosed } = useShiftStateContext((state) => state);
+  const {
+    shiftUnclosed: { shift, isLoading },
+  } = useShiftStateContext((state) => state);
 
   return (
     <Text as="h2" classes="text-2xl">
       State:{" "}
-      {shiftUnclosed.isLoading ? (
+      {isLoading ? (
         <Skeleton classes="h-8 w-16" />
       ) : (
         <Text
           as="span"
           classes={`${
-            typeof shiftUnclosed?.shift?.isClosed === "undefined"
-              ? "text-red-500"
-              : !shiftUnclosed?.shift?.isClosed
-                ? "text-green-500"
-                : "text-red-500"
+            isFalsy ? "text-red-500" : shift?.isClosed ? "text-red-500" : "text-green-500"
           } text-2xl`}
         >
-          {typeof shiftUnclosed?.shift?.isClosed === "undefined"
-            ? "Closed"
-            : !shiftUnclosed?.shift?.isClosed
-              ? "Open"
-              : "Closed"}
+          {typeof shift?.isClosed === "undefined" ? "Closed" : shift?.isClosed ? "Closed" : "Open"}
         </Text>
       )}
       <PopoverHome />
