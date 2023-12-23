@@ -1,3 +1,4 @@
+import { isEmpty } from "lodash";
 import { redirect } from "next/navigation";
 
 class Utilities {
@@ -16,16 +17,28 @@ class Utilities {
    * @returns {boolean} - Returns true if the value is a truty value.
    */
 
-  public static isTrutyValue(value: unknown): boolean {
+  public static isTruthyValue(value: unknown): boolean {
     if (typeof value === "string") {
       return /^true/i.test(value);
+    }
+
+    if (typeof value === "number") {
+      return value !== 0;
+    }
+
+    if (typeof value === "boolean") {
+      return value;
+    }
+
+    if (typeof value === "object") {
+      return !isEmpty(value);
     }
 
     return !!value;
   }
 
   public static isFalsyValue(value: unknown): boolean {
-    return !Utilities.isTrutyValue(value);
+    return !Utilities.isTruthyValue(value);
   }
 }
 

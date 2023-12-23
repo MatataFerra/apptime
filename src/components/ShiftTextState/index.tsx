@@ -1,5 +1,9 @@
 "use client";
 
+import { useCallback } from "react";
+
+import ut from "@/services/Utilities/client";
+
 import PopoverHome from "@/components/Popover/home";
 import Skeleton from "@/components/ui/Skeleton";
 import Text from "@/components/ui/Text";
@@ -11,6 +15,14 @@ function ShiftTextState() {
     shiftUnclosed: { shift, isLoading },
   } = useShiftStateContext((state) => state);
 
+  const checkCloseShift = useCallback(() => {
+    if (typeof shift?.isClosed === "undefined") {
+      return false;
+    }
+
+    return ut.isFalsyValue(shift?.isClosed);
+  }, [shift?.isClosed]);
+
   return (
     <Text as="h2" classes="text-2xl">
       State:{" "}
@@ -19,11 +31,9 @@ function ShiftTextState() {
       ) : (
         <Text
           as="span"
-          classes={`${
-            isFalsy ? "text-red-500" : shift?.isClosed ? "text-red-500" : "text-green-500"
-          } text-2xl`}
+          classes={`${checkCloseShift() ? "text-green-500" : "text-red-500"} text-2xl`}
         >
-          {typeof shift?.isClosed === "undefined" ? "Closed" : shift?.isClosed ? "Closed" : "Open"}
+          {checkCloseShift() ? "Open" : "Closed"}
         </Text>
       )}
       <PopoverHome />
