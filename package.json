@@ -16,7 +16,7 @@
     "prisma:push": "dotenv -e .env.development -- prisma db push",
     "prisma:seed": "dotenv -e .env.development -- prisma db seed",
     "prisma:studio": "dotenv -e .env.development -- prisma studio",
-    "test": "dotenv -e .env.development -- jest -i --watch",
+    "test": "dotenv -e .env.development -- vitest",
     "test:ci": "jest",
     "test:e2e": "dotenv -e .env.testing -- playwright test",
     "test:seed": "dotenv -e .env.testing -- prisma db seed",
