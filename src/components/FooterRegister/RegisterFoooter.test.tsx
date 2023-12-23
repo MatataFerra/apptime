@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen } from '@testing-library/react'
+import { describe,expect, test } from 'vitest'
 
 import RegisterFooter from "@/components/FooterRegister";
 

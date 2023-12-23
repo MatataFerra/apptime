@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { describe,expect, test, vi } from 'vitest'
 
 import Button from "@/components/ui/Button";
 import GoogleButton from "@/components/ui/Button/Google";
@@ -53,7 +54,7 @@ describe("Button", () => {
 
 describe("Google Button", () => {
   test("renders with default props", () => {
-    const onGoogleAuth = jest.fn();
+    const onGoogleAuth = vi.fn();
     render(<GoogleButton onGoogleAuth={onGoogleAuth} />);
     const buttonElement = screen.getByRole("button");
 
