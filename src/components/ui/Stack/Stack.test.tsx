@@ -1,13 +1,14 @@
 import { render } from "@testing-library/react";
+import { describe,expect, test } from 'vitest'
 
 import Stack from "./";
 
 describe("Stack component", () => {
-  it("renders without errors", () => {
+  test("renders without errors", () => {
     render(<Stack />);
   });
 
-  it("renders children correctly", () => {
+  test("renders children correctly", () => {
     const { getByText } = render(
       <Stack>
         <div>Child 1</div>
@@ -21,7 +22,7 @@ describe("Stack component", () => {
     expect(getByText("Child 3")).toBeInTheDocument();
   });
 
-  it("applies the correct classes and styles", () => {
+  test("applies the correct classes and styles", () => {
     const { container } = render(
       <Stack
         as="section"

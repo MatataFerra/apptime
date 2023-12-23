@@ -1,11 +1,10 @@
-import i18n from "@/services/i18n";
+import { afterAll, describe, expect,test, vi } from "vitest";
 
-import en from "#/messages/en.json";
-import es from "#/messages/es.json";
+
 
 describe("i18n", () => {
   afterAll(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test("There is an error with the headers()", () => {

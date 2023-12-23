@@ -5,15 +5,19 @@
 import React from "react";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { enableFetchMocks } from "jest-fetch-mock";
+import { fireEvent, render, screen , waitFor } from '@testing-library/react'
 import { NextIntlProvider } from "next-intl";
+import { describe,expect, test, vi } from 'vitest'
+import createFetchMock from 'vitest-fetch-mock';
 
 import Suscribe from "@/components/Suscribe"; // Ajusta la ruta según sea necesario
 
-enableFetchMocks();
+
+const fetchMocker = createFetchMock(vi);
+fetchMocker.enableMocks();
+
 describe("Suscribe Component", () => {
-  const useRouter = jest.spyOn(require("next/router"), "useRouter");
+  const useRouter = vi.spyOn(require("next/router"), "useRouter");
   const queryClient = new QueryClient();
 
   function Providers({ children, locale = "en" }: { children: React.ReactNode; locale: string }) {
@@ -30,6 +34,7 @@ describe("Suscribe Component", () => {
       </QueryClientProvider>
     );
   }
+
 
   test("displays component in english", () => {
     render(

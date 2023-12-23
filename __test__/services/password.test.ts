@@ -1,3 +1,5 @@
+import { describe, expect,test } from "vitest";
+
 import Password from "@/services/Auth/password";
 
 import { PASSWORD } from "@/utils/constants";

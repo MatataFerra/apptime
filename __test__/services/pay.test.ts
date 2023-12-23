@@ -1,9 +1,10 @@
 import { Profile } from "@prisma/client";
 import _ from "lodash";
+import { describe, expect,test } from "vitest";
 
 import PayService from "@/services/Pay";
 
-import { userMocked } from "#/mocks";
+import { userMocked } from "../../mocks";
 
 describe("Test Pay Service", () => {
   test("Should calculate publicHolidayPay", function () {
