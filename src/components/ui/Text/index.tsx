@@ -57,8 +57,8 @@ function Text<E extends ValidElement = typeof TextDefaultAsType>({
       className={cm(
         TEXT_VARIANTS[variant],
         classes,
-        color,
-        isArray(children) && "inline-flex gap-2"
+        color
+        // isArray(children) && "inline-flex gap-2"
       )}
       {...props}
     >

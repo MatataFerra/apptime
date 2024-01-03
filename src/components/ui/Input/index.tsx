@@ -15,7 +15,7 @@ function Input(props: InputProps, ref: Ref<HTMLInputElement>): ReactElement<Inpu
       {label ? (
         <Stack
           as="div"
-          spacing={spacing ? spacing : 0}
+          spacing={spacing ? spacing : undefined}
           orientation="vertical"
           classes={`${containerClasses ? containerClasses : ""}`}
         >
