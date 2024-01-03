@@ -3,7 +3,12 @@ import { Profile, User } from "@prisma/client";
 import ApiBaseService from "@/services/Api/base";
 
 import { UserType } from "@/types";
-import type { ApiResponse } from "@/types/api_response";
+import type {
+  ApiResponse,
+  FailureApiResponse,
+  SuccessApiResponse,
+  SuccessUserApiResponse,
+} from "@/types/api_response";
 
 import { API_ENDPOINTS } from "@/utils/constants/endpoints";
 
@@ -50,7 +55,7 @@ class ApiService extends ApiBaseService {
   }) {
     const parseFilters = Array.isArray(filters) ? filters.join(",") : "";
 
-    const response: ApiResponse<UserType> = await this.get({
+    const response: SuccessUserApiResponse = await this.get({
       endpoint: `${API_ENDPOINTS.USER}?email=${email}&only=${parseFilters}&shifts=${shifts}&profile=${profile}`,
       hasEnvUrl,
       options,
