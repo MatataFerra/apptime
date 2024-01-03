@@ -17,15 +17,21 @@ interface ShiftStateProps {
     earns: number;
     text: string;
     isLoading: boolean;
+    isEmpty: boolean;
   };
+  inputsDisabled: boolean;
+  differenceBetweenStartAndEnd: string;
 }
 
 interface ShiftState extends ShiftStateProps {
+  setUser: (user: UserStore) => void;
   updateShift: (shift: Partial<Shift>) => void;
   createShift: (shift: Shift) => void;
   updateShiftsInfo: () => void;
   updateShiftStatus: (state: boolean | undefined) => void;
   updateShiftUnclosed: () => void;
+  updateInputsAreDisabled: (state: boolean) => void;
+  updateDifferenceBetweenStartAndEnd: (state: string) => void;
 }
 
 type ShiftStateStore = ReturnType<typeof createShiftStatusStore>;
@@ -56,12 +62,23 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
       earns: 0,
       text: "",
       isLoading: true,
+      isEmpty: false,
     },
     isShiftActive: true,
+    inputsDisabled: initProps?.inputsDisabled || true,
+    differenceBetweenStartAndEnd: "",
   };
   return create<ShiftState>()((set, get) => ({
     ...DEFAULT_PROPS,
     ...initProps,
+    setUser: (user: UserStore) => {
+      set((state) => {
+        return {
+          ...state,
+          user,
+        };
+      });
+    },
     updateShift: (shift: Partial<Shift>) => {
       set((state) => {
         return {
@@ -72,6 +89,10 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
               if (s.id === shift.id) return { ...s, ...shift };
               return s;
             }),
+          },
+          shiftsInfo: {
+            ...state.shiftsInfo,
+            isEmpty: !state.user?.shifts?.length,
           },
         };
       });
@@ -90,6 +111,7 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
     updateShiftsInfo: () => {
       set((state) => {
         state.shiftsInfo.isLoading = true;
+
         const getter = get()?.user;
         const hourlyRate = getter?.profile?.hourlyRate || 60;
         const costMinute = hourlyRate / 60;
@@ -98,7 +120,15 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
           return shift?.endDate !== null;
         });
 
-        if (!lastShiftClosed) return state;
+        if (!lastShiftClosed)
+          return {
+            ...state,
+            shiftsInfo: {
+              ...state.shiftsInfo,
+              isLoading: false,
+              isEmpty: !getter?.shifts?.length,
+            },
+          };
 
         const humanizeDateLastShiftClosed = new DateHumanizer("today").humanizeDate(
           new Date(lastShiftClosed?.startDate ?? "") ?? Date.now()
@@ -137,6 +167,7 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
             earns: dateHumanized?.earns ?? 0,
             text: distanceLastShiftClosed?.text ?? "",
             isLoading: false,
+            isEmpty: !getter?.shifts?.length,
           },
         };
       });
@@ -160,6 +191,22 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
             shift: lastShift ?? null,
             isLoading: false,
           },
+        };
+      });
+    },
+    updateInputsAreDisabled: (state) => {
+      set((s) => {
+        return {
+          ...s,
+          inputsDisabled: state,
+        };
+      });
+    },
+    updateDifferenceBetweenStartAndEnd: (state) => {
+      set((s) => {
+        return {
+          ...s,
+          differenceBetweenStartAndEnd: state,
         };
       });
     },
