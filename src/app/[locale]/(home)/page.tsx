@@ -1,7 +1,4 @@
-import { getServerSession } from "next-auth";
-
 import i18n from "@/services/i18n";
-import UserService from "@/services/User";
 import ut from "@/services/Utilities/client";
 
 import { LocaleParams } from "@/types";
@@ -24,13 +21,6 @@ export default async function Home({ params }: { params: LocaleParams }) {
     return ut.redirectTo(PATH_NAMES.HOME);
   }
 
-  const session = await getServerSession();
-  const user = await UserService.findUniqueUser({
-    email: session?.user?.email,
-    shifts: true,
-    profile: true,
-  });
-
   return (
     <>
       <Stack orientation="vertical" spacing={8}>
@@ -38,7 +28,8 @@ export default async function Home({ params }: { params: LocaleParams }) {
           <WelcomeTitle />
           <DateComponent locale={params.locale} />
         </Stack>
-        <ShiftStatusProvider user={user}>
+
+        <ShiftStatusProvider>
           <ShiftTextState />
           <ShiftStatus />
           <ShiftButtons />
