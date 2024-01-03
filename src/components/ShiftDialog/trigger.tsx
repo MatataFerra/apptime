@@ -10,9 +10,11 @@ type Props = {
         apply_variant: boolean;
       }
     | undefined;
+  triggerText?: string;
 };
 
-function Trigger({ status }: Props) {
+function Trigger({ status, triggerText = "Start Shift" }: Props) {
+  const checkVariant = /Start/.test(triggerText);
   return (
     <>
       <DialogTrigger
@@ -21,12 +23,18 @@ function Trigger({ status }: Props) {
           `remove_button_highlight w-full cursor-pointer shadow-button ${
             status?.apply_variant ? "active:shadow-button-inner" : ""
           }`,
-          `${status?.apply_variant ? BUTTON_VARIANTS.black : BUTTON_VARIANTS.disabled}`
+          `${
+            status?.apply_variant
+              ? checkVariant
+                ? BUTTON_VARIANTS.black
+                : BUTTON_VARIANTS.danger
+              : BUTTON_VARIANTS.disabled
+          }`
         )}
         disabled={status?.disabled}
         aria-disabled={status?.disabled}
       >
-        Start Shift
+        {triggerText}
       </DialogTrigger>
     </>
   );
