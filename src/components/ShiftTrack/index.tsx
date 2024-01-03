@@ -1,4 +1,4 @@
-import ShiftInfo from "@/components/ShiftInfo";
+import ShiftTrackInfo from "@/components/ShiftTrackInfo";
 import ShiftTrackTitle from "@/components/ShiftTrackTitle";
 import Stack from "@/components/ui/Stack";
 
@@ -12,7 +12,7 @@ function ShiftTrack() {
         justifyContent="between"
       >
         <ShiftTrackTitle />
-        <ShiftInfo />
+        <ShiftTrackInfo />
       </Stack>
     </>
   );
