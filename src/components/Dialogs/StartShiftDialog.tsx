@@ -1,4 +1,4 @@
-import DialogButtons from "@/components/ShiftDialog/buttons";
+import DialogButtons from "@/components/ShiftDialog/start_buttons";
 import Trigger from "@/components/ShiftDialog/trigger";
 import {
   Dialog,
@@ -29,7 +29,7 @@ function StartShiftDialog({ triggerStatus }: Props) {
         <DialogContent className="min-h-[300px] w-10/12">
           <DialogHeader>
             <DialogTitle className="flex justify-center">
-              <Stack orientation="vertical" alignItems="center">
+              <Stack orientation="vertical" alignItems="center" spacing={2}>
                 <Image
                   alt="question-mark"
                   src="/assets/marks/question_mark.svg"

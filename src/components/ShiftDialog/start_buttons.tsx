@@ -40,14 +40,6 @@ function DialogButtons() {
   });
 
   function onStartShift(publicHolidayWorked: boolean) {
-    /* 
-      1. se crea un nuevo shift
-      
-      2. se actualiza el usuario con el nuevo shift
-      3. se actualiza el estado de los botones
-      4. cambia de offline a online
-      5. Cambia el estado del  shift de No Shift tracked a mostrar cuanto tiempo va
-    */
     mutate.mutate({
       body: {
         userId: user?.id as string,
