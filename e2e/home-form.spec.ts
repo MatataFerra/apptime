@@ -3,8 +3,6 @@ import { expect, Page, test } from "@playwright/test";
 import randomEmail from "../src/utils/helpers/generateRandomEmail";
 import { createUser, fillForm, USER_CREDENTIALS } from "./constants";
 
-const { email, password } = createUser({ email: randomEmail() });
-
 test.use({
   isMobile: true,
 });
@@ -12,6 +10,7 @@ test.use({
 test.beforeEach(async ({ page }, testInfo) => {
   await page.goto("http://localhost:3000/");
   await page.waitForURL(/login/);
+  const { email, password } = createUser({ email: randomEmail() });
 
   if (testInfo.title.includes("Should show success message if profile is created")) {
     // register new unique user
@@ -35,15 +34,34 @@ test.beforeEach(async ({ page }, testInfo) => {
     return;
   }
 
-  // login
-  await page.getByRole("textbox").first().fill(USER_CREDENTIALS.email);
-  await page.getByRole("textbox").last().fill(USER_CREDENTIALS.password);
+  if (testInfo.title.includes("Should show error if profile already exists")) {
+    // login
+    await page.locator("[name=email]").fill(USER_CREDENTIALS.email);
+    await page.locator("[name=password]").fill(USER_CREDENTIALS.password);
 
-  await page.getByRole("button", { name: "Login" }).click({
-    force: true,
-  });
+    await page.getByRole("button", { name: /Login/ }).click();
+
+    await page.waitForURL("http://localhost:3000/en");
+
+    await page.goto("http://localhost:3000/en/form");
+
+    await page.waitForURL(/form/);
+
+    return;
+  }
+
+  // create new user
+  await page.getByText(/register|registro/).click();
+  await page.waitForURL(/register/);
+
+  // buttons
+  await page.locator("[name=email]").fill(email);
+  await page.locator("[name=password]").fill(password);
+
+  await page.getByRole("button").first().click();
 
   await page.waitForURL("http://localhost:3000/en");
+
   expect(page.getByText("Please fill the form before start")).toBeVisible();
 
   await page.getByRole("button", { name: /click here/ }).click();

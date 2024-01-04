@@ -3,13 +3,17 @@
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { User } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
+import { has } from "lodash";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
 import api from "@/services/Api";
+
+import { ApiResponse, SuccessApiResponse, SuccessUserApiResponse } from "@/types/api_response";
 
 import List from "@/components/ListRegister";
 import Form from "@/components/ui/Form";
@@ -50,7 +54,7 @@ function RegisterForm() {
   const { passedErrors } = usePasswordErrors(passwordWatched);
 
   const { mutate, isPending } = useMutation({
-    mutationFn: api.register,
+    mutationFn: api.register.bind(api),
 
     onMutate() {
       //Blocking the register button
@@ -61,10 +65,10 @@ function RegisterForm() {
     },
 
     onSuccess(data) {
-      if (!data.response) {
+      const res = data as ApiResponse<User>;
+      if (!res.response) {
         // Error handling
-        const response = data;
-        if (response.error.type_error === "UserAlreadyExists") {
+        if (res.error.type_error === "UserAlreadyExists") {
           toast({
             title: t("user_already_exist"),
             duration: 2000,
