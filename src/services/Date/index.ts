@@ -1,10 +1,10 @@
 import { format, formatDistanceToNow } from "date-fns";
-import { enUS, es } from "date-fns/locale";
+import { enUS, es, Locale } from "date-fns/locale";
 
 import type { DateHumanizerStrategy, Locale as possibleLocale } from "@/types";
 
 type DateHumanizerStrategies = {
-  [x: string]: (date: Date, locale?: possibleLocale) => string;
+  [x: string]: (date: Date, locale?: possibleLocale, dateFormat?: string) => string;
 };
 
 export default class DateHumanizer {
@@ -21,9 +21,9 @@ export default class DateHumanizer {
       en: enUS,
     };
     this.strategies = {
-      today: (date: Date, locale?: possibleLocale) =>
-        format(date, "eee do, MMMM yyyy", { locale: this.locale[locale || "en"] }),
-      distanceToNow: (date: Date, locale?: possibleLocale) =>
+      today: (date: Date, locale?: possibleLocale, dateFormat: string = "eee do, MMMM yyyy") =>
+        format(date, dateFormat, { locale: this.locale[locale || "en"] }),
+      distanceToNow: (date: Date, locale?: possibleLocale, format?: string) =>
         formatDistanceToNow(date, { addSuffix: true, locale: this.locale[locale || "en"] }),
     };
   }
@@ -35,10 +35,10 @@ export default class DateHumanizer {
     this.strategy = strategy;
   }
 
-  humanizeDate(date: Date, locale?: possibleLocale): string {
+  humanizeDate(date: Date, locale?: possibleLocale, format: string = "eee do, MMMM yyyy"): string {
     if (!this.strategies[this.strategy]) {
       throw new Error("Estrategia no válida");
     }
-    return this.strategies[this.strategy](date, locale);
+    return this.strategies[this.strategy](date, locale, format);
   }
 }

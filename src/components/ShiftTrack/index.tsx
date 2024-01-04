@@ -1,18 +1,18 @@
-import ShiftInfo from "@/components/ShiftInfo";
+import ShiftTrackInfo from "@/components/ShiftTrackInfo";
+import ShiftTrackTitle from "@/components/ShiftTrackTitle";
 import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
 
 function ShiftTrack() {
   return (
     <>
       <Stack
         orientation="vertical"
-        classes="h-full self-start"
+        classes="h-full w-full self-start"
         alignItems="start"
         justifyContent="between"
       >
-        <Text classes="text-2xl">No shift is tracked</Text>
-        <ShiftInfo />
+        <ShiftTrackTitle />
+        <ShiftTrackInfo />
       </Stack>
     </>
   );

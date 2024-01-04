@@ -1,14 +1,15 @@
 import { Shift } from "@prisma/client";
-import { differenceInMinutes, parse } from "date-fns";
-import { enUS, es } from "date-fns/locale";
-import _ from "lodash";
+import { differenceInMinutes } from "date-fns";
+import _, { cloneDeep } from "lodash";
 
-type ShiftServiceType = Omit<Shift, "id">;
+type ShiftWithoutId = Omit<Shift, "id">;
 
 interface ShiftServiceInterface {
-  shift: ShiftServiceType;
+  shift: ShiftWithoutId;
   differenceInMinsBetweenStartAndEnd: () => void;
-  updateStatus: () => void;
+  closeShift: () => void;
+  checkPublicHoliday: () => void;
+  build: () => Omit<Shift, "id">;
 }
 
 /**
@@ -17,30 +18,83 @@ interface ShiftServiceInterface {
  * this class is based on Builder pattern
  * @method differenceInMinsBetweenStartAndEnd - Calculates the difference between the start and end of a shift
  * @method convertAmountInDecimal - Converts the amount of minutes in decimal
- * @param {ShiftServiceType["amount"]} amount - The amount of minutes.
+ * @param {ShiftWithoutId["amount"]} amount - The amount of minutes.
  * @method shiftStatus - Checks if the shift is closed
  * @method checkPublicHoliday - Checks if the shift is a public holiday
  * @method create - Creates a new shift and executes all the methods above
  * @method build - Returns the shift
  */
 class ShiftService implements ShiftServiceInterface {
-  shift: ShiftServiceType;
-  constructor(shift: ShiftServiceType) {
-    this.shift = shift;
+  shift: ShiftWithoutId;
+  constructor(shift: ShiftWithoutId) {
+    this.shift = cloneDeep(shift);
   }
 
-  static transformDateFromString(date: string, locale: "es" | "en" = "en") {
-    const LOCALES = {
-      en: enUS,
-      es: es,
+  static differenceInHHmm(start: string | number | Date, end?: string | number | Date) {
+    let startDate: Date;
+    let endDate: Date;
+
+    if (typeof start === "string" || typeof start === "number") {
+      startDate = new Date(start);
+    } else {
+      startDate = start;
+    }
+
+    endDate = !!end ? new Date(end) : new Date(Date.now());
+
+    const difference = Math.abs(differenceInMinutes(startDate, endDate));
+    const getHours = difference / 60;
+
+    function decimals(hours: number) {
+      const getDecimals = Math.floor(Number("0." + String(hours).split(".")[1]) * 60);
+
+      if (isNaN(getDecimals)) return 0;
+
+      return getDecimals;
+    }
+
+    return {
+      text: `${Math.floor(getHours)}h ${decimals(getHours)}m`,
+      hours: getHours,
+      minutes: decimals(getHours),
+      diff: difference,
     };
-    return parse(date, "HH:mm", new Date(), {
-      locale: LOCALES[locale],
+  }
+
+  static findUnClosedShift(shifts: Shift[] | undefined) {
+    if (!shifts) return null;
+    return shifts.find((shift) => !shift.isClosed);
+  }
+
+  static shiftsSorted(shifts: Shift[] | undefined) {
+    return shifts?.toSorted((a, b) => {
+      if (!a.isClosed || !b.isClosed) return 0;
+
+      return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
     });
   }
 
+  static convertAmountInDecimal(amount: ShiftWithoutId["amount"]): number {
+    const validAmount = amount ?? 0;
+    return Math.round((validAmount / 60) * 100) / 100;
+  }
+
+  closeShift() {
+    this.updateEndDate().updateStatus();
+
+    return this;
+  }
+
+  private updateEndDate() {
+    this.shift.endDate = !!this.shift.endDate
+      ? this.shift.endDate
+      : new Date(Date.now()).toString();
+
+    return this;
+  }
+
   differenceInMinsBetweenStartAndEnd() {
-    const start = new Date(this.shift.startDate);
+    const start = new Date(this?.shift?.startDate ?? Date.now());
 
     if (!this.shift?.endDate) {
       this.shift.amount = 0;
@@ -55,12 +109,7 @@ class ShiftService implements ShiftServiceInterface {
     return this;
   }
 
-  static convertAmountInDecimal(amount: ShiftServiceType["amount"]): number {
-    const validAmount = amount ?? 0;
-    return Math.round((validAmount / 60) * 100) / 100;
-  }
-
-  updateStatus() {
+  private updateStatus() {
     if (!this.shift.endDate) {
       this.shift.isClosed = false;
 
@@ -68,6 +117,7 @@ class ShiftService implements ShiftServiceInterface {
     }
 
     this.shift.isClosed = true;
+
     return this;
   }
 
@@ -79,14 +129,6 @@ class ShiftService implements ShiftServiceInterface {
     }
 
     return this;
-  }
-
-  create() {
-    this.differenceInMinsBetweenStartAndEnd();
-    this.updateStatus();
-    this.checkPublicHoliday();
-
-    return this.shift;
   }
 
   build() {

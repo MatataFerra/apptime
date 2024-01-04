@@ -1,3 +1,5 @@
+import { Page } from "@playwright/test";
+
 import randomEmail from "../src/utils/helpers/generateRandomEmail";
 
 const email = randomEmail();
@@ -22,5 +24,25 @@ export function createUser({ email }: { email: string }): { email: string; passw
   return {
     email,
     password: "Secreto4!",
+  };
+}
+
+export function fillForm(page: Page) {
+  return async () => {
+    await page.getByRole("textbox").first().fill("John");
+    await page.getByRole("textbox").last().fill("Doe");
+
+    await page.getByRole("button", { name: "Next" }).click();
+
+    await page.getByLabel("Hour value").fill("10");
+    await page.getByLabel("Start time").fill("08:00");
+    await page.getByLabel("Finish time").fill("17:00");
+
+    await page.getByRole("button", { name: "Next" }).click();
+
+    await page.getByRole("radio", { name: "Yes" }).last().click();
+    await page.getByTestId("input-unpaidBreaks").fill("1");
+
+    await page.getByRole("button", { name: "Submit" }).click();
   };
 }

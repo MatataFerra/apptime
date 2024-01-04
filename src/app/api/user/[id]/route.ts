@@ -23,10 +23,9 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
   if (!parsedSearchParams.success) {
     return NextResponse.json(
       {
-        message: parsedSearchParams.error.issues.map((issue) => ({
-          error: issue.message,
-          input: issue.path,
-        })),
+        error: ErrorFactory.createError("DataProvidedIsNotValid", {
+          error: parsedSearchParams.error,
+        }),
         response: false,
       },
       { status: 400 }

@@ -4,16 +4,17 @@ import ut from "@/services/Utilities/client";
 import { LocaleParams } from "@/types";
 
 import DateComponent from "@/components/Date";
-import HomeButtons from "@/components/Home/Buttons/container";
-import PopoverHome from "@/components/Popover/home";
+import ShiftButtons from "@/components/ShiftButtons";
 import ShiftStatus from "@/components/ShiftStatus";
+import ShiftTextState from "@/components/ShiftTextState";
 import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
 import WelcomeTitle from "@/components/WelcomeTitle";
+
+import ShiftStatusProvider from "@/providers/ShiftStatusProvider";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-export default function Home({ params }: { params: LocaleParams }) {
+export default async function Home({ params }: { params: LocaleParams }) {
   const isLocaleSupported = new i18n(params.locale).isLocaleSupported();
 
   if (!isLocaleSupported) {
@@ -27,12 +28,12 @@ export default function Home({ params }: { params: LocaleParams }) {
           <WelcomeTitle />
           <DateComponent locale={params.locale} />
         </Stack>
-        <Text as="h2" classes="text-2xl">
-          State: <span className="text-green-500">online</span>
-          <PopoverHome />
-        </Text>
-        <ShiftStatus />
-        <HomeButtons />
+
+        <ShiftStatusProvider>
+          <ShiftTextState />
+          <ShiftStatus />
+          <ShiftButtons />
+        </ShiftStatusProvider>
       </Stack>
     </>
   );

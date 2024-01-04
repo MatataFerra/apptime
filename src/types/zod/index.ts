@@ -86,10 +86,9 @@ const ShiftCreateSchema = ShiftModelSchema.omit({
   message: "One of the fields must be defined",
 });
 
-const ShiftUpdateSchema = ShiftModelSchema.partial().refine(
-  (values) => Object.keys(values).length > 0,
-  { message: "One of the fields must be defined" }
-);
+const ShiftUpdateSchema = ShiftModelSchema.omit({
+  id: true,
+});
 
 const SearchParamsSchema = z.object({
   shifts: z.string().nullable(),

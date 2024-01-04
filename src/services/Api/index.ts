@@ -1,28 +1,38 @@
 import { Profile, User } from "@prisma/client";
 
-import api from "@/services/Api/base";
+import ApiBaseService from "@/services/Api/base";
 
-import type { ApiResponse } from "@/types/api_response";
+import { UserType } from "@/types";
+import type {
+  ApiResponse,
+  FailureApiResponse,
+  SuccessApiResponse,
+  SuccessUserApiResponse,
+} from "@/types/api_response";
 
 import { API_ENDPOINTS } from "@/utils/constants/endpoints";
 
-class ApiService {
+class ApiService extends ApiBaseService {
+  constructor() {
+    super();
+  }
   static async createWaitingList(email: string) {
-    return api.post({
+    return this.post({
       endpoint: API_ENDPOINTS.WAITING_LIST,
       body: { email },
+      hasEnvUrl: false,
     });
   }
 
   static async register({ email, password }: { email: string; password: string }) {
     try {
-      const response = await api.post({
+      const response = await this.post({
         endpoint: API_ENDPOINTS.REGISTER,
         body: { email, password, emailVerified: null },
         hasEnvUrl: false,
       });
 
-      return await response.json();
+      return response;
     } catch (error) {
       return error;
     }
@@ -31,17 +41,24 @@ class ApiService {
   static async getUserByEmail({
     email,
     filters,
+    shifts = false,
+    profile = false,
     hasEnvUrl = true,
+    options,
   }: {
     email?: string | null;
     filters?: keyof User | (keyof User)[];
+    shifts?: boolean;
+    profile?: boolean;
     hasEnvUrl?: boolean;
-  }): Promise<ApiResponse<User>> {
-    const parseFilters = Array.isArray(filters) ? filters.join(",") : filters;
+    options?: NextFetchRequestConfig;
+  }) {
+    const parseFilters = Array.isArray(filters) ? filters.join(",") : "";
 
-    const response: ApiResponse<User> = await api.get({
-      endpoint: `${API_ENDPOINTS.USER}?email=${email}&filters=${parseFilters}`,
+    const response: SuccessUserApiResponse = await this.get({
+      endpoint: `${API_ENDPOINTS.USER}?email=${email}&only=${parseFilters}&shifts=${shifts}&profile=${profile}`,
       hasEnvUrl,
+      options,
     });
 
     return response;
@@ -53,8 +70,8 @@ class ApiService {
   }: {
     user: Partial<User>;
     hasEnvUrl?: boolean;
-  }) {
-    const response = await api.put({
+  }): Promise<ApiResponse<User>> {
+    const response: ApiResponse<User> = await this.put({
       endpoint: `${API_ENDPOINTS.USER}/${user.id}`,
       body: user,
       hasEnvUrl,
@@ -70,7 +87,7 @@ class ApiService {
     profile: Omit<Profile, "id">;
     hasEnvUrl?: boolean;
   }) {
-    const response = await api.post({
+    const response = await this.post({
       endpoint: API_ENDPOINTS.PROFILE,
       body: profile,
       hasEnvUrl,

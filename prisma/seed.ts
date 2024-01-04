@@ -2,10 +2,14 @@
 
 import { Shift, User } from "@prisma/client";
 import { hashSync } from "bcryptjs";
-import { addDays, addMinutes, differenceInMinutes } from "date-fns";
+import { addDays, addMinutes, differenceInMinutes, isToday as isTheDateToday } from "date-fns";
 
 import prisma from "./client";
-const now = new Date();
+
+const now = new Date(Date.now());
+const today = new Date();
+const myToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0);
+
 const datesMock = [
   now, // today
   addDays(now, -1), // yesterday
@@ -18,18 +22,25 @@ const datesMock = [
   addDays(now, -8), // one day before one week before
 ];
 
-function addShiftsForSeed(user: User): Shift[] {
-  const datesMocked = datesMock.map((date, i) => {
+const newDatesMock = [
+  myToday, // today at 12:00
+  addDays(myToday, -1), // yesterday
+  addDays(myToday, -2), // one day before yesterday
+  addDays(myToday, -3), // two days before yesterday
+  addDays(myToday, -4), // three days before yesterday
+];
+
+function addShiftsForSeed(user: User, dates: Array<Date>): Omit<Shift, "id">[] {
+  const datesMocked = dates.map((date, i) => {
     return {
-      id: i,
       userId: user?.id,
       startDate: date.toString(),
-      endDate: addMinutes(date, 125 + i).toString(),
-      amount: differenceInMinutes(addMinutes(date, 125 + i), date),
-      isClosed: true,
+      endDate: isTheDateToday(date) ? null : addMinutes(date, 125 + i).toString(),
+      amount: isTheDateToday(date) ? 0 : differenceInMinutes(addMinutes(date, 125 + i), date),
+      isClosed: isTheDateToday(date) ? false : true,
       isPublicHoliday: false,
       publicHolidayWorked: false,
-      notes: "mocked shift",
+      notes: `mocked shift number ${i} from user ${user?.name}`,
     };
   });
 
@@ -78,8 +89,11 @@ async function main() {
   }
 
   await prisma.shift.createMany({
-    skipDuplicates: true,
-    data: [...addShiftsForSeed(firstUser)],
+    data: [...addShiftsForSeed(firstUser, newDatesMock)],
+  });
+
+  await prisma.shift.createMany({
+    data: [...addShiftsForSeed(secondUser, datesMock)],
   });
 
   await prisma.profile.create({
@@ -115,6 +129,25 @@ async function main() {
       nightShift: true,
       startHour: 10,
       unpaidBreaks: 30,
+    },
+  });
+
+  // update first user and second user who have form completed
+  await prisma.user.update({
+    where: {
+      id: firstUser.id,
+    },
+    data: {
+      formCompleted: true,
+    },
+  });
+
+  await prisma.user.update({
+    where: {
+      id: secondUser.id,
+    },
+    data: {
+      formCompleted: true,
     },
   });
 

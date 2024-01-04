@@ -1,15 +1,13 @@
-import { getServerSession } from "next-auth";
-
-import UserService from "@/services/User";
+"use client";
 
 import UnfilledForm from "@/components/ShiftStatus/UnfilledForm";
 import ShiftTrack from "@/components/ShiftTrack";
 import Stack from "@/components/ui/Stack";
 
-async function Status() {
-  const session = await getServerSession();
-  const user = await UserService.findUniqueUser({ email: session?.user?.email });
+import { useShiftStateContext } from "@/store/useShiftStatusStore";
 
+function ShiftStatus() {
+  const user = useShiftStateContext((state) => state.user);
   return (
     <Stack
       orientation="vertical"
@@ -26,4 +24,4 @@ async function Status() {
   );
 }
 
-export default Status;
+export default ShiftStatus;

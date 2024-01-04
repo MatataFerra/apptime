@@ -1,5 +1,7 @@
 import { Profile } from "@prisma/client";
 
+import { UserType } from "@/types/services";
+
 interface User {
   name: string;
   surname: string;
@@ -28,3 +30,5 @@ export type FormStoreData = {
   user: FormStore["user"];
   profile: FormStore["profile"];
 };
+
+export type UserStore = Partial<UserType> | null;

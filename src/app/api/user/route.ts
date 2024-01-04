@@ -37,29 +37,29 @@ export async function GET(req: NextRequest) {
 
   try {
     const { only } = parsedSearchParams.data;
-    const onlyParam = only ? only?.split(",") : [];
+    const onlyParam = only ? only.split(",") : [];
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email: parsedSearchParams?.data?.email ?? "",
+      },
+      include: {
+        shifts: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
+        profile: JSON.parse(parsedSearchParams.data.profile ?? "false"),
+      },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        {
+          error: ErrorFactory.createError("UserNotFound"),
+          response: false,
+        },
+        { status: 400 }
+      );
+    }
 
     if (parsedSearchParams.data.email && onlyParam.length === 0) {
-      const user = await prisma.user.findUnique({
-        where: {
-          email: parsedSearchParams.data.email,
-        },
-        include: {
-          shifts: !!parsedSearchParams.data.shifts,
-          profile: !!parsedSearchParams.data.profile,
-        },
-      });
-
-      if (!user) {
-        return NextResponse.json(
-          {
-            error: ErrorFactory.createError("UserNotFound"),
-            response: false,
-          },
-          { status: 400 }
-        );
-      }
-
       return NextResponse.json(
         {
           message: "success",
@@ -71,24 +71,6 @@ export async function GET(req: NextRequest) {
     }
 
     if (parsedSearchParams.data.email && onlyParam.length > 0) {
-      const selectObj = onlyParam.reduce((acc, curr) => ({ ...acc, [curr]: true }), {});
-      const user = await prisma.user.findUnique({
-        where: {
-          email: parsedSearchParams.data.email,
-        },
-        select: selectObj,
-      });
-
-      if (!user) {
-        return NextResponse.json(
-          {
-            error: ErrorFactory.createError("UserNotFound"),
-            response: false,
-          },
-          { status: 400 }
-        );
-      }
-
       const userFiltered = await UserService.filterUserProps(user, onlyParam);
 
       return NextResponse.json(
@@ -98,23 +80,6 @@ export async function GET(req: NextRequest) {
           user: userFiltered,
         },
         { status: 200 }
-      );
-    }
-
-    const user = await prisma.user.findMany({
-      include: {
-        shifts: !!parsedSearchParams.data.shifts,
-        profile: !!parsedSearchParams.data.profile,
-      },
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        {
-          error: ErrorFactory.createError("UserNotFound"),
-          response: false,
-        },
-        { status: 400 }
       );
     }
 

@@ -1,24 +1,25 @@
 import { Shift } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 import ErrorFactory from "@/services/Error/factory";
+import ShiftService from "@/services/Shift";
 
 import { RouteParams, ShiftUpdateSchema } from "@/types";
 
 import prisma from "#/prisma/client";
 
 export async function PUT(req: NextRequest, { params }: RouteParams) {
-  const body: Shift = await req.json();
+  const body: Omit<Shift, "id"> = await req.json();
   const parsedBody = ShiftUpdateSchema.safeParse(body);
 
   if (!parsedBody.success) {
     return NextResponse.json(
       {
-        error: parsedBody.error.issues.map((issue) => ({
-          error: issue.message,
-          input: issue.path,
-        })),
+        error: ErrorFactory.createError("DataProvidedIsNotValid", {
+          error: parsedBody.error,
+        }),
         response: false,
       },
       { status: 400 }
@@ -26,24 +27,32 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
   }
 
   try {
+    const buildShift = new ShiftService({ ...parsedBody.data })
+      .closeShift()
+      .checkPublicHoliday()
+      .differenceInMinsBetweenStartAndEnd()
+      .build();
+
     const updatedShift = await prisma.shift.update({
       where: {
         id: Number(params.id),
       },
       data: {
-        ...parsedBody.data,
+        ...buildShift,
       },
     });
 
     if (!updatedShift) {
       return NextResponse.json(
         {
-          ...ErrorFactory.createError("ShiftNotFound"),
+          error: ErrorFactory.createError("ShiftNotFound"),
           response: false,
         },
         { status: 404 }
       );
     }
+
+    revalidatePath("/", "page");
 
     return NextResponse.json(
       {
@@ -57,7 +66,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     if (error instanceof PrismaClientKnownRequestError) {
       return NextResponse.json(
         {
-          ...ErrorFactory.createError("PrismaClientUpdateRecord"),
+          error: ErrorFactory.createError("PrismaClientUpdateRecord"),
           response: false,
         },
         { status: 408 }
@@ -65,7 +74,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     }
     return NextResponse.json(
       {
-        ...ErrorFactory.createError("InternalServer"),
+        error: ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }

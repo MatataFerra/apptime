@@ -20,18 +20,26 @@ function Suscribe() {
   const t = useTranslations("no-mobile");
 
   const mutation = useMutation({
-    mutationFn: api.createWaitingList,
+    mutationFn: api.createWaitingList.bind(api),
+    onError: (_) => {
+      setError("email", {
+        message: "Something went wrong, please try again later.",
+      });
+    },
   });
   const {
     register,
     handleSubmit,
-
-    formState: { errors, isSubmitSuccessful, isSubmitting, isValid },
+    setError,
+    clearErrors,
+    formState: { errors, isSubmitSuccessful, isSubmitting, isValid, isDirty },
   } = useForm<Inputs>({
     resolver: zodResolver(SuscribeSchema),
   });
 
   function onSubmit(event: Inputs) {
+    clearErrors("email");
+
     mutation.mutate(event.email);
   }
 

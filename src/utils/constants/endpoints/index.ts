@@ -5,4 +5,5 @@ export const API_ENDPOINTS = {
   REGISTER: `/api/user/create`,
   USER: `/api/user`,
   PROFILE: `/api/profile`,
+  SHIFT: `/api/shift`,
 };

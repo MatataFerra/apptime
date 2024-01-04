@@ -26,6 +26,7 @@ function StepOne() {
     <>
       <Stack orientation="vertical" classes="mt-16" spacing={8}>
         <Input
+          containerClasses="w-full"
           isRequired
           isError={formErrors.name}
           label="name"
@@ -36,6 +37,7 @@ function StepOne() {
           })}
         />
         <Input
+          containerClasses="w-full"
           label="surname"
           labelClasses="text-sm"
           {...register("surname", {

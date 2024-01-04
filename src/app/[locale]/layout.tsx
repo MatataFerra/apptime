@@ -48,10 +48,8 @@ export default async function RootLayout({
     <>
       <html lang={params.locale} className={cm(poppinsFont.className)}>
         <body>
-          <NextIntlClientProvider locale={params.locale} messages={messages}>
-            <Providers>{children}</Providers>
-            <Toaster />
-          </NextIntlClientProvider>
+          <Providers i18n={{ messages, locale: params.locale }}>{children}</Providers>
+          <Toaster />
         </body>
       </html>
     </>

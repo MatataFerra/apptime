@@ -23,8 +23,8 @@ function InputBase(props: InputProps, ref: Ref<HTMLInputElement>): ReactElement<
           type={type}
           autoComplete="off"
           className={cm(
-            type === "radio" ? INPUT_VARIANTS["radio"] : INPUT_VARIANTS[variant],
             "rounded-lg px-2 py-1",
+            type === "radio" ? INPUT_VARIANTS["radio"] : INPUT_VARIANTS[variant],
             isError ? "border border-red-600 focus:ring-red-600" : "",
             classes
           )}

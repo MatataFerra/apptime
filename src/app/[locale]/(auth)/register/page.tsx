@@ -1,7 +1,7 @@
 import RegisterFooter from "@/components/FooterRegister";
 import RegisterForm from "@/components/FormRegister";
 
-import PasswordValidProvider from "@/providers/PasswordValid";
+import PasswordValidProvider from "@/providers/PasswordValidProvider";
 
 export default async function Register() {
   return (
