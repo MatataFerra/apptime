@@ -41,3 +41,7 @@ TODO.ts
 playwright-report/
 test-results/
 
+#lock file
+pnpm-lock.yaml
+
+

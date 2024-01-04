@@ -40,7 +40,7 @@ function ShiftStatusProvider({ children }: Props) {
 
   return (
     <ShiftStatusContext.Provider value={store}>
-      {query.isLoading ? <ShiftSkeleton /> : children}
+      {query.isPending ? <ShiftSkeleton /> : children}
     </ShiftStatusContext.Provider>
   );
 }

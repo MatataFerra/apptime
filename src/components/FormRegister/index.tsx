@@ -49,7 +49,7 @@ function RegisterForm() {
   const { updateButtonBloqued, addAttempToRegister, attempsToRegister } = usePasswordValid();
   const { passedErrors } = usePasswordErrors(passwordWatched);
 
-  const { mutate, isLoading } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: api.register,
 
     onMutate() {
@@ -150,7 +150,7 @@ function RegisterForm() {
   return (
     <>
       <Loader
-        loading={isLoading}
+        loading={isPending}
         type="spinner"
         loaderClasses="spinner h-12 w-12"
         loaderContainerClasses="flex h-full justify-center items-center"
