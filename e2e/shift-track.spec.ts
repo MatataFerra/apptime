@@ -49,5 +49,13 @@ test("user can end a shift", async ({ page }) => {
   expect(page.getByRole("dialog")).toBeVisible();
   await page.getByRole("button", { name: /regular/ }).click();
   await page.getByRole("button", { name: /Finish/ }).click();
+  await page.getByRole("button", { name: /move/ }).click();
   expect(page.getByRole("button", { name: /Finish/ })).toBeDisabled();
+});
+
+test("start shift and see it Open", async ({ page }) => {
+  await page.getByRole("button", { name: /Start/ }).click();
+  expect(page.getByRole("dialog")).toBeVisible();
+  await page.getByRole("button", { name: /regular/ }).click();
+  expect(page.getByText(/Open/)).toBeVisible();
 });
