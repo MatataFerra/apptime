@@ -1,7 +1,7 @@
 import { Shift } from "@prisma/client";
-import { addMinutes } from "date-fns";
+import { addDays, addMinutes } from "date-fns";
 import { cloneDeep } from "lodash";
-import { describe, expect,test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import PayService from "@/services/Pay";
 import ShiftService from "@/services/Shift";
@@ -21,7 +21,7 @@ describe("ShiftService", () => {
   describe("Check if shift builds correctly", () => {
     let start = addMinutes(now, -DIFFERENCE_SHIFT).toString();
 
-    let SHIFT_MOCK = {
+    const SHIFT_MOCK = {
       ...shiftMock.shift,
       startDate: start,
       endDate: null,
@@ -60,6 +60,21 @@ describe("ShiftService", () => {
         endDate: now.toString(),
         amount: DIFFERENCE_SHIFT,
       });
+    });
+
+    test("should return the endDate with different value", () => {
+      const shift = new ShiftService({
+        ...shiftMock.shift,
+        startDate: start,
+        endDate: addDays(now, 1).toString(),
+      })
+        .closeShift()
+        .build();
+
+      expect(shift.endDate).not.toBe(SHIFT_MOCK.endDate);
+      expect(shift.endDate).toBe(addDays(now, 1).toString());
+      expect(shift.endDate).not.toBe(now.toString());
+      expect(SHIFT_MOCK.endDate).toBeNull();
     });
   });
 

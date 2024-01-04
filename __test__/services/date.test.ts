@@ -1,4 +1,4 @@
-import { describe, expect,test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import DateHumanizer from "@/services/Date";
 
@@ -34,7 +34,7 @@ describe("DateHumanizer", () => {
       const humanizer = new DateHumanizer("distanceToNow");
       const date = new Date("2022-01-01T00:00:00Z");
 
-      expect(humanizer.humanizeDate(date, "es")).toBe("hace casi 2 años");
+      expect(humanizer.humanizeDate(date, "es")).toBe("hace alrededor de 2 años");
     });
 
     test("should throw an error for an invalid strategy", () => {
