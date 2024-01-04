@@ -1,4 +1,4 @@
-import { PrismaClientInitializationError } from "@prisma/client/runtime/library";
+import { Prisma } from "@prisma/client";
 import _ from "lodash";
 import { ZodError } from "zod";
 
@@ -133,7 +133,7 @@ export class InternalServer extends Error implements ExceptionsInterface {
       this.exception.cause = error.message;
     }
 
-    if (error instanceof PrismaClientInitializationError) {
+    if (error instanceof Prisma.PrismaClientInitializationError) {
       this.exception.cause = error.message.split("\n").join(" ").trim();
       this.exception.message = "Prisma Client Initialization Error";
     }

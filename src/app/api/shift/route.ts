@@ -1,5 +1,4 @@
-import { Shift } from "@prisma/client";
-import { PrismaClientValidationError } from "@prisma/client/runtime/library";
+import { Prisma, Shift } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 import ErrorFactory from "@/services/Error/factory";
@@ -114,7 +113,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    if (error instanceof PrismaClientValidationError) {
+    if (error instanceof Prisma.PrismaClientValidationError) {
       return NextResponse.json(
         {
           error: ErrorFactory.createError("PrismaClientFields"),
