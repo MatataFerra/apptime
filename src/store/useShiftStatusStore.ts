@@ -39,21 +39,7 @@ type ShiftStateStore = ReturnType<typeof createShiftStatusStore>;
 
 export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
   const DEFAULT_PROPS: ShiftStateProps = {
-    user: initProps?.user || {
-      id: "",
-      email: "",
-      emailVerified: null,
-      image: null,
-      name: "",
-      password: null,
-      type_account: "CREDENTIALS",
-      role: "USER",
-      online: false,
-      formCompleted: false,
-      isActive: false,
-      shifts: [],
-      profile: null,
-    },
+    user: initProps?.user || null,
     shiftUnclosed: {
       shift: null,
       isLoading: true,
