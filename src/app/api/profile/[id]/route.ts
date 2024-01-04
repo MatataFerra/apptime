@@ -1,5 +1,4 @@
-import { Profile } from "@prisma/client";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { Prisma, Profile } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 import ErrorFactory from "@/services/Error/factory";
@@ -43,7 +42,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       { status: 200 }
     );
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return NextResponse.json(
         {
           error: ErrorFactory.createError("PrismaClientUpdateRecord"),

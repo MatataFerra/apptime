@@ -1,5 +1,4 @@
-import { Shift } from "@prisma/client";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { Prisma, Shift } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -63,7 +62,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       { status: 200 }
     );
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return NextResponse.json(
         {
           error: ErrorFactory.createError("PrismaClientUpdateRecord"),
@@ -109,7 +108,7 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
       { status: 200 }
     );
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return NextResponse.json(
         {
           ...ErrorFactory.createError("CustomError", {
