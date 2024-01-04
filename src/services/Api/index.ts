@@ -26,7 +26,7 @@ class ApiService extends ApiBaseService {
 
   static async register({ email, password }: { email: string; password: string }) {
     try {
-      const response = await this.post({
+      const response: SuccessUserApiResponse = await this.post({
         endpoint: API_ENDPOINTS.REGISTER,
         body: { email, password, emailVerified: null },
         hasEnvUrl: false,
