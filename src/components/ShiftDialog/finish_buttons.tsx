@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import api from "@/services/Api/Shift";
 
@@ -22,11 +22,15 @@ function FinishDialogButtons() {
     shiftUnclosed: { shift },
   } = useShiftStateContext((state) => state);
 
+  const queryClient = useQueryClient();
+
   const mutate = useMutation({
+    // @ts-ignore
     mutationFn: api.updateShift.bind(api),
     onSuccess: (_) => {
       updateShiftsInfo();
       updateShiftUnclosed();
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
   });
 
