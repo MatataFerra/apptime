@@ -1,6 +1,6 @@
 import { Shift } from "@prisma/client";
 import { differenceInMinutes } from "date-fns";
-import _ from "lodash";
+import _, { cloneDeep } from "lodash";
 
 type ShiftWithoutId = Omit<Shift, "id">;
 
@@ -27,7 +27,7 @@ interface ShiftServiceInterface {
 class ShiftService implements ShiftServiceInterface {
   shift: ShiftWithoutId;
   constructor(shift: ShiftWithoutId) {
-    this.shift = shift;
+    this.shift = cloneDeep(shift);
   }
 
   static differenceInHHmm(start: string | number | Date, end?: string | number | Date) {
@@ -86,7 +86,9 @@ class ShiftService implements ShiftServiceInterface {
   }
 
   private updateEndDate() {
-    this.shift.endDate = new Date(Date.now()).toString();
+    this.shift.endDate = !!this.shift.endDate
+      ? this.shift.endDate
+      : new Date(Date.now()).toString();
 
     return this;
   }

@@ -7,8 +7,6 @@ import { useSession } from "next-auth/react";
 
 import api from "@/services/Api";
 
-import type { UserStore } from "@/types/store";
-
 import ShiftSkeleton from "@/components/ShiftSkeleton";
 
 import { createShiftStatusStore, ShiftStatusContext } from "@/store/useShiftStatusStore";

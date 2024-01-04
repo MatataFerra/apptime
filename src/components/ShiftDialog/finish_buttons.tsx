@@ -16,9 +16,9 @@ function FinishDialogButtons() {
     updateShiftsInfo,
     updateShiftStatus,
     updateShiftUnclosed,
-    updateShift,
     updateInputsAreDisabled,
     inputsDisabled,
+    getShift,
     shiftUnclosed: { shift },
   } = useShiftStateContext((state) => state);
 
@@ -31,26 +31,22 @@ function FinishDialogButtons() {
   });
 
   function onFinishShift() {
-    updateShift({
-      isClosed: true,
-      endDate: new Date().toString(),
-      id: shift?.id,
-    });
+    const updateShift = getShift(shift?.id);
     mutate.mutate({
       body: {
-        ...shift,
-        amount: shift?.amount,
-        endDate: new Date().toString(),
+        ...updateShift,
+        amount: updateShift?.amount,
+        endDate: updateShift?.endDate,
         isClosed: true,
-        isPublicHoliday: shift?.isPublicHoliday,
-        notes: shift?.notes,
-        publicHolidayWorked: shift?.publicHolidayWorked,
-        startDate: shift?.startDate,
-        userId: shift?.userId,
+        isPublicHoliday: updateShift?.isPublicHoliday,
+        notes: updateShift?.notes,
+        publicHolidayWorked: updateShift?.publicHolidayWorked,
+        startDate: updateShift?.startDate,
+        userId: updateShift?.userId,
       },
-      id: shift?.id,
+      id: updateShift?.id,
     });
-    updateShiftStatus(true);
+    updateShiftStatus(false);
   }
 
   function onEditShift(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {

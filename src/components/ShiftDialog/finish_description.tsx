@@ -22,13 +22,32 @@ function FinishDescription() {
   let inputRefs = useRef(INPUTS.map(() => createRef() as unknown as RefObject<HTMLInputElement>));
   const { diff, setDiff, getDifference, initialState, inputValue, setInputValue } =
     useTimeLabel(inputRefs);
-  const inputsDisabled = useShiftStateContext((state) => state.inputsDisabled);
+  const {
+    inputsDisabled,
+    updateShift,
+    shiftUnclosed: { shift },
+  } = useShiftStateContext((state) => state);
 
   useEffect(() => {
     if (!inputsDisabled) {
       inputRefs.current[0].current?.focus();
     }
   }, [inputsDisabled]);
+
+  useEffect(() => {
+    const { from, to, start, end } = inputValue;
+
+    // create a new date object
+    const startDate = new Date(`${from} ${start}`);
+    const endDate = new Date(`${to} ${end}`);
+
+    // update shift state
+    updateShift({
+      startDate: startDate.toString(),
+      endDate: endDate.toString(),
+      id: shift?.id,
+    });
+  }, [inputValue, shift, shift?.id, updateShift]);
 
   return (
     <>

@@ -11,7 +11,7 @@ import { useShiftStateContext } from "@/store/useShiftStatusStore";
 
 function ShiftTextState() {
   const {
-    shiftUnclosed: { shift, isLoading },
+    shiftUnclosed: { shift },
   } = useShiftStateContext((state) => state);
 
   const checkCloseShift = useCallback(() => {

@@ -33,9 +33,7 @@ function ShiftTrackTitle() {
 
   return (
     <>
-      {shiftUnclosed.isLoading ? (
-        <Skeleton classes="h-8 w-2/3" />
-      ) : !!shiftUnclosed.shift ? (
+      {!!shiftUnclosed.shift ? (
         <Text classes="text-2xl">{`Current shift time: ${shiftTime}`}</Text>
       ) : (
         <Text classes="text-2xl">No shift is tracked</Text>

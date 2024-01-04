@@ -53,7 +53,7 @@ function DialogButtons() {
       },
     });
 
-    updateShiftStatus(false);
+    updateShiftStatus(true);
   }
 
   function onSelectOption(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {

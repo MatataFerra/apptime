@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 
 import { Shift } from "@prisma/client";
-import { create, createStore, useStore } from "zustand";
+import { create, useStore } from "zustand";
 
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
@@ -27,6 +27,7 @@ interface ShiftState extends ShiftStateProps {
   setUser: (user: UserStore) => void;
   updateShift: (shift: Partial<Shift>) => void;
   createShift: (shift: Shift) => void;
+  getShift: (id: number | undefined) => Shift | undefined;
   updateShiftsInfo: () => void;
   updateShiftStatus: (state: boolean | undefined) => void;
   updateShiftUnclosed: () => void;
@@ -64,7 +65,7 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
       isLoading: true,
       isEmpty: false,
     },
-    isShiftActive: true,
+    isShiftActive: false,
     inputsDisabled: initProps?.inputsDisabled || true,
     differenceBetweenStartAndEnd: "",
   };
@@ -86,7 +87,11 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
           user: {
             ...state.user,
             shifts: state.user?.shifts?.map((s) => {
-              if (s.id === shift.id) return { ...s, ...shift };
+              if (s.id === shift.id)
+                return {
+                  ...s,
+                  ...shift,
+                };
               return s;
             }),
           },
@@ -107,6 +112,11 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
           },
         };
       });
+    },
+    getShift: (id: number | undefined) => {
+      const getter = get()?.user;
+      if (!id) return undefined;
+      return getter?.shifts?.find((shift) => shift?.id === id);
     },
     updateShiftsInfo: () => {
       set((state) => {

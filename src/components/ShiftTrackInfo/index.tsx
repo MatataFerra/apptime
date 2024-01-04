@@ -21,18 +21,12 @@ function ShiftTrackInfo() {
           </Text>
         </Text>
       ) : (
-        <>
-          {isLoading ? (
-            <Loader.spinner containerClasses="flex w-full h-full justify-center items-center" />
-          ) : (
-            <Stack as="div" orientation="vertical">
-              <Text>
-                {!!text ? `last shift tracked: ${text} (${date})` : "waiting for the first shift"}
-              </Text>
-              <Text>money earn at the moment: {`${earns.toFixed(2)}`}$</Text>
-            </Stack>
-          )}
-        </>
+        <Stack as="div" orientation="vertical">
+          <Text>
+            {!!text ? `last shift tracked: ${text} (${date})` : "waiting for the first shift"}
+          </Text>
+          <Text>money earn at the moment: {`${earns.toFixed(2)}`}$</Text>
+        </Stack>
       )}
     </>
   );

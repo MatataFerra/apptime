@@ -15,6 +15,7 @@ type Props = {
 
 function Trigger({ status, triggerText = "Start Shift" }: Props) {
   const checkVariant = /Start/.test(triggerText);
+
   return (
     <>
       <DialogTrigger
