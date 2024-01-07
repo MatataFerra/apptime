@@ -7,22 +7,23 @@ import { useSession } from "next-auth/react";
 
 import api from "@/services/Api";
 
-import ShiftSkeleton from "@/components/ShiftSkeleton";
+import { UserType } from "@/types";
 
 import { createShiftStatusStore, ShiftStatusContext } from "@/store/useShiftStatusStore";
 
 type Props = {
   children: React.ReactNode;
+  user: Omit<UserType, "password"> | null;
 };
 
-function ShiftStatusProvider({ children }: Props) {
+function ShiftStatusProvider({ children, user }: Props) {
   const { data } = useSession();
-  const store = useRef(createShiftStatusStore()).current;
+  const store = useRef(createShiftStatusStore({ user: user })).current;
   const query = useQuery({
-    queryKey: ["user", data?.user?.email],
+    queryKey: ["user", user?.email],
     queryFn: () =>
       api.getUserByEmail.bind(api)({
-        email: data?.user?.email,
+        email: user?.email,
         shifts: true,
         profile: true,
         hasEnvUrl: false,
@@ -33,16 +34,13 @@ function ShiftStatusProvider({ children }: Props) {
   useEffect(() => {
     const { setUser, updateShiftsInfo, updateShiftUnclosed } = store.getState();
 
-    if (query.isSuccess) setUser(query.data?.user);
+    query.isSuccess && setUser(query?.data?.user);
+
     updateShiftsInfo();
     updateShiftUnclosed();
-  }, [query.data?.user, query.isSuccess, store]);
+  }, [query?.data?.user, query.isSuccess, store, user]);
 
-  return (
-    <ShiftStatusContext.Provider value={store}>
-      {query.isPending ? <ShiftSkeleton /> : children}
-    </ShiftStatusContext.Provider>
-  );
+  return <ShiftStatusContext.Provider value={store}>{children}</ShiftStatusContext.Provider>;
 }
 
 export default ShiftStatusProvider;
