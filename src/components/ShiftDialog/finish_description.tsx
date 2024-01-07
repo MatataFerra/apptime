@@ -26,6 +26,7 @@ function FinishDescription() {
     inputsDisabled,
     updateShift,
     shiftUnclosed: { shift },
+    clickOnSave,
   } = useShiftStateContext((state) => state);
 
   useEffect(() => {
@@ -48,6 +49,22 @@ function FinishDescription() {
       id: shift?.id,
     });
   }, [inputValue, shift, shift?.id, updateShift]);
+
+  useEffect(() => {
+    if (clickOnSave) {
+      const t = getDifference();
+      setDiff(t);
+    } else {
+      setDiff(initialState.diff);
+      setInputValue({
+        ...initialState,
+      });
+    }
+  }, [clickOnSave, getDifference, initialState, initialState.diff, setDiff, setInputValue]);
+
+  useEffect(() => {
+    const t = getDifference();
+  }, [diff, initialState, getDifference]);
 
   return (
     <>
@@ -82,7 +99,7 @@ function FinishDescription() {
             })}
           </Stack>
           <Stack>
-            <Text>Time elapsed: {inputsDisabled ? initialState.diff : diff}</Text>
+            <Text classes="text-xl font-semibold">Time elapsed: {diff}</Text>
           </Stack>
         </Box>
       </DialogDescription>
