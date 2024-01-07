@@ -6,13 +6,15 @@ import api from "@/services/Api/Shift";
 
 import DialogClose from "@/components/ShiftDialog/FinishDialogModule/DialogClose";
 import Button from "@/components/ui/Button";
+import Loader from "@/components/ui/Loader";
 import Stack from "@/components/ui/Stack";
-import { toast } from "@/components/ui/Toast/use-toast";
+import { useToast } from "@/components/ui/Toast/use-toast";
 
 import { useShiftStateContext } from "@/store/useShiftStatusStore";
 
 function FinishDialogButtons() {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const {
     getShift,
@@ -37,7 +39,8 @@ function FinishDialogButtons() {
       toast({
         title: "Shift updated",
         description: "Your shift has been updated successfully",
-        color: "bg-green-500",
+        className: "bg-green-400",
+        action: <Loader.spinner bg="text-black" spinColor="fill-gray-50" />,
       });
     },
   });
