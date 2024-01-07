@@ -12,6 +12,14 @@ interface ShiftStateProps {
   user: UserStore;
   shiftUnclosed: { shift: Shift | null; isLoading: boolean };
   isShiftActive: boolean;
+  clickOnSave: boolean;
+  initialShiftState: {
+    diff: string;
+    from: string;
+    to: string;
+    start: string;
+    end: string;
+  };
   shiftsInfo: {
     date: string;
     earns: number;
@@ -21,16 +29,25 @@ interface ShiftStateProps {
   };
   inputsDisabled: boolean;
   differenceBetweenStartAndEnd: string;
+  buttonClicked: {
+    edit: boolean;
+    cancel: boolean;
+    ok: boolean;
+    moveOn: boolean;
+  };
 }
 
 interface ShiftState extends ShiftStateProps {
   setUser: (user: UserStore) => void;
-  updateShift: (shift: Partial<Shift>) => void;
-  createShift: (shift: Shift) => void;
   getShift: (id: number | undefined) => Shift | undefined;
+  setButtonClicked: (button: Partial<ShiftStateProps["buttonClicked"]>) => void;
+  updateShift: (shift: Partial<Shift>) => void;
+  setClickOnSave: (state: boolean) => void;
+  createShift: (shift: Shift) => void;
   updateShiftsInfo: () => void;
   updateShiftStatus: (state: boolean | undefined) => void;
   updateShiftUnclosed: () => void;
+  setInitialShiftState: (state: Partial<ShiftStateProps["initialShiftState"]>) => void;
   updateInputsAreDisabled: (state: boolean) => void;
   updateDifferenceBetweenStartAndEnd: (state: string) => void;
 }
@@ -43,6 +60,20 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
     shiftUnclosed: {
       shift: null,
       isLoading: true,
+    },
+    clickOnSave: false,
+    buttonClicked: {
+      edit: true,
+      cancel: false,
+      ok: false,
+      moveOn: true,
+    },
+    initialShiftState: {
+      diff: "",
+      from: "",
+      to: "",
+      start: "",
+      end: "",
     },
     shiftsInfo: {
       date: "",
@@ -65,6 +96,11 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
           user,
         };
       });
+    },
+    getShift: (id: number | undefined) => {
+      const getter = get()?.user;
+      if (!id) return undefined;
+      return getter?.shifts?.find((shift) => shift?.id === id);
     },
     updateShift: (shift: Partial<Shift>) => {
       set((state) => {
@@ -99,10 +135,24 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
         };
       });
     },
-    getShift: (id: number | undefined) => {
-      const getter = get()?.user;
-      if (!id) return undefined;
-      return getter?.shifts?.find((shift) => shift?.id === id);
+    setClickOnSave: (state: boolean) => {
+      set((s) => {
+        return {
+          ...s,
+          clickOnSave: state,
+        };
+      });
+    },
+    setButtonClicked: (button) => {
+      set((state) => {
+        return {
+          ...state,
+          buttonClicked: {
+            ...state.buttonClicked,
+            ...button,
+          },
+        };
+      });
     },
     updateShiftsInfo: () => {
       set((state) => {
@@ -186,6 +236,17 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
           shiftUnclosed: {
             shift: lastShift ?? null,
             isLoading: false,
+          },
+        };
+      });
+    },
+    setInitialShiftState: (state) => {
+      set((s) => {
+        return {
+          ...s,
+          initialShiftState: {
+            ...s.initialShiftState,
+            ...state,
           },
         };
       });

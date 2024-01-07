@@ -1,29 +1,25 @@
-import { MutableRefObject, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import useLabel from "./useLabel";
 import { useShiftStateContext } from "@/store/useShiftStatusStore";
 
-type Ref = MutableRefObject<{ diff: string; from: string; to: string; start: string; end: string }>;
-
-function useInputLabelValue(initialState: Ref) {
-  const {
-    shiftUnclosed: { shift },
-    inputsDisabled,
-  } = useShiftStateContext((state) => state);
-  const getTimeAcoordingLabel = useLabel(shift);
-  const [inputValue, setInputValue] = useState({
-    from: getTimeAcoordingLabel("from"),
-    to: getTimeAcoordingLabel("to"),
-    start: getTimeAcoordingLabel("start"),
-    end: getTimeAcoordingLabel("end"),
-  });
+function useInputLabelValue() {
+  const { inputsDisabled, initialShiftState, clickOnSave } = useShiftStateContext((state) => state);
+  const [inputValue, setInputValue] = useState(initialShiftState);
 
   useEffect(() => {
+    if (clickOnSave) return;
+
     if (inputsDisabled) {
-      const { from, to, start, end } = initialState.current;
-      setInputValue({ from, to, start, end });
+      const { from, to, start, end } = initialShiftState;
+      setInputValue((prev) => ({
+        ...prev,
+        from,
+        to,
+        start,
+        end,
+      }));
     }
-  }, [initialState, inputsDisabled]);
+  }, [initialShiftState, inputsDisabled, clickOnSave]);
 
   return { inputValue, setInputValue };
 }

@@ -31,7 +31,7 @@ function useButtonStatus() {
       }));
 
     if (user?.formCompleted) {
-      if (!isShiftActive || typeof isShiftActive === "undefined") {
+      if (typeof isShiftActive === "undefined")
         return setbtnStatus((prev) => ({
           ...prev,
           startButton: {
@@ -43,17 +43,30 @@ function useButtonStatus() {
             apply_variant: false,
           },
         }));
+
+      if (!isShiftActive) {
+        return setbtnStatus((prev) => ({
+          ...prev,
+          startButton: {
+            disabled: true,
+            apply_variant: false,
+          },
+          finishButton: {
+            disabled: false,
+            apply_variant: true,
+          },
+        }));
       }
 
       return setbtnStatus((prev) => ({
         ...prev,
         startButton: {
-          disabled: true,
-          apply_variant: false,
-        },
-        finishButton: {
           disabled: false,
           apply_variant: true,
+        },
+        finishButton: {
+          disabled: true,
+          apply_variant: false,
         },
       }));
     }
