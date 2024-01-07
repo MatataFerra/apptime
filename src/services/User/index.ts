@@ -10,8 +10,8 @@ import { USER_ROLES } from "@/utils/constants";
 import prisma from "#/prisma/client";
 
 type FindUniqueUserType = {
-  id?: string | null;
-  email?: string | null;
+  id?: string;
+  email?: string;
   profile?: boolean;
   shifts?: boolean;
 };
@@ -28,14 +28,15 @@ class UserService {
     this.user = user;
   }
 
-  static async findUniqueUser(options: FindUniqueUserType): Promise<UserType | null> {
-    let fieldSelected: "id" | "email" = "email";
-    if (options.id) fieldSelected = "id";
-    if (options.email) fieldSelected = "email";
+  static async findUniqueUser(
+    options: FindUniqueUserType
+  ): Promise<Omit<UserType, "password"> | null> {
+    if (!options) return null;
 
     const user = await prisma.user.findUnique({
       where: {
-        [fieldSelected]: options[fieldSelected],
+        email: options.email,
+        id: options.id,
       },
       select: {
         id: true,
@@ -51,11 +52,27 @@ class UserService {
         isActive: true,
         online: true,
         passwordAttemps: true,
-        password: true,
+        password: false,
       },
     });
 
     return user;
+  }
+
+  static async removeProps(user: User | Partial<UserType>, params: string | string[]) {
+    if (!user) return null;
+    if (!params) return user;
+
+    return Object.keys(user).reduce((acc, current) => {
+      if (!params.includes(current)) {
+        return {
+          ...acc,
+          [current]: user[current as keyof typeof user],
+        };
+      }
+
+      return acc;
+    }, {});
   }
 
   static async filterUserProps(user: User | Partial<UserType>, params: (string | null)[]) {
@@ -95,7 +112,7 @@ class UserService {
   static async getSessionUser() {
     const session = await getServerSession();
     const user = await UserService.findUniqueUser({
-      email: session?.user?.email,
+      email: session?.user?.email ?? "",
       shifts: true,
       profile: true,
     });

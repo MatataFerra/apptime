@@ -1,19 +1,38 @@
+import { User } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { getToken, JWT } from "next-auth/jwt";
 
 import ErrorFactory from "@/services/Error/factory";
+import { Token } from "@/services/Token";
 import UserService from "@/services/User";
 
-import { SearchParamsSchema } from "@/types";
+import { JWTDecodedType, SearchParamsSchema } from "@/types";
 
 import { QUERY_PARAMS } from "@/utils/constants";
 
 import prisma from "#/prisma/client";
 
+function checkIsAdmin(user: User) {
+  return user.role === "ADMIN";
+}
+
+function parseEmailFromParams(token: JWTDecodedType | null, email: string | null) {
+  if (token?.role !== "ADMIN") return token?.email;
+  return email;
+}
+
 export async function GET(req: NextRequest) {
+  const checkToken = (await getToken({ req, secret: process.env.SECRET })) as JWTDecodedType | null;
+
+  if (!checkToken) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const searchParams = req.nextUrl.searchParams;
   const shifts = searchParams.get(QUERY_PARAMS.SHIFTS);
   const profile = searchParams.get(QUERY_PARAMS.PROFILE);
-  const email = searchParams.get(QUERY_PARAMS.EMAIL);
+  const email = parseEmailFromParams(checkToken, searchParams.get(QUERY_PARAMS.EMAIL));
   const only = searchParams.get(QUERY_PARAMS.ONLY);
 
   const parsedSearchParams = SearchParamsSchema.safeParse({
@@ -60,6 +79,18 @@ export async function GET(req: NextRequest) {
     }
 
     if (parsedSearchParams.data.email && onlyParam.length === 0) {
+      if (user.role !== "ADMIN" || user.email !== checkToken.email) {
+        const userFiltered = await UserService.removeProps(user, ["password", "email"]);
+        return NextResponse.json(
+          {
+            message: "success",
+            response: true,
+            user: { ...userFiltered, email: "**********" },
+          },
+          { status: 200 }
+        );
+      }
+
       return NextResponse.json(
         {
           message: "success",
