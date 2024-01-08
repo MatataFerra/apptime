@@ -28,9 +28,7 @@ class UserService {
     this.user = user;
   }
 
-  static async findUniqueUser(
-    options: FindUniqueUserType
-  ): Promise<Omit<UserType, "password"> | null> {
+  static async findUniqueUser(options: FindUniqueUserType): Promise<UserType | null> {
     if (!options) return null;
 
     const user = await prisma.user.findUnique({
@@ -52,7 +50,7 @@ class UserService {
         isActive: true,
         online: true,
         passwordAttemps: true,
-        password: false,
+        password: true,
       },
     });
 

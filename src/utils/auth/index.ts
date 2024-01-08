@@ -68,7 +68,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, account }) {
       if (account) {
         const userFounded = await UserService.findUniqueUser({
-          email: token.email,
+          email: token.email ?? "",
         });
         token.accessToken = account.access_token;
         token.type_account = account.provider;

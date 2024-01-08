@@ -36,7 +36,7 @@ export async function GET(req: NextApiRequest & NextRequest, res: NextResponse &
             email: credentials.email,
           });
 
-          if (!user || !(await compare(credentials.password, user.password ?? ""))) return null;
+          if (!user || !(await compare(credentials.password, user?.password ?? ""))) return null;
 
           return {
             ...user,
@@ -88,7 +88,7 @@ export async function GET(req: NextApiRequest & NextRequest, res: NextResponse &
       async jwt({ token, account, session }) {
         if (account) {
           const userFounded = await UserService.findUniqueUser({
-            email: token.email,
+            email: token?.email ?? "",
           });
           token.accessToken = account.access_token;
           token.type_account = account.provider;
@@ -179,7 +179,7 @@ export async function POST(req: NextApiRequest & NextRequest, res: NextResponse 
       async jwt({ token, account }) {
         if (account) {
           const userFounded = await UserService.findUniqueUser({
-            email: token.email,
+            email: token.email ?? "",
           });
           token.accessToken = account.access_token;
           token.type_account = account.provider;

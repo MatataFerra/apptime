@@ -85,6 +85,7 @@ function FinishDescription() {
                   }`}
                   disabled={inputsDisabled}
                   data-label={label}
+                  data-testid={label}
                   ref={inputRefs.current[index]}
                   max={format(new Date(), "yyyy-MM-dd")}
                   onChange={(_) => {
