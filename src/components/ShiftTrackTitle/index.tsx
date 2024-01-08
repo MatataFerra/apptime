@@ -6,14 +6,13 @@ import { useInterval } from "usehooks-ts";
 
 import ShiftService from "@/services/Shift";
 
-import Skeleton from "@/components/ui/Skeleton";
 import Text from "@/components/ui/Text";
 
 import { useShiftStateContext } from "@/store/useShiftStatusStore";
 
 function ShiftTrackTitle() {
   const { shiftUnclosed } = useShiftStateContext((state) => state);
-  const [shiftTime, setShiftTime] = useState("");
+  const [shiftTime, setShiftTime] = useState("loading...");
 
   useEffect(() => {
     const { text } = ShiftService.differenceInHHmm(
@@ -29,14 +28,18 @@ function ShiftTrackTitle() {
       shiftUnclosed.shift?.endDate ?? ""
     );
     setShiftTime(text);
-  }, 30000);
+  }, 10000);
 
   return (
     <>
-      {!!shiftUnclosed.shift ? (
-        <Text classes="text-2xl">{`Current shift time: ${shiftTime}`}</Text>
+      {shiftUnclosed.isLoading ? (
+        <Text classes="block text-2xl">loading...</Text>
+      ) : shiftUnclosed.shift ? (
+        <>
+          <Text classes="text-2xl">shift opened {` (${shiftTime})`}</Text>
+        </>
       ) : (
-        <Text classes="text-2xl">No shift is tracked</Text>
+        <Text classes="block text-2xl">No shift is being tracked</Text>
       )}
     </>
   );

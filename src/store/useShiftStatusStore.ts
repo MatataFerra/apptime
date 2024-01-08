@@ -11,6 +11,7 @@ import type { UserStore } from "@/types/store";
 interface ShiftStateProps {
   user: UserStore;
   shiftUnclosed: { shift: Shift | null; isLoading: boolean };
+
   isShiftActive: boolean;
   clickOnSave: boolean;
   initialShiftState: {
@@ -58,7 +59,7 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
   const DEFAULT_PROPS: ShiftStateProps = {
     user: initProps?.user || null,
     shiftUnclosed: {
-      shift: null,
+      shift: initProps?.shiftUnclosed?.shift || null,
       isLoading: true,
     },
     clickOnSave: false,

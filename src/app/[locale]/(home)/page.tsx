@@ -1,6 +1,8 @@
+import { Shift } from "@prisma/client";
 import { getServerSession } from "next-auth";
 
 import i18n from "@/services/i18n";
+import ShiftService from "@/services/Shift";
 import UserService from "@/services/User";
 import ut from "@/services/Utilities/client";
 
@@ -25,6 +27,7 @@ export default async function Home({ params }: { params: LocaleParams }) {
   }
 
   const user = await UserService.getSessionUser();
+  const shiftUnclosed = ShiftService.findUnClosedShift(user?.shifts) as Shift | null;
 
   return (
     <>
@@ -34,7 +37,7 @@ export default async function Home({ params }: { params: LocaleParams }) {
           <DateComponent locale={params.locale} />
         </Stack>
 
-        <ShiftStatusProvider user={user}>
+        <ShiftStatusProvider user={user} shiftOpen={shiftUnclosed}>
           <ShiftTextState />
           <ShiftStatus />
           <ShiftButtons />
