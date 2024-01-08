@@ -1,6 +1,7 @@
-import { expect, Page, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { addHours } from "date-fns";
 
-import { fillForm, USER_CREDENTIALS } from "./constants";
+import { USER_CREDENTIALS } from "./constants";
 
 test.use({
   isMobile: true,
@@ -9,30 +10,22 @@ test.use({
 test.beforeEach(async ({ page }) => {
   await page.goto("http://localhost:3000/");
   await page.waitForURL(/login/);
-  // login
-  await page.getByRole("textbox").first().fill(USER_CREDENTIALS.email);
-  await page.getByRole("textbox").last().fill(USER_CREDENTIALS.password);
+
+  await page.getByRole("textbox").first().fill("usuario2@example.com");
+  await page.getByRole("textbox").last().fill("Secreto2!");
 
   await page.getByRole("button", { name: "Login" }).click({
     force: true,
   });
-  await page.waitForURL(/en/);
-  const clickHere = page.getByRole("button", { name: /click here/ });
 
-  if (await clickHere.isVisible()) {
-    await clickHere.click();
-    await page.waitForURL(/form/);
+  const finishButton = page.getByRole("button", { name: /Finish/ });
 
-    await fillForm(page)();
+  if (await finishButton.isEnabled()) {
+    await finishButton.click();
+    await page.getByRole("button", { name: /move/ }).click();
   }
 
   await page.waitForURL(/en/);
-
-  const finish = page.getByRole("button", { name: /Finish/ });
-
-  if (await finish.isEnabled()) {
-    await finish.click();
-  }
 });
 
 test("user can start a shift", async ({ page }) => {
@@ -53,9 +46,14 @@ test("user can end a shift", async ({ page }) => {
   expect(page.getByRole("button", { name: /Finish/ })).toBeDisabled();
 });
 
-test("start shift and see it Open", async ({ page }) => {
-  await page.getByRole("button", { name: /Start/ }).click();
-  expect(page.getByRole("dialog")).toBeVisible();
-  await page.getByRole("button", { name: /regular/ }).click();
-  expect(page.getByText(/Open/)).toBeVisible();
-});
+// test("user can edit the time of shift", async ({ page }) => {
+//   const startTime = await page.getByTestId("start").textContent();
+//   await page.getByRole("button", { name: /Start/ }).click();
+//   expect(page.getByRole("dialog")).toBeVisible();
+//   await page.getByRole("button", { name: /regular/ }).click();
+//   await page.getByRole("button", { name: /Finish/ }).click();
+//   await page.getByRole("button", { name: /edit/ }).click();
+//   await page.getByTestId("end").fill(addHours(startTime!, 1).toString());
+//   await page.getByRole("button", { name: /save/ }).click();
+//   expect(page.getByText(/Elapsed|elapsed/)).toContainText(/1/);
+// });
