@@ -19,8 +19,7 @@ function ShiftButtons() {
 
   useEffect(() => {
     updateShiftStatus(shiftUnclosed?.isClosed);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [shiftUnclosed?.isClosed, updateShiftStatus]);
 
   return (
     <Stack classes="h-full w-full" spacing={10} alignItems="center" justifyContent="between">

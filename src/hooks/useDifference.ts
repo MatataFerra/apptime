@@ -1,4 +1,4 @@
-import { MutableRefObject, RefObject, useCallback } from "react";
+import { MutableRefObject, RefObject, useCallback, useEffect, useState } from "react";
 
 import ShiftService from "@/services/Shift";
 
@@ -27,30 +27,54 @@ function addHoursAndMinutes(date: Date, time: string) {
 }
 
 function useDifference(inputRefs: MutableRefObject<RefObject<HTMLInputElement>[]>) {
+  const [values, setValues] = useState<{
+    from: RefObject<HTMLInputElement> | undefined;
+    to: RefObject<HTMLInputElement> | undefined;
+    start: RefObject<HTMLInputElement> | undefined;
+    end: RefObject<HTMLInputElement> | undefined;
+  }>({
+    from: undefined,
+    to: undefined,
+    start: undefined,
+    end: undefined,
+  });
   function getDifference() {
     const { current } = inputRefs;
-    const from = current.find((ref) => ref.current?.dataset.label === "from")?.current?.valueAsDate;
-    const to = current.find((ref) => ref.current?.dataset.label === "to")?.current?.valueAsDate;
-    const start = current.find((ref) => ref.current?.dataset.label === "start")?.current?.value;
-    const end = current.find((ref) => ref.current?.dataset.label === "end")?.current?.value;
+    const from = current.find((ref) => ref.current?.dataset.label === "from");
+    const to = current.find((ref) => ref.current?.dataset.label === "to");
+    const start = current.find((ref) => ref.current?.dataset.label === "start");
+    const end = current.find((ref) => ref.current?.dataset.label === "end");
+
+    setValues({
+      from,
+      to,
+      start,
+      end,
+    });
 
     if (!from || !to || !start || !end) return "";
 
     const text = ShiftService.differenceInHHmm(
       getFullDate({
-        date: from,
-        time: start ?? "",
+        date: values?.from?.current?.valueAsDate,
+        time: values?.start?.current?.value ?? "",
       }),
       getFullDate({
-        date: to,
-        time: end ?? "",
+        date: values?.to?.current?.valueAsDate,
+        time: values?.end?.current?.value ?? "",
       })
     ).text;
 
     return text;
   }
 
-  const getDifferenceCallback = useCallback(getDifference, [inputRefs]);
+  const getDifferenceCallback = useCallback(getDifference, [
+    inputRefs,
+    values.end,
+    values?.from,
+    values?.start,
+    values.to,
+  ]);
 
   return { getDifference: getDifferenceCallback };
 }

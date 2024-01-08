@@ -92,10 +92,6 @@ async function main() {
     data: [...addShiftsForSeed(firstUser, newDatesMock)],
   });
 
-  await prisma.shift.createMany({
-    data: [...addShiftsForSeed(secondUser, datesMock)],
-  });
-
   await prisma.profile.create({
     data: {
       User: {
