@@ -8,7 +8,7 @@ import ut from "@/services/Utilities/client";
 import { LocaleParams } from "@/types";
 
 import DateComponent from "@/components/Date";
-import FabNotes from "@/components/FabNotes";
+import NotesFab from "@/components/NotesFab";
 import NotesPortal from "@/components/NotesPortal";
 import ShiftButtons from "@/components/ShiftButtons";
 import ShiftStatus from "@/components/ShiftStatus";
@@ -42,7 +42,7 @@ export default async function Home({ params }: { params: LocaleParams }) {
           <ShiftTextState />
           <ShiftStatus />
           <ShiftButtons />
-          <FabNotes />
+          <NotesFab />
           <NotesPortal />
         </ShiftStatusProvider>
       </Stack>
