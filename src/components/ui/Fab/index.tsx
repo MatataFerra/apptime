@@ -1,5 +1,3 @@
-"use client";
-
 import { CSSClassNames } from "@/types";
 
 import Button from "@/components/ui/Button";
@@ -8,33 +6,27 @@ import Text from "@/components/ui/Text";
 
 import { cn } from "@/utils/helpers/styleMerger";
 
-import { useNotesStore } from "@/store/useNotesStore";
-
-interface Props extends Omit<React.HTMLAttributes<HTMLDivElement>, "className"> {
+interface Props extends Omit<React.HTMLAttributes<HTMLButtonElement>, "className"> {
   classes?: CSSClassNames;
   text?: string;
+  disabled?: boolean;
   icon?: JSX.Element;
 }
 
-function FloatingActionButton({ classes, text = "Notes", icon }: Props) {
-  const { isOn, setIsOn, setIsNotesOpen, isNotesOpen } = useNotesStore();
+function FloatingActionButton({ classes, text = "Notes", icon, disabled, ...props }: Props) {
   return (
     <Button
-      as="div"
+      as="button"
+      type="button"
       variant="outlined"
+      disabled={disabled}
       classes={cn(
-        "absolute bottom-36 right-2 flex size-20 flex-col items-center justify-center rounded-full border bg-gradient-to-br from-green-300 to-blue-400 p-2 shadow-button transition-all active:from-green-400 active:to-blue-500 active:shadow-button-inner",
+        "absolute bottom-36 right-2 flex size-20 flex-col items-center justify-center rounded-full border bg-gradient-to-br p-2 shadow-button transition-all",
+        !disabled ? "from-green-400 to-blue-500" : "from-gray-400 to-gray-600",
+        !disabled ? "active:from-green-400 active:to-blue-500 active:shadow-button-inner" : "",
         classes ? classes : ""
       )}
-      onClick={() => {
-        if (!isOn) {
-          setIsOn(true);
-        } else {
-          setTimeout(() => setIsOn(false), 1000);
-        }
-
-        setIsNotesOpen(!isNotesOpen);
-      }}
+      {...props}
     >
       {icon ? (
         icon
