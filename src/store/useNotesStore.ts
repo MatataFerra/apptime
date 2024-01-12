@@ -4,8 +4,7 @@ import { devtools } from "zustand/middleware";
 type NotesStore = {
   isNotesOpen: boolean;
   isOn: boolean;
-  setIsOn: (isOn: boolean) => void;
-  setIsNotesOpen: (isNotesOpen: boolean) => void;
+  notesToggle: () => void;
 };
 
 export const useNotesStore = create(
@@ -13,8 +12,15 @@ export const useNotesStore = create(
     (set, get) => ({
       isOn: false,
       isNotesOpen: false,
-      setIsOn: (isOn: boolean) => set({ isOn }),
-      setIsNotesOpen: (isNotesOpen: boolean) => set({ isNotesOpen }),
+      notesToggle: () => {
+        if (!get().isOn) {
+          set({ isOn: true });
+        } else {
+          setTimeout(() => set({ isOn: false }), 1000);
+        }
+
+        set({ isNotesOpen: !get().isNotesOpen });
+      },
     }),
     {
       name: "notes",

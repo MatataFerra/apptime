@@ -48,12 +48,12 @@ function useButtonStatus() {
         return setbtnStatus((prev) => ({
           ...prev,
           startButton: {
-            disabled: true,
-            apply_variant: false,
-          },
-          finishButton: {
             disabled: false,
             apply_variant: true,
+          },
+          finishButton: {
+            disabled: true,
+            apply_variant: false,
           },
         }));
       }
@@ -61,12 +61,12 @@ function useButtonStatus() {
       return setbtnStatus((prev) => ({
         ...prev,
         startButton: {
-          disabled: false,
-          apply_variant: true,
-        },
-        finishButton: {
           disabled: true,
           apply_variant: false,
+        },
+        finishButton: {
+          disabled: false,
+          apply_variant: true,
         },
       }));
     }
