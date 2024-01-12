@@ -4,14 +4,12 @@ import { useEffect, useRef } from "react";
 
 import { Shift } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
 
 import api from "@/services/Api";
 
 import { UserType } from "@/types";
 
 import { createShiftStatusStore, ShiftStatusContext } from "@/store/useShiftStatusStore";
-import { useShiftStore } from "@/store/useShiftStore";
 
 type Props = {
   children: React.ReactNode;
@@ -20,7 +18,6 @@ type Props = {
 };
 
 function ShiftStatusProvider({ children, user, shiftOpen }: Props) {
-  const setCurrentShift = useShiftStore((state) => state.setCurrentShift);
   const store = useRef(
     createShiftStatusStore({ user: user, shiftUnclosed: { shift: shiftOpen, isLoading: false } })
   ).current;
@@ -34,12 +31,6 @@ function ShiftStatusProvider({ children, user, shiftOpen }: Props) {
         hasEnvUrl: false,
       }),
   });
-
-  useEffect(() => {
-    if (shiftOpen) {
-      setCurrentShift(shiftOpen);
-    }
-  }, [setCurrentShift, shiftOpen]);
 
   useEffect(() => {
     const { setUser, updateShiftsInfo, updateShiftUnclosed } = store.getState();
