@@ -17,7 +17,7 @@ interface Props extends Omit<React.HTMLAttributes<HTMLElement>, "className"> {
 }
 
 function Portal({ children, classes }: Props) {
-  const { isOn, isNotesOpen } = useNotesStore();
+  const { isOn, isNotesOpen } = useNotesStore((state) => state);
 
   const container = useRef<HTMLElement | null>(null);
 

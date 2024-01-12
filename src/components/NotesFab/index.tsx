@@ -13,7 +13,7 @@ function FabNotes() {
 
   return (
     <>
-      <FloatingActionButton onClick={notesToggle} disabled={!status} />
+      <FloatingActionButton data-testid="fab-btn" onClick={notesToggle} disabled={!status} />
     </>
   );
 }
