@@ -28,6 +28,7 @@ module.exports = {
       colors: {
         aquatic: "#13EFA0",
         "light-gold": "#FEE954",
+        "post-it-button": "#EB8F00",
         "hard-pink": "#FF2B91",
         "common-orange": "#FF6A00",
         "light-blue": "#64C2DB",
