@@ -17,6 +17,7 @@ function FinishDialogButtons() {
   const { toast } = useToast();
 
   const {
+    user,
     getShift,
     buttonClicked,
     setClickOnSave,
@@ -41,6 +42,7 @@ function FinishDialogButtons() {
         description: "Your shift has been updated successfully",
         className: "bg-green-400",
         action: <Loader.spinner bg="text-black" spinColor="fill-gray-50" />,
+        duration: 3000,
       });
     },
   });
