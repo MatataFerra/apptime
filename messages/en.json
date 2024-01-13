@@ -1,0 +1,26 @@
+{
+  "no-mobile": {
+    "navigation": {},
+    "subscription": {
+      "notify_message": "Do you want to get notice when the app is available for desktop?",
+      "success_message": "Thank you for subscribing!"
+    }
+  },
+  "login": {
+    "wrong_password": "User or password are not valid",
+    "account": {
+      "has_account": "Don't you have an account?",
+      "register": "register"
+    }
+  },
+  "register": {
+    "invalid_body": "An error ocurr during the registration, please try again",
+    "user_already_exist": "User already exist",
+    "successful": "User created succefully, will be redirected to main page",
+    "unexpected_error_after_register": "Something happend with the redirection, please try login again",
+    "max_attemps_to_register": "You have been tried to much times, please wait to try another time"
+  },
+  "home": {
+    "popover": "When state is offline it means that the user doesn't start any shift yet"
+  }
+}

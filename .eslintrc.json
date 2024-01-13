@@ -1,6 +1,46 @@
 {
-  "extends": "next/core-web-vitals",
+  "extends": ["next/core-web-vitals", "prettier", "plugin:@tanstack/eslint-plugin-query/recommended", "plugin:import/recommended" , "plugin:import/errors", "plugin:import/warnings"],
   "rules": {
-    "no-console":"warn"
-  }
+    "no-console": "warn",
+    "func-style": ["error", "declaration", { "allowArrowFunctions": false }],
+    "@tanstack/query/exhaustive-deps": "error",
+    "@tanstack/query/prefer-query-object-syntax": "error",
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error"
+  },
+  "plugins": ["@tanstack/query", "simple-import-sort"],
+
+  "overrides": [
+    // override "simple-import-sort" config
+    {
+      "files": ["*.js", "*.jsx", "*.ts", "*.tsx"],
+      "rules": {
+        "simple-import-sort/imports": [
+          "warn",
+          {
+            "groups": [
+              // Packages `react` related packages come first.
+              // Internal packages.
+              ["^react"],
+              ["^@?\\w"],
+              // @services
+              ["^@/services"],
+              // @types
+              ["^@/types"],
+              // @Components
+              ["^@/modules", "^@/layouts", "^@/components"],
+              ["^@/providers"],
+              ["^@/utils", "^@/hooks", "^@/styles", "^@/constants"],
+              
+              // Side effect imports.
+              ["^\\u0000"],
+              
+              // styles imports
+              ["^.+\\.s?css$"]
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }

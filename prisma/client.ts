@@ -1,26 +1,20 @@
 import { PrismaClient } from "@prisma/client";
+declare global {
+  var prisma: PrismaClient | undefined;
+}
 
-const prisma = new PrismaClient({
-  errorFormat: "pretty",
+let prisma: PrismaClient;
 
-  log: [
-    {
-      emit: "event",
-      level: "query",
-    },
-    {
-      emit: "event",
-      level: "error",
-    },
-    {
-      emit: "event",
-      level: "info",
-    },
-    {
-      emit: "event",
-      level: "warn",
-    },
-  ],
-});
+if (typeof window === "undefined") {
+  if (process.env.NODE_ENV === "production") {
+    prisma = new PrismaClient();
+  } else {
+    if (!global.prisma) {
+      global.prisma = new PrismaClient();
+    }
 
+    prisma = global.prisma;
+  }
+}
+//@ts-ignore
 export default prisma;

@@ -1,0 +1,56 @@
+import { SVGProps } from "react";
+
+function Icon() {}
+
+Icon.check = function ({ fill = "#1C274C", ...props }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+      <g id="SVGRepo_iconCarrier">
+        <path
+          opacity="0.5"
+          d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
+          fill={fill}
+        ></path>
+        <path
+          d="M16.0303 8.96967C16.3232 9.26256 16.3232 9.73744 16.0303 10.0303L11.0303 15.0303C10.7374 15.3232 10.2626 15.3232 9.96967 15.0303L7.96967 13.0303C7.67678 12.7374 7.67678 12.2626 7.96967 11.9697C8.26256 11.6768 8.73744 11.6768 9.03033 11.9697L10.5 13.4393L12.7348 11.2045L14.9697 8.96967C15.2626 8.67678 15.7374 8.67678 16.0303 8.96967Z"
+          fill="#202020"
+        ></path>
+      </g>
+    </svg>
+  );
+};
+
+Icon.mark = function ({ ...props }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width={props.width || "16"}
+      height={props.height || "16"}
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="M7.91132 14.8226C11.7283 14.8226 14.8226 11.7283 14.8226 7.91132C14.8226 4.0943 11.7283 1 7.91132 1C4.0943 1 1 4.0943 1 7.91132C1 11.7283 4.0943 14.8226 7.91132 14.8226Z"
+        stroke="black"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M5.83795 5.83793C5.83795 3.41894 9.63918 3.41896 9.63918 5.83793C9.63918 7.56576 7.91135 7.22012 7.91135 9.29352"
+        stroke="black"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M7.91132 12.065L7.91823 12.0574"
+        stroke="black"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+};
+
+export default Icon;

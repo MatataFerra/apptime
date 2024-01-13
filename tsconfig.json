@@ -6,6 +6,7 @@
       "dom.iterable",
       "esnext"
     ],
+    "types": ["@testing-library/jest-dom", "@testing-library/react","node"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -34,10 +35,11 @@
   },
   "include": [
     "next-env.d.ts",
+    "next-auth-extensions.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "__test__/vitest.setup.js"  ],
   "exclude": [
     "node_modules"
   ]

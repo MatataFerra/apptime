@@ -7,18 +7,710 @@
       "description": "Api for manage data in the app time "
     },
     "paths": {
-      "/hello": {
+      "/user": {
         "get": {
-          "summary": "Returns a list of users.",
-          "description": "This resource represents an individual user in the system. Each user is identified by a numeric `id`.",
-          "tags": ["User"],
+          "summary": "Returns a list of users",
+          "description": "This resource represents a list of users in the system. Each user is identified by a numeric `id`.",
+          "tags": [
+            "User"
+          ],
+          "parameters": [
+            {
+              "name": "profile",
+              "in": "query",
+              "required": false,
+              "description": "boolean to add profile info",
+              "schema": {
+                "type": "boolean",
+                "example": false,
+                "default": false
+              }
+            },
+            {
+              "name": "shifts",
+              "in": "query",
+              "required": false,
+              "description": "boolean to add shifts info",
+              "schema": {
+                "type": "boolean",
+                "example": false,
+                "default": false
+              }
+            }
+          ],
           "responses": {
             "200": {
-              "description": "A JSON array of user names with their shifts",
+              "description": "A JSON array of user info with their shifts",
               "content": {
                 "application/json": {
                   "schema": {
-                    "$ref": "#/components/schemas/User"
+                    "type": "array",
+                    "$ref": "#/components/schemas/UserSuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "summary": "User not found",
+              "description": "Returns a 400 error if the user is not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "500": {
+              "summary": "Internal server error",
+              "description": "Returns a 500 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "summary": "Create one user by ID and return the created user",
+          "description": "Send a JSON with the properties you want to create",
+          "tags": [
+            "User"
+          ],
+          "responses": {
+            "200": {
+              "description": "Success operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/UserSuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "summary": "One field must be provided",
+              "description": "Returns a 400 error if the user doesn't provide a valid Body",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/user/{id}": {
+        "get": {
+          "summary": "Returns one user by ID",
+          "description": "The user is identified by a numeric `ID`.",
+          "tags": [
+            "User"
+          ],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "description": "ID of user",
+              "schema": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 5
+              }
+            },
+            {
+              "name": "profile",
+              "in": "query",
+              "required": false,
+              "description": "boolean to add profile info",
+              "schema": {
+                "type": "boolean",
+                "example": false,
+                "default": false
+              }
+            },
+            {
+              "name": "shifts",
+              "in": "query",
+              "required": false,
+              "description": "boolean to add shifts info",
+              "schema": {
+                "type": "boolean",
+                "example": false,
+                "default": false
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "A JSON object of user info with their shifts",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/UserSuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "summary": "User not found",
+              "description": "Returns a 400 error if the user is not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "500": {
+              "summary": "Internal server error",
+              "description": "Returns a 500 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "put": {
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "description": "ID of user",
+              "schema": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 5
+              }
+            }
+          ],
+          "summary": "Update one user by ID and return the updated user",
+          "description": "Send a JSON object with the properties you want to update, and the server will update the user and return the updated user.",
+          "tags": [
+            "User"
+          ],
+          "responses": {
+            "200": {
+              "description": "an updated user",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/UserSuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "summary": "One field must be provided",
+              "description": "Returns a 400 error if the user doesn't provide a valid Body",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/shift": {
+        "get": {
+          "summary": "Returns a list of shifts for one user by ID",
+          "description": "Each user by `id` has a list of shifts.",
+          "tags": [
+            "Shift"
+          ],
+          "parameters": [
+            {
+              "name": "userId",
+              "in": "query",
+              "required": false,
+              "description": "numeric ID of user",
+              "schema": {
+                "type": "integer",
+                "example": 12
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "A JSON array of shift info about the user",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/ShiftSuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "summary": "No shift founded for that user",
+              "description": "Returns a 400 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "500": {
+              "summary": "Internal server error",
+              "description": "Returns a 500 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Returns a list of shifts for one user by ID",
+          "description": "Each user by `id` has a list of shifts.",
+          "tags": [
+            "Shift"
+          ],
+          "parameters": [
+            {
+              "name": "userId",
+              "in": "query",
+              "required": false,
+              "description": "numeric ID of user",
+              "schema": {
+                "type": "integer",
+                "example": 12
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Shift has been created and its info is returned",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/ShiftSuccessCreatedResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "summary": "Prisma error",
+              "description": "Returns a 400 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "500": {
+              "summary": "Internal server error",
+              "description": "Returns a 500 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/shift/{id}": {
+        "put": {
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/Shift"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "description": "ID of shift",
+              "schema": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 5
+              }
+            }
+          ],
+          "summary": "Update one shift by ID and return the updated shift",
+          "description": "Send a JSON object with the properties you want to update, and the server will update the shift and return the updated shift.",
+          "tags": [
+            "Shift"
+          ],
+          "responses": {
+            "200": {
+              "description": "Shift has been updated and its info is returned",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/ShiftSuccessCreatedResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "summary": "Zod error",
+              "description": "Returns a 400 error if the user doesn't provide a valid Body",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "408": {
+              "summary": "Prisma client error",
+              "description": "Returns a 408 error if prisma detect an invalid id or it doesn't was provided",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "404": {
+              "summary": "Shift not found",
+              "description": "Returns a 404 error if the shift is not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "500": {
+              "summary": "Internal server error",
+              "description": "Returns a 500 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/profile": {
+        "get": {
+          "summary": "Return the profile for one user by ID",
+          "description": "Each user by `id` has a profile.",
+          "tags": [
+            "Profile"
+          ],
+          "parameters": [
+            {
+              "name": "userId",
+              "in": "query",
+              "required": false,
+              "description": "numeric ID of user",
+              "schema": {
+                "type": "integer",
+                "example": 12
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "A JSON profile info about the user",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/ProfileSuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "summary": "Query nor provided",
+              "description": "Returns a 400 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "404": {
+              "summary": "User has no profile",
+              "description": "Returns a 404 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "500": {
+              "summary": "Internal server error",
+              "description": "Returns a 500 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Create a new profile for one user by ID",
+          "description": "Each user by `id` has an unique profile.",
+          "tags": [
+            "Profile"
+          ],
+          "parameters": [
+            {
+              "name": "userId",
+              "in": "query",
+              "required": false,
+              "description": "numeric ID of user",
+              "schema": {
+                "type": "integer",
+                "example": 12
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Profile has been created and its info is returned",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/ProfileSuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "summary": "Zod error or user already has a profile",
+              "description": "Returns a 400 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "404": {
+              "summary": "User not found",
+              "description": "Returns a 404 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "500": {
+              "summary": "Internal server error",
+              "description": "Returns a 500 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/profile/{id}": {
+        "put": {
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/Profile"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "description": "ID of profile to update",
+              "schema": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 5
+              }
+            }
+          ],
+          "summary": "Update the profile for one user by ID",
+          "description": "Send a JSON object with the properties you want to update, and the server will update the profile and return the updated profile.",
+          "tags": [
+            "Profile"
+          ],
+          "responses": {
+            "200": {
+              "description": "Profile has been updated and its info is returned",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/ProfileSuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "summary": "Zod error",
+              "description": "Returns a 400 error if the user doesn't provide a valid Body",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "404": {
+              "summary": "Prisma client error",
+              "description": "Returns a 404 error if prisma detect an invalid id or it doesn't was provided",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "500": {
+              "summary": "Internal server error",
+              "description": "Returns a 500 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dashboard": {
+        "get": {
+          "summary": "Get the dashboard info",
+          "description": "Returns the dashboard info",
+          "tags": [
+            "Dashboard"
+          ],
+          "parameters": [
+            {
+              "name": "userId",
+              "in": "query",
+              "required": false,
+              "description": "numeric ID of user",
+              "schema": {
+                "type": "integer",
+                "example": 12
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Dashboard info is returned",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/DashboardSuccessResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "summary": "User not found error or QueryNotProvided error",
+              "description": "Returns a 404 error if user not found or if the user doesn't provide a valid query",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "500": {
+              "summary": "Internal server error",
+              "description": "Returns a 500 error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
                   }
                 }
               }
@@ -38,38 +730,23 @@
       "schemas": {
         "User": {
           "type": "object",
-          "required": ["email", "password"],
+          "required": [
+            "email",
+            "password"
+          ],
           "properties": {
             "id": {
               "type": "number",
               "readOnly": true
             },
-            "endHour": {
-              "type": "number"
-            },
-            "extraNightShiftPay": {
-              "type": "number"
-            },
             "formCompleted": {
               "type": "boolean"
-            },
-            "holidayPay": {
-              "type": "boolean"
-            },
-            "holidayPayRate": {
-              "type": "number"
-            },
-            "hourlyRate": {
-              "type": "number"
             },
             "lastname": {
               "type": "string"
             },
             "name": {
               "type": "string"
-            },
-            "nightShift": {
-              "type": "boolean"
             },
             "online": {
               "type": "boolean"
@@ -81,6 +758,16 @@
             "email": {
               "type": "string",
               "format": "email"
+            },
+            "shifts": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Shift"
+              }
+            },
+            "profile": {
+              "type": "object",
+              "$ref": "#/components/schemas/Profile"
             }
           }
         },
@@ -94,9 +781,6 @@
             "amount": {
               "type": "number"
             },
-            "end": {
-              "type": "string"
-            },
             "endDate": {
               "type": "string"
             },
@@ -109,9 +793,6 @@
             "notes": {
               "type": "string"
             },
-            "start": {
-              "type": "string"
-            },
             "startDate": {
               "type": "string"
             },
@@ -120,10 +801,164 @@
               "readOnly": true
             }
           }
+        },
+        "Profile": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "number",
+              "readOnly": true
+            },
+            "endHour": {
+              "type": "number"
+            },
+            "extraNightShiftPay": {
+              "type": "number"
+            },
+            "holidayPay": {
+              "type": "boolean"
+            },
+            "holidayPayRate": {
+              "type": "number"
+            },
+            "hourlyRate": {
+              "type": "number"
+            },
+            "nightShift": {
+              "type": "boolean"
+            },
+            "userId": {
+              "type": "number",
+              "readOnly": true
+            }
+          }
+        },
+        "Error": {
+          "type": "object",
+          "properties": {
+            "error": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "cause": {
+                  "type": "string"
+                },
+                "type_error": {
+                  "type": "string"
+                }
+              }
+            },
+            "response": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        "UserSuccessResponse": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "response": {
+              "type": "boolean",
+              "default": true
+            },
+            "user": {
+              "type": "object",
+              "$ref": "#/components/schemas/User"
+            }
+          }
+        },
+        "ShiftSuccessResponse": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "response": {
+              "type": "boolean",
+              "default": true
+            },
+            "shift": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Shift"
+              }
+            }
+          }
+        },
+        "ShiftSuccessCreatedResponse": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "response": {
+              "type": "boolean",
+              "default": true
+            },
+            "shift": {
+              "type": "object",
+              "$ref": "#/components/schemas/Shift"
+            }
+          }
+        },
+        "ProfileSuccessResponse": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "response": {
+              "type": "boolean",
+              "default": true
+            },
+            "shift": {
+              "type": "object",
+              "$ref": "#/components/schemas/Profile"
+            }
+          }
+        },
+        "DashboardSuccessResponse": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "response": {
+              "type": "boolean",
+              "default": true
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "shiftsLen": {
+                  "type": "number"
+                },
+                "hoursWorked": {
+                  "type": "number"
+                },
+                "averageHoursWorkedPerDay": {
+                  "type": "number"
+                },
+                "hourValue": {
+                  "type": "number"
+                },
+                "lastDayRegistered": {
+                  "type": "string"
+                },
+                "getPaidInWeek": {
+                  "type": "number"
+                }
+              }
+            }
+          }
         }
       }
     },
-
     "securitySchemes": {
       "basicAuth": {
         "type": "http",

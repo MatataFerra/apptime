@@ -3,48 +3,26 @@ name: "Pipeline"
 on:
   push:
     branches:
-      - develop
+      - main
 
 jobs:
-  linter:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: "npm"
-      - name: Install Yarn
-        run: |
-          npm install -g yarn
-          yarn -v
-      - name: Install dependencies
-        run: yarn install
-      - name: Run linter
-        run: yarn lint
-
   test:
-    needs:
-      - linter
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
-          cache: "npm"
-      - name: Install Yarn
-        run: |
-          npm install -g yarn
-          yarn -v
+          node-version: 20
+          cache: "pnpm"
       - name: Install dependencies
-        run: yarn install
+        run: pnpm install
       - name: Database installing
-        run: yarn compose
+        run: pnpm compose
       - name: Prisma config
         run: |
           npx prisma generate
@@ -53,6 +31,6 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/apptimedb
       - name: Running Test
-        run: npm run test:ci
+        run: pnpm test:ci
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/apptimedb

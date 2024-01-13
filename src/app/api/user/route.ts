@@ -1,58 +1,131 @@
-/* eslint-disable no-console */
+import { User } from "@prisma/client";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { getToken, JWT } from "next-auth/jwt";
+
+import ErrorFactory from "@/services/Error/factory";
+import { Token } from "@/services/Token";
+import UserService from "@/services/User";
+
+import { JWTDecodedType, SearchParamsSchema } from "@/types";
+
+import { QUERY_PARAMS } from "@/utils/constants";
+
 import prisma from "#/prisma/client";
-import { Data } from "@/types";
-import { NextResponse, NextRequest } from "next/server";
+
+function checkIsAdmin(user: User) {
+  return user.role === "ADMIN";
+}
+
+function parseEmailFromParams(token: JWTDecodedType | null, email: string | null) {
+  if (token?.role !== "ADMIN") return token?.email;
+  return email;
+}
 
 export async function GET(req: NextRequest) {
+  const checkToken = (await getToken({ req, secret: process.env.SECRET })) as JWTDecodedType | null;
+
+  if (!checkToken) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const searchParams = req.nextUrl.searchParams;
+  const shifts = searchParams.get(QUERY_PARAMS.SHIFTS);
+  const profile = searchParams.get(QUERY_PARAMS.PROFILE);
+  const email = parseEmailFromParams(checkToken, searchParams.get(QUERY_PARAMS.EMAIL));
+  const only = searchParams.get(QUERY_PARAMS.ONLY);
+
+  const parsedSearchParams = SearchParamsSchema.safeParse({
+    shifts,
+    profile,
+    email,
+    only,
+  });
+
+  if (!parsedSearchParams.success) {
+    return NextResponse.json(
+      {
+        error: ErrorFactory.createError("DataProvidedIsNotValid", {
+          error: parsedSearchParams.error,
+        }),
+        response: false,
+      },
+      { status: 400 }
+    );
+  }
+
   try {
-    const user = await prisma.user.findFirst({
+    const { only } = parsedSearchParams.data;
+    const onlyParam = only ? only.split(",") : [];
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email: parsedSearchParams?.data?.email ?? "",
+      },
       include: {
-        shifts: true,
+        shifts: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
+        profile: JSON.parse(parsedSearchParams.data.profile ?? "false"),
       },
     });
 
     if (!user) {
       return NextResponse.json(
         {
-          message: "User not found",
+          error: ErrorFactory.createError("UserNotFound"),
           response: false,
         },
         { status: 400 }
       );
     }
 
-    const parsedData = Data.safeParse({
-      message: "success",
-      response: true,
-      user,
-    });
+    if (parsedSearchParams.data.email && onlyParam.length === 0) {
+      if (user.role !== "ADMIN" || user.email !== checkToken.email) {
+        const userFiltered = await UserService.removeProps(user, ["password", "email"]);
+        return NextResponse.json(
+          {
+            message: "success",
+            response: true,
+            user: { ...userFiltered, email: "**********" },
+          },
+          { status: 200 }
+        );
+      }
 
-    if (!parsedData.success) {
       return NextResponse.json(
         {
-          message: parsedData.error.issues
-            .map((issue) => issue.message)
-            .join(","),
-          response: false,
+          message: "success",
+          response: true,
+          user,
         },
-        { status: 400 }
+        { status: 200 }
+      );
+    }
+
+    if (parsedSearchParams.data.email && onlyParam.length > 0) {
+      const userFiltered = await UserService.filterUserProps(user, onlyParam);
+
+      return NextResponse.json(
+        {
+          message: "success",
+          response: true,
+          user: userFiltered,
+        },
+        { status: 200 }
       );
     }
 
     return NextResponse.json(
       {
-        message: parsedData.data.message,
-        response: parsedData.data.response,
-        user: parsedData.data.user,
+        message: "success",
+        response: true,
+        user,
       },
       { status: 200 }
     );
   } catch (error) {
-    console.error(error);
-
     return NextResponse.json(
       {
-        message: "Internal Server Error",
+        error: ErrorFactory.createError("InternalServer", { error }),
         response: false,
       },
       { status: 500 }

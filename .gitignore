@@ -35,5 +35,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
 TODO.ts
+
+#Playwright
+playwright-report/
+test-results/
+
+#lock file
+package-lock.json
+yarn.lock
+
+
+

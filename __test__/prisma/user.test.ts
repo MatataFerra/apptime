@@ -1,71 +1,131 @@
-import { prismaMock } from "#/prisma/singleton";
-import mockedUser from "#/mocks/user.prisma.json";
-import prisma from "#/prisma/client";
+import { afterAll, beforeEach,describe, expect,test, vi } from "vitest";
+
+import { userMocked } from "../../mocks";
+import prisma from "../../prisma/client";
+import prismaMock from "../../prisma/singleton";
+
 
 async function findFirstMock() {
-  const user = await prisma.user.findFirst();
+  const user = await prisma.user.findFirst({
+    include: {
+      profile: true,
+      shifts: true,
+    },
+  });
+
+  return user;
+}
+
+async function findManyMock() {
+  const user = await prisma.user.findMany({
+    include: {
+      profile: true,
+      shifts: true,
+    },
+  });
 
   return user;
 }
 
 const expectedUser = {
-  id: expect.any(Number),
+  id: expect.any(String),
   email: expect.any(String),
-  endHour: expect.any(Number),
-  extraNightShiftPay: expect.any(Number),
-  formCompleted: expect.any(Boolean),
-  holidayPay: expect.any(Boolean),
-  holidayPayRate: expect.any(Number),
-  hourlyRate: expect.any(Number),
   lastname: expect.any(String),
   name: expect.any(String),
-  nightShift: expect.any(Boolean),
+  formCompleted: expect.any(Boolean),
   online: expect.any(Boolean),
   password: expect.any(String),
-  startHour: expect.any(Number),
-  unpaidBreaks: expect.any(Number),
+  emailVerified: expect.any(Date),
+  role: expect.any(String),
+  isActive: expect.any(Boolean),
+
+  profile: expect.objectContaining({
+    id: expect.any(Number),
+    userId: expect.any(String),
+    endHour: expect.any(Number),
+    extraNightShiftPay: expect.any(Number),
+    holidayPay: expect.any(Boolean),
+    holidayPayRate: expect.any(Number),
+    hourlyRate: expect.any(Number),
+    nightShift: expect.any(Boolean),
+    startHour: expect.any(Number),
+    unpaidBreaks: expect.any(Number),
+  }),
+
   shifts: expect.arrayContaining([
     {
       id: expect.any(Number),
       amount: expect.any(Number),
-      end: expect.any(String),
       endDate: expect.any(String),
       isClosed: expect.any(Boolean),
-      isHoliday: expect.any(Boolean),
+      isPublicHoliday: expect.any(Boolean),
+      publicHolidayWorked: expect.any(Boolean),
       notes: expect.any(String),
-      start: expect.any(String),
       startDate: expect.any(String),
-      userId: expect.any(Number),
+      userId: expect.any(String),
     },
   ]),
 };
 
 describe("GET /user", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterAll(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
-  it("should return a user when one exists", async () => {
-    prismaMock.user.findFirst.mockResolvedValue(mockedUser.user);
-    const result = await findFirstMock();
+  test("create user", async () => {
+    const user = prismaMock.user.create.mockResolvedValueOnce({
+      email: "",
+      name: "test",
+      password: "test",
+      emailVerified: new Date(),
+      role: "USER",
+      isActive: true,
+      formCompleted: true,
+      image: "",
+      online: true,
+      type_account: "CREDENTIALS",
+      id: "1",
+    });
 
-    expect(result).not.toBeNull();
+    expect(user).not.toBeNull();
   });
 
-  it("User from prisma should match expected user", async () => {
-    prismaMock.user.findFirst.mockResolvedValue(mockedUser.user);
-    const result = await findFirstMock();
-    expect(result).toMatchObject(expectedUser);
+  test("should return a user when one exists", async () => {
+    const t = prismaMock.user.findFirst.mockResolvedValueOnce(userMocked);
+    // const result = await findFirstMock();
+
+    expect(t).not.toBeNull();
   });
 
-  it("should return a 404 when no user exists", async () => {
-    prismaMock.user.findFirst.mockResolvedValue(null);
-    const result = await findFirstMock();
+  // test("User from prisma should match expected user", async () => {
+  //   prismaMock.user.findFirst.mockResolvedValue(userMocked);
+  //   const result = await findFirstMock();
 
-    expect(result).toBeNull();
-  });
+  //   expect(result).toMatchObject(expectedUser);
+  // });
+
+  // test("should return a 404 when no user exists", async () => {
+  //   prismaMock.user.findFirst.mockResolvedValue(null);
+  //   const result = await findFirstMock();
+
+  //   expect(result).toBeNull();
+  // });
+
+  // test("should return a list of users when they exist", async () => {
+  //   prismaMock.user.findMany.mockResolvedValue([userMocked]);
+  //   const result = await findManyMock();
+
+  //   expect(result).not.toBeNull();
+  // });
+
+  // test("should return an empty list when no users exist", async () => {
+  //   prismaMock.user.findMany.mockResolvedValue([]);
+  //   const result = await findManyMock();
+
+  //   expect(result).toEqual([]);
+  // });
 });

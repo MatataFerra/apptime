@@ -1,0 +1,14 @@
+# Ignore everything recursively
+*
+
+# only files into src directory
+!src/
+
+# But not the .tsx files
+!*.tsx
+
+# Not .ts files into the src directory
+!*.ts
+
+# Check subdirectories too
+!*/

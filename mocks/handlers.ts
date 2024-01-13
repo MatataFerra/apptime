@@ -1,12 +1,18 @@
-import { rest } from "msw";
+import {
+  DefaultBodyType,
+  PathParams,
+  ResponseComposition,
+  rest,
+  RestContext,
+  RestRequest,
+} from "msw";
 
-export const handlers = [
-  rest.get("/api/your-endpoint", (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        message: "Mocked data",
-      })
-    );
-  }),
-];
+export async function post_waiting_list(
+  req: RestRequest<DefaultBodyType, PathParams<string>>,
+  res: ResponseComposition<DefaultBodyType>,
+  ctx: RestContext
+) {
+  return res(ctx.status(200), ctx.json({ message: "Added to waiting list" }));
+}
+
+export const handlers = [rest.post("/api/waiting-list", post_waiting_list)];
