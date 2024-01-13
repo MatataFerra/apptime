@@ -1,5 +1,4 @@
 import { Shift } from "@prisma/client";
-import { getServerSession } from "next-auth";
 
 import i18n from "@/services/i18n";
 import ShiftService from "@/services/Shift";
@@ -9,6 +8,8 @@ import ut from "@/services/Utilities/client";
 import { LocaleParams } from "@/types";
 
 import DateComponent from "@/components/Date";
+import NotesFab from "@/components/NotesFab";
+import NotesPortal from "@/components/NotesPortal";
 import ShiftButtons from "@/components/ShiftButtons";
 import ShiftStatus from "@/components/ShiftStatus";
 import ShiftTextState from "@/components/ShiftTextState";
@@ -41,6 +42,8 @@ export default async function Home({ params }: { params: LocaleParams }) {
           <ShiftTextState />
           <ShiftStatus />
           <ShiftButtons />
+          <NotesFab />
+          <NotesPortal />
         </ShiftStatusProvider>
       </Stack>
     </>

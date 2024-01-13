@@ -48,7 +48,7 @@ function FinishDescription() {
       endDate: endDate.toString(),
       id: shift?.id,
     });
-  }, [inputValue, shift, shift?.id, updateShift]);
+  }, [inputValue, shift?.id, updateShift]);
 
   useEffect(() => {
     if (clickOnSave) {

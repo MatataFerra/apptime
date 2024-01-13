@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 
 import { Shift } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
 
 import api from "@/services/Api";
 
@@ -19,7 +18,6 @@ type Props = {
 };
 
 function ShiftStatusProvider({ children, user, shiftOpen }: Props) {
-  const { data } = useSession();
   const store = useRef(
     createShiftStatusStore({ user: user, shiftUnclosed: { shift: shiftOpen, isLoading: false } })
   ).current;
@@ -32,8 +30,6 @@ function ShiftStatusProvider({ children, user, shiftOpen }: Props) {
         profile: true,
         hasEnvUrl: false,
       }),
-    enabled: !!data?.user?.email,
-    refetchOnReconnect: true,
   });
 
   useEffect(() => {

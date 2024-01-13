@@ -18,8 +18,9 @@ function ShiftButtons() {
   const buttonStatus = useButtonStatus();
 
   useEffect(() => {
-    updateShiftStatus(shiftUnclosed?.isClosed);
-  }, [shiftUnclosed?.isClosed, updateShiftStatus]);
+    if (!shiftUnclosed) return;
+    updateShiftStatus(!shiftUnclosed?.isClosed);
+  }, [shiftUnclosed, updateShiftStatus]);
 
   return (
     <Stack classes="h-full w-full" spacing={10} alignItems="center" justifyContent="between">

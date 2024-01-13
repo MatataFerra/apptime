@@ -3,7 +3,13 @@ export type TAILWIND_COLOR =
   | `${keyof typeof TAILWIND_TYPE_COLOR}-${EXTENDED_COLORS}`
   | `${keyof typeof TAILWIND_TYPE_COLOR}-${BASE_COLORS}`;
 
-type EXTENDED_COLORS = "aquatic" | "common_orange" | "light-gold" | "hard-pink" | "light-blue";
+type EXTENDED_COLORS =
+  | "aquatic"
+  | "common_orange"
+  | "light-gold"
+  | "hard-pink"
+  | "light-blue"
+  | "post-it-button";
 
 type BASE_COLORS = "black" | "white";
 

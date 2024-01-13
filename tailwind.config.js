@@ -28,6 +28,7 @@ module.exports = {
       colors: {
         aquatic: "#13EFA0",
         "light-gold": "#FEE954",
+        "post-it-button": "#EB8F00",
         "hard-pink": "#FF2B91",
         "common-orange": "#FF6A00",
         "light-blue": "#64C2DB",
@@ -93,6 +94,33 @@ module.exports = {
           to: { height: 0 },
         },
 
+        "dissapear-up": {
+          to: { transform: "translateY(-15rem)" },
+          from: { transform: "translateY(0)" },
+        },
+
+        'fade-down': {
+          '0%': {
+              opacity: '0',
+              transform: 'translateY(-2rem)',
+          },
+          '100%': {
+              opacity: '1',
+              transform: 'translateY(0)',
+          },
+        },
+
+        'fade-up': {
+          '0%': {
+              opacity: '0',
+              transform: 'translateY(2rem)',
+          },
+          '100%': {
+              opacity: '1',
+              transform: 'translateY(0)',
+          },
+        },
+
         "fade_in": {
           "0%": {
             opacity: 0,
@@ -142,6 +170,9 @@ module.exports = {
         shake: "shake 1s ease 1",
         "fade-in": "fade_in 0.5s ease-in-out",
         "fade-out": "fade_out 0.5s ease-in-out",
+        "fade-down": "fade-down 0.5s ease-in-out",
+        "fade-up": "fade-up 0.5s ease-in-out",
+        "dissapear-up": "dissapear-up 0.5s ease-in-out forwards",
       },
     },
   },

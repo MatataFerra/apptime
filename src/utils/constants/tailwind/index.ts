@@ -16,7 +16,7 @@ export const GRADIENTS = {
 export const BUTTON_VARIANTS = {
   primary: "shadow-button bg-aquatic p-3 font-bold text-black",
   secondary: "bg-gray-200 text-gray-800 dark:bg-gray-800 dark:text-gray-100 p-3",
-  danger: "bg-red-500 text-white p-3",
+  danger: "bg-red-500 text-white p-3 shadow-button active:shadow-button-inner",
   success: "bg-green-500 text-white p-3",
   warning: "bg-yellow-500 text-white p-3",
   info: "bg-blue-500 text-white p-3 font-bold text-white shadow-button",
@@ -29,6 +29,7 @@ export const BUTTON_VARIANTS = {
   black:
     "bg-black text-white p-3 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px]",
   teal: "bg-light-blue text-white p-3 text-black shadow-button active:shadow-button-inner",
+  "post-it": "bg-post-it-button text-white p-3 text-black shadow-button active:shadow-button-inner",
 };
 
 export const INPUT_VARIANTS = {
