@@ -42,6 +42,8 @@ playwright-report/
 test-results/
 
 #lock file
-pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
 
 
