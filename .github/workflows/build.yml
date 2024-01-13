@@ -16,13 +16,13 @@ jobs:
         with:
           node-version: 20
           cache: "npm"
-      - name: Install Yarn
+          cache-dependency-path: "./pnpm-lock.yaml"
+      - name: Install Pnpm
         run: |
-          npm install -g yarn
-          yarn -v
+          npm install -g pnpm
       - name: Install dependencies
-        run: yarn install
+        run: pnpm install
       - name: Build app
-        run: yarn build
+        run: pnpm build
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
