@@ -16,14 +16,14 @@ jobs:
         with:
           node-version: 20
           cache: "npm"
-      - name: Install Yarn
+          cache-dependency-path: "./pnpm-lock.yaml"
+      - name: Install Pnpm
         run: |
-          npm install -g yarn
-          yarn -v
+          npm install -g pnpm
       - name: Install dependencies
-        run: yarn install
+        run: pnpm install
       - name: Database installing
-        run: yarn compose
+        run: pnpm compose
       - name: Prisma config
         run: |
           npx prisma generate
@@ -32,6 +32,6 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/apptimedb
       - name: Running Test
-        run: npm run test:ci
+        run: pnpm test:ci
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/apptimedb
