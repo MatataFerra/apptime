@@ -6,31 +6,30 @@ import { GRADIENTS } from "@/utils/constants/tailwind";
 
 function NoScreenCompatibility() {
   return (
-    <section className="grid h-full w-full grid-cols-2 grid-rows-4">
-      <aside className="z-50 col-start-2 row-start-1 row-end-[-1] flex flex-col items-end justify-between gap-1">
-        <nav className="flex flex-col items-end gap-1">
-          <Text as="h1" variant="title">
-            No screen
-            <Text
-              as="span"
-              variant="gradient"
-              classes={`animate-text  text-4xl font-bold ${GRADIENTS.error}`}
-            >
-              compatibility
-            </Text>
+    <section className="grid h-full w-full grid-cols-12 grid-rows-6">
+      <nav className="col-start-8 col-end-[-1] row-start-1 row-end-3 flex flex-col items-end gap-1">
+        <Text as="h1" variant="title" classes="text-clamp-1-to-2.5">
+          No screen{" "}
+          <Text
+            as="span"
+            variant="gradient"
+            classes={`${GRADIENTS.error} text-clamp-1-to-2.5 animate-text font-bold text-transparent`}
+          >
+            compatibility
           </Text>
-          <Text as="p" variant="default">
-            This app is only available for mobile devices
-          </Text>
-        </nav>
-        <div className="w-[40rem]">
-          <Suscribe />
-        </div>
-      </aside>
+        </Text>
+        <Text as="p" variant="default">
+          This app is only available for mobile devices
+        </Text>
+      </nav>
+
+      <section className="z-50 col-start-8 col-end-[-1] row-auto w-[40rem] justify-self-end 2xl:row-start-5">
+        <Suscribe />
+      </section>
 
       <Background
         img="/assets/mobile-only.webp"
-        classes="absolute col-start-1 col-end-1 row-start-1 row-end-4 w-auto -rotate-6 justify-self-center"
+        classes="col-start-1 col-end-5 row-start-1 row-end-6 aspect-square h-fit w-fit -rotate-6 2xl:col-start-2 2xl:col-end-6 2xl:row-start-2"
         width="w-[60rem]"
       />
       <Background.waveBack classes="absolute right-0 top-48 -z-10" />
