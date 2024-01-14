@@ -14,12 +14,12 @@ export const useNotesStore = create(
       isNotesOpen: false,
       notesToggle: () => {
         if (!get().isOn) {
-          set({ isOn: true });
+          set({ isOn: true }, false, "IS_ON_TOGGLE");
         } else {
-          setTimeout(() => set({ isOn: false }), 1000);
+          setTimeout(() => set({ isOn: false }, false, "IS_OFF_TOGGLE"), 300);
         }
 
-        set({ isNotesOpen: !get().isNotesOpen });
+        set({ isNotesOpen: !get().isNotesOpen }, false, "NOTES_TOGGLE");
       },
     }),
     {
