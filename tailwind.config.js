@@ -68,6 +68,8 @@ module.exports = {
       },
       fontSize: {
         "4xl": "2.25rem",
+        "clamp-1-to-2.5": "clamp(1rem, 5vw, 2.5rem)",
+        "clamp-1-to-3": "clamp(1rem, 5vw, 3rem)"
       },
 
       dropShadow: {
