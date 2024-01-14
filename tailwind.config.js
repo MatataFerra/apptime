@@ -163,6 +163,15 @@ module.exports = {
           "20%, 40%, 60%, 80%": {
             transform: "translateX(3px)",
           },
+        },
+
+        "backdrop-blurry": {
+          "0%": {
+            backdropFilter: "blur(0px)",
+          },
+          "100%": {
+            backdropFilter: "blur(4px)",
+          },
         }
       },
       animation: {
@@ -175,6 +184,7 @@ module.exports = {
         "fade-down": "fade-down 0.5s ease-in-out",
         "fade-up": "fade-up 0.5s ease-in-out",
         "dissapear-up": "dissapear-up 0.5s ease-in-out forwards",
+        "backdrop-blurry": "backdrop-blurry 0.5s ease-in-out forwards",
       },
     },
   },
