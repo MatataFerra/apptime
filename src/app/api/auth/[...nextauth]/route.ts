@@ -11,7 +11,7 @@ import i18n from "@/services/i18n";
 import UserService from "@/services/User";
 import ut from "@/services/Utilities";
 
-export async function GET(req: NextApiRequest & NextRequest, res: NextResponse & NextApiResponse) {
+async function authOptions(req: NextApiRequest & NextRequest, res: NextResponse & NextApiResponse) {
   const locale = new i18n("en").getLocale(req);
 
   return await NextAuth(req, res, {
@@ -85,6 +85,7 @@ export async function GET(req: NextApiRequest & NextRequest, res: NextResponse &
 
         return sessionAccessToken;
       },
+
       async jwt({ token, account, session }) {
         if (account) {
           const userFounded = await UserService.findUniqueUser({
@@ -93,6 +94,8 @@ export async function GET(req: NextApiRequest & NextRequest, res: NextResponse &
           token.accessToken = account.access_token;
           token.type_account = account.provider;
           token.role = userFounded?.role ?? "NOT_FOUND";
+
+          return token;
         }
         const tokenClone = cloneDeep(token);
 
@@ -110,85 +113,10 @@ export async function GET(req: NextApiRequest & NextRequest, res: NextResponse &
   });
 }
 
+export async function GET(req: NextApiRequest & NextRequest, res: NextResponse & NextApiResponse) {
+  return await authOptions(req, res);
+}
+
 export async function POST(req: NextApiRequest & NextRequest, res: NextResponse & NextApiResponse) {
-  const locale = new i18n("en").getLocale(req);
-
-  return await NextAuth(req, res, {
-    providers: [
-      CredentialsProvider({
-        name: "email and password",
-        credentials: {
-          email: {
-            label: "Email",
-            type: "email",
-            placeholder: "example@example.com",
-          },
-          password: { label: "Password", type: "password" },
-        },
-
-        async authorize(credentials) {
-          if (!credentials?.email || !credentials.password) return null;
-
-          if (!credentials.password) return null;
-
-          const user = await UserService.findUniqueUser({
-            email: credentials.email,
-          });
-
-          if (!user || !(await compare(credentials.password, user.password ?? ""))) return null;
-
-          return {
-            ...user,
-            id: user.id.toString(),
-          };
-        },
-      }),
-      GoogleProvider({
-        clientId: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      }),
-    ],
-
-    session: {
-      strategy: "jwt",
-    },
-
-    pages: {
-      signIn: `/${locale}/login`,
-      newUser: `/${locale}/register`,
-    },
-
-    secret: process.env.NEXTAUTH_SECRET,
-
-    callbacks: {
-      async session({ session, token }) {
-        const sessionDeepClone = cloneDeep(session);
-        const sessionAccessToken = assign(sessionDeepClone, {
-          accessToken: token.accessToken,
-          type_account: token.type_account,
-        });
-
-        AuthService.oauthUser({
-          email: sessionAccessToken.user?.email ?? "",
-          name: sessionAccessToken.user?.name ?? "",
-          image: sessionAccessToken.user?.image ?? "",
-        });
-
-        return sessionAccessToken;
-      },
-      async jwt({ token, account }) {
-        if (account) {
-          const userFounded = await UserService.findUniqueUser({
-            email: token.email ?? "",
-          });
-          token.accessToken = account.access_token;
-          token.type_account = account.provider;
-          token.role = userFounded?.role ?? "NOT_FOUND";
-        }
-        const tokenClone = cloneDeep(token);
-
-        return tokenClone;
-      },
-    },
-  });
+  return await authOptions(req, res);
 }

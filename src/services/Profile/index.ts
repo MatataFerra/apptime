@@ -1,10 +1,41 @@
 import { Profile } from "@prisma/client";
 
+import prisma from "#/prisma/client";
+
 class ProfileService {
   profile: Profile;
 
   constructor(profile: Profile) {
     this.profile = profile;
+  }
+
+  static async createProfile({
+    userId,
+    profile,
+  }: {
+    userId: string;
+    profile: Omit<Profile, "id" | "userId">;
+  }) {
+    const profileCreated = await prisma.profile.create({
+      data: {
+        User: {
+          connect: {
+            id: userId,
+          },
+        },
+
+        endHour: profile.endHour,
+        hourlyRate: profile.hourlyRate,
+        startHour: profile.startHour,
+        holidayPay: profile.holidayPay,
+        nightShift: profile.nightShift,
+        extraNightShiftPay: profile.extraNightShiftPay,
+        holidayPayRate: profile.holidayPayRate,
+        unpaidBreaks: profile.unpaidBreaks,
+      },
+    });
+
+    return profileCreated;
   }
 
   static convertHourlyRateInMinuteRate(hourlyRate: Profile["hourlyRate"]) {

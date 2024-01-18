@@ -18,8 +18,9 @@ function Portal({ children, isOn, isNotesOpen }: Props) {
     // create element
     if (!container.current) {
       container.current = document.createElement("nav");
-      container.current.id = "notes";
     }
+
+    container.current.id = "notes";
     container.current.className = cn(
       isNotesOpen
         ? "[&>section]:animate-fade-down"

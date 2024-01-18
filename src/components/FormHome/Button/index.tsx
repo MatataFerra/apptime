@@ -7,7 +7,6 @@ import { Profile } from "@prisma/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { ApiResponse } from "@/types/api_response";
 import { FormStep } from "@/types/forms";
 import { FormStoreData } from "@/types/store";
 
@@ -67,10 +66,10 @@ function Buttons() {
       duration: 5000,
     });
 
-    onSubmitServerAction(data).then((data: ApiResponse<Profile>) => {
-      if (!data.response) {
+    onSubmitServerAction(data).then((profile: Profile | null) => {
+      if (!profile) {
         return toast({
-          title: `😮 ${data.error.message}`,
+          title: `😮 Something has gone wrong`,
           variant: "destructive",
           duration: 3000,
 
@@ -82,16 +81,14 @@ function Buttons() {
         });
       }
 
-      if (data.response) {
-        toast({
-          title: "😎 Your profile has been created",
-          description: "You will be redirected to the home page",
-          duration: 3000,
-          className: "bg-green-200",
-          action: <Loader.spinner />,
-          onAnimationEnd: () => replace("/"),
-        });
-      }
+      toast({
+        title: "😎 Your profile has been created",
+        description: "You will be redirected to the home page",
+        duration: 3000,
+        className: "bg-green-200",
+        action: <Loader.spinner />,
+        onAnimationEnd: () => replace("/"),
+      });
     });
   }
 
