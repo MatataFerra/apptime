@@ -1,6 +1,6 @@
 import { Profile } from "@prisma/client";
 
-import prisma from "#/prisma/client";
+import prisma from "@/../prisma/client";
 
 class ProfileService {
   profile: Profile;
