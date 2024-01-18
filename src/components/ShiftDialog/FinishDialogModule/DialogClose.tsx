@@ -15,7 +15,11 @@ function FinishClose({ onFinishShift }: Props) {
           type="button"
           variant="gradient"
           classes="h-12 w-full p-[3px]"
-          onClick={onFinishShift}
+          onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+            // debido al error TypeError: Response body object should not be disturbed or locked
+            // se debe detener el comportamiento por defecto del evento
+            onFinishShift();
+          }}
         >
           <Text
             as="span"

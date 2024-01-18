@@ -12,14 +12,16 @@ interface Props extends Omit<React.HTMLAttributes<HTMLElement>, "className"> {
 }
 
 function Portal({ children, isOn, isNotesOpen }: Props) {
-  const container = useRef<HTMLElement | null>(null);
+  const isWindow = typeof window !== "undefined";
+  const container = useRef<HTMLElement | null>(isWindow ? document.createElement("nav") : null);
 
   useEffect(() => {
     // create element
     if (!container.current) {
       container.current = document.createElement("nav");
-      container.current.id = "notes";
     }
+
+    container.current.id = "notes";
     container.current.className = cn(
       isNotesOpen
         ? "[&>section]:animate-fade-down"

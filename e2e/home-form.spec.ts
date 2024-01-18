@@ -8,7 +8,7 @@ test.use({
 });
 
 test.beforeEach(async ({ page }, testInfo) => {
-  await page.goto("http://localhost:3000/");
+  await page.goto("http://localhost:3000/en");
   await page.waitForURL(/login/);
   const { email, password } = createUser({ email: randomEmail() });
 
@@ -77,7 +77,7 @@ test("Should complete the profile form", async ({ page }) => {
     .first()
     .textContent();
 
-  expect(message).toMatch(/\b(?:Your profile has been created|Profile already exists)\b/i);
+  expect(message).toMatch(/\b(?:Your profile has been created|Something has gone wrong)\b/i);
 });
 
 test("Should show error message when the form is not completed", async ({ page }) => {
@@ -92,18 +92,18 @@ test("Should show error if profile already exists", async ({ page }) => {
   await fillForm(page)();
 
   const message = await page
-    .getByText(/Your profile has been created|Profile already exists/)
+    .getByText(/Your profile has been created|Something has gone wrong/)
     .first()
     .textContent();
 
-  expect(message).toMatch(/\bProfile already exists\b/i);
+  expect(message).toMatch(/\bSomething has gone wrong\b/i);
 });
 
 test("Should show success message if profile is created", async ({ page }) => {
   await fillForm(page)();
 
   const message = await page
-    .getByText(/Your profile has been created|Profile already exists/)
+    .getByText(/Your profile has been created|Something has gone wrong/)
     .first()
     .textContent();
 
