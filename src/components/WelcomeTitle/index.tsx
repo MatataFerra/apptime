@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 
 import { SuccessApiResponse } from "@/types/api_response";
 
+import Skeleton from "@/components/ui/Skeleton";
 import Text from "@/components/ui/Text";
 
 import { GRADIENTS } from "@/utils/constants/tailwind";
@@ -24,12 +25,17 @@ function WelcomeTitle({ username }: Props) {
         <Text variant="title" classes="text-5xl">
           Welcome
         </Text>
-        <Text
-          variant="gradient"
-          classes={`balance_text text-5xl font-bold ${GRADIENTS.gradient_2}`}
-        >
-          {username ? username : data?.user?.name}
-        </Text>
+
+        {data?.user?.name ? (
+          <Text
+            variant="gradient"
+            classes={`balance_text text-5xl font-bold ${GRADIENTS.gradient_2}`}
+          >
+            {data?.user?.name}
+          </Text>
+        ) : (
+          <Skeleton classes="h-9 w-52" />
+        )}
       </div>
     </>
   );
