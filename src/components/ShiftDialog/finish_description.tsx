@@ -6,11 +6,14 @@ import { format } from "date-fns";
 import { capitalize } from "lodash";
 
 import Box from "@/components/ui/Box";
+import Button from "@/components/ui/Button";
 import { DialogDescription } from "@/components/ui/Dialog";
+import Icon from "@/components/ui/Icons";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
+import useInputValue from "@/hooks/useInputValue";
 import useTimeLabel, { type Labels } from "@/hooks/useTimeLabel";
 
 import { useShiftStateContext } from "@/store/useShiftStatusStore";
@@ -20,13 +23,12 @@ const INPUTS = Array.from(LABELS).map((label) => ({ label }));
 
 function FinishDescription() {
   let inputRefs = useRef(INPUTS.map(() => createRef() as unknown as RefObject<HTMLInputElement>));
-  const { diff, setDiff, getDifference, initialState, inputValue, setInputValue } =
-    useTimeLabel(inputRefs);
+  const { diff, initialState } = useTimeLabel();
+  const { inputValue, setInputValue } = useInputValue();
   const {
-    inputsDisabled,
     updateShift,
+    inputsDisabled,
     shiftUnclosed: { shift },
-    clickOnSave,
   } = useShiftStateContext((state) => state);
 
   useEffect(() => {
@@ -49,22 +51,6 @@ function FinishDescription() {
       id: shift?.id,
     });
   }, [inputValue, shift?.id, updateShift]);
-
-  useEffect(() => {
-    if (clickOnSave) {
-      const t = getDifference();
-      setDiff(t);
-    } else {
-      setDiff(initialState.diff);
-      setInputValue({
-        ...initialState,
-      });
-    }
-  }, [clickOnSave, getDifference, initialState, initialState.diff, setDiff, setInputValue]);
-
-  useEffect(() => {
-    const t = getDifference();
-  }, [diff, initialState, getDifference]);
 
   return (
     <>
@@ -89,18 +75,28 @@ function FinishDescription() {
                   ref={inputRefs.current[index]}
                   max={format(new Date(), "yyyy-MM-dd")}
                   onChange={(_) => {
-                    const t = getDifference();
-
-                    setInputValue((prev) => ({ ...prev, [label]: _.target.value }));
-
-                    setDiff(t);
+                    setInputValue({
+                      [label]: _.target.value,
+                    });
                   }}
                 />
               );
             })}
           </Stack>
-          <Stack>
+          <Stack alignItems="center">
             <Text classes="text-xl font-semibold">Time elapsed: {diff}</Text>
+            <Button
+              type="button"
+              variant="white"
+              onClick={() => {
+                setInputValue({
+                  ...initialState,
+                });
+              }}
+              classes="mx-auto my-0 w-fit self-center p-2 active:shadow-button-inner"
+            >
+              <Icon.reset className="size-4 fill-black font-bold" />
+            </Button>
           </Stack>
         </Box>
       </DialogDescription>

@@ -1,82 +1,35 @@
-import { MutableRefObject, RefObject, useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
+import { isNaN } from "lodash";
+
+import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
 
-function getFullDate({ date, time }: { date: Date | undefined | null; time: string }) {
-  const dateFomated = formatDate(date ?? new Date());
+import useInputValuesStore from "@/store/useInputValuesStore";
 
-  return addHoursAndMinutes(new Date(dateFomated), time);
-}
+function useDifference() {
+  const inputValues = useInputValuesStore((state) => state.inputValues);
+  const [difference, setDifference] = useState<string>("");
 
-function formatDate(date = new Date()) {
-  const year = date.toLocaleString("default", { year: "numeric" });
-  const month = date.toLocaleString("default", {
-    month: "2-digit",
-  });
-  const day = date.toLocaleString("default", { day: "2-digit" });
+  useEffect(() => {
+    const formatStart = new DateHumanizer("formatAndAddTime").humanizeDate(
+      new Date(inputValues.from ?? ""),
+      { time: inputValues.start ?? "" }
+    );
 
-  return [year, month, day].join("-");
-}
+    const formatEnd = new DateHumanizer("formatAndAddTime").humanizeDate(
+      new Date(inputValues.to ?? ""),
+      { time: inputValues.end ?? "" }
+    );
 
-function addHoursAndMinutes(date: Date, time: string) {
-  const [hours, minutes] = time.split(":");
+    const { text, diff } = ShiftService.differenceInHHmm(formatStart, formatEnd);
 
-  date.setHours(Number(hours));
-  date.setMinutes(Number(minutes));
-  return date;
-}
+    if (isNaN(diff)) return;
 
-function useDifference(inputRefs: MutableRefObject<RefObject<HTMLInputElement>[]>) {
-  const [values, setValues] = useState<{
-    from: RefObject<HTMLInputElement> | undefined;
-    to: RefObject<HTMLInputElement> | undefined;
-    start: RefObject<HTMLInputElement> | undefined;
-    end: RefObject<HTMLInputElement> | undefined;
-  }>({
-    from: undefined,
-    to: undefined,
-    start: undefined,
-    end: undefined,
-  });
-  function getDifference() {
-    const { current } = inputRefs;
-    const from = current.find((ref) => ref.current?.dataset.label === "from");
-    const to = current.find((ref) => ref.current?.dataset.label === "to");
-    const start = current.find((ref) => ref.current?.dataset.label === "start");
-    const end = current.find((ref) => ref.current?.dataset.label === "end");
+    setDifference(text);
+  }, [inputValues]);
 
-    setValues({
-      from,
-      to,
-      start,
-      end,
-    });
-
-    if (!from || !to || !start || !end) return "";
-
-    const text = ShiftService.differenceInHHmm(
-      getFullDate({
-        date: values?.from?.current?.valueAsDate,
-        time: values?.start?.current?.value ?? "",
-      }),
-      getFullDate({
-        date: values?.to?.current?.valueAsDate,
-        time: values?.end?.current?.value ?? "",
-      })
-    ).text;
-
-    return text;
-  }
-
-  const getDifferenceCallback = useCallback(getDifference, [
-    inputRefs,
-    values.end,
-    values?.from,
-    values?.start,
-    values.to,
-  ]);
-
-  return { getDifference: getDifferenceCallback };
+  return { getDifference: difference };
 }
 
 export default useDifference;
