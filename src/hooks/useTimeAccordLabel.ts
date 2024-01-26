@@ -2,26 +2,18 @@ import { useMemo } from "react";
 
 import { Shift } from "@prisma/client";
 
+import DateHumanizer from "@/services/Date";
+
 import { Labels } from "./useTimeLabel";
 
-function formatDate(date = new Date()) {
-  const year = date.toLocaleString("default", { year: "numeric" });
-  const month = date.toLocaleString("default", {
-    month: "2-digit",
-  });
-  const day = date.toLocaleString("default", { day: "2-digit" });
-
-  return [year, month, day].join("-");
-}
-
 function getFormattedDate(date: Date) {
-  return formatDate(date);
+  return new DateHumanizer("formatDate").humanizeDate(date);
 }
 function getFormattedTime(date: Date) {
   return date.toLocaleTimeString();
 }
 
-function useLabel(shift: Shift | null) {
+function useTimeAccordLabel(shift: Shift | null) {
   const getTimeAcoordingLabel = useMemo(() => {
     const labelToFunctionMap = {
       from: () => getFormattedDate(new Date(shift?.startDate ?? Date.now())),
@@ -36,4 +28,4 @@ function useLabel(shift: Shift | null) {
   return getTimeAcoordingLabel;
 }
 
-export default useLabel;
+export default useTimeAccordLabel;
