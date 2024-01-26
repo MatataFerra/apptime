@@ -1,23 +1,23 @@
-import { getServerSession } from "next-auth";
+"use client";
+
+import { User } from "@prisma/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
+
+import { SuccessApiResponse } from "@/types/api_response";
 
 import Text from "@/components/ui/Text";
 
 import { GRADIENTS } from "@/utils/constants/tailwind";
 
-type UserSession = {
-  user: {
-    name: string;
-    email: string;
-    image: string;
-  };
-};
-
 interface Props {
   username?: string;
 }
 
-async function WelcomeTitle({ username }: Props) {
-  const session: UserSession | null = await getServerSession();
+function WelcomeTitle({ username }: Props) {
+  const session = useSession();
+  const query = useQueryClient();
+  const data = query.getQueryData<SuccessApiResponse<User>>(["user", session.data?.user?.email]);
   return (
     <>
       <div className="flex flex-col gap-4">
@@ -28,7 +28,7 @@ async function WelcomeTitle({ username }: Props) {
           variant="gradient"
           classes={`balance_text text-5xl font-bold ${GRADIENTS.gradient_2}`}
         >
-          {username ? username.split(" ")[0] : session?.user.name.split(" ")[0]}
+          {username ? username : data?.user?.name}
         </Text>
       </div>
     </>
