@@ -14,7 +14,7 @@ type Props = {
 };
 
 function DateComponent({ humanize = "today", date = new Date(), classes, locale }: Props) {
-  const dateHumanized = new DateHumanizer(humanize).humanizeDate(date, locale);
+  const dateHumanized = new DateHumanizer(humanize).humanizeDate(date, { locale });
   const TODAY_TRANSLATIONS = {
     en: "today is",
     es: "hoy es",

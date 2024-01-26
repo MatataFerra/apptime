@@ -3,8 +3,14 @@ import { enUS, es, Locale } from "date-fns/locale";
 
 import type { DateHumanizerStrategy, Locale as possibleLocale } from "@/types";
 
+type Options = {
+  locale?: possibleLocale;
+  dateFormat?: string;
+  time?: string;
+};
+
 type DateHumanizerStrategies = {
-  [x: string]: (date: Date, locale?: possibleLocale, dateFormat?: string) => string;
+  [x: string]: (date: Date, options: Options) => string;
 };
 
 export default class DateHumanizer {
@@ -21,10 +27,12 @@ export default class DateHumanizer {
       en: enUS,
     };
     this.strategies = {
-      today: (date: Date, locale?: possibleLocale, dateFormat: string = "eee do, MMMM yyyy") =>
+      today: (date: Date, { locale, dateFormat = "eee do, MMMM yyyy" }) =>
         format(date, dateFormat, { locale: this.locale[locale || "en"] }),
-      distanceToNow: (date: Date, locale?: possibleLocale, format?: string) =>
+      distanceToNow: (date: Date, { locale }) =>
         formatDistanceToNow(date, { addSuffix: true, locale: this.locale[locale || "en"] }),
+      formatAndAddTime: (date: Date, { time }) => this.formatAndAddTime({ date, time }),
+      formatDate: (date: Date) => this.formatDate(date),
     };
   }
 
@@ -35,10 +43,35 @@ export default class DateHumanizer {
     this.strategy = strategy;
   }
 
-  humanizeDate(date: Date, locale?: possibleLocale, format: string = "eee do, MMMM yyyy"): string {
+  humanizeDate(date: Date, options?: Options) {
     if (!this.strategies[this.strategy]) {
       throw new Error("Estrategia no válida");
     }
-    return this.strategies[this.strategy](date, locale, format);
+    return this.strategies[this.strategy](date, { ...options });
+  }
+
+  formatAndAddTime({ date, time }: { date: Date | undefined | null; time?: string }) {
+    const dateFomated = this.formatDate(date ?? new Date());
+
+    return this.addHoursAndMinutes(new Date(dateFomated), time ?? "").toString();
+  }
+
+  /* Private methods */
+  private formatDate(date = new Date()) {
+    const year = date.toLocaleString("default", { year: "numeric" });
+    const month = date.toLocaleString("default", {
+      month: "2-digit",
+    });
+    const day = date.toLocaleString("default", { day: "2-digit" });
+
+    return [year, month, day].join("-");
+  }
+
+  private addHoursAndMinutes(date: Date, time: string) {
+    const [hours, minutes] = time.split(":");
+
+    date.setHours(Number(hours));
+    date.setMinutes(Number(minutes));
+    return date;
   }
 }
