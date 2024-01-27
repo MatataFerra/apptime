@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 import Button from "@/components/ui/Button";
 import Portal from "@/components/ui/Portal/";
@@ -9,6 +9,7 @@ import Text from "@/components/ui/Text";
 import { useToast } from "@/components/ui/Toast/use-toast";
 
 import { cn } from "@/utils/helpers/styleMerger";
+import useDelayed from "@/hooks/useDelayed";
 
 import { useNotesStore } from "@/store/useNotesStore";
 import { useShiftStateContext } from "@/store/useShiftStatusStore";
@@ -20,7 +21,8 @@ function NotesPortal() {
   } = useShiftStateContext((state) => state);
   const [note, setNote] = useState(shift?.notes ?? "");
   const { toast } = useToast();
-  const { notesToggle, isOn, isNotesOpen } = useNotesStore();
+  const { notesToggle, isNotesOpen } = useNotesStore();
+  const isNotesOpenDelayed = useDelayed(isNotesOpen, 500);
 
   function onSaveNotes() {
     if (note.length <= 3) return;
@@ -39,11 +41,20 @@ function NotesPortal() {
 
   return (
     <>
-      <Portal data-testid="modal-test" isOn={isOn} isNotesOpen={isNotesOpen}>
+      <Portal
+        data-testid="modal-test"
+        id="notes"
+        isOn={isNotesOpenDelayed}
+        classes={
+          isNotesOpen
+            ? "[&>section]:animate-fade-down"
+            : "[&>section]:animate-dissapear-up [&>section]:transition-all"
+        }
+      >
         {isNotesOpen && (
           <Stack
             as="div"
-            classes={`animate-backdrop-blurry absolute top-0 h-svh w-full bg-[#80808033] transition-all`}
+            classes={`absolute top-0 h-svh w-full animate-backdrop-blurry bg-[#80808033] transition-all`}
             onClick={notesToggle}
           />
         )}
