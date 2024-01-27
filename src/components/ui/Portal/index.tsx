@@ -1,18 +1,23 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 
+import { CSSClassNames } from "@/types";
+
+import { generateRandomID } from "@/utils/helpers/generateRandomID";
 import { cn } from "@/utils/helpers/styleMerger";
 
 interface Props extends Omit<React.HTMLAttributes<HTMLElement>, "className"> {
-  children: React.ReactNode;
+  id?: string;
   isOn: boolean;
-  isNotesOpen: boolean;
+  children: React.ReactNode;
+  classes?: CSSClassNames;
+  handleOutsideClick?: () => void;
 }
 
-function Portal({ children, isOn, isNotesOpen }: Props) {
-  const isWindow = typeof window !== "undefined";
+function Portal({ children, isOn, classes, id, handleOutsideClick }: Props) {
+  const isWindow = useMemo(() => typeof window !== "undefined", []);
   const container = useRef<HTMLElement | null>(isWindow ? document.createElement("nav") : null);
 
   useEffect(() => {
@@ -21,19 +26,18 @@ function Portal({ children, isOn, isNotesOpen }: Props) {
       container.current = document.createElement("nav");
     }
 
-    container.current.id = "notes";
-    container.current.className = cn(
-      isNotesOpen
-        ? "[&>section]:animate-fade-down"
-        : "[&>section]:animate-dissapear-up [&>section]:transition-all"
-    );
+    id ? (container.current.id = id) : null;
+    classes ? (container.current.className = cn(classes)) : null;
 
-    document.body.appendChild(container.current);
+    // append to body
+    if (isOn) {
+      document.body.appendChild(container.current);
+    }
 
     return () => {
-      container.current && document.body.removeChild(container.current);
+      isOn && container.current && document.body.removeChild(container.current);
     };
-  }, [isNotesOpen]);
+  }, [classes, id, isOn]);
 
   useEffect(() => {
     if (isOn) {
@@ -43,10 +47,29 @@ function Portal({ children, isOn, isNotesOpen }: Props) {
     }
   }, [isOn]);
 
+  // detect click outside
+  useEffect(() => {
+    function onClickOutside(event: MouseEvent) {
+      if (container.current && !container.current.contains(event.target as Node)) {
+        handleOutsideClick && handleOutsideClick();
+      }
+    }
+
+    if (isOn) {
+      document.addEventListener("mousedown", onClickOutside);
+    } else {
+      document.removeEventListener("mousedown", onClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", onClickOutside);
+    };
+  }, [handleOutsideClick, isOn]);
+
   return (
     <>
       {isOn &&
-        document.body &&
+        isWindow &&
         createPortal(<>{children}</>, container.current ? container?.current : document.body)}
     </>
   );
