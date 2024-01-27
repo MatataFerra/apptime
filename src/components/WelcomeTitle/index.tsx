@@ -31,7 +31,7 @@ function WelcomeTitle({ username }: Props) {
             variant="gradient"
             classes={`balance_text text-5xl font-bold ${GRADIENTS.gradient_2}`}
           >
-            {data?.user?.name}
+            {data?.user?.name.trim().slice(0, 10)}
           </Text>
         ) : (
           <Skeleton classes="h-9 w-52" />
