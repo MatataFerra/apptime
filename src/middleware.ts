@@ -67,20 +67,13 @@ export default withAuth(async function middleware(req: NextRequest) {
 export const config = {
   //! tratar de reemplazar con un array de rutas para evitar escribirlas a mano
   matcher: [
+    "/(es|en)(/form|/admin|/history-shifts|/no-mobile|/fast-charge|/incomes)?$",
     "/",
-    "/es",
-    "/en",
     "/form",
-    "/es/form",
-    "/en/form",
     "/admin",
-    "/es/admin",
-    "/en/admin",
     "/history-shifts",
-    "/es/history-shifts",
-    "/en/history-shifts",
     "/no-mobile",
-    "/es/no-mobile",
-    "/en/no-mobile",
+    "/fast-charge",
+    "/incomes",
   ],
 };
