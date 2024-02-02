@@ -2,14 +2,18 @@
 
 import { ReactElement } from "react";
 
+import { CSSClassNames } from "@/types";
+
 import Portal from "@/components/ui/Portal";
 import Stack from "@/components/ui/Stack";
 
+import { cn } from "@/utils/helpers/styleMerger";
 import useDelayed from "@/hooks/useDelayed";
 
 type Props = {
-  children: ReactElement;
   isOpen: boolean;
+  classes?: CSSClassNames;
+  children: ReactElement | ReactElement[];
   handleOutsideClick?: () => void;
 };
 
@@ -31,7 +35,12 @@ function Drawer({ children, isOpen, ...rest }: Props) {
             onClick={rest.handleOutsideClick}
           />
         )}
-        <Stack classes={`absolute inset-0 w-1/2 bg-slate-600 `}>{children}</Stack>
+        <Stack
+          orientation="vertical"
+          classes={cn(`absolute inset-0 w-1/2 bg-white p-4`, rest.classes)}
+        >
+          {children}
+        </Stack>
       </Portal>
     </>
   );
