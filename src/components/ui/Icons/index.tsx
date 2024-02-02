@@ -121,4 +121,17 @@ Icon.calculator = function ({ ...props }: SVGProps<SVGSVGElement>) {
   );
 };
 
+Icon.home = function ({ ...props }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={36} height={32} fill="none" {...props}>
+      <path
+        stroke="#000"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M1 11.313 17.875 1 34.75 11.313M31 17.875v12c0 .621-.504 1.125-1.125 1.125h-24a1.125 1.125 0 0 1-1.125-1.125v-12"
+      />
+    </svg>
+  );
+};
+
 export default Icon;
