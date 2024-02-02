@@ -8,7 +8,6 @@ import ut from "@/services/Utilities/client";
 import { LocaleParams } from "@/types";
 
 import DateComponent from "@/components/Date";
-import DrawerMenu from "@/components/DrawerMenu";
 import NotesFab from "@/components/NotesFab";
 import NotesPortal from "@/components/NotesPortal";
 import ShiftButtons from "@/components/ShiftButtons";
@@ -35,7 +34,7 @@ export default async function Home({ params }: { params: LocaleParams }) {
     <>
       <Stack orientation="vertical" spacing={8}>
         <Stack as="div" orientation="vertical" spacing={4}>
-          <WelcomeTitle />
+          <WelcomeTitle user={user} />
           <DateComponent locale={params.locale} />
         </Stack>
 
@@ -46,7 +45,6 @@ export default async function Home({ params }: { params: LocaleParams }) {
           <NotesFab />
           <NotesPortal />
         </ShiftStatusProvider>
-        <DrawerMenu />
       </Stack>
     </>
   );

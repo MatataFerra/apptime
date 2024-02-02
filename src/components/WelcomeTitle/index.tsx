@@ -1,10 +1,4 @@
-"use client";
-
-import { User } from "@prisma/client";
-import { useQueryClient } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
-
-import { SuccessApiResponse } from "@/types/api_response";
+import { UserType } from "@/types";
 
 import Skeleton from "@/components/ui/Skeleton";
 import Text from "@/components/ui/Text";
@@ -12,13 +6,10 @@ import Text from "@/components/ui/Text";
 import { GRADIENTS } from "@/utils/constants/tailwind";
 
 interface Props {
-  username?: string;
+  user?: UserType | null;
 }
 
-function WelcomeTitle({ username }: Props) {
-  const session = useSession();
-  const query = useQueryClient();
-  const data = query.getQueryData<SuccessApiResponse<User>>(["user", session.data?.user?.email]);
+function WelcomeTitle({ user }: Props) {
   return (
     <>
       <div className="flex flex-col gap-4">
@@ -26,12 +17,12 @@ function WelcomeTitle({ username }: Props) {
           Welcome
         </Text>
 
-        {data?.user?.name ? (
+        {user?.name ? (
           <Text
             variant="gradient"
             classes={`balance_text text-5xl font-bold ${GRADIENTS.gradient_2}`}
           >
-            {data?.user?.name.trim().slice(0, 10)}
+            {user?.name.trim().slice(0, 10)}
           </Text>
         ) : (
           <Skeleton classes="h-9 w-52" />
