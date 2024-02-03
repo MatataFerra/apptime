@@ -5,10 +5,6 @@ exports[`Portal > renders children when isOn is false 1`] = `
   style="overflow: auto;"
 >
   <div />
-  <nav
-    class="[&>section]:animate-fade-down"
-    id="notes"
-  />
 </body>
 `;
 
@@ -19,10 +15,7 @@ exports[`Portal > renders children when isOn is true 1`] = `
   style="overflow: hidden;"
 >
   <div />
-  <nav
-    class="[&>section]:animate-fade-down"
-    id="notes"
-  >
+  <nav>
     <section>
       Portal
     </section>

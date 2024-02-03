@@ -10,12 +10,12 @@ import Stack from "@/components/ui/Stack";
 import { cn } from "@/utils/helpers/styleMerger";
 import useDelayed from "@/hooks/useDelayed";
 
-type Props = {
+interface Props extends React.HTMLAttributes<HTMLElement> {
   isOpen: boolean;
   classes?: CSSClassNames;
   children: ReactElement | ReactElement[];
   handleOutsideClick?: () => void;
-};
+}
 
 function Drawer({ children, isOpen, ...rest }: Props) {
   //delay the animation of the drawer

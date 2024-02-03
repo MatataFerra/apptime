@@ -16,7 +16,7 @@ interface Props extends Omit<React.HTMLAttributes<HTMLElement>, "className"> {
   handleOutsideClick?: () => void;
 }
 
-function Portal({ children, isOn, classes, id, handleOutsideClick }: Props) {
+function Portal({ children, isOn, classes, id, handleOutsideClick, ...props }: Props) {
   const isWindow = useMemo(() => typeof window !== "undefined", []);
   const container = useRef<HTMLElement | null>(isWindow ? document.createElement("nav") : null);
 
@@ -29,6 +29,11 @@ function Portal({ children, isOn, classes, id, handleOutsideClick }: Props) {
     id ? (container.current.id = id) : null;
     classes ? (container.current.className = cn(classes)) : null;
 
+    // set attributes
+    for (const [key, value] of Object.entries(props)) {
+      container.current.setAttribute(key, value as string);
+    }
+
     // append to body
     if (isOn) {
       document.body.appendChild(container.current);
@@ -37,7 +42,7 @@ function Portal({ children, isOn, classes, id, handleOutsideClick }: Props) {
     return () => {
       isOn && container.current && document.body.removeChild(container.current);
     };
-  }, [classes, id, isOn]);
+  }, [classes, id, isOn, props]);
 
   useEffect(() => {
     if (isOn) {
