@@ -101,6 +101,16 @@ module.exports = {
           from: { transform: "translateY(0)" },
         },
 
+        "show-left": {
+          to: { transform: "translateX(0)" },
+          from: { transform: "translateX(-100%)" },
+        },
+
+        "show-right": {
+          to: { transform: "translateX(-100%)" },
+          from: { transform: "translateX(0)" },
+        },
+
         'fade-down': {
           '0%': {
               opacity: '0',
@@ -120,25 +130,6 @@ module.exports = {
           '100%': {
               opacity: '1',
               transform: 'translateY(0)',
-          },
-        },
-
-        "fade_in": {
-          "0%": {
-            opacity: 0,
-          },
-          "100%": {
-            opacity: 1,
-          },
-        
-        },
-
-        "fade_out": {
-          "0%": {
-            opacity: 1,
-          },
-          "100%": {
-            opacity: 0,
           },
         },
 
@@ -179,10 +170,10 @@ module.exports = {
         "accordion-up": "accordion-up 0.2s ease-out",
         text: "text 5s ease infinite",
         shake: "shake 1s ease 1",
-        "fade-in": "fade_in 0.5s ease-in-out",
-        "fade-out": "fade_out 0.5s ease-in-out",
         "fade-down": "fade-down 0.5s ease-in-out",
         "fade-up": "fade-up 0.5s ease-in-out",
+        "show-left": "show-left 0.5s ease-in-out forwards",
+        "show-right": "show-right 0.5s ease-in-out forwards",
         "dissapear-up": "dissapear-up 0.5s ease-in-out forwards",
         "backdrop-blurry": "backdrop-blurry 0.5s ease-in-out forwards",
       },

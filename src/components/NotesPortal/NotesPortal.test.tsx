@@ -6,7 +6,7 @@ import Portal from "../ui/Portal";
 describe("Portal", () => {
   test("renders children when isOn is true", () => {
     const { baseElement, container } = render(
-      <Portal isOn={true} isNotesOpen={true}>
+      <Portal isOn={true}>
         <section>Portal</section>
       </Portal>
     );
@@ -18,7 +18,7 @@ describe("Portal", () => {
 
   test("renders children when isOn is false", () => {
     const { baseElement, container } = render(
-      <Portal isOn={false} isNotesOpen={true}>
+      <Portal isOn={false}>
         <section>Portal</section>
       </Portal>
     );

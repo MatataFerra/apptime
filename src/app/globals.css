@@ -141,31 +141,6 @@ input[type=radio]:disabled {
   cursor: not-allowed;
 }
 
-.fade_in {
-  animation: fade_in 0.5s ease-in-out;
-}
-
-.fade_out {
-  animation: fade_out 0.5s ease-in-out;
-}
-
-@keyframes fade_in {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes fade_out {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
 
 div[data-radio-state="false"] .animate_fade_out {
   animation: fade_out 0.5s ease-in-out;
