@@ -69,6 +69,8 @@ export const config = {
   matcher: [
     "/(es|en)(/form|/admin|/history-shifts|/no-mobile|/fast-charge|/incomes)?$",
     "/",
+    "/es",
+    "/en",
     "/form",
     "/admin",
     "/history-shifts",
