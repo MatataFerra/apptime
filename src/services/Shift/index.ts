@@ -2,6 +2,8 @@ import { Shift } from "@prisma/client";
 import { differenceInMinutes } from "date-fns";
 import _, { cloneDeep } from "lodash";
 
+import { UserType } from "@/types";
+
 type ShiftWithoutId = Omit<Shift, "id">;
 
 interface ShiftServiceInterface {
@@ -30,6 +32,44 @@ class ShiftService implements ShiftServiceInterface {
     this.shift = cloneDeep(shift);
   }
 
+  static calculateEarnings({
+    shift,
+    profile,
+    startDate,
+    endDate,
+    isPublicHoliday,
+  }: {
+    shift?: Shift;
+    profile: UserType["profile"];
+    startDate?: string;
+    endDate?: string;
+    isPublicHoliday?: boolean;
+  }) {
+    let amount = 0;
+    let holidayRate = 1;
+    let minuteRate = profile?.hourlyRate ? profile?.hourlyRate / 60 : 1;
+
+    if (!shift || !shift?.amount) {
+      const start = new Date(startDate ?? "");
+      const end = new Date(endDate ?? "");
+
+      amount = differenceInMinutes(end, start);
+    } else {
+      amount = shift.amount;
+      const start = new Date(shift.startDate);
+      const end = new Date(shift.endDate ?? "");
+      amount = differenceInMinutes(end, start);
+    }
+
+    if (shift?.publicHolidayWorked || isPublicHoliday) {
+      holidayRate = 1.5;
+    }
+
+    const earnings = amount * minuteRate * holidayRate;
+
+    return Math.round(earnings * 100) / 100;
+  }
+
   static differenceInHHmm(start: string | number | Date, end?: string | number | Date) {
     let startDate: Date;
     let endDate: Date;
@@ -45,18 +85,10 @@ class ShiftService implements ShiftServiceInterface {
     const difference = Math.abs(differenceInMinutes(startDate, endDate));
     const getHours = difference / 60;
 
-    function decimals(hours: number) {
-      const getDecimals = Math.floor(Number("0." + String(hours).split(".")[1]) * 60);
-
-      if (isNaN(getDecimals)) return 0;
-
-      return getDecimals;
-    }
-
     return {
-      text: `${Math.floor(getHours)}h ${decimals(getHours)}m`,
+      text: `${Math.floor(getHours)}h ${this.decimals(getHours)}m`,
       hours: getHours,
-      minutes: decimals(getHours),
+      minutes: this.decimals(getHours),
       diff: difference,
     };
   }
@@ -85,14 +117,6 @@ class ShiftService implements ShiftServiceInterface {
     return this;
   }
 
-  private updateEndDate() {
-    this.shift.endDate = !!this.shift.endDate
-      ? this.shift.endDate
-      : new Date(Date.now()).toString();
-
-    return this;
-  }
-
   differenceInMinsBetweenStartAndEnd() {
     const start = new Date(this?.shift?.startDate ?? Date.now());
 
@@ -109,18 +133,6 @@ class ShiftService implements ShiftServiceInterface {
     return this;
   }
 
-  private updateStatus() {
-    if (!this.shift.endDate) {
-      this.shift.isClosed = false;
-
-      return this;
-    }
-
-    this.shift.isClosed = true;
-
-    return this;
-  }
-
   checkPublicHoliday() {
     if (this.shift.publicHolidayWorked) {
       this.shift.isPublicHoliday = true;
@@ -133,6 +145,34 @@ class ShiftService implements ShiftServiceInterface {
 
   build() {
     return this.shift;
+  }
+
+  private updateEndDate() {
+    this.shift.endDate = !!this.shift.endDate
+      ? this.shift.endDate
+      : new Date(Date.now()).toString();
+
+    return this;
+  }
+
+  private updateStatus() {
+    if (!this.shift.endDate) {
+      this.shift.isClosed = false;
+
+      return this;
+    }
+
+    this.shift.isClosed = true;
+
+    return this;
+  }
+
+  private static decimals(hours: number) {
+    const getDecimals = Math.floor(Number("0." + String(hours).split(".")[1]) * 60);
+
+    if (isNaN(getDecimals)) return 0;
+
+    return getDecimals;
   }
 }
 
