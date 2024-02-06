@@ -10,6 +10,14 @@ import { cn } from "@/utils/helpers/styleMerger";
 function Input(props: InputProps, ref: Ref<HTMLInputElement>): ReactElement<InputProps> {
   const { label, labelClasses, isRequired, containerClasses, spacing, ...rest } = props;
 
+  if (label && !rest.name) {
+    // eslint-disable-next-line no-console
+    console.log(
+      "\x1b[31m%s\x1b[0m",
+      "Input component with label: " + "'" + label + "'" + " must have a name prop"
+    );
+  }
+
   return (
     <>
       {label ? (
