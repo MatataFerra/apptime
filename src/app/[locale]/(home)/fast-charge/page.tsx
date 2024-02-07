@@ -1,6 +1,4 @@
 import FastChargeForm from "@/components/FastChargeForm";
-import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
