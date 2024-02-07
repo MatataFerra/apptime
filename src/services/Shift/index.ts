@@ -1,8 +1,10 @@
 import { Shift } from "@prisma/client";
 import { differenceInMinutes } from "date-fns";
-import _, { cloneDeep } from "lodash";
+import { cloneDeep } from "lodash";
 
 import { UserType } from "@/types";
+
+import prisma from "../../../prisma/client";
 
 type ShiftWithoutId = Omit<Shift, "id">;
 
@@ -21,6 +23,11 @@ interface ShiftServiceInterface {
  * @method differenceInMinsBetweenStartAndEnd - Calculates the difference between the start and end of a shift
  * @method convertAmountInDecimal - Converts the amount of minutes in decimal
  * @param {ShiftWithoutId["amount"]} amount - The amount of minutes.
+ * @method calculateEarnings - Calculates the earnings of a shift
+ * @param {Shift} shift - The shift
+ * @param {UserType["profile"]} profile - The user profile
+ * @param {string} startDate - The start date of the shift
+ * @param {string} endDate - The end date of the shift
  * @method shiftStatus - Checks if the shift is closed
  * @method checkPublicHoliday - Checks if the shift is a public holiday
  * @method create - Creates a new shift and executes all the methods above
@@ -32,6 +39,27 @@ class ShiftService implements ShiftServiceInterface {
     this.shift = cloneDeep(shift);
   }
 
+  async create({ userId }: { userId: string }) {
+    const createShift = await prisma.shift.create({
+      data: {
+        User: {
+          connect: {
+            id: userId,
+          },
+        },
+        startDate: this.shift.startDate,
+        endDate: this.shift.endDate,
+        amount: this.shift.amount,
+        isClosed: this.shift.isClosed,
+        isPublicHoliday: this.shift.isPublicHoliday,
+        notes: this.shift.notes,
+        publicHolidayWorked: this.shift.publicHolidayWorked,
+      },
+    });
+
+    return createShift;
+  }
+
   static calculateEarnings({
     shift,
     profile,
@@ -39,7 +67,7 @@ class ShiftService implements ShiftServiceInterface {
     endDate,
     isPublicHoliday,
   }: {
-    shift?: Shift;
+    shift?: Omit<Shift, "id">;
     profile: UserType["profile"];
     startDate?: string;
     endDate?: string;
@@ -61,7 +89,7 @@ class ShiftService implements ShiftServiceInterface {
       amount = differenceInMinutes(end, start);
     }
 
-    if (shift?.publicHolidayWorked || isPublicHoliday) {
+    if (shift?.isPublicHoliday || isPublicHoliday) {
       holidayRate = 1.5;
     }
 

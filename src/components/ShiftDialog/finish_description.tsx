@@ -62,6 +62,7 @@ function FinishDescription() {
                 <Input
                   containerClasses="grid grid-cols-[1fr,1fr] !gap-4 items-center w-full"
                   key={label}
+                  name={`${label}-shift`}
                   label={capitalize(label)}
                   value={inputValue[label as Labels]}
                   type={label === "start" || label === "end" ? "time" : "date"}

@@ -177,4 +177,68 @@ describe("ShiftService", () => {
       expect(shift.isClosed).toBe(true);
     });
   });
+
+  describe("Should calculate  earnings", () => {
+    test("Should calculate the earnings of a shift", () => {
+      const mock: Shift = {
+        ...shiftMock.shift,
+        startDate: now.toString(),
+        endDate: addMinutes(now, DIFFERENCE_SHIFT).toString(),
+      };
+
+      const shift = new ShiftService(mock).differenceInMinsBetweenStartAndEnd().build();
+
+      const earnings = ShiftService.calculateEarnings({
+        profile: profileMock.profile,
+        shift,
+      });
+
+      expect(earnings).toBe(5.25);
+    });
+
+    test("Should calculate the earnings of a shift when is public holiday", () => {
+      const mock: Shift = {
+        ...shiftMock.shift,
+        startDate: now.toString(),
+        endDate: addMinutes(now, DIFFERENCE_SHIFT).toString(),
+        isPublicHoliday: true,
+      };
+
+      const shift = new ShiftService(mock).differenceInMinsBetweenStartAndEnd().build();
+
+      const earnings = ShiftService.calculateEarnings({
+        profile: profileMock.profile,
+        shift,
+      });
+
+      expect(earnings).toBe(7.88);
+    });
+
+    test("Should calculate the earnings when user pass start and end dates instead shift", () => {
+      const start = now.toString();
+      const end = addMinutes(now, DIFFERENCE_SHIFT).toString();
+
+      const earnings = ShiftService.calculateEarnings({
+        profile: profileMock.profile,
+        startDate: start,
+        endDate: end,
+      });
+
+      expect(earnings).toBe(5.25);
+    });
+
+    test("Should calculate the earnings when user pass start and end dates instead shift and is public holiday", () => {
+      const start = now.toString();
+      const end = addMinutes(now, DIFFERENCE_SHIFT).toString();
+
+      const earnings = ShiftService.calculateEarnings({
+        profile: profileMock.profile,
+        startDate: start,
+        endDate: end,
+        isPublicHoliday: true,
+      });
+
+      expect(earnings).toBe(7.88);
+    });
+  });
 });
