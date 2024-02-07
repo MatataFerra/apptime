@@ -7,47 +7,35 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { isNaN } from "lodash";
 import { useLocale } from "next-intl";
-import { z } from "zod";
 
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
 
-import { Locale } from "@/types";
+import { FastChargeFormSchema, Locale } from "@/types";
+import { type FastChargeInputs, type FastChargeInputsParsed } from "@/types/forms";
 
+import PopoverBase from "@/components/Popover";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
+import { useToast } from "@/components/ui/Toast/use-toast";
 
 import useQueryUser from "@/hooks/useQueryUser";
 
-import PopoverBase from "../Popover";
-
-type Inputs = {
-  "start-date": string;
-  "finish-date": string;
-  "start-time": string;
-  "finish-time": string;
-  "fast-holiday": boolean;
-};
-
-const FastChargeFormSchema = z.object({
-  "start-date": z.string().length(10),
-  "finish-date": z.string().length(10),
-  "start-time": z.string().length(5),
-  "finish-time": z.string().length(5),
-  "fast-holiday": z.boolean(),
-});
+import onSubmitFastCharge from "@/server-actions/fast-charge";
 
 function FastChargeForm() {
   const locale = useLocale() as Locale;
+  const { toast } = useToast();
   const {
     handleSubmit,
     register,
     watch,
     setValue,
+    reset,
     formState: { touchedFields },
-  } = useForm<Inputs>({
+  } = useForm<FastChargeInputs>({
     resolver: zodResolver(FastChargeFormSchema),
   });
   const user = useQueryUser();
@@ -56,7 +44,9 @@ function FastChargeForm() {
   const finishDateWatch = watch("finish-date");
   const startTimeWatch = watch("start-time");
   const finishTimeWatch = watch("finish-time");
-  const fastHolidayWatch = watch("fast-holiday");
+  const fastWorkedWatch = watch("fast-worked");
+
+  const thisYear = new Date(Date.now()).getFullYear().toString();
 
   useEffect(() => {
     if (startDateWatch && !touchedFields["finish-date"]) {
@@ -111,17 +101,33 @@ function FastChargeForm() {
         profile: user.profile,
         startDate: formatStart,
         endDate: formatEnd,
-        isPublicHoliday: fastHolidayWatch,
+        isPublicHoliday: fastWorkedWatch,
       });
 
       return isNaN(earnings) ? 0 : earnings;
     }
 
     return 0;
-  }, [formatEnd, formatStart, user?.profile, fastHolidayWatch]);
+  }, [formatEnd, formatStart, user?.profile, fastWorkedWatch]);
 
-  function onSubmit(data: Inputs) {
-    // not implemented
+  function onSubmit(data: FastChargeInputs) {
+    const parseData: FastChargeInputsParsed = {
+      startDate: formatStart,
+      endDate: formatEnd,
+      isPublicHoliday: data["fast-holiday"],
+      isWorked: data["fast-worked"],
+    };
+
+    onSubmitFastCharge(parseData).then((res) => {
+      if (res) {
+        toast({
+          title: "Shift created successfully",
+          className: "bg-green-500 text-white",
+          duration: 2000,
+        });
+        reset();
+      }
+    });
   }
 
   return (
@@ -132,14 +138,14 @@ function FastChargeForm() {
           label="Start date"
           type="date"
           // create a function to get the current year, give more flexibility
-          max={format(new Date("2024-12-31"), "yyyy-MM-dd")}
+          max={format(new Date(`${thisYear}-12-31`), "yyyy-MM-dd")}
           {...register("start-date")}
         />
         <Input
           classes="text-base"
           label="Finish date"
           type="date"
-          max={format(new Date("2024-12-31"), "yyyy-MM-dd")}
+          max={format(new Date(`${thisYear}-12-31`), "yyyy-MM-dd")}
           {...register("finish-date")}
         />
         <Input classes="text-base" label="Start time" type="time" {...register("start-time")} />
@@ -147,7 +153,13 @@ function FastChargeForm() {
         <Stack alignItems="center">
           <Input classes="size-4" type="checkbox" id="fast-holiday" {...register("fast-holiday")} />
           <Text as="label" htmlFor="fast-holiday">
-            is it a holiday?
+            is it a public holiday?
+          </Text>
+        </Stack>
+        <Stack alignItems="center">
+          <Input classes="size-4" type="checkbox" id="fast-worked" {...register("fast-worked")} />
+          <Text as="label" htmlFor="fast-worked">
+            did you work it?
           </Text>
         </Stack>
       </Stack>
