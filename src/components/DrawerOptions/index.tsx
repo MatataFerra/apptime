@@ -37,6 +37,7 @@ function DrawerOptions() {
       <Stack grid rows="1fr auto" classes="h-full w-full">
         <Stack orientation="vertical" classes="w-full">
           <Stack
+            data-testid="fast-charge"
             as="button"
             grid
             cols="20% 1fr"

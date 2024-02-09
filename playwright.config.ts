@@ -7,6 +7,7 @@ const IGNORE_TEST_DESKTOP = [
   /.*register.spec.ts/,
   /.*home-form.spec.ts/,
   /.*shift-track.spec.ts/,
+  /.*fast-charge.spec.ts/,
 ];
 const IGNORE_TEST_MOBILE = [/.*no-mobile.spec.ts/];
 
