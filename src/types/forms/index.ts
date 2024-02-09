@@ -1,6 +1,8 @@
 import { HTMLInputTypeAttribute } from "react";
 
-import { CSSClassNames } from "@/types";
+import { z } from "zod";
+
+import { CSSClassNames, FastChargeFormSchema } from "@/types";
 
 import { INPUT_VARIANTS } from "@/utils/constants/tailwind";
 export enum FormStep {
@@ -36,3 +38,13 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
 export interface InputMeasureProps extends InputProps {
   inputClasses?: CSSClassNames;
 }
+
+// Fast Charge Form
+
+export type FastChargeInputs = z.infer<typeof FastChargeFormSchema>;
+export type FastChargeInputsParsed = {
+  startDate: string;
+  endDate: string;
+  isPublicHoliday: boolean;
+  isWorked: boolean;
+};

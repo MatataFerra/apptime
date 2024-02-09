@@ -128,6 +128,19 @@ const PasswordSchema = z.object({
   }),
 });
 
+/* 
+  Fast Charge Schema
+*/
+
+export const FastChargeFormSchema = z.object({
+  "start-date": z.string().length(10),
+  "finish-date": z.string().length(10),
+  "start-time": z.string().length(5),
+  "finish-time": z.string().length(5),
+  "fast-holiday": z.boolean(),
+  "fast-worked": z.boolean(),
+});
+
 /**
  * @description Enum to handle errors
  */
