@@ -10,6 +10,7 @@ type ShiftWithoutId = Omit<Shift, "id">;
 
 interface ShiftServiceInterface {
   shift: ShiftWithoutId;
+  create: ({ userId }: { userId: string }) => Promise<Shift>;
   differenceInMinsBetweenStartAndEnd: () => void;
   closeShift: () => void;
   checkPublicHoliday: () => void;

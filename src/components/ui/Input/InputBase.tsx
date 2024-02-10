@@ -21,9 +21,8 @@ function InputBase(props: InputProps, ref: Ref<HTMLInputElement>): ReactElement<
           id={rest.name}
           ref={ref}
           type={type}
-          autoComplete="off"
           className={cm(
-            "rounded-lg px-2 py-1",
+            "rounded-lg border border-gray-200 px-2 py-1",
             type === "radio" ? INPUT_VARIANTS["radio"] : INPUT_VARIANTS[variant],
             isError ? "border border-red-600 focus:ring-red-600" : "",
             classes
