@@ -13,13 +13,13 @@ function InputMeasure(props: InputProps, ref: Ref<HTMLInputElement>) {
   return (
     <>
       <Stack
-        as="fieldset"
+        as="div"
         alignItems="center"
         classes={`${
           isError ? "border border-red-600 focus-within:ring-red-600" : "focus-within:ring-blue-600"
         } ${
           classes ? classes : ""
-        } rounded-md bg-white p-3 px-2 py-1 text-2xl shadow-input focus-within:border-transparent focus-within:outline-none focus-within:ring-2`}
+        } h-[69px] items-center rounded-md border border-gray-200 bg-white p-3 px-2 py-1 text-2xl shadow-input focus-within:border-transparent focus-within:outline-none focus-within:ring-2`}
       >
         <input
           id={rest.name}
@@ -28,7 +28,7 @@ function InputMeasure(props: InputProps, ref: Ref<HTMLInputElement>) {
           autoComplete="off"
           className={cn(
             INPUT_VARIANTS["plane"],
-            "rounded-lg outline-none",
+            "h-full rounded-lg outline-none ",
             measurePlace === "left" ? "order-2" : "order-1"
           )}
           {...rest}
