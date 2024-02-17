@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import ShiftService from "@/services/Shift";
 import UserService from "@/services/User";
 
@@ -29,6 +31,8 @@ export default async function onSubmitFastCharge(data: FastChargeInputsParsed) {
 
   try {
     const createShift = await new ShiftService(shift).create({ userId: currentUser.id });
+
+    revalidatePath("/[locale]/(home)/history-shifts", "page");
 
     return createShift;
   } catch (error) {
