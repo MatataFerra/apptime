@@ -96,7 +96,7 @@ function CarouselDashboard({ params }: Props) {
   );
 
   return (
-    <Stack orientation="horizontal" as="header">
+    <Stack orientation="horizontal" as="header" classes="w-full">
       <Carousel
         opts={{
           align: "center",
@@ -104,11 +104,11 @@ function CarouselDashboard({ params }: Props) {
           dragFree: true,
           dragThreshold: 0.1,
         }}
-        className="w-full max-w-sm"
+        className="w-full max-w-[90svw] overflow-hidden"
       >
         <CarouselContent>
           {Object.keys(CARDS_CONTENT).map((key, index) => (
-            <CarouselItem key={index} className="basis-1/3">
+            <CarouselItem key={index} className="basis-1/3 md:basis-1/5">
               <Card>
                 <Text classes="text-pretty text-sm">
                   {CARDS_CONTENT[key as keyof typeof CARDS_CONTENT].title}
