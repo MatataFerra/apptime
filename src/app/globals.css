@@ -145,3 +145,12 @@ input[type=radio]:disabled {
 div[data-radio-state="false"] .animate_fade_out {
   animation: fade_out 0.5s ease-in-out;
 }
+
+.glass {
+
+  background: rgba(183, 183, 183, 0.37);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(183, 183, 183, 0.3);
+  
+}
