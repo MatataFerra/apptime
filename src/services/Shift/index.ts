@@ -40,6 +40,16 @@ class ShiftService implements ShiftServiceInterface {
     this.shift = cloneDeep(shift);
   }
 
+  async delete({ id }: { id: number }) {
+    const deleteShift = await prisma.shift.delete({
+      where: {
+        id,
+      },
+    });
+
+    return deleteShift;
+  }
+
   async create({ userId }: { userId: string }) {
     const createShift = await prisma.shift.create({
       data: {
@@ -78,17 +88,18 @@ class ShiftService implements ShiftServiceInterface {
     let holidayRate = 1;
     let minuteRate = profile?.hourlyRate ? profile?.hourlyRate / 60 : 1;
 
-    if (!shift || !shift?.amount) {
+    if (startDate && endDate) {
       const start = new Date(startDate ?? "");
       const end = new Date(endDate ?? "");
 
       amount = differenceInMinutes(end, start);
     } else {
-      amount = shift.amount;
-      const start = new Date(shift.startDate);
-      const end = new Date(shift.endDate ?? "");
+      const start = new Date(shift?.startDate ?? "");
+      const end = new Date(shift?.endDate ?? "");
       amount = differenceInMinutes(end, start);
     }
+
+    if (amount <= 0) amount = 0;
 
     if (shift?.isPublicHoliday || isPublicHoliday) {
       holidayRate = 1.5;
@@ -127,11 +138,16 @@ class ShiftService implements ShiftServiceInterface {
     return shifts.find((shift) => !shift.isClosed);
   }
 
-  static shiftsSorted(shifts: Shift[] | undefined) {
-    return shifts?.toSorted((a, b) => {
-      if (!a.isClosed || !b.isClosed) return 0;
+  static shiftsSorted(shifts: Shift[] | undefined, { desc = true }: { desc?: boolean } = {}) {
+    if (!shifts) return null;
+    if (desc) {
+      return shifts.toSorted((a, b) => {
+        return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+      });
+    }
 
-      return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+    return shifts.toSorted((a, b) => {
+      return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
     });
   }
 

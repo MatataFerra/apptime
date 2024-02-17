@@ -33,6 +33,12 @@ export default class DateHumanizer {
         formatDistanceToNow(date, { addSuffix: true, locale: this.locale[locale || "en"] }),
       formatAndAddTime: (date: Date, { time }) => this.formatAndAddTime({ date, time }),
       formatDate: (date: Date) => this.formatDate(date),
+      short: (date: Date, { locale }) =>
+        new Date(date).toLocaleDateString(locale, {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        }),
     };
   }
 

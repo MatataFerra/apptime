@@ -67,7 +67,10 @@ class Dashboard implements DashboardInterface {
       const amount = shift.amount ?? 0;
 
       if (isThisWeek(new Date(shift.startDate))) {
-        return (acc + amount) * this.minuteValue;
+        const total = amount * this.minuteValue;
+        const newValue = acc + total;
+
+        return newValue;
       }
 
       return acc;

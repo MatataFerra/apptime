@@ -11,7 +11,7 @@ export type UserType = User & {
 };
 export type HandleErrorType = z.infer<typeof HandleErrorTypeSchema>;
 
-export type DashboardUserType = Omit<UserType, "account" | "session">;
+export type DashboardUserType = UserType;
 
 // Interfaces
 export interface InterfaceConfig {
@@ -57,4 +57,9 @@ export type PassedErrors = {
 };
 
 // Date Humanizer
-export type DateHumanizerStrategy = "today" | "distanceToNow" | "formatAndAddTime" | "formatDate";
+export type DateHumanizerStrategy =
+  | "today"
+  | "distanceToNow"
+  | "formatAndAddTime"
+  | "formatDate"
+  | "short";
