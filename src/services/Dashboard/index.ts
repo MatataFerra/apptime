@@ -62,13 +62,12 @@ class Dashboard implements DashboardInterface {
 
   // We can refactor this function using the Pay Service, also we can migrate this
   // functionality to Pay Service and create a better abastraction
-  estimatedWeeklyEarnings({ weekStartsOn }: { weekStartsOn: keyof typeof DAYS }) {
+  estimatedWeeklyEarnings({ weekStartsOn = "monday" }: { weekStartsOn?: keyof typeof DAYS } = {}) {
     return this.user.shifts.reduce((acc, shift) => {
       const amount = shift.amount ?? 0;
 
       if (
-        (isThisWeek(new Date(shift.startDate)),
-        {
+        isThisWeek(new Date(shift.startDate), {
           weekStartsOn: DAYS[weekStartsOn as keyof typeof DAYS],
         })
       ) {
@@ -89,7 +88,7 @@ class Dashboard implements DashboardInterface {
       averageHoursWorkedPerDay: ShiftService.convertAmountInDecimal(this.averageHoursWorkedPerDay),
       hourValue: this.hourValue,
       lastDayRegistered: this.lastDayRegistered,
-      estimatedWeeklyEarnings: this.estimatedWeeklyEarnings({ weekStartsOn: "monday" }),
+      estimatedWeeklyEarnings: this.estimatedWeeklyEarnings(),
     };
   }
 }
