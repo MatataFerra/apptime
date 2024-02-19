@@ -6,6 +6,7 @@ import UserService from "@/services/User";
 import { LocaleParams } from "@/types";
 
 import CarouselDashboard from "@/components/CarouselDashboard";
+import PickupDate from "@/components/PickupDate";
 import TableBody from "@/components/TableBody";
 import Icon from "@/components/ui/Icons";
 import Stack from "@/components/ui/Stack";
@@ -43,16 +44,21 @@ export default async function HistoryShift({ params }: { params: LocaleParams })
     <Stack orientation="vertical" spacing={8}>
       <DashboardProvider user={user}>
         <CarouselDashboard params={params} />
-        <Stack orientation="horizontal" justifyContent="between" classes="w-full">
+        <Stack
+          orientation="horizontal"
+          alignItems="center"
+          justifyContent="between"
+          classes="w-full"
+        >
           <Text variant="gradient" classes={`text-2xl font-bold ${GRADIENTS.gradient_2}`}>
             History Shifts
           </Text>
-          <Stack as="div" alignItems="center">
-            <Icon.calendar />
-            <Text>pick date</Text>
-          </Stack>
+          <PickupDate />
         </Stack>
-        <Stack orientation="vertical" classes="glass h-60 w-full overflow-y-scroll rounded-lg p-4">
+        <Stack
+          orientation="vertical"
+          classes="glass h-fit max-h-60 min-h-10 w-full overflow-y-scroll rounded-lg p-4"
+        >
           {/* Create table */}
           <table className="h-full w-full">
             <thead className="border border-l-0 border-r-0 border-t-0 border-b-red-500 text-left">

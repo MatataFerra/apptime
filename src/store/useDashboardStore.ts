@@ -1,16 +1,20 @@
 import { createContext, useContext } from "react";
 
+import { isSameDay } from "date-fns";
 import { create, useStore } from "zustand";
 
 import type { UserType } from "@/types";
 
 interface DashboardStateProps {
   user: UserType | null;
+  initialShifts: UserType["shifts"];
 }
 
 interface DashboardState extends DashboardStateProps {
   update: (props: Partial<DashboardStateProps["user"]>) => void;
   deleteShift: (id: number) => void;
+  filterByDate: (date: string) => void;
+  resetShifts: () => void;
 }
 
 type DashboardStateStore = ReturnType<typeof createDashboardStore>;
@@ -18,6 +22,7 @@ type DashboardStateStore = ReturnType<typeof createDashboardStore>;
 export function createDashboardStore(initProps?: Partial<DashboardStateProps>) {
   const DEFAULT_PROPS: DashboardStateProps = {
     user: initProps?.user || null,
+    initialShifts: initProps?.initialShifts || initProps?.user?.shifts || [],
   };
   return create<DashboardState>()((set, get) => ({
     ...DEFAULT_PROPS,
@@ -33,6 +38,31 @@ export function createDashboardStore(initProps?: Partial<DashboardStateProps>) {
           user: {
             ...(get().user as UserType),
             shifts: newShifts ?? [],
+          },
+        });
+      }
+    },
+    filterByDate: (date) => {
+      const initial = get().initialShifts;
+      const newShifts = initial.filter((shift) =>
+        isSameDay(new Date(shift.startDate), new Date(date))
+      );
+
+      if (get().user) {
+        set({
+          user: {
+            ...(get().user as UserType),
+            shifts: newShifts ?? [],
+          },
+        });
+      }
+    },
+    resetShifts: () => {
+      if (get().user) {
+        set({
+          user: {
+            ...(get().user as UserType),
+            shifts: get().initialShifts,
           },
         });
       }
