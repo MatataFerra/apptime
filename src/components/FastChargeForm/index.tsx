@@ -40,7 +40,7 @@ function FastChargeForm() {
   } = useForm<FastChargeInputs>({
     resolver: zodResolver(FastChargeFormSchema),
   });
-  const { data } = useUser();
+  const { data: user } = useUser();
 
   const startDateWatch = watch("start-date");
   const finishDateWatch = watch("finish-date");
@@ -98,9 +98,9 @@ function FastChargeForm() {
   }, [finishDateWatch, finishTimeWatch, formatEnd, formatStart, startDateWatch, startTimeWatch]);
 
   const calculateEarnings = useMemo(() => {
-    if (data?.profile) {
+    if (user?.profile) {
       const earnings = ShiftService.calculateEarnings({
-        profile: data?.user.profile,
+        profile: user.profile,
         startDate: formatStart,
         endDate: formatEnd,
         isPublicHoliday: fastWorkedWatch,
@@ -110,7 +110,7 @@ function FastChargeForm() {
     }
 
     return 0;
-  }, [data?.profile, data?.user.profile, fastWorkedWatch, formatEnd, formatStart]);
+  }, [user?.profile, fastWorkedWatch, formatEnd, formatStart]);
 
   function onSubmit(formData: FastChargeInputs) {
     const parseData: FastChargeInputsParsed = {
@@ -129,7 +129,7 @@ function FastChargeForm() {
         });
 
         queryClient.invalidateQueries({
-          queryKey: ["user"],
+          queryKey: ["user", user?.email],
         });
 
         reset();
