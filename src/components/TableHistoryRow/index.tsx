@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { Shift } from "@prisma/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -13,16 +13,13 @@ import ShiftService from "@/services/Shift";
 import { Locale, UserType } from "@/types";
 
 import Button from "@/components/ui/Button";
-import Icon from "@/components/ui/Icons";
 import Image from "@/components/ui/Image";
-import Text from "@/components/ui/Text";
-
-import { cn } from "@/utils/helpers/styleMerger";
+import TableElement from "@/components/ui/TableElement";
 
 import { SuccessApiResponse } from "../../types/api_response/index";
 import { useDashboardContext } from "@/store/useDashboardStore";
 
-function TableElement({ shift }: { shift: Shift }) {
+function TableHistoryRow({ shift }: { shift: Shift }) {
   const [isRippled, setIsRippled] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const locale = useLocale() as Locale;
@@ -75,22 +72,14 @@ function TableElement({ shift }: { shift: Shift }) {
   }
 
   return (
-    <tr
-      className={`border border-l-0 border-r-0 border-t-0 border-b-slate-400 ${isDeleting ? "animate-fade-out-left" : ""}`}
-    >
-      <Text as="td" classes="py-3">
-        {shortDate(shift.startDate)}
-      </Text>
-      <Text as="td" classes="py-3">
-        {shift?.amount ? String(getHours(shift?.amount ?? 0)) : "..."}
-      </Text>
-      <Text as="td" classes="py-3">
-        ${String(calculateEarnings(shift))}
-      </Text>
-      <td>
+    <TableElement as="tr" classes={isDeleting ? "animate-fade-out-left" : undefined}>
+      <TableElement>{shortDate(shift.startDate)}</TableElement>
+      <TableElement>{shift?.amount ? String(getHours(shift?.amount ?? 0)) : "..."}</TableElement>
+      <TableElement>${String(calculateEarnings(shift))}</TableElement>
+      <TableElement>
         <Button
-          variant="outlined"
-          classes={`relative z-0 size-10 rounded-full bg-transparent after:absolute after:inset-0  after:rounded-full after:bg-light-blue after:opacity-0 ${isRippled ? "after:animate-ripple" : ""}`}
+          variant="rippled"
+          classes={isRippled ? "after:animate-ripple" : ""}
           onClick={() => {
             // Delete shift
             mutate({ id: shift.id });
@@ -110,9 +99,9 @@ function TableElement({ shift }: { shift: Shift }) {
             height={20}
           />
         </Button>
-      </td>
-    </tr>
+      </TableElement>
+    </TableElement>
   );
 }
 
-export default TableElement;
+export default TableHistoryRow;

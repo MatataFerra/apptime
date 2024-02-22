@@ -2,20 +2,21 @@
 
 import ShiftService from "@/services/Shift";
 
-import TableElement from "@/components/TableElement";
+import TableHistoryRow from "@/components/TableHistoryRow";
+import TableBody from "@/components/ui/TableBody";
 
 import { useDashboardContext } from "@/store/useDashboardStore";
 
-function TableBody() {
+function TableHistoryBody() {
   const { user } = useDashboardContext((state) => state);
 
   return (
-    <tbody>
+    <TableBody>
       {ShiftService.shiftsSorted(user?.shifts, { desc: false })?.map((shift) => (
-        <TableElement key={shift.id} shift={shift} />
+        <TableHistoryRow key={shift.id} shift={shift} />
       ))}
-    </tbody>
+    </TableBody>
   );
 }
 
-export default TableBody;
+export default TableHistoryBody;

@@ -1,44 +1,24 @@
-import { Shift } from "@prisma/client";
-
-import ShiftService from "@/services/Shift";
 import UserService from "@/services/User";
 
 import { LocaleParams } from "@/types";
 
 import CarouselDashboard from "@/components/CarouselDashboard";
 import PickupDate from "@/components/PickupDate";
-import TableBody from "@/components/TableBody";
-import Icon from "@/components/ui/Icons";
+import TableHistoryBody from "@/components/TableHistoryBody";
+import TableHistoryFoot from "@/components/TableHistoryFoot";
 import Stack from "@/components/ui/Stack";
+import Table from "@/components/ui/Table";
+import TableHead from "@/components/ui/TableHead";
 import Text from "@/components/ui/Text";
 
 import DashboardProvider from "@/providers/DashboardProvider";
 
 import { GRADIENTS } from "@/utils/constants/tailwind";
 
+const COLUMNS = ["Day", "Hours", "Earnings"] as const;
+
 export default async function HistoryShift({ params }: { params: LocaleParams }) {
   const user = await UserService.getSessionUser();
-
-  function calculateEarnings(shift: Shift) {
-    return ShiftService.calculateEarnings({
-      profile: user?.profile ?? null,
-      shift,
-    });
-  }
-
-  function getHours(minutes: number) {
-    return ShiftService.convertAmountInDecimal(minutes);
-  }
-
-  function totalEarnings() {
-    return user?.shifts.reduce((acc, shift) => acc + calculateEarnings(shift), 0);
-  }
-
-  function sumHours() {
-    return user?.shifts.reduce((acc, shift) => {
-      return acc + (shift?.amount ? getHours(shift?.amount ?? 0) : 0);
-    }, 0);
-  }
 
   return (
     <Stack orientation="vertical" spacing={8}>
@@ -57,32 +37,18 @@ export default async function HistoryShift({ params }: { params: LocaleParams })
         </Stack>
         <Stack
           orientation="vertical"
-          classes="glass h-fit max-h-60 min-h-10 w-full overflow-y-scroll rounded-lg p-4"
+          classes="h-fit max-h-60 min-h-10 w-full overflow-y-scroll rounded-lg border border-gray-200 bg-white shadow-input"
         >
-          {/* Create table */}
-          <table className="h-full w-full">
-            <thead className="border border-l-0 border-r-0 border-t-0 border-b-red-500 text-left">
-              <tr>
-                <th>
-                  <Text classes="pb-2">Day</Text>
-                </th>
-                <th>
-                  <Text classes="pb-2">Hours</Text>
-                </th>
-                <th>
-                  <Text classes="pb-2">Earnings</Text>
-                </th>
-              </tr>
-            </thead>
-            <TableBody />
-            <tfoot>
-              <tr>
-                <th className="pt-2 text-left">Totals</th>
-                <td className="pt-2">{`${sumHours()?.toFixed(2)}`}h</td>
-                <td className="pt-2">${`${totalEarnings()?.toFixed(2)}`}</td>
-              </tr>
-            </tfoot>
-          </table>
+          <Table classes="h-full w-full table-fixed">
+            <TableHead
+              classes="border border-l-0 border-r-0 border-t-0 border-b-gray-900 text-left"
+              columnTitle={COLUMNS}
+              elementClasses="p-4"
+            />
+
+            <TableHistoryBody />
+            <TableHistoryFoot />
+          </Table>
         </Stack>
       </DashboardProvider>
     </Stack>
