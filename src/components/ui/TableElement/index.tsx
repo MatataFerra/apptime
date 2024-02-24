@@ -28,10 +28,12 @@ function TableElement<E extends ValidTableElement = typeof TableElementDefaultAs
   const Element = as || "td";
   const defaultStyles = !isTr ? "p-4 text-base text-gray-800 dark:text-gray-100" : "";
   const classesStyles = classes ? classes : "";
-  const styles = !isTr ? `${defaultStyles} ${classesStyles}` : undefined;
 
   return (
-    <Element className={styles ? cn(styles) : undefined} {...props}>
+    <Element
+      className={defaultStyles || classes ? cn(defaultStyles, classesStyles) : undefined}
+      {...props}
+    >
       {children}
     </Element>
   );

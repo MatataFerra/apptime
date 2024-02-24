@@ -20,8 +20,7 @@ export const BUTTON_VARIANTS = {
   success: "bg-green-500 text-white p-3",
   warning: "bg-yellow-500 text-white p-3",
   info: "bg-blue-500 text-white p-3 font-bold text-white shadow-button",
-  rippled:
-    "bg-white text-black p-3 relative z-0 size-10 rounded-full bg-transparent after:absolute after:inset-0  after:rounded-full after:bg-light-blue after:opacity-0",
+  rounded: "text-black p-3 rounded-full bg-transparent",
   gradient: "bg-gradient-to-r from-blue-600 p-3 via-purple-500 to-orange-500 text-white",
   google: "bg-white text-black p-3 border border-gray-300 shadow-button",
   outlined: "bg-white text-black p-3",

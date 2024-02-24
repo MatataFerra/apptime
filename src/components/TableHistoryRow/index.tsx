@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 
 import { Shift } from "@prisma/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 
 import api from "@/services/Api/Shift";
@@ -11,17 +12,18 @@ import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
 
 import { Locale, UserType } from "@/types";
+import { SuccessApiResponse } from "@/types/api_response/index";
 
 import Button from "@/components/ui/Button";
 import Image from "@/components/ui/Image";
+import Ripple from "@/components/ui/Ripple";
 import TableElement from "@/components/ui/TableElement";
 
-import { SuccessApiResponse } from "../../types/api_response/index";
 import { useDashboardContext } from "@/store/useDashboardStore";
 
 function TableHistoryRow({ shift }: { shift: Shift }) {
-  const [isRippled, setIsRippled] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
   const locale = useLocale() as Locale;
   const queryClient = useQueryClient();
   const { user, update, deleteShift } = useDashboardContext((state) => state);
@@ -58,6 +60,7 @@ function TableHistoryRow({ shift }: { shift: Shift }) {
 
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
+      router.refresh();
     },
   });
 
@@ -77,28 +80,18 @@ function TableHistoryRow({ shift }: { shift: Shift }) {
       <TableElement>{shift?.amount ? String(getHours(shift?.amount ?? 0)) : "..."}</TableElement>
       <TableElement>${String(calculateEarnings(shift))}</TableElement>
       <TableElement>
-        <Button
-          variant="rippled"
-          classes={isRippled ? "after:animate-ripple" : ""}
-          onClick={() => {
-            // Delete shift
-            mutate({ id: shift.id });
-
-            setIsRippled(true);
-
-            setTimeout(() => {
-              setIsRippled(false);
-            }, 500);
-          }}
-        >
-          <Image
-            src="/assets/trash.svg"
-            classes="relative z-20"
-            alt="delete"
-            width={20}
-            height={20}
-          />
-        </Button>
+        <Ripple>
+          <Button
+            variant="rounded"
+            classes="size-10"
+            onClick={() => {
+              // Delete shift
+              mutate({ id: shift.id });
+            }}
+          >
+            <Image src="/assets/trash.svg" classes="z-20" alt="delete" width={20} height={20} />
+          </Button>
+        </Ripple>
       </TableElement>
     </TableElement>
   );
