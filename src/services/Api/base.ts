@@ -12,6 +12,8 @@ interface POST_PROPS extends GET_PROPS {
 
 interface PUT_PROPS extends POST_PROPS {}
 
+interface DELETE_PROPS extends GET_PROPS {}
+
 class ApiBaseService {
   private static hasUrl(hasEnvUrl: boolean) {
     return hasEnvUrl ? ENV_URL : "";
@@ -46,6 +48,17 @@ class ApiBaseService {
       headers: {
         "Content-Type": "application/json",
       },
+      next: options,
+    });
+
+    const data = await response.json();
+
+    return data;
+  }
+
+  static async delete({ endpoint, hasEnvUrl = true, options }: DELETE_PROPS) {
+    const response = await fetch(`${this.hasUrl(hasEnvUrl)}${endpoint}`, {
+      method: "DELETE",
       next: options,
     });
 

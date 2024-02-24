@@ -133,6 +133,30 @@ module.exports = {
           },
         },
 
+        "fade-out-left": {
+          "0%": {
+            "opacity": "1",
+            "transform": "translateX(0)"
+          },
+          "100%": {
+            "opacity": "0",
+            "transform": "translateX(-200px)"
+          }
+        },
+
+        ripple: {
+          "0%": {
+            transform: "scale3d(0.3,0.3,1)",
+          },
+          "50%": {
+            opacity:"1"
+          },
+          "100%": {
+            transform: "scale3d(1.2,1.2,1)",
+            opacity: "0",
+          },
+        },
+
         text: {
           "0%, 100%": {
             "background-size": "300% 300%",
@@ -166,6 +190,7 @@ module.exports = {
         }
       },
       animation: {
+        "fade-out-left": "fade-out-left 1s ease-out",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         text: "text 5s ease infinite",
@@ -176,6 +201,7 @@ module.exports = {
         "show-right": "show-right 0.5s ease-in-out forwards",
         "dissapear-up": "dissapear-up 0.5s ease-in-out forwards",
         "backdrop-blurry": "backdrop-blurry 0.5s ease-in-out forwards",
+        ripple: "ripple .5s ease-in-out",
       },
     },
   },

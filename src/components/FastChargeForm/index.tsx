@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { isNaN } from "lodash";
 import { useLocale } from "next-intl";
@@ -21,12 +22,13 @@ import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 import { useToast } from "@/components/ui/Toast/use-toast";
 
-import useQueryUser from "@/hooks/useQueryUser";
+import useUser from "@/hooks/useUser";
 
 import onSubmitFastCharge from "@/server-actions/fast-charge";
 
 function FastChargeForm() {
   const locale = useLocale() as Locale;
+  const queryClient = useQueryClient();
   const { toast } = useToast();
   const {
     handleSubmit,
@@ -38,7 +40,7 @@ function FastChargeForm() {
   } = useForm<FastChargeInputs>({
     resolver: zodResolver(FastChargeFormSchema),
   });
-  const user = useQueryUser();
+  const { data: user } = useUser();
 
   const startDateWatch = watch("start-date");
   const finishDateWatch = watch("finish-date");
@@ -108,14 +110,14 @@ function FastChargeForm() {
     }
 
     return 0;
-  }, [formatEnd, formatStart, user?.profile, fastWorkedWatch]);
+  }, [user?.profile, fastWorkedWatch, formatEnd, formatStart]);
 
-  function onSubmit(data: FastChargeInputs) {
+  function onSubmit(formData: FastChargeInputs) {
     const parseData: FastChargeInputsParsed = {
       startDate: formatStart,
       endDate: formatEnd,
-      isPublicHoliday: data["fast-holiday"],
-      isWorked: data["fast-worked"],
+      isPublicHoliday: formData["fast-holiday"],
+      isWorked: formData["fast-worked"],
     };
 
     onSubmitFastCharge(parseData).then((res) => {
@@ -125,6 +127,11 @@ function FastChargeForm() {
           className: "bg-green-500 text-white",
           duration: 2000,
         });
+
+        queryClient.invalidateQueries({
+          queryKey: ["user", user?.email],
+        });
+
         reset();
       }
     });

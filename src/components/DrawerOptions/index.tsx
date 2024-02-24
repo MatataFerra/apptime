@@ -50,6 +50,7 @@ function DrawerOptions() {
             <Text classes="select-none font-bold">Fast charge</Text>
           </Stack>
           <Stack
+            data-testid="history-shifts"
             as="button"
             grid
             cols="20% 1fr"

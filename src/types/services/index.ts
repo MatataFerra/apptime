@@ -11,7 +11,7 @@ export type UserType = User & {
 };
 export type HandleErrorType = z.infer<typeof HandleErrorTypeSchema>;
 
-export type DashboardUserType = Omit<UserType, "account" | "session">;
+export type DashboardUserType = UserType;
 
 // Interfaces
 export interface InterfaceConfig {
@@ -29,7 +29,7 @@ export interface DashboardInterface {
   get averageHoursWorkedPerDay(): number;
   get hourValue(): number;
   get lastDayRegistered(): string;
-  estimatedWeeklyEarnings(): number;
+  estimatedWeeklyEarnings({ weekStartsOn }: { weekStartsOn?: keyof typeof DAYS }): number;
   dashboardData(): {
     shiftsLen: number;
     hoursWorked: number;
@@ -39,6 +39,17 @@ export interface DashboardInterface {
     estimatedWeeklyEarnings: number;
   };
 }
+
+// Days
+export const DAYS = {
+  sunday: 0,
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6,
+} as const;
 
 export interface JWTDecodedType extends JWT {
   accessToken: string;
@@ -57,4 +68,9 @@ export type PassedErrors = {
 };
 
 // Date Humanizer
-export type DateHumanizerStrategy = "today" | "distanceToNow" | "formatAndAddTime" | "formatDate";
+export type DateHumanizerStrategy =
+  | "today"
+  | "distanceToNow"
+  | "formatAndAddTime"
+  | "formatDate"
+  | "short";

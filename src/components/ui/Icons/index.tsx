@@ -134,4 +134,30 @@ Icon.home = function ({ ...props }: SVGProps<SVGSVGElement>) {
   );
 };
 
+Icon.calendar = function ({ ...props }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={16} height={17} fill="none" {...props}>
+      <path
+        stroke="#000"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M10.474 2.579V1m0 1.579v1.579m0-1.58H6.92M1 7.317v7.105C1 15.293 1.707 16 2.579 16h11.053c.872 0 1.579-.707 1.579-1.579V7.316H1ZM1 7.316V4.158c0-.872.707-1.579 1.579-1.579h1.579M4.158 1v3.158M15.21 7.316V4.158c0-.872-.706-1.579-1.578-1.579h-.395"
+      />
+    </svg>
+  );
+};
+
+Icon.trash = function ({ ...props }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={20} height={20} fill="none" {...props}>
+      <path
+        stroke="#000"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M17 9v9.4a.6.6 0 0 1-.6.6H3.6a.6.6 0 0 1-.6-.6V9M8 15V9M12 15V9M19 5h-5m0 0V1.6a.6.6 0 0 0-.6-.6H6.6a.6.6 0 0 0-.6.6V5m8 0H6M1 5h5"
+      />
+    </svg>
+  );
+};
+
 export default Icon;

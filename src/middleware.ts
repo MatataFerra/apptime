@@ -45,19 +45,17 @@ export default withAuth(async function middleware(req: NextRequest) {
     NextResponse.next();
   }
 
-  if (i18n.isRouteSupported(PATH_NAMES.HOME, nextPathName)) {
-    const noMobilePath = i18n.parsePathname(PATH_NAMES.NO_MOBILE, locale);
-
-    if (!ut.isMobile({ request: req })) {
-      return ut.redirect(req, noMobilePath);
-    }
-  }
-
   if (i18n.isRouteSupported(PATH_NAMES.NO_MOBILE, nextPathName)) {
     const homePath = i18n.parsePathname(PATH_NAMES.HOME, locale);
 
     if (ut.isMobile({ request: req })) {
       return ut.redirect(req, homePath);
+    }
+  } else {
+    const noMobilePath = i18n.parsePathname(PATH_NAMES.NO_MOBILE, locale);
+
+    if (!ut.isMobile({ request: req })) {
+      return ut.redirect(req, noMobilePath);
     }
   }
 });
@@ -67,15 +65,26 @@ export default withAuth(async function middleware(req: NextRequest) {
 export const config = {
   //! tratar de reemplazar con un array de rutas para evitar escribirlas a mano
   matcher: [
-    "/(es|en)(/form|/admin|/history-shifts|/no-mobile|/fast-charge|/incomes)?$",
     "/",
     "/es",
     "/en",
     "/form",
+    "/es/form",
+    "/en/form",
     "/admin",
+    "/es/admin",
+    "/en/admin",
     "/history-shifts",
+    "/es/history-shifts",
+    "/en/history-shifts",
     "/no-mobile",
+    "/es/no-mobile",
+    "/en/no-mobile",
     "/fast-charge",
+    "/es/fast-charge",
+    "/en/fast-charge",
     "/incomes",
+    "/es/incomes",
+    "/en/incomes",
   ],
 };

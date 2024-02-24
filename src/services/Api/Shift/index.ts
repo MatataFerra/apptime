@@ -32,6 +32,14 @@ class ApiShiftService extends ApiBaseService {
     });
     return response;
   }
+
+  static async deleteShift({ id }: { id: number }) {
+    const response = await this.delete({
+      endpoint: `${API_ENDPOINTS.SHIFT}/${id}`,
+      hasEnvUrl: false,
+    });
+    return response;
+  }
 }
 
 export default ApiShiftService;
