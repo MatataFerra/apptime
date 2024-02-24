@@ -41,6 +41,7 @@ function PickupDate() {
     <Stack as="menu" alignItems="center" classes="rounded-sm border border-slate-400 p-2">
       <select
         value={isReset ? "select" : undefined}
+        defaultValue={"select"}
         name="date"
         id="date"
         className="bg-transparent outline-none"
