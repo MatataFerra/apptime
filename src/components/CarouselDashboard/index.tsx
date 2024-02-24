@@ -1,9 +1,6 @@
-"use client";
-
-import { useMemo } from "react";
-
 import Dashboard from "@/services/Dashboard";
 import DateHumanizer from "@/services/Date";
+import UserService from "@/services/User";
 
 import { LocaleParams } from "@/types";
 
@@ -12,23 +9,25 @@ import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/Carouse
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
-import { useDashboardContext } from "@/store/useDashboardStore";
-
 type Props = {
   params: LocaleParams;
 };
 
-type Dash = {
-  shiftsLen: number;
-  hoursWorked: number;
-  averageHoursWorkedPerDay: number;
-  hourValue: number;
-  lastDayRegistered: string;
-  estimatedWeeklyEarnings: number;
+type DashboardData = {
+  title: string;
+  value: string | number;
 };
 
-function CarouselDashboard({ params }: Props) {
-  const { user } = useDashboardContext((state) => state);
+async function CarouselDashboard({ params }: Props) {
+  const user = await UserService.getSessionUser();
+  const defaultValues = {
+    shiftsLen: 0,
+    hoursWorked: 0,
+    averageHoursWorkedPerDay: 0,
+    hourValue: 0,
+    lastDayRegistered: "",
+    estimatedWeeklyEarnings: 0,
+  };
   const {
     shiftsLen,
     lastDayRegistered,
@@ -36,64 +35,53 @@ function CarouselDashboard({ params }: Props) {
     estimatedWeeklyEarnings,
     hourValue,
     hoursWorked,
-  } = useMemo<Dash>(() => {
-    if (!user)
-      return {
-        shiftsLen: 0,
-        hoursWorked: 0,
-        averageHoursWorkedPerDay: 0,
-        hourValue: 0,
-        lastDayRegistered: "",
-        estimatedWeeklyEarnings: 0,
-      };
+  } = !user ? defaultValues : new Dashboard(user).dashboardData();
 
-    return new Dashboard(user).dashboardData();
-  }, [user]);
-
-  const humanizedLastDayRegistered = useMemo(
-    () =>
-      new DateHumanizer("short").humanizeDate(new Date(lastDayRegistered), {
-        locale: params.locale,
-      }),
-    [lastDayRegistered, params.locale]
+  const humanizedLastDayRegistered = new DateHumanizer("short").humanizeDate(
+    new Date(lastDayRegistered),
+    {
+      locale: params.locale,
+    }
   );
 
-  const CARDS_CONTENT = useMemo(
-    () => ({
-      shiftsLen: {
-        title: "Total shifts saved",
-        value: shiftsLen,
-      },
-      lastDayRegistered: {
-        title: "Last day registered",
-        value: humanizedLastDayRegistered,
-      },
-      averageHoursWorkedPerDay: {
-        title: "Average hours p/day",
-        value: averageHoursWorkedPerDay,
-      },
-      estimatedWeeklyEarnings: {
-        title: "Weekly earnings",
-        value: `$${estimatedWeeklyEarnings.toFixed(2)}`,
-      },
-      hourValue: {
-        title: "Hour value",
-        value: hourValue,
-      },
-      hoursWorked: {
-        title: "Hours worked",
-        value: hoursWorked,
-      },
-    }),
-    [
-      shiftsLen,
-      humanizedLastDayRegistered,
-      averageHoursWorkedPerDay,
-      estimatedWeeklyEarnings,
-      hourValue,
-      hoursWorked,
-    ]
-  );
+  const shiftLen: DashboardData = {
+    title: "Total shifts saved",
+    value: shiftsLen,
+  };
+
+  const lastDay: DashboardData = {
+    title: "Last day registered",
+    value: humanizedLastDayRegistered,
+  };
+
+  const averageHours: DashboardData = {
+    title: "Average hours p/day",
+    value: `${averageHoursWorkedPerDay}hs.`,
+  };
+
+  const estimatedWeekly: DashboardData = {
+    title: "Weekly earnings",
+    value: `$${estimatedWeeklyEarnings.toFixed(2)}`,
+  };
+
+  const hourVal: DashboardData = {
+    title: "Hour value",
+    value: `$${hourValue}`,
+  };
+
+  const hoursWork: DashboardData = {
+    title: "Hours worked",
+    value: `${hoursWorked}hs.`,
+  };
+
+  const CARDS_CONTENT = {
+    shiftsLen: shiftLen,
+    lastDayRegistered: lastDay,
+    averageHoursWorkedPerDay: averageHours,
+    estimatedWeeklyEarnings: estimatedWeekly,
+    hourValue: hourVal,
+    hoursWorked: hoursWork,
+  };
 
   return (
     <Stack orientation="horizontal" as="header" classes="w-full">
