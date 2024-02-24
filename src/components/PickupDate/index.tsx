@@ -40,6 +40,7 @@ function PickupDate() {
   return (
     <Stack as="menu" alignItems="center" classes="rounded-sm border border-slate-400 p-2">
       <select
+        data-testid="date-filter"
         value={isReset ? "select" : undefined}
         defaultValue={"select"}
         name="date"
