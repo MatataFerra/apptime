@@ -3,6 +3,18 @@ export type TAILWIND_COLOR =
   | `${keyof typeof TAILWIND_TYPE_COLOR}-${EXTENDED_COLORS}`
   | `${keyof typeof TAILWIND_TYPE_COLOR}-${BASE_COLORS}`;
 
+export type BG_TAILWIND_COLOR =
+  `${Extract<keyof typeof TAILWIND_TYPE_COLOR, "bg">}-${keyof typeof TAILWIND_COLORS}-${keyof typeof TAILWIND_NUMBER_COLORS}`;
+
+export type FROM_TO_TAILWIND_COLOR = {
+  from:
+    | `from-${keyof typeof TAILWIND_COLORS}-${keyof typeof TAILWIND_NUMBER_COLORS}`
+    | `from-[#${string}]`;
+  to:
+    | `to-${keyof typeof TAILWIND_COLORS}-${keyof typeof TAILWIND_NUMBER_COLORS}`
+    | `to-[#${string}]`;
+};
+
 type EXTENDED_COLORS =
   | "aquatic"
   | "common_orange"

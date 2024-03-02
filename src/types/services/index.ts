@@ -74,3 +74,9 @@ export type DateHumanizerStrategy =
   | "formatAndAddTime"
   | "formatDate"
   | "short";
+
+// Chart
+export type EarnsMonthData = {
+  month: string;
+  earnings: number;
+} | null;

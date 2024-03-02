@@ -48,3 +48,18 @@ export const PASSWORD = {
 
 export const MAX_ATTEMPTS_TO_REGISTER = 3;
 export const MAX_TIME_FOR_RETRY_REGISTER_IN_MS = 60000;
+
+export const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
