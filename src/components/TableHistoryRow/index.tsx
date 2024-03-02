@@ -65,9 +65,11 @@ function TableHistoryRow({ shift }: { shift: Shift }) {
   });
 
   function shortDate(date: string) {
-    return new DateHumanizer("short").humanizeDate(new Date(date), {
+    const short = new DateHumanizer("short").humanizeDate(new Date(date), {
       locale: locale,
     });
+
+    return short;
   }
 
   function getHours(minutes: number) {
