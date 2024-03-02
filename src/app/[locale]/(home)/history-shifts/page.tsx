@@ -2,6 +2,7 @@ import UserService from "@/services/User";
 
 import { LocaleParams } from "@/types";
 
+import CarouselChart from "@/components/CarouselChart";
 import CarouselDashboard from "@/components/CarouselDashboard";
 import PickupDate from "@/components/PickupDate";
 import TableHistory from "@/components/TableHistory";
@@ -36,6 +37,7 @@ export default async function HistoryShift({ params }: { params: LocaleParams })
         >
           <TableHistory />
         </Stack>
+        <CarouselChart />
       </DashboardProvider>
     </Stack>
   );
