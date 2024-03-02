@@ -96,7 +96,7 @@ async function CarouselDashboard({ params }: Props) {
       >
         <CarouselContent>
           {Object.keys(CARDS_CONTENT).map((key, index) => (
-            <CarouselItem key={index} className="basis-1/3 md:basis-1/5">
+            <CarouselItem key={index} className="basis-1/2 sm:basis-1/3 md:basis-1/5">
               <Card>
                 <Text classes="text-pretty text-sm">
                   {CARDS_CONTENT[key as keyof typeof CARDS_CONTENT].title}
