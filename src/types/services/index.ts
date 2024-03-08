@@ -2,6 +2,8 @@ import { Profile, Shift, User } from "@prisma/client";
 import { JWT } from "next-auth/jwt";
 import { z } from "zod";
 
+import type { BG_TAILWIND_COLOR, FROM_TO_TAILWIND_COLOR } from "@/types/tailwind";
+
 import { HandleErrorTypeSchema } from "../zod";
 
 // Types
@@ -73,10 +75,24 @@ export type DateHumanizerStrategy =
   | "distanceToNow"
   | "formatAndAddTime"
   | "formatDate"
-  | "short";
+  | "short"
+  | "long";
 
 // Chart
 export type EarnsMonthData = {
   month: string;
   earnings: number;
 } | null;
+
+//Color
+
+export type Gradient = {
+  from: FROM_TO_TAILWIND_COLOR["from"];
+  to: FROM_TO_TAILWIND_COLOR["to"];
+};
+
+export type PlainColor = BG_TAILWIND_COLOR;
+
+export type Color = PlainColor | Gradient;
+
+export type ColorWithGradientAndHex<T> = T extends Gradient ? { from: string; to: string } : string;
