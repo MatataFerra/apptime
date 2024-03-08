@@ -4,8 +4,8 @@ import { Rectangle } from "recharts";
 import type { BarRectangleItem } from "recharts/types/cartesian/Bar";
 
 interface Props extends BarRectangleItem {
-  from?: `#${string}`;
-  to?: `#${string}`;
+  from?: string;
+  to?: string;
 }
 
 function BarGradient(props: Props) {

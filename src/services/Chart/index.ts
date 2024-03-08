@@ -69,7 +69,10 @@ class Chart {
     return data.sort((a: EarnsMonthData, b: EarnsMonthData) => {
       if (!a?.month || !b?.month) return 0;
 
-      return MONTHS.indexOf(a.month) - MONTHS.indexOf(b.month);
+      const parseMonths = MONTHS.map((month) => month.toLowerCase());
+      return (
+        parseMonths.indexOf(a.month.toLowerCase()) - parseMonths.indexOf(b.month.toLowerCase())
+      );
     });
   }
 }

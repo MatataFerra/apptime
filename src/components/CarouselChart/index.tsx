@@ -43,7 +43,7 @@ function CarouselChart() {
             <Text variant="gradient" classes={`mb-2 text-lg ${GRADIENTS.gradient_1}`}>
               Earnings per month (year: {new Date().getFullYear().toString()})
             </Text>
-            <EarnsPerMonth user={user} />
+            <EarnsPerMonth />
           </CarouselItem>
           <CarouselItem>
             <Text variant="gradient" classes={`mb-2 text-lg ${GRADIENTS.gradient_2}`}>
