@@ -1,33 +1,24 @@
 import { Bar, BarChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
+import ColorService from "@/services/Color";
+
+import type { Color } from "@/types";
+
+import CustomChartTooltip from "@/components/CustomChartTooltip";
+import BarGradient from "@/components/ui/BarGradient";
 import ChartLegend from "@/components/ui/ChartLegend";
-
-import { type Color, isGradient } from "@/utils/helpers/colorOrGradient";
-
-import BarGradient from "../BarGradient";
 
 type Props = {
   data: any[] | Record<string, any>[] | undefined;
-  legend: string;
   color: Color;
-  barColor?: `#${string}`;
+  legend?: string;
+  barColor?: string;
+  showDates?: boolean;
+  customLegend?: React.ReactNode;
 };
 
-function CustomTooltip({ active, payload, label, legend }: any) {
-  if (active && payload && payload.length) {
-    return (
-      <div className="flex flex-col divide-y-2 rounded-lg bg-white p-4 shadow-lg">
-        <p className="py-2 text-base text-gray-700">{label}</p>
-        <p className="py-2 text-sm text-gray-900">{`${legend}: $${payload[0].value}`}</p>
-      </div>
-    );
-  }
-
-  return null;
-}
-
 function Chart(props: Props) {
-  const { data, legend, color, barColor } = props;
+  const { data, legend, color, customLegend, showDates } = props;
   let dataKey = "";
   let xAxis;
 
@@ -36,7 +27,6 @@ function Chart(props: Props) {
     xAxis = Object.keys(data[0])[0];
   }
 
-  const gradient = isGradient(color);
   return (
     <ResponsiveContainer
       width="100%"
@@ -58,15 +48,33 @@ function Chart(props: Props) {
           }}
           tickFormatter={(value) => `$${value}`}
         />
-        <Tooltip cursor={{ fill: "#e6faffb2" }} content={<CustomTooltip legend={legend} />} />
+        <Tooltip
+          cursor={{ fill: "#e6faffb2" }}
+          content={
+            <CustomChartTooltip legend={legend} customLegend={customLegend} showDates={showDates} />
+          }
+        />
         <Legend
-          content={<ChartLegend legend={legend} color={gradient ? color : "bg-blue-500"} />}
+          content={<ChartLegend legend={legend} color={ColorService.getColor(color)} />}
           margin={{ top: 8 }}
         />
-        {gradient ? (
-          <Bar dataKey={dataKey} label={false} shape={<BarGradient from={"#"} to={"#"} />} />
+        {ColorService.isGradient(color) ? (
+          <Bar
+            dataKey={dataKey}
+            label={false}
+            shape={
+              <BarGradient
+                from={ColorService.getColor(color, { hex: true }).from}
+                to={ColorService.getColor(color, { hex: true }).to}
+              />
+            }
+          />
         ) : (
-          <Bar dataKey={dataKey} label={false} fill={barColor ? barColor : "#2196f3"} />
+          <Bar
+            dataKey={dataKey}
+            label={false}
+            fill={color ? ColorService.getColor(color, { hex: true }) : "#2196f3"}
+          />
         )}
       </BarChart>
     </ResponsiveContainer>
