@@ -1,10 +1,12 @@
 "use client";
 
 import ChartService from "@/services/Chart";
+import DateHumanizer from "@/services/Date";
+import ShiftService from "@/services/Shift";
 
-import { UserType } from "@/types";
+import Chart from "@/components/ui/Chart";
 
-import Chart from "../ui/Chart";
+import { useDashboardContext } from "@/store/useDashboardStore";
 
 // Override console.error
 // This is a hack to suppress the warning about missing defaultProps in recharts library as of version 2.12
@@ -17,22 +19,36 @@ console.error = (...args: any) => {
   error(...args);
 };
 
-type Props = {
-  user: UserType | null;
-};
+function EarnsPerMonth() {
+  const { user, initialShifts } = useDashboardContext((state) => state);
+  const group = new ChartService(initialShifts ?? []).groupByMonths; // [ "Jan": [{}, {}], "Feb": [{}, {}]
 
-function EarnsPerMonth({ user }: Props) {
-  const earnsPerMonth = new ChartService(user?.shifts ?? [])
-    .earnsPerMonth(user?.profile!)
-    .filter((data) => data !== null);
+  const earningsByMonthData = Object.entries(group ?? {}).map(([month, shifts]) => {
+    const earnings = shifts.map((shift) =>
+      ShiftService.calculateEarnings({ shift, profile: user?.profile! })
+    );
 
-  const sortEarns = ChartService.sortEarnsPerMonth(earnsPerMonth);
+    return {
+      month,
+      earnings: earnings.reduce((acc, val) => acc + val, 0),
+      dates: ShiftService.shiftsSorted(shifts, { desc: false })?.map((shift) => {
+        return {
+          date: `${new DateHumanizer("short").humanizeDate(new Date(shift.startDate))} - hours: ${ShiftService.differenceInHHmm(shift.startDate, shift?.endDate ?? "").text}`,
+          id: shift.id,
+        };
+      }),
+      shiftsWorked: shifts.length,
+    };
+  });
+
+  const earnsByMonthSortedData = ChartService.sortEarnsPerMonth(earningsByMonthData);
 
   return (
     <Chart
-      data={sortEarns}
-      legend="Shift payment per Month"
-      color={{ from: "from-blue-400", to: "to-orange-200" }}
+      data={earnsByMonthSortedData}
+      legend="Payment per Month"
+      color="bg-violet-800"
+      showDates
     />
   );
 }
