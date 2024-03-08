@@ -12,6 +12,11 @@ const nextConfig = {
     }],
     dangerouslyAllowSVG: true,
   },
+  experimental: {
+    serverActions: {
+      allowedOrigins: ["https://d33vz13z-3000.aue.devtunnels.ms/","localhost:3000"]
+    }
+  }
 };
 
 module.exports = withNextIntl(nextConfig);

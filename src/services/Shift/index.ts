@@ -156,6 +156,23 @@ class ShiftService implements ShiftServiceInterface {
     return Math.round((validAmount / 60) * 100) / 100;
   }
 
+  static groupShiftsByMonths(shifts: Shift[] | undefined) {
+    if (!shifts) return null;
+    return shifts.reduce(
+      (acc, shift) => {
+        const date = new Date(shift.startDate);
+        const month = date.toLocaleString("en-US", { month: "short" });
+        const key = `${month}`;
+        if (!acc[key]) {
+          acc[key] = [];
+        }
+        acc[key].push(shift);
+        return acc;
+      },
+      {} as Record<string, Shift[]>
+    );
+  }
+
   closeShift() {
     this.updateEndDate().updateStatus();
 

@@ -39,6 +39,12 @@ export default class DateHumanizer {
           day: "numeric",
           year: "numeric",
         }),
+      long: (date: Date, { locale }) =>
+        new Date(date).toLocaleDateString(locale, {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        }),
     };
   }
 
@@ -56,13 +62,13 @@ export default class DateHumanizer {
     return this.strategies[this.strategy](date, { ...options });
   }
 
-  formatAndAddTime({ date, time }: { date: Date | undefined | null; time?: string }) {
+  /* Private methods */
+  private formatAndAddTime({ date, time }: { date: Date | undefined | null; time?: string }) {
     const dateFomated = this.formatDate(date ?? new Date());
 
     return this.addHoursAndMinutes(new Date(dateFomated), time ?? "").toString();
   }
 
-  /* Private methods */
   private formatDate(date = new Date()) {
     const year = date.toLocaleString("default", { year: "numeric" });
     const month = date.toLocaleString("default", {
