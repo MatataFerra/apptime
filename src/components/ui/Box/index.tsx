@@ -11,7 +11,7 @@ type Props = {
  * @param ref forwardRef
  * @returns JSX.Element
  */
-function Box(props: Props, ref: Ref<HTMLInputElement>) {
+function Box(props: Props, ref: Ref<HTMLElement>) {
   return <section ref={ref}>{props.children}</section>;
 }
 

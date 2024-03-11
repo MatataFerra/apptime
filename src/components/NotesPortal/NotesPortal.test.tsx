@@ -12,7 +12,7 @@ describe("Portal", () => {
     );
 
     expect(baseElement).toMatchSnapshot();
-    expect(baseElement.querySelector("section")).not.toBeNull();
+    expect(baseElement.querySelector("div")).not.toBeNull();
     expect(container).toMatchSnapshot();
   });
 
