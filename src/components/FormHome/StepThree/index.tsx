@@ -64,7 +64,7 @@ function StepThree() {
           })}
         />
         <RadioWithInput
-          min={0}
+          min={1}
           max={10}
           radioLabel="Unpaid breaks?"
           radioGroupName="unpaidBreaks"
