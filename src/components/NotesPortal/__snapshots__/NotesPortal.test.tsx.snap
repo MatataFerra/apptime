@@ -5,6 +5,7 @@ exports[`Portal > renders children when isOn is false 1`] = `
   style="overflow: auto;"
 >
   <div />
+  <div />
 </body>
 `;
 
@@ -15,11 +16,10 @@ exports[`Portal > renders children when isOn is true 1`] = `
   style="overflow: hidden;"
 >
   <div />
-  <nav>
-    <section>
-      Portal
-    </section>
-  </nav>
+  <div
+    class=""
+    id="1"
+  />
 </body>
 `;
 
