@@ -67,8 +67,10 @@ function FinishDescription() {
                   value={inputValue[label as Labels]}
                   type={label === "start" || label === "end" ? "time" : "date"}
                   variant="underline"
-                  classes={`h-8 w-32 text-sm outline-none transition-all ${
-                    inputsDisabled ? "border-b-2 border-gray-100" : "border-b-2"
+                  classes={`h-8 w-32 border-l-transparent border-r-transparent border-t-transparent text-sm outline-none transition-all ${
+                    inputsDisabled
+                      ? "border-b-2 border-gray-100 border-l-transparent border-r-transparent border-t-transparent"
+                      : "border-b-2 focus:border-l-transparent focus:border-r-transparent focus:border-t-transparent"
                   }`}
                   disabled={inputsDisabled}
                   data-label={label}
