@@ -11,38 +11,79 @@ import { cn } from "@/utils/helpers/styleMerger";
 interface Props extends Omit<React.HTMLAttributes<HTMLElement>, "className"> {
   id?: string;
   isOn: boolean;
+  targetSelector?: string;
   children: React.ReactNode;
   classes?: CSSClassNames;
   handleOutsideClick?: () => void;
 }
 
-function Portal({ children, isOn, classes, id, handleOutsideClick, ...props }: Props) {
+function Portal({
+  children,
+  isOn,
+  classes,
+  id,
+  handleOutsideClick,
+  targetSelector,
+  ...props
+}: Props) {
   const isWindow = useMemo(() => typeof window !== "undefined", []);
-  const container = useRef<HTMLElement | null>(isWindow ? document.createElement("nav") : null);
+  const container = useRef<HTMLElement | null>(null);
 
+  // create nav element
   useEffect(() => {
-    // create element
-    if (!container.current) {
-      container.current = document.createElement("nav");
-    }
+    const targetElement: HTMLElement | null =
+      targetSelector && typeof targetSelector === "string"
+        ? document.querySelector(targetSelector)
+        : null;
 
-    id ? (container.current.id = id) : null;
-    classes ? (container.current.className = cn(classes)) : null;
-
-    // set attributes
-    for (const [key, value] of Object.entries(props)) {
-      container.current.setAttribute(key, value as string);
-    }
-
-    // append to body
-    if (isOn) {
-      document.body.appendChild(container.current);
+    if (targetElement) {
+      container.current = targetElement;
+    } else {
+      const newTargetElement = document.createElement("div");
+      document.body.appendChild(newTargetElement);
+      container.current = newTargetElement;
     }
 
     return () => {
-      isOn && container.current && document.body.removeChild(container.current);
+      container.current && document.body.removeChild(container.current);
     };
-  }, [classes, id, isOn, props]);
+  }, [targetSelector]);
+
+  // set attributes
+  useEffect(() => {
+    if (!isWindow) return;
+    if (!container.current) return;
+
+    for (const [key, value] of Object.entries(props)) {
+      container.current.setAttribute(key, value as string);
+    }
+  }, [isOn, isWindow, props]);
+
+  // set id
+  useEffect(() => {
+    if (isOn && container.current && isWindow) {
+      container.current.id = id || generateRandomID();
+    }
+
+    return () => {
+      if (container.current) {
+        container.current.id = "";
+      }
+    };
+  }, [id, isWindow, isOn]);
+
+  // set classes
+  useEffect(() => {
+    if (isOn && container.current && isWindow) {
+      container.current.className = cn(classes);
+    }
+
+    return () => {
+      if (container.current) {
+        container.current.className = "";
+      }
+    };
+  }, [classes, isWindow, isOn]);
 
   useEffect(() => {
     if (isOn) {
@@ -72,11 +113,7 @@ function Portal({ children, isOn, classes, id, handleOutsideClick, ...props }: P
   }, [handleOutsideClick, isOn]);
 
   return (
-    <>
-      {isOn &&
-        isWindow &&
-        createPortal(<>{children}</>, container.current ? container?.current : document.body)}
-    </>
+    <>{isWindow && isOn && container.current ? createPortal(children, container.current) : null}</>
   );
 }
 
