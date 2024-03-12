@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { Shift } from "@prisma/client";
+
 import EarnsPerDay from "@/components/Charts/EarnsPerDay";
 import EarnsPerMonth from "@/components/Charts/EarnsPerMonth";
 import Button from "@/components/ui/Button";
@@ -16,10 +18,10 @@ import {
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
-import { GRADIENTS } from "@/utils/constants/tailwind";
 import { cn } from "@/utils/helpers/styleMerger";
 import { useDot } from "@/hooks/useDot";
 
+import ChartEmpty from "../ChartEmpty";
 import { useDashboardContext } from "@/store/useDashboardStore";
 
 function CarouselChart() {
@@ -39,18 +41,20 @@ function CarouselChart() {
         className="mx-auto mt-8 h-full w-full max-w-xl"
       >
         <CarouselContent>
-          <CarouselItem>
-            <Text variant="gradient" classes={`mb-2 text-lg ${GRADIENTS.gradient_1}`}>
-              Earnings per month (year: {new Date().getFullYear().toString()})
-            </Text>
-            <EarnsPerMonth />
-          </CarouselItem>
-          <CarouselItem>
-            <Text variant="gradient" classes={`mb-2 text-lg ${GRADIENTS.gradient_2}`}>
-              Earnings per day
-            </Text>
-            <EarnsPerDay user={user} />
-          </CarouselItem>
+          <ChartEmpty data={user?.shifts as unknown as Shift[]}>
+            <CarouselItem>
+              <Text gradient="title" classes="mb-2 text-lg">
+                Earnings per month (year: {new Date().getFullYear().toString()})
+              </Text>
+              <EarnsPerMonth />
+            </CarouselItem>
+            <CarouselItem>
+              <Text gradient="secondary" classes="mb-2 text-lg">
+                Earnings per day
+              </Text>
+              <EarnsPerDay user={user} />
+            </CarouselItem>
+          </ChartEmpty>
         </CarouselContent>
         <Stack
           as="footer"

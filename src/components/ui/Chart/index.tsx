@@ -1,3 +1,4 @@
+import { isEmpty } from "lodash";
 import { Bar, BarChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import ColorService from "@/services/Color";
@@ -22,9 +23,9 @@ function Chart(props: Props) {
   let dataKey = "";
   let xAxis;
 
-  if (Array.isArray(data)) {
-    dataKey = Object.keys(data[0])[1];
-    xAxis = Object.keys(data[0])[0];
+  if (Array.isArray(data) && !isEmpty(data)) {
+    dataKey = Object?.keys(data[0])[1];
+    xAxis = Object?.keys(data[0])[0];
   }
 
   return (

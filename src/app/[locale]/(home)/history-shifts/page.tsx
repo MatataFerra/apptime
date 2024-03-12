@@ -11,8 +11,6 @@ import Text from "@/components/ui/Text";
 
 import DashboardProvider from "@/providers/DashboardProvider";
 
-import { GRADIENTS } from "@/utils/constants/tailwind";
-
 export default async function HistoryShift({ params }: { params: LocaleParams }) {
   const user = await UserService.getSessionUser();
 
@@ -26,14 +24,14 @@ export default async function HistoryShift({ params }: { params: LocaleParams })
           justifyContent="between"
           classes="w-full"
         >
-          <Text variant="gradient" classes={`text-2xl font-bold ${GRADIENTS.gradient_2}`}>
+          <Text gradient="title" classes={`text-2xl font-bold`}>
             History Shifts
           </Text>
           <PickupDate />
         </Stack>
         <Stack
           orientation="vertical"
-          classes="h-fit max-h-60 min-h-10 w-full overflow-y-scroll rounded-lg border border-gray-200 bg-white shadow-input"
+          classes="h-fit max-h-60 min-h-52 w-full overflow-y-scroll rounded-lg border border-gray-200 bg-white shadow-input"
         >
           <TableHistory />
         </Stack>
