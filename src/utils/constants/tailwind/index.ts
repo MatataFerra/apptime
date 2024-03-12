@@ -21,7 +21,8 @@ export const BUTTON_VARIANTS = {
   warning: "bg-yellow-500 text-white p-3",
   info: "bg-blue-500 text-white p-3 font-bold text-white shadow-button",
   rounded: "text-black p-3 rounded-full bg-transparent",
-  gradient: "bg-gradient-to-r from-blue-600 p-3 via-purple-500 to-orange-500 text-white",
+  gradient_primary: "border_gradient_1",
+  gradient_secondary: "border_gradient_2",
   google: "bg-white text-black p-3 border border-gray-300 shadow-button",
   outlined: "bg-white text-black p-3",
   white:

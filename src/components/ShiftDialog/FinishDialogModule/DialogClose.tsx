@@ -13,7 +13,7 @@ function FinishClose({ onFinishShift }: Props) {
         <Button
           data-button={1}
           type="button"
-          variant="gradient"
+          variant="gradient_secondary"
           classes="h-12 w-full p-[3px]"
           onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
             // debido al error TypeError: Response body object should not be disturbed or locked
