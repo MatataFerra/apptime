@@ -1,14 +1,13 @@
 import React, { ReactElement } from "react";
 
-import { isArray } from "lodash";
-
 import { CSSClassNames } from "@/types";
 import { TAILWIND_COLOR } from "@/types/tailwind";
 
-import { TEXT_VARIANTS } from "@/utils/constants/tailwind";
+import { GRADIENTS, TEXT_VARIANTS } from "@/utils/constants/tailwind";
 import { cm } from "@/utils/helpers/styleMerger";
 
 type Variants = keyof typeof TEXT_VARIANTS;
+type Gradients = keyof typeof GRADIENTS;
 
 export const TextDefaultAsType = "p" as const;
 type As = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span" | "small" | "label" | "th" | "td";
@@ -20,6 +19,7 @@ type TextOwnProps<E extends ValidElement> = {
   classes?: CSSClassNames;
   variant?: Variants;
   color?: TAILWIND_COLOR;
+  gradient?: Gradients;
   children: (string | ReactElement | boolean)[] | string | ReactElement | undefined;
 };
 
@@ -48,12 +48,21 @@ function Text<E extends ValidElement = typeof TextDefaultAsType>({
   classes,
   variant = "default",
   color,
+  gradient,
   ...props
 }: TextProps<E>): ReactElement {
   const Component = as || TextDefaultAsType;
 
   return (
-    <Component className={cm(TEXT_VARIANTS[variant], classes, color)} {...props}>
+    <Component
+      className={cm(
+        TEXT_VARIANTS[variant],
+        gradient ? `bg-gradient-to-r bg-clip-text text-transparent ${GRADIENTS[gradient]}` : "",
+        classes,
+        color
+      )}
+      {...props}
+    >
       {children}
     </Component>
   );

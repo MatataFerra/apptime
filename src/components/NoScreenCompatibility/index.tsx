@@ -2,8 +2,6 @@ import Background from "@/components/Background";
 import Suscribe from "@/components/Suscribe";
 import Text from "@/components/ui/Text";
 
-import { GRADIENTS } from "@/utils/constants/tailwind";
-
 function NoScreenCompatibility() {
   return (
     <section className="grid h-full w-full grid-cols-12 grid-rows-6">
@@ -12,8 +10,8 @@ function NoScreenCompatibility() {
           No screen{" "}
           <Text
             as="span"
-            variant="gradient"
-            classes={`${GRADIENTS.error} text-clamp-1-to-2.5 animate-text font-bold text-transparent`}
+            gradient="error"
+            classes="animate-text text-clamp-1-to-2.5 font-bold text-transparent"
           >
             compatibility
           </Text>

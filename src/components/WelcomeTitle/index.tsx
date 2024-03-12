@@ -3,8 +3,6 @@ import { UserType } from "@/types";
 import Skeleton from "@/components/ui/Skeleton";
 import Text from "@/components/ui/Text";
 
-import { GRADIENTS } from "@/utils/constants/tailwind";
-
 interface Props {
   user?: UserType | null;
 }
@@ -18,10 +16,7 @@ function WelcomeTitle({ user }: Props) {
         </Text>
 
         {user?.name ? (
-          <Text
-            variant="gradient"
-            classes={`balance_text text-5xl font-bold ${GRADIENTS.gradient_2}`}
-          >
+          <Text gradient="title" classes={`balance_text text-5xl font-bold`}>
             {user?.name.trim().slice(0, 10)}
           </Text>
         ) : (

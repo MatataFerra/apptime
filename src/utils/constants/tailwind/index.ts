@@ -1,15 +1,14 @@
 export const TEXT_VARIANTS = {
   default: "text-base text-gray-800 dark:text-gray-100",
   title: "text-4xl font-bold text-gray-800 dark:text-gray-100",
-  gradient: "text-transparent bg-gradient-to-r bg-clip-text",
   subtitle: "text-xl font-bold text-gray-800 dark:text-gray-100",
   error: "text-red-600 dark:text-red-400",
   success: "text-green-600 dark:text-green-400",
 };
 
 export const GRADIENTS = {
-  gradient_1: "from-blue-600 via-purple-500 to-orange-500",
-  gradient_2: "from-hard-pink to-common-orange",
+  title: "from-hard-pink to-common-orange",
+  secondary: "from-blue-600 via-purple-500 to-orange-500",
   error: "from-red-300 via-red-500 to-red-700",
 };
 
