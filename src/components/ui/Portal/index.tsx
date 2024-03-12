@@ -45,9 +45,9 @@ function Portal({
     }
 
     return () => {
-      container.current && document.body.removeChild(container.current);
+      isOn && container.current && document.body.removeChild(container.current);
     };
-  }, [targetSelector]);
+  }, [targetSelector, isOn]);
 
   // set attributes
   useEffect(() => {

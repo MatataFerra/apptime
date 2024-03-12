@@ -7,7 +7,7 @@ const COLUMNS = ["Day", "Hours", "Earnings"] as const;
 
 function TableHistory() {
   return (
-    <Table classes="h-full w-full table-fixed">
+    <Table classes="h-full w-full">
       <TableHead
         classes="border border-l-0 border-r-0 border-t-0 border-b-gray-900 text-left"
         columnTitle={COLUMNS}

@@ -1,3 +1,5 @@
+import { isValid } from "date-fns";
+
 import Dashboard from "@/services/Dashboard";
 import DateHumanizer from "@/services/Date";
 import UserService from "@/services/User";
@@ -37,12 +39,11 @@ async function CarouselDashboard({ params }: Props) {
     hoursWorked,
   } = !user ? defaultValues : new Dashboard(user).dashboardData();
 
-  const humanizedLastDayRegistered = new DateHumanizer("short").humanizeDate(
-    new Date(lastDayRegistered),
-    {
-      locale: params.locale,
-    }
-  );
+  const humanizedLastDayRegistered = isValid(lastDayRegistered)
+    ? new DateHumanizer("short").humanizeDate(new Date(lastDayRegistered), {
+        locale: params.locale,
+      })
+    : "No shifts registered.";
 
   const shiftLen: DashboardData = {
     title: "Total shifts saved",
