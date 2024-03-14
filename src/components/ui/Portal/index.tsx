@@ -45,9 +45,12 @@ function Portal({
     }
 
     return () => {
-      isOn && container.current && document.body.removeChild(container.current);
+      if (container.current && document.body.contains(container.current)) {
+        document.body.removeChild(container.current);
+        container.current.remove();
+      }
     };
-  }, [targetSelector, isOn]);
+  }, [targetSelector]);
 
   // set attributes
   useEffect(() => {
@@ -57,6 +60,14 @@ function Portal({
     for (const [key, value] of Object.entries(props)) {
       container.current.setAttribute(key, value as string);
     }
+
+    return () => {
+      if (container.current) {
+        for (const key of Object.keys(props)) {
+          container.current.removeAttribute(key);
+        }
+      }
+    };
   }, [isOn, isWindow, props]);
 
   // set id
@@ -67,7 +78,7 @@ function Portal({
 
     return () => {
       if (container.current) {
-        container.current.id = "";
+        container.current.removeAttribute("id");
       }
     };
   }, [id, isWindow, isOn]);
@@ -80,7 +91,7 @@ function Portal({
 
     return () => {
       if (container.current) {
-        container.current.className = "";
+        container.current.removeAttribute("class");
       }
     };
   }, [classes, isWindow, isOn]);

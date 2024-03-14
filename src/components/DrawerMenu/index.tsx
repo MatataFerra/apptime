@@ -20,7 +20,7 @@ function DrawerMenu({ children }: Props) {
   return (
     <>
       <Drawer isOpen={isOpen} handleOutsideClick={() => toggle()}>
-        <Stack justifyContent="between" classes="w-full">
+        <Stack justifyContent="between" classes="z-10 w-full">
           {children}
           <Button
             type="button"
