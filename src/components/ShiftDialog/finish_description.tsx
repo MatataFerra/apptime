@@ -2,7 +2,7 @@
 
 import { createRef, RefObject, useEffect, useRef } from "react";
 
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import { capitalize } from "lodash";
 
 import Box from "@/components/ui/Box";
@@ -76,7 +76,11 @@ function FinishDescription() {
                   data-label={label}
                   data-testid={label}
                   ref={inputRefs.current[index]}
-                  max={format(new Date(), "yyyy-MM-dd")}
+                  max={
+                    label !== "to"
+                      ? format(new Date(), "yyyy-MM-dd")
+                      : format(addDays(new Date(), 1), "yyyy-MM-dd")
+                  }
                   onChange={(_) => {
                     setInputValue({
                       [label]: _.target.value,

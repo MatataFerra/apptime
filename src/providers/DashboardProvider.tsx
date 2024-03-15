@@ -1,6 +1,8 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+
+import { useQueryClient } from "@tanstack/react-query";
 
 import type { UserType } from "@/types";
 
@@ -13,6 +15,13 @@ type Props = {
 
 function DashboardProvider({ children, user }: Props) {
   const store = useRef(createDashboardStore({ user: user })).current;
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const query = queryClient.getQueryData(["user", user?.email]) as { user: UserType } | undefined;
+
+    store.setState({ user: query?.user });
+  }, [queryClient, store, user?.email]);
 
   return <DashboardContext.Provider value={store}>{children}</DashboardContext.Provider>;
 }

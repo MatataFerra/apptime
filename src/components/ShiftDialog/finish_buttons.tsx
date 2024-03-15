@@ -36,7 +36,7 @@ function FinishDialogButtons() {
     onSuccess: (_) => {
       updateShiftsInfo();
       updateShiftUnclosed();
-      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
       toast({
         title: "Shift updated",
         description: "Your shift has been updated successfully",
@@ -45,6 +45,7 @@ function FinishDialogButtons() {
         duration: 3000,
       });
     },
+    gcTime: 1000,
   });
 
   function onFinishShift() {

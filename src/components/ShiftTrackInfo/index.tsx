@@ -13,11 +13,8 @@ function ShiftTrackInfo() {
   return (
     <>
       {isEmpty ? (
-        <Text classes="mx-0 my-auto block text-center text-2xl">
-          You don&apos;t have any shift tracked yet,{" "}
-          <Text as="span" classes="text-2xl text-cyan-500 underline">
-            please start one.
-          </Text>
+        <Text classes="mx-0 my-auto block text-center text-xl text-red-700">
+          {"You haven't started your shift yet! Please press the 'Start Shift' button."}
         </Text>
       ) : (
         <Stack as="div" orientation="vertical">
@@ -25,8 +22,8 @@ function ShiftTrackInfo() {
             {isLoading
               ? "loading data..."
               : !!text
-              ? `last shift tracked: ${text} (${date})`
-              : "waiting for the first shift"}
+                ? `last shift tracked: ${text} (${date})`
+                : "waiting for the first shift"}
           </Text>
           <Text>money earn at the moment: {`${earns.toFixed(2)}`}$</Text>
         </Stack>

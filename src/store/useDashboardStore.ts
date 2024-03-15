@@ -39,6 +39,7 @@ export function createDashboardStore(initProps?: Partial<DashboardStateProps>) {
             ...(get().user as UserType),
             shifts: newShifts ?? [],
           },
+          initialShifts: newShifts ?? [],
         });
       }
     },

@@ -20,7 +20,7 @@ function Providers({ children, i18n }: Props) {
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        {process.env.SHOW_DEVTOOLS && <ReactQueryDevtools initialIsOpen={false} />}
+        {process.env.NEXT_PUBLIC_SHOW_DEVTOOLS && <ReactQueryDevtools initialIsOpen={false} />}
         <SessionProvider>
           <NextIntlClientProvider {...i18n} timeZone="UTC">
             {children}

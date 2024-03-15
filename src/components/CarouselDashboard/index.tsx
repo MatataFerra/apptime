@@ -39,7 +39,7 @@ async function CarouselDashboard({ params }: Props) {
     hoursWorked,
   } = !user ? defaultValues : new Dashboard(user).dashboardData();
 
-  const humanizedLastDayRegistered = isValid(lastDayRegistered)
+  const humanizedLastDayRegistered = isValid(new Date(lastDayRegistered))
     ? new DateHumanizer("short").humanizeDate(new Date(lastDayRegistered), {
         locale: params.locale,
       })
