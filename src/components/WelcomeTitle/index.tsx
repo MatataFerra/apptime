@@ -17,7 +17,7 @@ function WelcomeTitle({ user }: Props) {
 
         {user?.name ? (
           <Text gradient="title" classes={`balance_text text-5xl font-bold`}>
-            {user?.name.trim().slice(0, 10)}
+            {user.name.split(" ")[0].trim()}
           </Text>
         ) : (
           <Skeleton classes="h-9 w-52" />
