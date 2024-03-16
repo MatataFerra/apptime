@@ -4,7 +4,7 @@ import { CSSClassNames } from "@/types";
 import { TAILWIND_COLOR } from "@/types/tailwind";
 
 import { GRADIENTS, TEXT_VARIANTS } from "@/utils/constants/tailwind";
-import { cm } from "@/utils/helpers/styleMerger";
+import { cn } from "@/utils/helpers/styleMerger";
 
 type Variants = keyof typeof TEXT_VARIANTS;
 type Gradients = keyof typeof GRADIENTS;
@@ -20,7 +20,7 @@ type TextOwnProps<E extends ValidElement> = {
   variant?: Variants;
   color?: TAILWIND_COLOR;
   gradient?: Gradients;
-  children: (string | ReactElement | boolean)[] | string | ReactElement | undefined;
+  children: React.ReactNode;
 };
 
 type TextProps<E extends ValidElement> = TextOwnProps<E> &
@@ -55,7 +55,7 @@ function Text<E extends ValidElement = typeof TextDefaultAsType>({
 
   return (
     <Component
-      className={cm(
+      className={cn(
         TEXT_VARIANTS[variant],
         gradient ? `bg-gradient-to-r bg-clip-text text-transparent ${GRADIENTS[gradient]}` : "",
         classes,
