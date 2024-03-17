@@ -6,7 +6,13 @@ import UserService from "@/services/User";
 import TableElement from "@/components/ui/TableElement";
 import TableFoot from "@/components/ui/TableFoot";
 
-async function TableHistoryFoot() {
+type Props = {
+  colsNumber: number;
+};
+
+const EMPTY_COLS = 2;
+
+async function TableHistoryFoot({ colsNumber }: Props) {
   const user = await UserService.getSessionUser();
 
   function calculateEarnings(shift: Shift) {
@@ -37,7 +43,9 @@ async function TableHistoryFoot() {
       </TableElement>
       <TableElement>{`${sumHours()?.toFixed(2)}`}h</TableElement>
       <TableElement>${`${totalEarnings()?.toFixed(2)}`}</TableElement>
-      <TableElement />
+      {Array.from({ length: colsNumber - EMPTY_COLS }, (_, i) => (
+        <TableElement key={i} />
+      ))}
     </TableFoot>
   );
 }

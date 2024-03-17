@@ -15,6 +15,7 @@ import { Locale, UserType } from "@/types";
 import { SuccessApiResponse } from "@/types/api_response/index";
 
 import Button from "@/components/ui/Button";
+import Icon from "@/components/ui/Icons";
 import Image from "@/components/ui/Image";
 import Ripple from "@/components/ui/Ripple";
 import TableElement from "@/components/ui/TableElement";
@@ -79,8 +80,17 @@ function TableHistoryRow({ shift }: { shift: Shift }) {
   return (
     <TableElement as="tr" classes={isDeleting ? "animate-fade-out-left" : undefined}>
       <TableElement>{shortDate(shift.startDate)}</TableElement>
-      <TableElement>{shift?.amount ? String(getHours(shift?.amount ?? 0)) : "..."}</TableElement>
+      <TableElement>
+        {shift?.amount ? `${String(getHours(shift?.amount ?? 0))}h` : "..."}
+      </TableElement>
       <TableElement>${String(calculateEarnings(shift))}</TableElement>
+      <TableElement align="center">
+        {user?.profile?.hourlyRate ? `$${user?.profile?.hourlyRate}` : "..."}
+      </TableElement>
+      <TableElement align="center">
+        {shift?.isPublicHoliday ? <Icon.star style={{ color: "#97881a" }} /> : null}
+      </TableElement>
+
       <TableElement>
         <Ripple>
           <Button

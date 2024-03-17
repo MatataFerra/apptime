@@ -2,7 +2,9 @@
 
 import { useEffect, useRef } from "react";
 
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+
+import api from "@/services/Api";
 
 import type { UserType } from "@/types";
 
@@ -14,14 +16,25 @@ type Props = {
 };
 
 function DashboardProvider({ children, user }: Props) {
-  const store = useRef(createDashboardStore({ user: user })).current;
-  const queryClient = useQueryClient();
+  const store = useRef(createDashboardStore({ user })).current;
+  const query = useQuery({
+    queryKey: ["user", user?.email],
+    queryFn: () =>
+      api.getUserByEmail.bind(api)({
+        email: user?.email,
+        shifts: true,
+        profile: true,
+        hasEnvUrl: false,
+      }),
+  });
 
   useEffect(() => {
-    const query = queryClient.getQueryData(["user", user?.email]) as { user: UserType } | undefined;
-
-    store.setState({ user: query?.user });
-  }, [queryClient, store, user?.email]);
+    if (query.isError) {
+      store.setState({ user });
+    } else {
+      query.isSuccess && store.setState({ user: query?.data?.user as UserType });
+    }
+  }, [query, store, user]);
 
   return <DashboardContext.Provider value={store}>{children}</DashboardContext.Provider>;
 }
