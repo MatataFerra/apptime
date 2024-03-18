@@ -33,12 +33,17 @@ export default class DateHumanizer {
         formatDistanceToNow(date, { addSuffix: true, locale: this.locale[locale || "en"] }),
       formatAndAddTime: (date: Date, { time }) => this.formatAndAddTime({ date, time }),
       formatDate: (date: Date) => this.formatDate(date),
-      short: (date: Date, { locale }) =>
-        new Date(date).toLocaleDateString(locale, {
+      short: (date: Date, { locale, dateFormat }) => {
+        if (dateFormat) {
+          return this.format(date, dateFormat, locale);
+        }
+
+        return new Date(date).toLocaleDateString(locale, {
           month: "short",
           day: "numeric",
           year: "numeric",
-        }),
+        });
+      },
       long: (date: Date, { locale }) =>
         new Date(date).toLocaleDateString(locale, {
           month: "long",
@@ -85,5 +90,9 @@ export default class DateHumanizer {
     date.setHours(Number(hours));
     date.setMinutes(Number(minutes));
     return date;
+  }
+
+  private format(date: Date, dateFormat: string, locale?: "es" | "en") {
+    return format(date, dateFormat, { locale: this.locale[locale || "en"] });
   }
 }

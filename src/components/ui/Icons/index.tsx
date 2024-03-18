@@ -160,4 +160,24 @@ Icon.trash = function ({ ...props }: SVGProps<SVGSVGElement>) {
   );
 };
 
+Icon.star = function ({ ...props }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width={16}
+      height={16}
+      strokeLinejoin="round"
+      data-testid="geist-icon"
+      style={{
+        color: "currentcolor",
+      }}
+      {...props}
+    >
+      <path
+        fill="currentColor"
+        d="m8 .49 2.573 4.718 5.283.99-3.692 3.905.691 5.33L8 13.128l-4.855 2.305.691-5.33L.144 6.197l5.283-.989L8 .49Z"
+      />
+    </svg>
+  );
+};
+
 export default Icon;

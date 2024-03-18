@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 
+import { useLocale } from "next-intl";
+
 import ShiftService from "@/services/Shift";
+
+import { Locale } from "@/types";
 
 import Icon from "@/components/ui/Icons";
 import Stack from "@/components/ui/Stack";
@@ -12,6 +16,7 @@ import { useDashboardContext } from "@/store/useDashboardStore";
 
 function PickupDate() {
   const [isReset, setIsReset] = useState(false);
+  const locale = useLocale() as Locale;
   const { filterByDate, initialShifts, resetShifts } = useDashboardContext((state) => state);
 
   type Acc = {
@@ -21,7 +26,10 @@ function PickupDate() {
 
   const datesSorted = ShiftService.shiftsSorted(initialShifts ?? [], { desc: false });
   const uniqueDates = datesSorted?.reduce((acc: Acc[], shift) => {
-    const humanize = new DateHumanizer("short").humanizeDate(new Date(shift.startDate));
+    const humanize = new DateHumanizer("short").humanizeDate(new Date(shift.startDate), {
+      dateFormat: "eee d, MMM yy",
+      locale,
+    });
     const isDateExists = acc.some((date) => date.date === humanize);
 
     if (!isDateExists) {
@@ -51,11 +59,13 @@ function PickupDate() {
         <option disabled value="select" className="border-none">
           Select Date
         </option>
-        {uniqueDates?.map((shift) => (
-          <option key={shift.value} value={shift.value} className="border-none">
-            {shift.date}
-          </option>
-        ))}
+        {uniqueDates?.map((shift) => {
+          return (
+            <option key={shift.value} value={shift.value} className="border-none">
+              {shift.date}
+            </option>
+          );
+        })}
       </select>
       <Icon.cancel
         onClick={() => {

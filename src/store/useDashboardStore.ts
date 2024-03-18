@@ -6,7 +6,7 @@ import { create, useStore } from "zustand";
 import type { UserType } from "@/types";
 
 interface DashboardStateProps {
-  user: UserType | null;
+  user: UserType | null | undefined;
   initialShifts: UserType["shifts"];
 }
 

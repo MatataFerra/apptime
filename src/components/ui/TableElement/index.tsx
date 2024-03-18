@@ -26,7 +26,7 @@ function TableElement<E extends ValidTableElement = typeof TableElementDefaultAs
 }: Props<E>) {
   const isTr = as === "tr";
   const Element = as || "td";
-  const defaultStyles = !isTr ? "p-4 text-base text-gray-800 dark:text-gray-100" : "";
+  const defaultStyles = !isTr ? "p-4 text-xs text-gray-800 dark:text-gray-100" : "";
   const classesStyles = classes ? classes : "";
 
   return (
