@@ -5,12 +5,13 @@ import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
+import { format, isBefore, isEqual } from "date-fns";
 import { isNaN } from "lodash";
 import { useLocale } from "next-intl";
 
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
+import Toast from "@/services/Toast";
 
 import { FastChargeFormSchema, Locale } from "@/types";
 import { type FastChargeInputs, type FastChargeInputsParsed } from "@/types/forms";
@@ -20,7 +21,6 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
-import { useToast } from "@/components/ui/Toast/use-toast";
 
 import useUser from "@/hooks/useUser";
 
@@ -29,14 +29,14 @@ import onSubmitFastCharge from "@/server-actions/fast-charge";
 function FastChargeForm() {
   const locale = useLocale() as Locale;
   const queryClient = useQueryClient();
-  const { toast } = useToast();
   const {
     handleSubmit,
     register,
     watch,
     setValue,
     reset,
-    formState: { touchedFields },
+    setError,
+    formState: { touchedFields, errors },
   } = useForm<FastChargeInputs>({
     resolver: zodResolver(FastChargeFormSchema),
   });
@@ -120,12 +120,30 @@ function FastChargeForm() {
       isWorked: formData["fast-worked"],
     };
 
+    if (isBefore(new Date(finishDateWatch), new Date(startDateWatch))) {
+      setError("finish-date", {
+        message: "Finish date must be after start date",
+      });
+
+      return;
+    }
+
+    if (
+      isBefore(new Date(parseData.endDate), new Date(parseData.startDate)) ||
+      isEqual(new Date(parseData.endDate), new Date(parseData.startDate))
+    ) {
+      setError("finish-time", {
+        message: "Finish time must be after start date",
+      });
+      return;
+    }
+
     onSubmitFastCharge(parseData).then((res) => {
       if (res) {
-        toast({
-          title: "Shift created successfully",
-          className: "bg-green-500 text-white",
+        Toast({
+          type: "success",
           duration: 2000,
+          message: "Shift created successfully",
         });
 
         queryClient.invalidateQueries({
@@ -141,7 +159,7 @@ function FastChargeForm() {
     <>
       <Stack as="form" grid cols={2} id="fast-charge" onSubmit={handleSubmit(onSubmit)}>
         <Input
-          classes="text-base"
+          classes="w-full min-w-40 text-base"
           label="Start date"
           type="date"
           // create a function to get the current year, give more flexibility
@@ -149,14 +167,30 @@ function FastChargeForm() {
           {...register("start-date")}
         />
         <Input
-          classes="text-base"
+          containerClasses="[&>small]:text-red-600 [&>small]:text-[.5rem] [&>small]:mt-0"
+          classes="w-full min-w-40 text-left text-base"
           label="Finish date"
           type="date"
+          isError={!!errors["finish-date"]}
+          description={errors["finish-date"]?.message}
           max={format(new Date(`${thisYear}-12-31`), "yyyy-MM-dd")}
           {...register("finish-date")}
         />
-        <Input classes="text-base" label="Start time" type="time" {...register("start-time")} />
-        <Input classes="text-base" label="Finish time" type="time" {...register("finish-time")} />
+        <Input
+          classes="w-full min-w-40 text-left text-base"
+          label="Start time"
+          type="time"
+          {...register("start-time")}
+        />
+        <Input
+          containerClasses="[&>small]:text-red-600 [&>small]:text-[.5rem] [&>small]:mt-0"
+          classes="w-full min-w-40 text-left text-base"
+          label="Finish time"
+          type="time"
+          isError={!!errors["finish-time"]}
+          description={errors["finish-time"]?.message}
+          {...register("finish-time")}
+        />
         <Stack alignItems="center">
           <Input classes="size-4" type="checkbox" id="fast-holiday" {...register("fast-holiday")} />
           <Text as="label" htmlFor="fast-holiday">
