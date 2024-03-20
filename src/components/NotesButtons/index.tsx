@@ -1,6 +1,7 @@
+import Toast from "@/services/Toast";
+
 import Button from "@/components/ui/Button";
 import Stack from "@/components/ui/Stack";
-import { useToast } from "@/components/ui/Toast/use-toast";
 
 import { useNotesStore } from "@/store/useNotesStore";
 import { useShiftStateContext } from "@/store/useShiftStatusStore";
@@ -10,7 +11,6 @@ function NotesButtons() {
     updateShift,
     shiftUnclosed: { shift },
   } = useShiftStateContext((state) => state);
-  const { toast } = useToast();
   const { notesToggle, notes } = useNotesStore((state) => state);
 
   function onSaveNotes() {
@@ -19,8 +19,9 @@ function NotesButtons() {
 
     updateShift({ notes, id: shift.id });
 
-    toast({
-      title: "Note added",
+    Toast({
+      message: "Note added",
+      type: "plain",
       description: "Your note has been added to the shift.",
       duration: 2000,
     });
