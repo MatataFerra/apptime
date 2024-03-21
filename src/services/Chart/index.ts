@@ -32,13 +32,15 @@ class Chart {
   }
 
   earnsPerDay(profile: Profile) {
-    const data = this.sortShifts?.map((shift) => ({
-      date: new DateHumanizer("short").humanizeDate(new Date(shift.startDate)),
-      earnings: ShiftService.calculateEarnings({
-        shift,
-        profile,
-      }),
-    }));
+    const data = this.sortShifts
+      ?.filter((shift) => shift.isClosed)
+      .map((shift) => ({
+        date: new DateHumanizer("short").humanizeDate(new Date(shift.startDate)),
+        earnings: ShiftService.calculateEarnings({
+          shift,
+          profile,
+        }),
+      }));
 
     return data;
   }
