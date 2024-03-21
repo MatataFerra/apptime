@@ -16,7 +16,6 @@ export const useNotesStore = createWithEqualityFn(
       isNotesOpen: false,
       notes: "",
       setNotes: (note) => {
-        // console.log("setNotes", note, "prev", get().notes);
         set({ notes: note }, false, "setNotes");
       },
       notesToggle: () => {

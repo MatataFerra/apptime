@@ -141,9 +141,11 @@ class ShiftService implements ShiftServiceInterface {
   static shiftsSorted(shifts: Shift[] | undefined, { desc = true }: { desc?: boolean } = {}) {
     if (!shifts) return null;
     if (desc) {
-      return shifts.toSorted((a, b) => {
-        return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
-      });
+      return shifts
+        .filter((shift) => shift.isClosed)
+        .toSorted((a, b) => {
+          return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+        });
     }
 
     return shifts.toSorted((a, b) => {
@@ -210,9 +212,11 @@ class ShiftService implements ShiftServiceInterface {
   }
 
   private updateEndDate() {
-    this.shift.endDate = !!this.shift.endDate
-      ? this.shift.endDate
-      : new Date(Date.now()).toString();
+    if (this.shift.isClosed) {
+      this.shift.endDate = !!this.shift.endDate
+        ? this.shift.endDate
+        : new Date(Date.now()).toString();
+    }
 
     return this;
   }

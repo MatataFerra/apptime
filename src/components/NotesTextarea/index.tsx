@@ -19,7 +19,9 @@ function NotesTextarea(props: Props) {
 
   useEffect(() => {
     if (isNotesOpen) {
+      if (!refTextArea.current) return;
       refTextArea.current?.focus();
+      refTextArea.current.selectionStart = refTextArea.current.value.length;
     }
   }, [isNotesOpen]);
 
@@ -27,7 +29,7 @@ function NotesTextarea(props: Props) {
     <Textarea
       id={id}
       ref={refTextArea}
-      classes="mx-1 h-full rounded-none bg-transparent p-2 text-2xl outline-none"
+      classes="mx-1 h-full resize-none rounded-none bg-transparent p-2 text-2xl outline-none"
       value={notes}
       onChange={(e) => setNotes(e.target.value)}
       {...props}

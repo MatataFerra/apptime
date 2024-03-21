@@ -1,3 +1,4 @@
+import api from "@/services/Api/Shift";
 import Toast from "@/services/Toast";
 
 import Button from "@/components/ui/Button";
@@ -13,10 +14,11 @@ function NotesButtons() {
   } = useShiftStateContext((state) => state);
   const { notesToggle, notes } = useNotesStore((state) => state);
 
-  function onSaveNotes() {
+  async function onSaveNotes() {
     if (notes.length <= 3) return;
     if (!shift) return;
 
+    await api.updateShift({ body: { ...shift, notes }, id: shift.id });
     updateShift({ notes, id: shift.id });
 
     Toast({

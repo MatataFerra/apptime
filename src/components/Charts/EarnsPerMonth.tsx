@@ -24,9 +24,9 @@ function EarnsPerMonth() {
   const group = new ChartService(initialShifts ?? []).groupByMonths; // [ "Jan": [{}, {}], "Feb": [{}, {}]
 
   const earningsByMonthData = Object.entries(group ?? {}).map(([month, shifts]) => {
-    const earnings = shifts.map((shift) =>
-      ShiftService.calculateEarnings({ shift, profile: user?.profile! })
-    );
+    const earnings = shifts
+      .filter((shift) => shift.isClosed)
+      .map((shift) => ShiftService.calculateEarnings({ shift, profile: user?.profile! }));
 
     return {
       month,

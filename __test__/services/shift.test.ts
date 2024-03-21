@@ -32,6 +32,12 @@ describe("ShiftService", () => {
       expect(shift).toEqual(SHIFT_MOCK);
     });
 
+    test("endData should be null", () => {
+      const shift = new ShiftService(SHIFT_MOCK).build();
+
+      expect(shift.endDate).toBeNull();
+    });
+
     test("should return the same shift with the updated status and the endDate updated", () => {
       const shift = new ShiftService({ ...SHIFT_MOCK, endDate: now.toString() })
         .closeShift()
@@ -43,7 +49,7 @@ describe("ShiftService", () => {
     });
 
     test("should return the shift with all transformations", () => {
-      const shift = new ShiftService(SHIFT_MOCK)
+      const shift = new ShiftService({ ...SHIFT_MOCK, isClosed: true })
         .closeShift()
         .checkPublicHoliday()
         .differenceInMinsBetweenStartAndEnd()
