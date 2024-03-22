@@ -3,7 +3,7 @@ import TableHistoryFoot from "@/components/TableHistoryFoot";
 import Table from "@/components/ui/Table";
 import TableHead from "@/components/ui/TableHead";
 
-const COLUMNS = ["Day", "Hours", "Earnings", "Hour value", "Public Holiday"] as const;
+const COLUMNS = ["Day", "Hours", "Earnings", "Public Holiday"] as const;
 
 function TableHistory() {
   return (

@@ -18,8 +18,12 @@ import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icons";
 import Image from "@/components/ui/Image";
 import Ripple from "@/components/ui/Ripple";
+import Stack from "@/components/ui/Stack";
 import TableElement from "@/components/ui/TableElement";
+import Text from "@/components/ui/Text";
 
+import TableDialog from "../TableDialog";
+import TableDialogContent from "../TableDialogContent";
 import { useDashboardContext } from "@/store/useDashboardStore";
 
 function TableHistoryRow({ shift }: { shift: Shift }) {
@@ -45,15 +49,6 @@ function TableHistoryRow({ shift }: { shift: Shift }) {
     }: {
       id: number;
     }) => Promise<SuccessApiResponse<UserType>>,
-    onMutate: async ({ id }) => {
-      setTimeout(() => {
-        setIsDeleting(true);
-      }, 750);
-
-      setTimeout(() => {
-        deleteShift(id);
-      }, 1500);
-    },
 
     onError: () => {
       update({ shifts: user?.shifts });
@@ -78,34 +73,52 @@ function TableHistoryRow({ shift }: { shift: Shift }) {
   }
 
   return (
-    <TableElement as="tr" classes={isDeleting ? "animate-fade-out-left" : undefined}>
-      <TableElement>{shortDate(shift.startDate)}</TableElement>
-      <TableElement>
-        {shift?.amount ? `${String(getHours(shift?.amount ?? 0))}h` : "..."}
-      </TableElement>
-      <TableElement>${String(calculateEarnings(shift))}</TableElement>
-      <TableElement align="center">
-        {user?.profile?.hourlyRate ? `$${user?.profile?.hourlyRate}` : "..."}
-      </TableElement>
-      <TableElement align="center">
-        {shift?.isPublicHoliday ? <Icon.star style={{ color: "#97881a" }} /> : null}
-      </TableElement>
+    <TableDialog
+      title="Info about this shift"
+      content={
+        <TableDialogContent
+          shift={shift}
+          user={user}
+          shortDate={shortDate}
+          getHours={getHours}
+          calculateEarnings={calculateEarnings}
+        />
+      }
+    >
+      <TableElement as="tr" type="tr" classes={`${isDeleting ? "animate-fade-out-left" : ""}`}>
+        <TableElement>{shortDate(shift.startDate)}</TableElement>
+        <TableElement>
+          {shift?.amount ? `${String(getHours(shift?.amount ?? 0))}h` : "..."}
+        </TableElement>
+        <TableElement>${String(calculateEarnings(shift))}</TableElement>
+        <TableElement align="center">
+          {shift?.isPublicHoliday ? <Icon.star style={{ color: "#97881a" }} /> : null}
+        </TableElement>
 
-      <TableElement>
-        <Ripple>
-          <Button
-            variant="rounded"
-            classes="size-10"
-            onClick={() => {
-              // Delete shift
-              mutate({ id: shift.id });
-            }}
-          >
-            <Image src="/assets/trash.svg" classes="z-20" alt="delete" width={20} height={20} />
-          </Button>
-        </Ripple>
+        <TableElement>
+          <Ripple>
+            <Button
+              variant="rounded"
+              classes="size-10"
+              onClick={() => {
+                // Delete shift
+
+                setTimeout(() => {
+                  setIsDeleting(true);
+                }, 750);
+
+                setTimeout(() => {
+                  deleteShift(shift.id);
+                  mutate({ id: shift.id });
+                }, 1500);
+              }}
+            >
+              <Image src="/assets/trash.svg" classes="z-20" alt="delete" width={20} height={20} />
+            </Button>
+          </Ripple>
+        </TableElement>
       </TableElement>
-    </TableElement>
+    </TableDialog>
   );
 }
 

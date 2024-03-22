@@ -180,4 +180,26 @@ Icon.star = function ({ ...props }: SVGProps<SVGSVGElement>) {
   );
 };
 
+Icon.eye = function ({ ...props }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width={16}
+      height={16}
+      strokeLinejoin="round"
+      data-testid="geist-icon"
+      style={{
+        color: "currentcolor",
+      }}
+      {...props}
+    >
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M4.022 4.77a5.25 5.25 0 0 1 7.956 0L14.76 8l-2.782 3.23a5.25 5.25 0 0 1-7.956 0L1.24 8l2.782-3.23Zm9.093-.98C10.422.664 5.578.664 2.885 3.79L-.318 7.51v.98l3.203 3.72c2.693 3.127 7.537 3.127 10.23 0l3.203-3.72v-.98l-3.203-3.72ZM6.5 8a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0ZM8 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+};
+
 export default Icon;
