@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "next-auth/middleware";
 import createIntlMiddleware from "next-intl/middleware";
