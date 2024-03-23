@@ -18,7 +18,7 @@ console.error = (...args: any) => {
 };
 
 type Props = {
-  user: UserType | null;
+  user: UserType | null | undefined;
 };
 
 function EarnsPerDay({ user }: Props) {
