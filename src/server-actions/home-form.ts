@@ -1,44 +1,50 @@
 "use server";
 
-import { getServerSession } from "next-auth";
+import { Profile } from "@prisma/client";
 
-import api from "@/services/Api";
+import ProfileService from "@/services/Profile";
+import UserService from "@/services/User";
 
 import { FormStoreData } from "@/types/store";
 
-export default async function onSubmitServerAction(data: FormStoreData) {
-  const { user, profile } = data;
-  // holiday pay en profile por default es 8
-  const session = await getServerSession();
-  const fullname = `${user.name} ${user.surname}`;
+export default async function onSubmitServerAction(data: FormStoreData): Promise<Profile | null> {
+  const { user: userData, profile } = data;
+  const fullname = `${userData.name} ${userData.surname}`;
+  const currentUser = await UserService.getSessionUser();
 
-  const userByEmail = await api.getUserByEmail({
-    email: session?.user?.email,
-    filters: "id",
-  });
-
-  if (!userByEmail.response) {
-    return userByEmail;
+  if (!currentUser) {
+    return null;
   }
 
-  const userUpdated = await api.updateUser({
+  if (currentUser.profile) {
+    return null;
+  }
+
+  await UserService.updateUser({
+    id: currentUser.id,
     user: {
-      id: userByEmail.user.id,
       name: fullname,
       formCompleted: true,
     },
   });
 
-  if (!userUpdated.response) {
-    return userUpdated;
-  }
-
-  const response = await api.createProfile({
+  const response = await ProfileService.createProfile({
+    userId: currentUser.id,
     profile: {
-      userId: userByEmail.user.id,
-      ...profile,
+      endHour: profile.endHour,
+      hourlyRate: profile.hourlyRate,
+      startHour: profile.startHour,
+      holidayPay: profile.holidayPay,
+      nightShift: profile.nightShift,
+      extraNightShiftPay: profile.extraNightShiftPay,
+      holidayPayRate: profile.holidayPayRate,
+      unpaidBreaks: profile.unpaidBreaks,
     },
   });
+
+  if (!response) {
+    return null;
+  }
 
   return response;
 }

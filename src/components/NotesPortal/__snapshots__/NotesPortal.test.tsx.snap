@@ -1,0 +1,26 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Portal > renders children when isOn is false 1`] = `
+<body
+  style="overflow: auto;"
+>
+  <div />
+  <div />
+</body>
+`;
+
+exports[`Portal > renders children when isOn is false 2`] = `<div />`;
+
+exports[`Portal > renders children when isOn is true 1`] = `
+<body
+  style="overflow: hidden;"
+>
+  <div />
+  <div
+    class=""
+    id="1"
+  />
+</body>
+`;
+
+exports[`Portal > renders children when isOn is true 2`] = `<div />`;

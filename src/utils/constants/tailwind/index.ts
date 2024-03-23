@@ -1,15 +1,14 @@
 export const TEXT_VARIANTS = {
-  default: "text-base text-gray-800 dark:text-gray-100",
+  default: "text-gray-800 dark:text-gray-100",
   title: "text-4xl font-bold text-gray-800 dark:text-gray-100",
-  gradient: "text-transparent bg-gradient-to-r bg-clip-text",
   subtitle: "text-xl font-bold text-gray-800 dark:text-gray-100",
   error: "text-red-600 dark:text-red-400",
   success: "text-green-600 dark:text-green-400",
 };
 
 export const GRADIENTS = {
-  gradient_1: "from-blue-600 via-purple-500 to-orange-500",
-  gradient_2: "from-hard-pink to-common-orange",
+  title: "from-hard-pink to-common-orange",
+  secondary: "from-blue-600 via-purple-500 to-orange-500",
   error: "from-red-300 via-red-500 to-red-700",
 };
 
@@ -20,7 +19,9 @@ export const BUTTON_VARIANTS = {
   success: "bg-green-500 text-white p-3",
   warning: "bg-yellow-500 text-white p-3",
   info: "bg-blue-500 text-white p-3 font-bold text-white shadow-button",
-  gradient: "bg-gradient-to-r from-blue-600 p-3 via-purple-500 to-orange-500 text-white",
+  rounded: "text-black p-3 rounded-full bg-transparent",
+  gradient_primary: "border_gradient_1",
+  gradient_secondary: "border_gradient_2",
   google: "bg-white text-black p-3 border border-gray-300 shadow-button",
   outlined: "bg-white text-black p-3",
   white:

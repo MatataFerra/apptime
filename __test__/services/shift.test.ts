@@ -32,6 +32,12 @@ describe("ShiftService", () => {
       expect(shift).toEqual(SHIFT_MOCK);
     });
 
+    test("endData should be null", () => {
+      const shift = new ShiftService(SHIFT_MOCK).build();
+
+      expect(shift.endDate).toBeNull();
+    });
+
     test("should return the same shift with the updated status and the endDate updated", () => {
       const shift = new ShiftService({ ...SHIFT_MOCK, endDate: now.toString() })
         .closeShift()
@@ -43,7 +49,7 @@ describe("ShiftService", () => {
     });
 
     test("should return the shift with all transformations", () => {
-      const shift = new ShiftService(SHIFT_MOCK)
+      const shift = new ShiftService({ ...SHIFT_MOCK, isClosed: true })
         .closeShift()
         .checkPublicHoliday()
         .differenceInMinsBetweenStartAndEnd()
@@ -175,6 +181,70 @@ describe("ShiftService", () => {
       const shift = new ShiftService(mock).closeShift().build();
 
       expect(shift.isClosed).toBe(true);
+    });
+  });
+
+  describe("Should calculate  earnings", () => {
+    test("Should calculate the earnings of a shift", () => {
+      const mock: Shift = {
+        ...shiftMock.shift,
+        startDate: now.toString(),
+        endDate: addMinutes(now, DIFFERENCE_SHIFT).toString(),
+      };
+
+      const shift = new ShiftService(mock).differenceInMinsBetweenStartAndEnd().build();
+
+      const earnings = ShiftService.calculateEarnings({
+        profile: profileMock.profile,
+        shift,
+      });
+
+      expect(earnings).toBe(5.25);
+    });
+
+    test("Should calculate the earnings of a shift when is public holiday", () => {
+      const mock: Shift = {
+        ...shiftMock.shift,
+        startDate: now.toString(),
+        endDate: addMinutes(now, DIFFERENCE_SHIFT).toString(),
+        isPublicHoliday: true,
+      };
+
+      const shift = new ShiftService(mock).differenceInMinsBetweenStartAndEnd().build();
+
+      const earnings = ShiftService.calculateEarnings({
+        profile: profileMock.profile,
+        shift,
+      });
+
+      expect(earnings).toBe(7.88);
+    });
+
+    test("Should calculate the earnings when user pass start and end dates instead shift", () => {
+      const start = now.toString();
+      const end = addMinutes(now, DIFFERENCE_SHIFT).toString();
+
+      const earnings = ShiftService.calculateEarnings({
+        profile: profileMock.profile,
+        startDate: start,
+        endDate: end,
+      });
+
+      expect(earnings).toBe(5.25);
+    });
+
+    test("Should calculate the earnings when user pass start and end dates instead shift and is public holiday", () => {
+      const start = now.toString();
+      const end = addMinutes(now, DIFFERENCE_SHIFT).toString();
+
+      const earnings = ShiftService.calculateEarnings({
+        profile: profileMock.profile,
+        startDate: start,
+        endDate: end,
+        isPublicHoliday: true,
+      });
+
+      expect(earnings).toBe(7.88);
     });
   });
 });

@@ -2,6 +2,8 @@ import { Profile, Shift, User } from "@prisma/client";
 import { JWT } from "next-auth/jwt";
 import { z } from "zod";
 
+import type { BG_TAILWIND_COLOR, FROM_TO_TAILWIND_COLOR } from "@/types/tailwind";
+
 import { HandleErrorTypeSchema } from "../zod";
 
 // Types
@@ -11,7 +13,7 @@ export type UserType = User & {
 };
 export type HandleErrorType = z.infer<typeof HandleErrorTypeSchema>;
 
-export type DashboardUserType = Omit<UserType, "account" | "session">;
+export type DashboardUserType = UserType;
 
 // Interfaces
 export interface InterfaceConfig {
@@ -29,7 +31,7 @@ export interface DashboardInterface {
   get averageHoursWorkedPerDay(): number;
   get hourValue(): number;
   get lastDayRegistered(): string;
-  estimatedWeeklyEarnings(): number;
+  estimatedWeeklyEarnings({ weekStartsOn }: { weekStartsOn?: keyof typeof DAYS }): number;
   dashboardData(): {
     shiftsLen: number;
     hoursWorked: number;
@@ -39,6 +41,17 @@ export interface DashboardInterface {
     estimatedWeeklyEarnings: number;
   };
 }
+
+// Days
+export const DAYS = {
+  sunday: 0,
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6,
+} as const;
 
 export interface JWTDecodedType extends JWT {
   accessToken: string;
@@ -57,4 +70,29 @@ export type PassedErrors = {
 };
 
 // Date Humanizer
-export type DateHumanizerStrategy = "today" | "distanceToNow" | "parseString";
+export type DateHumanizerStrategy =
+  | "today"
+  | "distanceToNow"
+  | "formatAndAddTime"
+  | "formatDate"
+  | "short"
+  | "long";
+
+// Chart
+export type EarnsMonthData = {
+  month: string;
+  earnings: number;
+} | null;
+
+//Color
+
+export type Gradient = {
+  from: FROM_TO_TAILWIND_COLOR["from"];
+  to: FROM_TO_TAILWIND_COLOR["to"];
+};
+
+export type PlainColor = BG_TAILWIND_COLOR;
+
+export type Color = PlainColor | Gradient;
+
+export type ColorWithGradientAndHex<T> = T extends Gradient ? { from: string; to: string } : string;

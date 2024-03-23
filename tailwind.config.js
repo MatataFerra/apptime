@@ -68,6 +68,8 @@ module.exports = {
       },
       fontSize: {
         "4xl": "2.25rem",
+        "clamp-1-to-2.5": "clamp(1rem, 5vw, 2.5rem)",
+        "clamp-1-to-3": "clamp(1rem, 5vw, 3rem)"
       },
 
       dropShadow: {
@@ -99,6 +101,16 @@ module.exports = {
           from: { transform: "translateY(0)" },
         },
 
+        "show-left": {
+          to: { transform: "translateX(0)" },
+          from: { transform: "translateX(-100%)" },
+        },
+
+        "show-right": {
+          to: { transform: "translateX(-100%)" },
+          from: { transform: "translateX(0)" },
+        },
+
         'fade-down': {
           '0%': {
               opacity: '0',
@@ -121,22 +133,27 @@ module.exports = {
           },
         },
 
-        "fade_in": {
+        "fade-out-left": {
           "0%": {
-            opacity: 0,
+            "opacity": "1",
+            "transform": "translateX(0)"
           },
           "100%": {
-            opacity: 1,
-          },
-        
+            "opacity": "0",
+            "transform": "translateX(-200px)"
+          }
         },
 
-        "fade_out": {
+        ripple: {
           "0%": {
-            opacity: 1,
+            transform: "scale3d(0.3,0.3,1)",
+          },
+          "50%": {
+            opacity:"1"
           },
           "100%": {
-            opacity: 0,
+            transform: "scale3d(1.2,1.2,1)",
+            opacity: "0",
           },
         },
 
@@ -161,18 +178,30 @@ module.exports = {
           "20%, 40%, 60%, 80%": {
             transform: "translateX(3px)",
           },
+        },
+
+        "backdrop-blurry": {
+          "0%": {
+            backdropFilter: "blur(0px)",
+          },
+          "100%": {
+            backdropFilter: "blur(4px)",
+          },
         }
       },
       animation: {
+        "fade-out-left": "fade-out-left 1s ease-out",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         text: "text 5s ease infinite",
         shake: "shake 1s ease 1",
-        "fade-in": "fade_in 0.5s ease-in-out",
-        "fade-out": "fade_out 0.5s ease-in-out",
         "fade-down": "fade-down 0.5s ease-in-out",
         "fade-up": "fade-up 0.5s ease-in-out",
+        "show-left": "show-left 0.5s ease-in-out forwards",
+        "show-right": "show-right 0.5s ease-in-out forwards",
         "dissapear-up": "dissapear-up 0.5s ease-in-out forwards",
+        "backdrop-blurry": "backdrop-blurry 0.5s ease-in-out forwards",
+        ripple: "ripple .5s ease-in-out",
       },
     },
   },

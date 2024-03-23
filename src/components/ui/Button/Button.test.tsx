@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe,expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from "vitest";
 
 import Button from "@/components/ui/Button";
 import GoogleButton from "@/components/ui/Button/Google";
@@ -11,7 +11,7 @@ const DEFAULT_STYLES = "w-40 cursor-pointer rounded-lg text-center";
 
 describe("Button", () => {
   test("renders with default props", () => {
-    render(<Button />);
+    render(<Button>Send</Button>);
     const buttonElement = screen.getByText("Send");
     expect(buttonElement).toBeInTheDocument();
 

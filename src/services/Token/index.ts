@@ -1,6 +1,6 @@
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { cookies as cookieStore } from "next/headers";
-import { decode } from "next-auth/jwt";
+import { decode, encode } from "next-auth/jwt";
 
 import { JWTDecodedType } from "@/types";
 
@@ -38,6 +38,17 @@ class TokenService implements TokenServiceInterface {
   static getCookie(cookie = "next-auth.session-token") {
     const getCookie = cookieStore().get(cookie);
     return getCookie;
+  }
+
+  static async createToken(data: { email: string; name: string; picture: string; sub: string }) {
+    const token = await encode({
+      token: {
+        ...data,
+      },
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    return token;
   }
 }
 

@@ -34,7 +34,7 @@ export default async function Home({ params }: { params: LocaleParams }) {
     <>
       <Stack orientation="vertical" spacing={8}>
         <Stack as="div" orientation="vertical" spacing={4}>
-          <WelcomeTitle />
+          <WelcomeTitle user={user} />
           <DateComponent locale={params.locale} />
         </Stack>
 

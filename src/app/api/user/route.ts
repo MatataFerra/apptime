@@ -1,13 +1,11 @@
 import { User } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 import { getToken, JWT } from "next-auth/jwt";
 
 import ErrorFactory from "@/services/Error/factory";
-import { Token } from "@/services/Token";
 import UserService from "@/services/User";
 
-import { JWTDecodedType, SearchParamsSchema } from "@/types";
+import { SearchParamsSchema } from "@/types";
 
 import { QUERY_PARAMS } from "@/utils/constants";
 
@@ -17,13 +15,16 @@ function checkIsAdmin(user: User) {
   return user.role === "ADMIN";
 }
 
-function parseEmailFromParams(token: JWTDecodedType | null, email: string | null) {
+function parseEmailFromParams(token: JWT | null, email: string | null) {
   if (token?.role !== "ADMIN") return token?.email;
   return email;
 }
 
 export async function GET(req: NextRequest) {
-  const checkToken = (await getToken({ req, secret: process.env.SECRET })) as JWTDecodedType | null;
+  const checkToken = await getToken({
+    req,
+    cookieName: "next-auth.session-token",
+  });
 
   if (!checkToken) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -79,13 +80,13 @@ export async function GET(req: NextRequest) {
     }
 
     if (parsedSearchParams.data.email && onlyParam.length === 0) {
-      if (user.role !== "ADMIN" || user.email !== checkToken.email) {
-        const userFiltered = await UserService.removeProps(user, ["password", "email"]);
+      if (user.role !== "ADMIN" || user.email !== checkToken?.email) {
+        const userFiltered = await UserService.removeProps(user, ["password"]);
         return NextResponse.json(
           {
             message: "success",
             response: true,
-            user: { ...userFiltered, email: "**********" },
+            user: { ...userFiltered },
           },
           { status: 200 }
         );

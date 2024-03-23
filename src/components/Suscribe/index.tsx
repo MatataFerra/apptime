@@ -69,12 +69,10 @@ function Suscribe() {
           {...register("email")}
         />
         <Button
-          variant="gradient"
+          variant={"gradient_primary"}
           classes="transform animate-text p-1 transition-transform active:scale-75"
         >
-          <div className="items-center justify-center rounded-[inherit] bg-gray-800 px-3 py-1 transition-all hover:bg-gray-900">
-            <Text classes="font-black text-white">Notify Me</Text>
-          </div>
+          <Text classes="font-black text-white">Notify Me</Text>
         </Button>
       </Stack>
       {isSubmitting && <Loader.spinner />}

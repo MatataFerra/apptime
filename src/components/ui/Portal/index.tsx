@@ -1,30 +1,100 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 
 import { CSSClassNames } from "@/types";
 
-import Stack from "@/components/ui/Stack";
-
+import { generateRandomID } from "@/utils/helpers/generateRandomID";
 import { cn } from "@/utils/helpers/styleMerger";
 
-import { useNotesStore } from "@/store/useNotesStore";
-
 interface Props extends Omit<React.HTMLAttributes<HTMLElement>, "className"> {
+  id?: string;
+  isOn: boolean;
+  targetSelector?: string;
   children: React.ReactNode;
   classes?: CSSClassNames;
+  handleOutsideClick?: () => void;
 }
 
-function Portal({ children, classes }: Props) {
-  const { isOn, isNotesOpen } = useNotesStore((state) => state);
-
+function Portal({
+  children,
+  isOn,
+  classes,
+  id,
+  handleOutsideClick,
+  targetSelector,
+  ...props
+}: Props) {
+  const isWindow = useMemo(() => typeof window !== "undefined", []);
   const container = useRef<HTMLElement | null>(null);
 
+  // create nav element
   useEffect(() => {
-    container.current = document.querySelector("#notes");
-    document.body.appendChild(container.current!);
-  }, []);
+    const targetElement: HTMLElement | null =
+      targetSelector && typeof targetSelector === "string"
+        ? document.querySelector(targetSelector)
+        : null;
+
+    if (targetElement) {
+      container.current = targetElement;
+    } else {
+      const newTargetElement = document.createElement("div");
+      document.body.appendChild(newTargetElement);
+      container.current = newTargetElement;
+    }
+
+    return () => {
+      if (container.current && document.body.contains(container.current)) {
+        document.body.removeChild(container.current);
+        container.current.remove();
+      }
+    };
+  }, [targetSelector]);
+
+  // set attributes
+  useEffect(() => {
+    if (!isWindow) return;
+    if (!container.current) return;
+
+    for (const [key, value] of Object.entries(props)) {
+      container.current.setAttribute(key, value as string);
+    }
+
+    return () => {
+      if (container.current) {
+        for (const key of Object.keys(props)) {
+          container.current.removeAttribute(key);
+        }
+      }
+    };
+  }, [isOn, isWindow, props]);
+
+  // set id
+  useEffect(() => {
+    if (isOn && container.current && isWindow) {
+      container.current.id = id || generateRandomID();
+    }
+
+    return () => {
+      if (container.current) {
+        container.current.removeAttribute("id");
+      }
+    };
+  }, [id, isWindow, isOn]);
+
+  // set classes
+  useEffect(() => {
+    if (isOn && container.current && isWindow) {
+      container.current.className = cn(classes);
+    }
+
+    return () => {
+      if (container.current) {
+        container.current.removeAttribute("class");
+      }
+    };
+  }, [classes, isWindow, isOn]);
 
   useEffect(() => {
     if (isOn) {
@@ -34,32 +104,27 @@ function Portal({ children, classes }: Props) {
     }
   }, [isOn]);
 
+  // detect click outside
+  useEffect(() => {
+    function onClickOutside(event: MouseEvent) {
+      if (container.current && !container.current.contains(event.target as Node)) {
+        handleOutsideClick && handleOutsideClick();
+      }
+    }
+
+    if (isOn) {
+      document.addEventListener("mousedown", onClickOutside);
+    } else {
+      document.removeEventListener("mousedown", onClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", onClickOutside);
+    };
+  }, [handleOutsideClick, isOn]);
+
   return (
-    <nav
-      id="notes"
-      ref={container}
-      className={cn(
-        isNotesOpen
-          ? "[&>section]:animate-fade-down"
-          : "[&>section]:animate-dissapear-up [&>section]:transition-all"
-      )}
-    >
-      {isOn &&
-        document.body &&
-        createPortal(
-          <>
-            <Stack
-              classes={cn(
-                "absolute top-0 h-52 w-full rounded-lg bg-white p-4 shadow-lg",
-                classes ? classes : ""
-              )}
-            >
-              {children}
-            </Stack>
-          </>,
-          container?.current!
-        )}
-    </nav>
+    <>{isWindow && isOn && container.current ? createPortal(children, container.current) : null}</>
   );
 }
 

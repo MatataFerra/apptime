@@ -1,7 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
+:root {
+  --gradient-1: #64C2DB;
+  --gradient-2: #FF2B91;
+  --gradient-3: #FF6A00;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -141,32 +147,20 @@ input[type=radio]:disabled {
   cursor: not-allowed;
 }
 
-.fade_in {
-  animation: fade_in 0.5s ease-in-out;
-}
-
-.fade_out {
-  animation: fade_out 0.5s ease-in-out;
-}
-
-@keyframes fade_in {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes fade_out {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
 
 div[data-radio-state="false"] .animate_fade_out {
   animation: fade_out 0.5s ease-in-out;
+}
+
+
+.border_gradient_1 {
+	@apply border-2 border-solid border-transparent;
+  background: linear-gradient(#222, #222) padding-box,
+  linear-gradient(90deg, var(--gradient-1) 0%, var(--gradient-2) 50%, var(--gradient-3) 100%) border-box;
+}
+
+.border_gradient_2 {
+	@apply border-2 border-solid border-transparent;
+  background: linear-gradient(#fff, #fff) padding-box,
+  linear-gradient(90deg, var(--gradient-1) 0%, var(--gradient-2) 50%, var(--gradient-3) 100%) border-box;
 }

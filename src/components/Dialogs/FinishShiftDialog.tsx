@@ -26,7 +26,7 @@ type Props = {
 };
 
 function FinishShiftDialog({ triggerStatus }: Props) {
-  const { updateInputsAreDisabled } = useShiftStateContext((state) => state);
+  const { updateInputsAreDisabled, setButtonClicked } = useShiftStateContext((state) => state);
 
   return (
     <>
@@ -34,6 +34,12 @@ function FinishShiftDialog({ triggerStatus }: Props) {
         onOpenChange={(open) => {
           if (!open) {
             setTimeout(() => updateInputsAreDisabled(true), 100);
+            setButtonClicked({
+              edit: true,
+              moveOn: true,
+              cancel: false,
+              ok: false,
+            });
 
             return;
           }

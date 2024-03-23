@@ -7,6 +7,7 @@ export const envSchema = z.object({
   NEXT_PUBLIC_API_MOCKING: z.string().optional(),
   NEXTAUTH_SECRET: z.string(),
   NEXTAUTH_URL: z.string(),
+  NEXT_PUBLIC_SHOW_DEVTOOLS: z.string(),
 });
 
 declare global {

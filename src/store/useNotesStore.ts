@@ -1,29 +1,32 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
+import { shallow } from "zustand/shallow";
+import { createWithEqualityFn } from "zustand/traditional";
 
 type NotesStore = {
   isNotesOpen: boolean;
-  isOn: boolean;
+  notes: string;
+  setNotes: (note: string) => void;
   notesToggle: () => void;
 };
 
-export const useNotesStore = create(
+export const useNotesStore = createWithEqualityFn(
   devtools<NotesStore>(
     (set, get) => ({
-      isOn: false,
       isNotesOpen: false,
+      notes: "",
+      setNotes: (note) => {
+        set({ notes: note }, false, "setNotes");
+      },
       notesToggle: () => {
-        if (!get().isOn) {
-          set({ isOn: true });
-        } else {
-          setTimeout(() => set({ isOn: false }), 1000);
-        }
-
-        set({ isNotesOpen: !get().isNotesOpen });
+        set((state) => ({
+          isNotesOpen: !state.isNotesOpen,
+        }));
       },
     }),
     {
       name: "notes",
     }
-  )
+  ),
+  shallow
 );
