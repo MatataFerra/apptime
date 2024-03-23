@@ -1,3 +1,5 @@
+import { forwardRef } from "react";
+
 import { CSSClassNames } from "@/types";
 
 import { cn } from "@/utils/helpers/styleMerger";
@@ -18,19 +20,20 @@ type TableElementOwnProps<E extends React.PropsWithChildren<ValidTableElement>> 
 type Props<E extends ValidTableElement> = TableElementOwnProps<E> &
   Omit<Omit<React.ComponentProps<E>, "className">, keyof TableElementOwnProps<E>>;
 
-function TableElement<E extends ValidTableElement = typeof TableElementDefaultAsType>({
-  classes,
-  children,
-  as,
-  ...props
-}: Props<E>) {
+function TableElement<E extends ValidTableElement = typeof TableElementDefaultAsType>(
+  { classes, children, as, ...props }: Props<E>,
+  ref: React.ForwardedRef<HTMLTableCellElement>
+) {
   const isTr = as === "tr";
   const Element = as || "td";
-  const defaultStyles = !isTr ? "p-4 text-xs text-gray-800 dark:text-gray-100" : "";
+  const defaultStyles = !isTr
+    ? "p-4 text-xs text-gray-800 dark:text-gray-100 group-hover:bg-sky-50"
+    : "group cursor-pointer";
   const classesStyles = classes ? classes : "";
 
   return (
     <Element
+      ref={ref}
       className={defaultStyles || classes ? cn(defaultStyles, classesStyles) : undefined}
       {...props}
     >
@@ -39,4 +42,4 @@ function TableElement<E extends ValidTableElement = typeof TableElementDefaultAs
   );
 }
 
-export default TableElement;
+export default forwardRef(TableElement);

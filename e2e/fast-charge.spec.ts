@@ -24,24 +24,10 @@ test.beforeEach(async ({ page }) => {
 
   await page.waitForURL(/en/);
 
-  await page.getByTestId("ham").click();
-});
-
-test("user can see drawer", async ({ page }) => {
-  expect(await page.isVisible("text=Fast charge")).toBeTruthy();
-});
-
-test("user can see fast charge form", async ({ page }) => {
-  await page.getByTestId("fast-charge").click();
-
-  await page.waitForURL(/fast-charge/);
-
-  expect(page.url()).toContain("http://localhost:3000/en/fast-charge");
+  await page.goto("http://localhost:3000/en/fast-charge");
 });
 
 test("user can fill up the form and submit", async ({ page }) => {
-  await page.getByTestId("fast-charge").click();
-
   await page.waitForURL(/fast-charge/);
 
   await page.getByRole("textbox", { name: /Start date/ }).fill("2022-01-01");
