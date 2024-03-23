@@ -24,24 +24,10 @@ test.beforeEach(async ({ page }) => {
 
   await page.waitForURL(/en/);
 
-  await page.getByTestId("ham").click();
-});
-
-test("user can see drawer", async ({ page }) => {
-  expect(await page.isVisible("text=History of Shifts")).toBeTruthy();
-});
-
-test("user can see history shifts", async ({ page }) => {
-  await page.getByTestId("history-shifts").click();
-
-  await page.waitForURL(/history-shifts/);
-
-  expect(page.url()).toContain("http://localhost:3000/en/history-shifts");
+  await page.goto("http://localhost:3000/en/history-shifts");
 });
 
 test("user can see history shifts list", async ({ page }) => {
-  await page.getByTestId("history-shifts").click();
-
   await page.waitForURL(/history-shifts/);
 
   const title = page.getByText(/History Shifts/);
@@ -52,8 +38,6 @@ test("user can see history shifts list", async ({ page }) => {
 });
 
 test("user can see carousel", async ({ page }) => {
-  await page.getByTestId("history-shifts").click();
-
   await page.waitForURL(/history-shifts/);
 
   const card = page.getByText(/saved/);
