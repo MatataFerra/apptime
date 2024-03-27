@@ -3,6 +3,8 @@ import { object, string } from "zod";
 
 import ErrorFactory from "@/services/Error/factory";
 
+import prisma from "#/prisma/client";
+
 export async function GET() {
   const waitingList = await prisma?.waitingListDesktop.findMany();
 

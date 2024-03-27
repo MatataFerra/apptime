@@ -1,5 +1,6 @@
 import { isEmpty } from "lodash";
 import { redirect } from "next/navigation";
+import yn from "yn";
 
 class Utilities {
   /**
@@ -39,6 +40,20 @@ class Utilities {
 
   public static isFalsyValue(value: unknown): boolean {
     return !Utilities.isTruthyValue(value);
+  }
+
+  private static stringIsValidNumber(value: string): boolean {
+    return !isNaN(Number(value));
+  }
+
+  /**
+   * Function to check if string is true or false, use it most of the time with env values
+   * @param value string
+   * @returns boolean from string
+   */
+
+  public static toBool(value: string): boolean {
+    return value === "true";
   }
 }
 

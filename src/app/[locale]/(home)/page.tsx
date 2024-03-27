@@ -28,6 +28,11 @@ export default async function Home({ params }: { params: LocaleParams }) {
   }
 
   const user = await UserService.getSessionUser();
+
+  if (!user) {
+    return ut.redirectTo(PATH_NAMES.LOGIN);
+  }
+
   const shiftUnclosed = ShiftService.findUnClosedShift(user?.shifts) as Shift | null;
 
   return (
