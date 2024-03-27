@@ -1,6 +1,5 @@
 import { isEmpty } from "lodash";
 import { redirect } from "next/navigation";
-import yn from "yn";
 
 class Utilities {
   /**
