@@ -3,11 +3,12 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./apptime.db"
 }
 
 model Shift {
@@ -30,8 +31,8 @@ model User {
   image           String?
   name            String
   password        String?
-  type_account    Type             @default(CREDENTIALS)
-  role            Role             @default(USER)
+  type_account    String             @default("CREDENTIALS")
+  role            String             @default("USER")
   online          Boolean          @default(false)
   formCompleted   Boolean          @default(false)
   isActive        Boolean          @default(true)
@@ -68,13 +69,13 @@ model WaitingListDesktop {
   createdAt DateTime @default(now())
 }
 
-enum Type {
-  OAUTH
-  CREDENTIALS
-}
+// enum Type {
+//   OAUTH
+//   CREDENTIALS
+// }
 
-enum Role {
-  USER
-  ADMIN
-  SUPER_USER
-}
+// enum Role {
+//   USER
+//   ADMIN
+//   SUPER_USER
+// }
