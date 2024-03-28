@@ -6,9 +6,8 @@ const nextConfig = {
   images: {
     remotePatterns: [{
       protocol: 'https',
-      hostname: 'placehold.co',
+      hostname: 'lh3.googleusercontent.com',
       port: '',
-      pathname: '/100x100/**',
     }],
     dangerouslyAllowSVG: true,
   },

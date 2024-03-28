@@ -9,7 +9,6 @@ import GoogleProvider from "next-auth/providers/google";
 import AuthService from "@/services/Auth";
 import i18n from "@/services/i18n";
 import UserService from "@/services/User";
-import ut from "@/services/Utilities";
 
 async function authOptions(req: NextApiRequest & NextRequest, res: NextResponse & NextApiResponse) {
   const locale = new i18n("en").getLocale(req);
@@ -100,14 +99,6 @@ async function authOptions(req: NextApiRequest & NextRequest, res: NextResponse 
         const tokenClone = cloneDeep(token);
 
         return tokenClone;
-      },
-
-      async redirect({ url, baseUrl }) {
-        const isMobile = ut.isMobile({ request: req });
-        const parseUrl = new URL(baseUrl);
-        parseUrl.searchParams.set("isMobile", isMobile.toString());
-
-        return parseUrl.href;
       },
     },
   });
