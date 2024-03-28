@@ -2,7 +2,7 @@ import { createClient } from "@libsql/client/web";
 import { PrismaLibSQL } from "@prisma/adapter-libsql";
 import { PrismaClient } from "@prisma/client";
 
-import ut from "@/services/Utilities/client";
+import ut from "../src/services/Utilities/client";
 
 declare global {
   var prisma: PrismaClient | undefined;
