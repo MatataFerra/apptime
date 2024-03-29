@@ -32,8 +32,7 @@ export function withAuthMiddleware(middleware: CustomMiddleware) {
     }
 
     if (i18n.isRouteSupported(PATH_NAMES.ADMIN, nextPathName)) {
-      const cookie = req.cookies.get("next-auth.session-token");
-      const token = await new TokenService(cookie).decodedCookieData();
+      const token = await new TokenService("next-auth.session-token").decodedCookieData();
 
       if (token?.role !== USER_ROLES.ADMIN) ut.redirect(req, PATH_NAMES.HOME);
 
