@@ -7,17 +7,17 @@ export function radioInputHandleValue(value: number) {
     end: seconds * 1000,
   });
 
-  if (result.hours === 0 && result.minutes === 0) {
+  if (!result.hours && !result.minutes) {
     return null;
   }
 
-  if (result.hours === 0 && result.minutes !== 0) {
+  if (!result.hours && result.minutes) {
     return {
       minutes: `${result.minutes} min`,
     };
   }
 
-  if (result.hours !== 0 && result.minutes === 0) {
+  if (result.hours && !result.minutes) {
     if (result.hours === 1) {
       return {
         hours: `${result.hours} hour`,
@@ -29,7 +29,7 @@ export function radioInputHandleValue(value: number) {
     };
   }
 
-  if (result.hours !== 0 && result.minutes !== 0) {
+  if (result.hours && result.minutes) {
     if (result.hours === 1) {
       return {
         hours: `${result.hours} hour and`,

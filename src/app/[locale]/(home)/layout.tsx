@@ -1,7 +1,10 @@
 import { ReactElement } from "react";
 
+import DrawerMenu from "@/components/DrawerMenu";
+import DrawerUserInfo from "@/components/DrawerUserInfo";
+import Ham from "@/components/Ham";
+import Staging from "@/components/Staging";
 import Header from "@/components/ui/Header";
-import Img from "@/components/ui/Image";
 
 interface Props {
   children: ReactElement;
@@ -9,11 +12,16 @@ interface Props {
 
 export default async function HomeLayout({ children }: Props) {
   return (
-    <main className="grid h-[100dvh] grid-rows-[auto,1fr] gap-8 p-7">
-      <Header position="between">
-        <Img src="/assets/ham-menu.svg" alt="arrow-left" width={50} height={50} />
-      </Header>
-      {children}
-    </main>
+    <Staging>
+      <main className="grid h-[100dvh] grid-rows-[auto,1fr] gap-8 p-4">
+        <Header position="between">
+          <Ham />
+        </Header>
+        <DrawerMenu>
+          <DrawerUserInfo />
+        </DrawerMenu>
+        {children}
+      </main>
+    </Staging>
   );
 }

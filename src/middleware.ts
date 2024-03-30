@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "next-auth/middleware";
 import createIntlMiddleware from "next-intl/middleware";
@@ -37,20 +38,13 @@ export default withAuth(async function middleware(req: NextRequest) {
   }
 
   if (i18n.isRouteSupported(PATH_NAMES.ADMIN, nextPathName)) {
-    const cookie = req.cookies.get("next-auth.session-token");
-    const token = await new TokenService(cookie).decodedCookieData();
+    const token = await new TokenService("next-auth.session-token").decodedCookieData();
 
-    if (token?.role !== USER_ROLES.ADMIN) ut.redirect(req, PATH_NAMES.HOME);
+    if (token?.role !== USER_ROLES.ADMIN) {
+      return ut.redirect(req, PATH_NAMES.HOME);
+    }
 
     NextResponse.next();
-  }
-
-  if (i18n.isRouteSupported(PATH_NAMES.HOME, nextPathName)) {
-    const noMobilePath = i18n.parsePathname(PATH_NAMES.NO_MOBILE, locale);
-
-    if (!ut.isMobile({ request: req })) {
-      return ut.redirect(req, noMobilePath);
-    }
   }
 
   if (i18n.isRouteSupported(PATH_NAMES.NO_MOBILE, nextPathName)) {
@@ -58,6 +52,12 @@ export default withAuth(async function middleware(req: NextRequest) {
 
     if (ut.isMobile({ request: req })) {
       return ut.redirect(req, homePath);
+    }
+  } else {
+    const noMobilePath = i18n.parsePathname(PATH_NAMES.NO_MOBILE, locale);
+
+    if (!ut.isMobile({ request: req })) {
+      return ut.redirect(req, noMobilePath);
     }
   }
 });
@@ -82,5 +82,11 @@ export const config = {
     "/no-mobile",
     "/es/no-mobile",
     "/en/no-mobile",
+    "/fast-charge",
+    "/es/fast-charge",
+    "/en/fast-charge",
+    "/incomes",
+    "/es/incomes",
+    "/en/incomes",
   ],
 };

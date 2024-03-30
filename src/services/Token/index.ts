@@ -1,11 +1,12 @@
+import { verify } from "jsonwebtoken";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { cookies as cookieStore } from "next/headers";
-import { decode } from "next-auth/jwt";
+import { decode, encode } from "next-auth/jwt";
 
 import { JWTDecodedType } from "@/types";
 
 interface TokenServiceInterface {
-  cookie: RequestCookie | undefined;
+  cookie: string;
   decodedCookieData(): Promise<JWTDecodedType | null>;
 }
 
@@ -20,73 +21,48 @@ interface TokenServiceInterface {
  */
 
 class TokenService implements TokenServiceInterface {
-  cookie: RequestCookie | undefined;
-  constructor(cookie: RequestCookie | undefined) {
+  cookie: string;
+  constructor(cookie: string) {
     this.cookie = cookie;
   }
   async decodedCookieData(): Promise<JWTDecodedType | null> {
     if (!this.cookie) return null;
 
+    const cookie = this.getCookie();
+
     const result = (await decode({
-      token: this.cookie.value,
+      token: cookie?.value ?? "",
       secret: process.env.NEXTAUTH_SECRET,
     })) as JWTDecodedType;
 
     return result;
   }
 
-  static getCookie(cookie = "next-auth.session-token") {
-    const getCookie = cookieStore().get(cookie);
+  getCookie() {
+    const getCookie = cookieStore().get(this.cookie);
     return getCookie;
   }
-}
 
-/**
- * @class Token Service
- * @description This class is responsible for all the logic related to the Token model based on Builder pattern
- * @param {string} cookie - The cookie that the user wants to get.
- *
- * @returns {Token} - Returns the token
- *
- */
-export class Token {
-  cookie: string;
-  session: {
-    cookie: RequestCookie | undefined;
-    token: JWTDecodedType | null;
-  };
-  constructor(cookie: string = "next-auth.session-token") {
-    this.cookie = cookie;
-    this.session = {
-      cookie: undefined,
-      token: null,
-    };
+  verifyToken(secret?: string) {
+    const cookie = this.getCookie();
+    const appSecret = secret ?? process.env.NEXTAUTH_SECRET;
+    try {
+      const result = verify(cookie?.value ?? "", appSecret);
+      if (result) return true;
+    } catch (error) {
+      return null;
+    }
   }
 
-  private async decodedCookieData() {
-    if (!this.session || !this.session.cookie) return this;
-
-    const result = (await decode({
-      token: this.session.cookie.value,
+  static async createToken(data: { email: string; name: string; picture: string; sub: string }) {
+    const token = await encode({
+      token: {
+        ...data,
+      },
       secret: process.env.NEXTAUTH_SECRET,
-    })) as JWTDecodedType;
+    });
 
-    this.session.token = result;
-
-    return this;
-  }
-
-  private async getCookie() {
-    const getCookie = cookieStore().get(this.cookie);
-    this.session.cookie = getCookie || undefined;
-    return this;
-  }
-
-  async build() {
-    await this.getCookie();
-    await this.decodedCookieData();
-
-    return this.session.token;
+    return token;
   }
 }
 

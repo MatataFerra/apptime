@@ -67,13 +67,13 @@ function DialogButtons() {
           <Button
             data-button={1}
             type="button"
-            variant="gradient"
-            classes="h-12 w-full px-[5px] py-[3px]"
+            variant="gradient_secondary"
+            classes="h-12 w-full rounded-lg px-[5px] py-[3px]"
             onClick={onSelectOption}
           >
             <Text
               as="span"
-              classes="flex h-full w-full items-center justify-center rounded bg-white p-2 text-xs text-black"
+              classes="flex h-full w-full items-center justify-center p-2 text-xs text-black"
             >
               Yes! Money 🤑
             </Text>

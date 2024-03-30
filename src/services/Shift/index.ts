@@ -1,11 +1,16 @@
 import { Shift } from "@prisma/client";
 import { differenceInMinutes } from "date-fns";
-import _, { cloneDeep } from "lodash";
+import { cloneDeep } from "lodash";
+
+import { UserType } from "@/types";
+
+import prisma from "../../../prisma/client";
 
 type ShiftWithoutId = Omit<Shift, "id">;
 
 interface ShiftServiceInterface {
   shift: ShiftWithoutId;
+  create: ({ userId }: { userId: string }) => Promise<Shift>;
   differenceInMinsBetweenStartAndEnd: () => void;
   closeShift: () => void;
   checkPublicHoliday: () => void;
@@ -19,6 +24,11 @@ interface ShiftServiceInterface {
  * @method differenceInMinsBetweenStartAndEnd - Calculates the difference between the start and end of a shift
  * @method convertAmountInDecimal - Converts the amount of minutes in decimal
  * @param {ShiftWithoutId["amount"]} amount - The amount of minutes.
+ * @method calculateEarnings - Calculates the earnings of a shift
+ * @param {Shift} shift - The shift
+ * @param {UserType["profile"]} profile - The user profile
+ * @param {string} startDate - The start date of the shift
+ * @param {string} endDate - The end date of the shift
  * @method shiftStatus - Checks if the shift is closed
  * @method checkPublicHoliday - Checks if the shift is a public holiday
  * @method create - Creates a new shift and executes all the methods above
@@ -28,6 +38,76 @@ class ShiftService implements ShiftServiceInterface {
   shift: ShiftWithoutId;
   constructor(shift: ShiftWithoutId) {
     this.shift = cloneDeep(shift);
+  }
+
+  async delete({ id }: { id: number }) {
+    const deleteShift = await prisma.shift.delete({
+      where: {
+        id,
+      },
+    });
+
+    return deleteShift;
+  }
+
+  async create({ userId }: { userId: string }) {
+    const createShift = await prisma.shift.create({
+      data: {
+        User: {
+          connect: {
+            id: userId,
+          },
+        },
+        startDate: this.shift.startDate,
+        endDate: this.shift.endDate,
+        amount: this.shift.amount,
+        isClosed: this.shift.isClosed,
+        isPublicHoliday: this.shift.isPublicHoliday,
+        notes: this.shift.notes,
+        publicHolidayWorked: this.shift.publicHolidayWorked,
+      },
+    });
+
+    return createShift;
+  }
+
+  static calculateEarnings({
+    shift,
+    profile,
+    startDate,
+    endDate,
+    isPublicHoliday,
+  }: {
+    shift?: Omit<Shift, "id">;
+    profile: UserType["profile"];
+    startDate?: string;
+    endDate?: string;
+    isPublicHoliday?: boolean;
+  }) {
+    let amount = 0;
+    let holidayRate = 1;
+    let minuteRate = profile?.hourlyRate ? profile?.hourlyRate / 60 : 1;
+
+    if (startDate && endDate) {
+      const start = new Date(startDate ?? "");
+      const end = new Date(endDate ?? "");
+
+      amount = differenceInMinutes(end, start);
+    } else {
+      const start = new Date(shift?.startDate ?? "");
+      const end = new Date(shift?.endDate ?? "");
+      amount = differenceInMinutes(end, start);
+    }
+
+    if (amount <= 0) amount = 0;
+
+    if (shift?.isPublicHoliday || isPublicHoliday) {
+      holidayRate = 1.5;
+    }
+
+    const earnings = amount * minuteRate * holidayRate;
+
+    return Math.round(earnings * 100) / 100;
   }
 
   static differenceInHHmm(start: string | number | Date, end?: string | number | Date) {
@@ -45,18 +125,10 @@ class ShiftService implements ShiftServiceInterface {
     const difference = Math.abs(differenceInMinutes(startDate, endDate));
     const getHours = difference / 60;
 
-    function decimals(hours: number) {
-      const getDecimals = Math.floor(Number("0." + String(hours).split(".")[1]) * 60);
-
-      if (isNaN(getDecimals)) return 0;
-
-      return getDecimals;
-    }
-
     return {
-      text: `${Math.floor(getHours)}h ${decimals(getHours)}m`,
+      text: `${Math.floor(getHours)}h ${this.decimals(getHours)}m`,
       hours: getHours,
-      minutes: decimals(getHours),
+      minutes: this.decimals(getHours),
       diff: difference,
     };
   }
@@ -66,11 +138,18 @@ class ShiftService implements ShiftServiceInterface {
     return shifts.find((shift) => !shift.isClosed);
   }
 
-  static shiftsSorted(shifts: Shift[] | undefined) {
-    return shifts?.toSorted((a, b) => {
-      if (!a.isClosed || !b.isClosed) return 0;
+  static shiftsSorted(shifts: Shift[] | undefined, { desc = true }: { desc?: boolean } = {}) {
+    if (!shifts) return null;
+    if (desc) {
+      return shifts
+        .filter((shift) => shift.isClosed)
+        .toSorted((a, b) => {
+          return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+        });
+    }
 
-      return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+    return shifts.toSorted((a, b) => {
+      return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
     });
   }
 
@@ -79,16 +158,25 @@ class ShiftService implements ShiftServiceInterface {
     return Math.round((validAmount / 60) * 100) / 100;
   }
 
-  closeShift() {
-    this.updateEndDate().updateStatus();
-
-    return this;
+  static groupShiftsByMonths(shifts: Shift[] | undefined) {
+    if (!shifts) return null;
+    return shifts.reduce(
+      (acc, shift) => {
+        const date = new Date(shift.startDate);
+        const month = date.toLocaleString("en-US", { month: "short" });
+        const key = `${month}`;
+        if (!acc[key]) {
+          acc[key] = [];
+        }
+        acc[key].push(shift);
+        return acc;
+      },
+      {} as Record<string, Shift[]>
+    );
   }
 
-  private updateEndDate() {
-    this.shift.endDate = !!this.shift.endDate
-      ? this.shift.endDate
-      : new Date(Date.now()).toString();
+  closeShift() {
+    this.updateEndDate().updateStatus();
 
     return this;
   }
@@ -109,18 +197,6 @@ class ShiftService implements ShiftServiceInterface {
     return this;
   }
 
-  private updateStatus() {
-    if (!this.shift.endDate) {
-      this.shift.isClosed = false;
-
-      return this;
-    }
-
-    this.shift.isClosed = true;
-
-    return this;
-  }
-
   checkPublicHoliday() {
     if (this.shift.publicHolidayWorked) {
       this.shift.isPublicHoliday = true;
@@ -133,6 +209,36 @@ class ShiftService implements ShiftServiceInterface {
 
   build() {
     return this.shift;
+  }
+
+  private updateEndDate() {
+    if (this.shift.isClosed) {
+      this.shift.endDate = !!this.shift.endDate
+        ? this.shift.endDate
+        : new Date(Date.now()).toString();
+    }
+
+    return this;
+  }
+
+  private updateStatus() {
+    if (!this.shift.endDate) {
+      this.shift.isClosed = false;
+
+      return this;
+    }
+
+    this.shift.isClosed = true;
+
+    return this;
+  }
+
+  private static decimals(hours: number) {
+    const getDecimals = Math.floor(Number("0." + String(hours).split(".")[1]) * 60);
+
+    if (isNaN(getDecimals)) return 0;
+
+    return getDecimals;
   }
 }
 

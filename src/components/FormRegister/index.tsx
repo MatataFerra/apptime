@@ -11,6 +11,7 @@ import { useTranslations } from "next-intl";
 import { z } from "zod";
 
 import api from "@/services/Api";
+import Toast from "@/services/Toast";
 
 import { ApiResponse } from "@/types/api_response";
 
@@ -19,7 +20,6 @@ import Form from "@/components/ui/Form";
 import Input from "@/components/ui/Input";
 import Loader from "@/components/ui/Loader";
 import Stack from "@/components/ui/Stack";
-import { useToast } from "@/components/ui/Toast/use-toast";
 
 import { usePasswordValid } from "@/providers/PasswordValidProvider";
 
@@ -39,7 +39,6 @@ type RegisterInputs = {
 
 function RegisterForm() {
   const router = useRouter();
-  const { toast } = useToast();
   const t = useTranslations("register");
 
   const { handleSubmit, register, setFocus, watch } = useForm<RegisterInputs>({
@@ -68,10 +67,10 @@ function RegisterForm() {
       if (!res.response) {
         // Error handling
         if (res.error.type_error === "UserAlreadyExists") {
-          toast({
-            title: t("user_already_exist"),
+          Toast({
+            type: "warning",
+            message: t("user_already_exist"),
             duration: 2000,
-            className: "bg-yellow-200",
             action: <Loader.spinner bg="text-black" spinColor="fill-gray-50" />,
           });
 
@@ -82,17 +81,17 @@ function RegisterForm() {
           return;
         }
 
-        return toast({
-          title: t("invalid_body"),
-          variant: "destructive",
+        return Toast({
+          message: t("invalid_body"),
+          type: "error",
           duration: 1500,
         });
       }
 
       // ui notif
-      toast({
-        title: t("successful"),
-        className: "bg-green-400",
+      Toast({
+        message: t("successful"),
+        type: "success",
         duration: 2000,
         itemID: "success_register",
       });
@@ -106,9 +105,9 @@ function RegisterForm() {
       }).then((res) => {
         if (res?.error) {
           // Error handling with login
-          toast({
-            title: t("unexpected_error_after_register"),
-            variant: "destructive",
+          Toast({
+            message: t("unexpected_error_after_register"),
+            type: "error",
           });
 
           return router.push(PATH_NAMES.LOGIN);
@@ -137,9 +136,9 @@ function RegisterForm() {
     if (attempsToRegister === MAX_ATTEMPTS_TO_REGISTER) {
       // Block the button
       updateButtonBloqued();
-      return toast({
-        title: t("max_attemps_to_register"),
-        variant: "destructive",
+      return Toast({
+        message: t("max_attemps_to_register"),
+        type: "error",
         duration: 2000,
       });
     }

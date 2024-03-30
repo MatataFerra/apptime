@@ -37,7 +37,7 @@ const UserModelSchema = z.object({
   }),
   email: z.string().email(),
   emailVerified: z.date().nullable(),
-  image: z.string().nullable().default("https://i.imgur.com/6VBx3io.png"),
+  image: z.string().nullable().default("/assets/user-profile.webp"),
   name: z.string().default("User"),
   password: z.string(),
   online: z.boolean().default(false),
@@ -126,6 +126,19 @@ const PasswordSchema = z.object({
       });
     }
   }),
+});
+
+/* 
+  Fast Charge Schema
+*/
+
+export const FastChargeFormSchema = z.object({
+  "start-date": z.string().length(10),
+  "finish-date": z.string().length(10),
+  "start-time": z.string().length(5),
+  "finish-time": z.string().length(5),
+  "fast-holiday": z.boolean(),
+  "fast-worked": z.boolean(),
 });
 
 /**

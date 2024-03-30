@@ -87,21 +87,8 @@ export async function POST(req: NextRequest) {
   const shiftTransform = new ShiftService(parsedBody.data).checkPublicHoliday().build();
 
   try {
-    const shift = await prisma.shift.create({
-      data: {
-        User: {
-          connect: {
-            id: parsedBody?.data?.userId,
-          },
-        },
-        startDate: shiftTransform.startDate,
-        endDate: shiftTransform.endDate,
-        amount: shiftTransform.amount,
-        isClosed: shiftTransform.isClosed,
-        isPublicHoliday: shiftTransform.isPublicHoliday,
-        notes: shiftTransform.notes,
-        publicHolidayWorked: shiftTransform.publicHolidayWorked,
-      },
+    const shift = await new ShiftService(shiftTransform).create({
+      userId: parsedBody.data.userId,
     });
 
     return NextResponse.json(

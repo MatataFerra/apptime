@@ -28,13 +28,18 @@ export default async function Home({ params }: { params: LocaleParams }) {
   }
 
   const user = await UserService.getSessionUser();
+
+  if (!user) {
+    return ut.redirectTo(PATH_NAMES.LOGIN);
+  }
+
   const shiftUnclosed = ShiftService.findUnClosedShift(user?.shifts) as Shift | null;
 
   return (
     <>
       <Stack orientation="vertical" spacing={8}>
         <Stack as="div" orientation="vertical" spacing={4}>
-          <WelcomeTitle />
+          <WelcomeTitle user={user} />
           <DateComponent locale={params.locale} />
         </Stack>
 

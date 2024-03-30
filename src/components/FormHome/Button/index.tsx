@@ -7,14 +7,14 @@ import { Profile } from "@prisma/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { ApiResponse } from "@/types/api_response";
+import Toast from "@/services/Toast";
+
 import { FormStep } from "@/types/forms";
 import { FormStoreData } from "@/types/store";
 
 import Button from "@/components/ui/Button";
 import Form from "@/components/ui/Form";
 import Loader from "@/components/ui/Loader";
-import { useToast } from "@/components/ui/Toast/use-toast";
 
 import onSubmitServerAction from "@/server-actions/home-form";
 import { useFormStepStore } from "@/store/useFormStepStore";
@@ -23,7 +23,6 @@ import { useFormStore } from "@/store/useFormStore";
 function Buttons() {
   const { setCurrentStep, currentStep } = useFormStepStore();
   const { replace } = useRouter();
-  const { toast } = useToast();
   const { user, profile, setFormErrors, formErrors, isFormErrorsInitialized, hasErrors } =
     useFormStore();
   const { handleSubmit } = useForm<FormStoreData>({
@@ -52,28 +51,28 @@ function Buttons() {
     setFormErrors({ data: { user: data.user, profile: data.profile } });
 
     if (hasErrors()) {
-      return toast({
-        title: "😮 Something has gone wrong",
+      return Toast({
+        type: "error",
+        message: "😮 Something has gone wrong",
         description: "Please check the form and try again",
-        variant: "destructive",
         duration: 2000,
-        className: "[&>div>div]:text-xl",
+        classes: "[&>div>div]:text-xl",
       });
     }
 
-    toast({
-      title: "⏳ We are creating your profile",
+    Toast({
+      type: "info",
+      message: "⏳ We are creating your profile",
       action: <Loader.spinner />,
       duration: 5000,
     });
 
-    onSubmitServerAction(data).then((data: ApiResponse<Profile>) => {
-      if (!data.response) {
-        return toast({
-          title: `😮 ${data.error.message}`,
-          variant: "destructive",
+    onSubmitServerAction(data).then((profile: Profile | null) => {
+      if (!profile) {
+        return Toast({
+          type: "error",
+          message: "😮 Something has gone wrong",
           duration: 3000,
-
           action: (
             <Button as="div" variant="white" classes="remove_button_highlight border-none">
               <Link href="/">Go Home</Link>
@@ -82,16 +81,14 @@ function Buttons() {
         });
       }
 
-      if (data.response) {
-        toast({
-          title: "😎 Your profile has been created",
-          description: "You will be redirected to the home page",
-          duration: 3000,
-          className: "bg-green-200",
-          action: <Loader.spinner />,
-          onAnimationEnd: () => replace("/"),
-        });
-      }
+      Toast({
+        type: "success",
+        message: "😎 Your profile has been created",
+        description: "You will be redirected to the home page",
+        duration: 3000,
+        action: <Loader.spinner />,
+        onAnimationEnd: () => replace("/"),
+      });
     });
   }
 

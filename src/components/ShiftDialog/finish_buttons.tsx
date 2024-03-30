@@ -3,18 +3,17 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import api from "@/services/Api/Shift";
+import Toast from "@/services/Toast";
 
 import DialogClose from "@/components/ShiftDialog/FinishDialogModule/DialogClose";
 import Button from "@/components/ui/Button";
 import Loader from "@/components/ui/Loader";
 import Stack from "@/components/ui/Stack";
-import { useToast } from "@/components/ui/Toast/use-toast";
 
 import { useShiftStateContext } from "@/store/useShiftStatusStore";
 
 function FinishDialogButtons() {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   const {
     user,
@@ -36,15 +35,16 @@ function FinishDialogButtons() {
     onSuccess: (_) => {
       updateShiftsInfo();
       updateShiftUnclosed();
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-      toast({
-        title: "Shift updated",
+      queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
+      Toast({
+        message: "Shift updated",
+        type: "success",
         description: "Your shift has been updated successfully",
-        className: "bg-green-400",
         action: <Loader.spinner bg="text-black" spinColor="fill-gray-50" />,
         duration: 3000,
       });
     },
+    gcTime: 1000,
   });
 
   function onFinishShift() {

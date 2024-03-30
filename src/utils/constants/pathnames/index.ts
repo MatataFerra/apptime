@@ -5,5 +5,7 @@ export const PATH_NAMES = {
   LOGIN: "/login",
   REGISTER: "/register",
   HISTORY_SHIFT: "/history-shifts",
+  FAST_CHARGE: "/fast-charge",
+  ICOMES: "/incomes",
   FORM: "/form",
 } as const;

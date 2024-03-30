@@ -54,7 +54,7 @@ function addUsersMocked(): Omit<User, "id">[] {
       name: `User Testing ${i}`,
       emailVerified: null,
       formCompleted: false,
-      image: "https://placehold.co/100x100",
+      image: "/assets/user-profile.webp",
       online: false,
       password: hashSync(`Secreto${i}!`, 10),
       type_account: "CREDENTIALS",
@@ -67,9 +67,22 @@ function addUsersMocked(): Omit<User, "id">[] {
 async function main() {
   await clearDatabase();
 
-  await prisma.user.createMany({
-    data: [...addUsersMocked()],
-  });
+  for (const userData of addUsersMocked()) {
+    await prisma.user.create({
+      data: {
+        email: userData.email,
+        name: userData.name,
+        emailVerified: userData.emailVerified,
+        formCompleted: userData.formCompleted,
+        image: userData.image,
+        online: userData.online,
+        password: userData.password,
+        type_account: userData.type_account,
+        role: userData.role,
+        isActive: userData.isActive,
+      },
+    });
+  }
 
   const firstUser = await prisma.user.findUnique({
     where: {
@@ -88,9 +101,20 @@ async function main() {
     return;
   }
 
-  await prisma.shift.createMany({
-    data: [...addShiftsForSeed(firstUser, newDatesMock)],
-  });
+  for (const shiftData of addShiftsForSeed(firstUser, newDatesMock)) {
+    await prisma.shift.create({
+      data: {
+        userId: shiftData.userId,
+        startDate: shiftData.startDate,
+        endDate: shiftData.endDate,
+        amount: shiftData.amount,
+        isClosed: shiftData.isClosed,
+        isPublicHoliday: shiftData.isPublicHoliday,
+        publicHolidayWorked: shiftData.publicHolidayWorked,
+        notes: shiftData.notes,
+      },
+    });
+  }
 
   await prisma.profile.create({
     data: {

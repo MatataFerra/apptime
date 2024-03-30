@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
 
-import { HandleErrorType } from "@/types/services";
+import { HandleErrorType, UserType } from "@/types/services";
 
 export type ApiResponse<T> = SuccessApiResponse<T> | FailureApiResponse;
 
@@ -28,5 +28,5 @@ export interface FailureApiResponse {
 export interface SuccessUserApiResponse extends Response {
   message: string;
   response: boolean;
-  user: User;
+  user: User | UserType;
 }

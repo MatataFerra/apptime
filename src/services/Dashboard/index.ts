@@ -1,9 +1,9 @@
 import { isThisWeek, max } from "date-fns";
-import _ from "lodash";
+import { isNaN as isLodashNan } from "lodash";
 
 import ShiftService from "@/services/Shift";
 
-import { DashboardInterface, DashboardUserType } from "@/types/services";
+import { type DashboardInterface, type DashboardUserType, DAYS } from "@/types/services";
 
 /**
   @description
@@ -42,7 +42,7 @@ class Dashboard implements DashboardInterface {
   get averageHoursWorkedPerDay() {
     const total = this.hoursWorked / this.shiftsLen;
 
-    if (_.isNaN(total)) return 0;
+    if (isLodashNan(total)) return 0;
 
     return total;
   }
@@ -62,12 +62,19 @@ class Dashboard implements DashboardInterface {
 
   // We can refactor this function using the Pay Service, also we can migrate this
   // functionality to Pay Service and create a better abastraction
-  estimatedWeeklyEarnings() {
+  estimatedWeeklyEarnings({ weekStartsOn = "monday" }: { weekStartsOn?: keyof typeof DAYS } = {}) {
     return this.user.shifts.reduce((acc, shift) => {
       const amount = shift.amount ?? 0;
 
-      if (isThisWeek(new Date(shift.startDate))) {
-        return (acc + amount) * this.minuteValue;
+      if (
+        isThisWeek(new Date(shift.startDate), {
+          weekStartsOn: DAYS[weekStartsOn as keyof typeof DAYS],
+        })
+      ) {
+        const total = amount * this.minuteValue;
+        const newValue = acc + total;
+
+        return newValue;
       }
 
       return acc;

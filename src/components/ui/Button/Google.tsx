@@ -4,15 +4,17 @@ import Text from "@/components/ui/Text";
 
 interface Props {
   onGoogleAuth: () => void;
+  disabled?: boolean;
 }
 
-function GoogleButton({ onGoogleAuth }: Props) {
+function GoogleButton({ onGoogleAuth, ...props }: Props) {
   return (
     <Button
       type="button"
-      variant="google"
+      variant={props.disabled ? "disabled" : "google"}
       classes="mx-0 my-auto grid w-full grid-cols-1 items-center"
       onClick={onGoogleAuth}
+      {...props}
     >
       <Img
         classes="col-start-1 col-end-2 row-start-1 row-end-2"

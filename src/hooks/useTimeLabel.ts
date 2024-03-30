@@ -1,15 +1,15 @@
-import { MutableRefObject, RefObject, useEffect } from "react";
+import { useEffect } from "react";
 
 import { LABELS } from "@/components/ShiftDialog/finish_description";
 
 import useDifference from "./useDifference";
-import useInputLabelValue from "./useInputLabelValue";
-import useLabel from "./useLabel";
+import useInputValue from "./useInputValue";
+import useTimeAccordLabel from "./useTimeAccordLabel";
 import { useShiftStateContext } from "@/store/useShiftStatusStore";
 
 export type Labels = (typeof LABELS)[number];
 
-function useTimeLabel(inputRefs: MutableRefObject<RefObject<HTMLInputElement>[]>) {
+function useTimeLabel() {
   const {
     shiftUnclosed: { shift },
     differenceBetweenStartAndEnd,
@@ -18,21 +18,18 @@ function useTimeLabel(inputRefs: MutableRefObject<RefObject<HTMLInputElement>[]>
     setInitialShiftState,
   } = useShiftStateContext((state) => state);
 
-  const getTimeAcoordingLabel = useLabel(shift);
-  const { getDifference } = useDifference(inputRefs);
+  const getTimeAcoordingLabel = useTimeAccordLabel(shift);
 
-  const { inputValue, setInputValue } = useInputLabelValue();
+  const { getDifference } = useDifference();
+  const { inputValue, setInputValue } = useInputValue();
 
   useEffect(() => {
-    const t = getDifference();
-
-    updateDifferenceBetweenStartAndEnd(t);
+    updateDifferenceBetweenStartAndEnd(getDifference);
   }, [getDifference, updateDifferenceBetweenStartAndEnd]);
 
   useEffect(() => {
-    const t = getDifference();
     setInitialShiftState({
-      diff: t,
+      diff: getDifference,
       from: getTimeAcoordingLabel("from"),
       to: getTimeAcoordingLabel("to"),
       start: getTimeAcoordingLabel("start"),

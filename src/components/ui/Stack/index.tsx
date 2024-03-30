@@ -37,8 +37,8 @@ type Props<E extends React.ElementType> = StackOwnProps<E> &
  * @param {keyof typeof STACK_ALIGN} alignItems - start | end | center
  * @param {number} spacing - use tailwing gap class
  * @param {boolean} grid - if is true, then you can use cols and rows props
- * @param {number | string} cols - use it as number or string e.g.: 1fr or 1fr,auto,1fr
- * @param {number | string} rows - use it as number or string e.g.: 1fr or 1fr,auto,1fr
+ * @param {number | string} cols - use it as number or string e.g.: "1fr" or "auto 1fr auto"
+ * @param {number | string} rows - use it as number or string e.g.: "1fr" or "auto 1fr auto"
  * @returns {React.ReactElement}
  */
 function Stack<E extends React.ElementType = typeof StackDefaultAsType>({

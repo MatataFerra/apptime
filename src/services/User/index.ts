@@ -1,4 +1,4 @@
-import { Profile, Shift, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import { getServerSession } from "next-auth";
 
 import TokenService from "@/services/Token";
@@ -97,8 +97,7 @@ class UserService {
   }
 
   static async authenticatedUser() {
-    const cookie = TokenService.getCookie();
-    const token = await new TokenService(cookie).decodedCookieData();
+    const token = await new TokenService("next-auth.session-token").decodedCookieData();
 
     if (!token) return null;
 
@@ -126,6 +125,17 @@ class UserService {
         password: this.user.password,
         name: this.user.name,
         type_account: this.user.type_account,
+      },
+    });
+  }
+
+  static async updateUser({ id, user }: { id: string; user: Partial<User> }) {
+    return await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        ...user,
       },
     });
   }

@@ -7,6 +7,10 @@ export const envSchema = z.object({
   NEXT_PUBLIC_API_MOCKING: z.string().optional(),
   NEXTAUTH_SECRET: z.string(),
   NEXTAUTH_URL: z.string(),
+  NEXT_PUBLIC_SHOW_DEVTOOLS: z.string(),
+  NEXT_PUBLIC_TURSO_DATABASE_URL: z.string(),
+  TURSO_ON: z.string(),
+  STAGING: z.string(),
 });
 
 declare global {
