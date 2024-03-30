@@ -48,3 +48,7 @@ yarn.lock
 #vscode
 .vscode
 
+#others
+.go-tetris.log
+local.db
+/prisma/apptime.db
