@@ -26,7 +26,7 @@ export const BUTTON_VARIANTS = {
   outlined: "bg-white text-black p-3",
   white:
     "bg-white text-black p-3 border border-black shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px]",
-  disabled: "bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-100 p-3",
+  disabled: "bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-100 p-3 cursor-not-allowed",
   black:
     "bg-black text-white p-3 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px]",
   teal: "bg-light-blue text-white p-3 text-black shadow-button active:shadow-button-inner",

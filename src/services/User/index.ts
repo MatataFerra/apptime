@@ -97,8 +97,7 @@ class UserService {
   }
 
   static async authenticatedUser() {
-    const cookie = TokenService.getCookie();
-    const token = await new TokenService(cookie).decodedCookieData();
+    const token = await new TokenService("next-auth.session-token").decodedCookieData();
 
     if (!token) return null;
 

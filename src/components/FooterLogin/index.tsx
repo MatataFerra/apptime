@@ -31,7 +31,7 @@ function LoginFooter({ classes, idForm = "form" }: Props) {
       >
         Login
       </Button>
-      <GoogleButton onGoogleAuth={onGoogleAuth} />
+      <GoogleButton onGoogleAuth={onGoogleAuth} disabled />
     </Footer>
   );
 }
