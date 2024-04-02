@@ -79,5 +79,4 @@ export const FULL_MONTHS_NAMES = [
   "December",
 ] as const;
 
-export const NEXT_AUTH_SESSION_TOKEN =
-  "next-auth.session-token" || "__Secure-next-auth.session-token";
+export const NEXT_AUTH_SESSION_TOKEN = "__Secure-next-auth.session-token";

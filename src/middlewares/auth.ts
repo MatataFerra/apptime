@@ -6,7 +6,7 @@ import i18n from "@/services/i18n";
 import TokenService from "@/services/Token";
 import ut from "@/services/Utilities";
 
-import { NEXT_AUTH_SESSION_TOKEN, SUPPORTED_LOCALES, USER_ROLES } from "@/utils/constants";
+import { USER_ROLES } from "@/utils/constants";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 import { CustomMiddleware } from "./chain";
@@ -32,7 +32,7 @@ export function withAuthMiddleware(middleware: CustomMiddleware) {
     }
 
     if (i18n.isRouteSupported(PATH_NAMES.ADMIN, nextPathName)) {
-      const token = await new TokenService(NEXT_AUTH_SESSION_TOKEN).decodedCookieData();
+      const token = await new TokenService("next-auth.session-token").decodedCookieData();
 
       if (token?.role !== USER_ROLES.ADMIN) ut.redirect(req, PATH_NAMES.HOME);
 
