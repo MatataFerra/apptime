@@ -25,6 +25,8 @@ jobs:
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install
+      - name: Prisma generate
+        run: pnpm dlx prisma generate
       - name: Build app
         run: pnpm build
         env:

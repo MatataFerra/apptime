@@ -7,7 +7,7 @@ import UserService from "@/services/User";
 
 import { SearchParamsSchema } from "@/types";
 
-import { QUERY_PARAMS } from "@/utils/constants";
+import { NEXT_AUTH_SESSION_TOKEN, QUERY_PARAMS } from "@/utils/constants";
 
 import prisma from "#/prisma/client";
 
@@ -23,7 +23,7 @@ function parseEmailFromParams(token: JWT | null, email: string | null) {
 export async function GET(req: NextRequest) {
   const checkToken = await getToken({
     req,
-    cookieName: "next-auth.session-token",
+    cookieName: NEXT_AUTH_SESSION_TOKEN,
   });
 
   if (!checkToken) {

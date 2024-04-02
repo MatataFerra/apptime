@@ -5,7 +5,7 @@ import TokenService from "@/services/Token";
 
 import { UserType } from "@/types";
 
-import { USER_ROLES } from "@/utils/constants";
+import { NEXT_AUTH_SESSION_TOKEN, USER_ROLES } from "@/utils/constants";
 
 import prisma from "#/prisma/client";
 
@@ -97,7 +97,7 @@ class UserService {
   }
 
   static async authenticatedUser() {
-    const token = await new TokenService("next-auth.session-token").decodedCookieData();
+    const token = await new TokenService(NEXT_AUTH_SESSION_TOKEN).decodedCookieData();
 
     if (!token) return null;
 
