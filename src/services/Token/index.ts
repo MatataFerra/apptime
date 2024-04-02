@@ -5,6 +5,8 @@ import { decode, encode } from "next-auth/jwt";
 
 import { JWTDecodedType } from "@/types";
 
+import { NEXT_AUTH_SESSION_TOKEN } from "@/utils/constants";
+
 interface TokenServiceInterface {
   cookie: string;
   decodedCookieData(): Promise<JWTDecodedType | null>;
@@ -39,8 +41,9 @@ class TokenService implements TokenServiceInterface {
   }
 
   getCookie() {
-    const getCookie = cookieStore().get(this.cookie);
-    return getCookie;
+    const cookie = cookieStore().get(this.cookie);
+
+    if (!cookie) return cookieStore().get(NEXT_AUTH_SESSION_TOKEN);
   }
 
   verifyToken(secret?: string) {
