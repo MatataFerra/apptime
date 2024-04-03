@@ -50,6 +50,12 @@ function DialogButtons() {
         isPublicHoliday: false,
         notes: "",
         publicHolidayWorked,
+        /* cambiar valores después  */
+        hourValue: 27,
+        holidayPay: false,
+        holidayPayRate: 8,
+        taxCode: 0,
+        unpaidBreaks: 1,
       },
     });
 
