@@ -160,8 +160,6 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
         state.shiftsInfo.isLoading = true;
 
         const getter = get()?.user;
-        const hourlyRate = getter?.profile?.hourlyRate || 60;
-        const costMinute = hourlyRate / 60;
 
         const lastShiftClosed = ShiftService.shiftsSorted(getter?.shifts)?.find((shift) => {
           return shift?.endDate !== null;
@@ -194,6 +192,9 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
               new Date(curr?.startDate ?? ""),
               new Date(curr?.endDate ?? "")
             );
+
+            const costMinute = curr?.hourValue / 60;
+
             const costDiff = diff * costMinute;
             const earns = acc.earns + costDiff;
 
