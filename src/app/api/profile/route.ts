@@ -114,6 +114,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const {
+      data: { firstName, address, city, country, lastName },
+    } = parsedBody;
+
     const profile = await prisma.profile.create({
       data: {
         User: {
@@ -121,15 +125,11 @@ export async function POST(req: NextRequest) {
             id: user.id,
           },
         },
-
-        endHour: parsedBody.data?.endHour,
-        startHour: parsedBody.data?.startHour,
-        holidayPay: parsedBody.data?.holidayPay,
-        hourlyRate: parsedBody.data?.hourlyRate,
-        nightShift: parsedBody.data?.nightShift,
-        extraNightShiftPay: parsedBody.data?.extraNightShiftPay,
-        holidayPayRate: parsedBody.data?.holidayPayRate,
-        unpaidBreaks: parsedBody.data?.unpaidBreaks,
+        firstName,
+        address,
+        city,
+        country,
+        lastName,
       },
     });
 
