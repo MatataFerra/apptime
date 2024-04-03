@@ -1,6 +1,6 @@
 import { isThisWeek, max } from "date-fns";
 import _ from "lodash";
-import { describe, expect,test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import DashboardService from "@/services/Dashboard";
 import ShiftService from "@/services/Shift";
@@ -26,7 +26,7 @@ describe("Dashboard Service", () => {
     const dashboard = new DashboardService(userMocked);
 
     const expectedPaid = userShiftsMocked.reduce((acc, shift) => {
-      const minuteValue = userMocked.profile?.hourlyRate / 60;
+      const minuteValue = 27 / 60;
 
       const amount = shift?.amount ?? 0;
 
@@ -48,9 +48,7 @@ describe("Dashboard Service", () => {
     }, 0);
 
     const expectedHours = ShiftService.convertAmountInDecimal(total);
-    const dashboardWorkedHours = ShiftService.convertAmountInDecimal(
-      dashboard.hoursWorked
-    );
+    const dashboardWorkedHours = ShiftService.convertAmountInDecimal(dashboard.hoursWorked);
 
     expect(dashboardWorkedHours).toBe(expectedHours);
   });

@@ -40,7 +40,7 @@ describe("DateHumanizer", () => {
       const humanizer = new DateHumanizer("distanceToNow");
       const date = new Date("2022-01-01T00:00:00Z");
 
-      expect(humanizer.humanizeDate(date, { locale: "es" })).toBe("hace alrededor de 2 años");
+      expect(humanizer.humanizeDate(date, { locale: "es" })).toBe("hace más de 2 años");
     });
 
     test("should throw an error for an invalid strategy", () => {

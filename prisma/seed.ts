@@ -40,6 +40,11 @@ function addShiftsForSeed(user: User, dates: Array<Date>): Omit<Shift, "id">[] {
       isClosed: isTheDateToday(date) ? false : true,
       isPublicHoliday: false,
       publicHolidayWorked: false,
+      hourValue: 27,
+      holidayPay: true,
+      holidayPayRate: 8,
+      unpaidBreaks: 1,
+      taxCode: 1,
       notes: `mocked shift number ${i} from user ${user?.name}`,
     };
   });
@@ -112,6 +117,11 @@ async function main() {
         isPublicHoliday: shiftData.isPublicHoliday,
         publicHolidayWorked: shiftData.publicHolidayWorked,
         notes: shiftData.notes,
+        holidayPay: shiftData.holidayPay,
+        hourValue: shiftData.hourValue,
+        holidayPayRate: shiftData.holidayPayRate,
+        taxCode: shiftData.taxCode,
+        unpaidBreaks: shiftData.unpaidBreaks,
       },
     });
   }
@@ -123,14 +133,11 @@ async function main() {
           id: firstUser.id,
         },
       },
-      endHour: 17,
-      extraNightShiftPay: 0,
-      holidayPay: true,
-      holidayPayRate: 1.5,
-      hourlyRate: 10.5,
-      nightShift: false,
-      startHour: 8,
-      unpaidBreaks: 0,
+      firstName: "Testing",
+      lastName: "Surname",
+      address: "House mock",
+      city: "City mock",
+      country: "Argentina",
     },
   });
 
@@ -141,14 +148,11 @@ async function main() {
           id: secondUser.id,
         },
       },
-      endHour: 19,
-      extraNightShiftPay: 0,
-      holidayPay: true,
-      holidayPayRate: 2,
-      hourlyRate: 22,
-      nightShift: true,
-      startHour: 10,
-      unpaidBreaks: 30,
+      firstName: "User",
+      lastName: "Lastname",
+      address: "Adress mock",
+      city: "City mock",
+      country: "Argentina",
     },
   });
 
