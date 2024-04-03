@@ -19,9 +19,14 @@ export default async function onSubmitFastCharge(data: FastChargeInputsParsed) {
     endDate: data.endDate,
     isPublicHoliday: data.isPublicHoliday,
     publicHolidayWorked: data.isWorked,
+    hourValue: data.hourValue,
+    holidayPay: data.holidayPay,
     amount: 0,
     isClosed: true,
     notes: "",
+    taxCode: 0,
+    holidayPayRate: data.holidayPayRate,
+    unpaidBreaks: data.unpaidBreaks,
     userId: currentUser.id,
   })
     .closeShift()
