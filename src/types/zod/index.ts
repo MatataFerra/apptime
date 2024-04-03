@@ -13,6 +13,11 @@ const ShiftModelSchema = z.object({
   publicHolidayWorked: z.boolean(),
   notes: z.string().nullable(),
   startDate: z.string(),
+  hourValue: z.number(),
+  holidayPay: z.boolean(),
+  holidayPayRate: z.number().nullable(),
+  unpaidBreaks: z.number().nullable(),
+  taxCode: z.number().nullable(),
   userId: z.string().nullable(),
 });
 
@@ -20,14 +25,11 @@ const ProfileSchema = z.object({
   id: z.number({
     required_error: "Id must be provided correctly",
   }),
-  endHour: z.number(),
-  extraNightShiftPay: z.number(),
-  holidayPay: z.boolean(),
-  holidayPayRate: z.number(),
-  hourlyRate: z.number(),
-  nightShift: z.boolean(),
-  startHour: z.number(),
-  unpaidBreaks: z.number(),
+  firstName: z.string(),
+  lastName: z.string().nullable(),
+  address: z.string().nullable(),
+  city: z.string().nullable(),
+  country: z.string().nullable(),
   userId: z.string().nullable(),
 });
 
@@ -139,6 +141,9 @@ export const FastChargeFormSchema = z.object({
   "finish-time": z.string().length(5),
   "fast-holiday": z.boolean(),
   "fast-worked": z.boolean(),
+  "hour-value": z.number().int().positive(),
+  "unpaid-breaks": z.number().int().positive().max(10),
+  "holiday-pay-rate": z.number().int().positive(),
 });
 
 /**
