@@ -2,13 +2,7 @@ import { Profile, User } from "@prisma/client";
 
 import ApiBaseService from "@/services/Api/base";
 
-import { UserType } from "@/types";
-import type {
-  ApiResponse,
-  FailureApiResponse,
-  SuccessApiResponse,
-  SuccessUserApiResponse,
-} from "@/types/api_response";
+import type { ApiResponse, SuccessUserApiResponse } from "@/types/api_response";
 
 import { API_ENDPOINTS } from "@/utils/constants/endpoints";
 
