@@ -19,6 +19,7 @@ import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 const Fab = dynamic(() => import("@/components/NotesFab"), { ssr: false });
 const Notes = dynamic(() => import("@/components/NotesPortal"), { ssr: false });
+const ShiftProvider = dynamic(() => import("@/providers/ShiftStatusProvider"));
 const Buttons = dynamic(() => import("@/components/ShiftButtons"), {
   ssr: false,
   loading: () => (
@@ -30,7 +31,6 @@ const Buttons = dynamic(() => import("@/components/ShiftButtons"), {
     </>
   ),
 });
-const ShiftProvider = dynamic(() => import("@/providers/ShiftStatusProvider"));
 
 export default async function Home({ params }: { params: LocaleParams }) {
   const isLocaleSupported = new i18n(params.locale).isLocaleSupported();
