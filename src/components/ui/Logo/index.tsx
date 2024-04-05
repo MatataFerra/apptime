@@ -16,7 +16,13 @@ function Logo({ withText }: Props) {
       className="flex cursor-pointer items-center justify-start gap-2"
       onClick={() => router.push("/")}
     >
-      <Img src="/assets/apptime-logo.svg" alt="App time logo" width={50} height={50} />
+      <Img
+        src="/assets/apptime-logo.svg"
+        alt="App time logo"
+        classes="size-14"
+        width={0}
+        height={0}
+      />
       {withText ? (
         <Text as="h1" gradient="secondary" classes={`text-2xl font-bold`}>
           App Time
