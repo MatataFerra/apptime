@@ -1,5 +1,4 @@
 import { User } from "@prisma/client";
-import jwt from "jsonwebtoken";
 import { getServerSession, Session } from "next-auth";
 import { signIn, signOut } from "next-auth/react";
 
@@ -20,7 +19,6 @@ interface AuthServiceInterface {
   login(type_account: string, callbackUrl: string): Promise<void>;
   logout(): Promise<void>;
   register(user: Omit<User, "id">): Promise<User>;
-  isValidToken(token: string): Promise<boolean>;
 }
 
 /** Authentication service
@@ -104,17 +102,6 @@ class Auth implements AuthServiceInterface {
     }
 
     return user;
-  }
-
-  isValidToken(token: string): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      jwt.verify(token, process.env.NEXTAUTH_SECRET, (err) => {
-        if (err) {
-          return reject(err);
-        }
-        return resolve(true);
-      });
-    });
   }
 }
 
