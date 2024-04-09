@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 
 import { Profile } from "@prisma/client";
 
-import ProfileService from "@/services/Profile";
+import ShiftService from "@/services/Shift";
 
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
@@ -30,48 +30,12 @@ function StepTwo() {
 
   return (
     <Stack orientation="vertical" classes="mt-4">
-      <Stack classes="mb-10">
-        <Input
-          classes="w-2/6"
-          isRequired
-          isError={formErrors.hourlyRate}
-          min={0}
-          type="number"
-          label="Hour value"
-          measure="$"
-          measurePlace="left"
-          {...register("hourlyRate", {
-            onChange: onInputChange,
-            value: !!profile.hourlyRate && profile.hourlyRate,
-          })}
-        />
-      </Stack>
+      <Stack classes="mb-10"></Stack>
 
       <Stack orientation="horizontal">
         <Text classes="font-bold">When you start and finish your shift?</Text>
       </Stack>
-      <Stack classes="w-3/4">
-        <Input
-          isRequired
-          isError={formErrors.startHour}
-          type="time"
-          label="Start time"
-          {...register("startHour", {
-            onChange: onInputChange,
-            value: ProfileService.convertFloatInHour(profile.startHour),
-          })}
-        />
-        <Input
-          isRequired
-          isError={formErrors.endHour}
-          type="time"
-          label="Finish time"
-          {...register("endHour", {
-            onChange: onInputChange,
-            value: ProfileService.convertFloatInHour(profile.endHour),
-          })}
-        />
-      </Stack>
+      <Stack classes="w-3/4"></Stack>
     </Stack>
   );
 }

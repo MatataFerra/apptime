@@ -25,6 +25,10 @@ type Props = {
     | undefined;
 };
 
+/**
+ * @deprecated This component is deprecated and should be replaced with the new ShiftFinishButton component
+ */
+
 function FinishShiftDialog({ triggerStatus }: Props) {
   const { updateInputsAreDisabled, setButtonClicked } = useShiftStateContext((state) => state);
 

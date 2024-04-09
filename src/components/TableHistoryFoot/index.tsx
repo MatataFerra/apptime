@@ -16,10 +16,7 @@ async function TableHistoryFoot({ colsNumber }: Props) {
   const user = await UserService.getSessionUser();
 
   function calculateEarnings(shift: Shift) {
-    return ShiftService.calculateEarnings({
-      profile: user?.profile ?? null,
-      shift,
-    });
+    return ShiftService.calculateEarnings({ shift });
   }
 
   function getHours(minutes: number) {

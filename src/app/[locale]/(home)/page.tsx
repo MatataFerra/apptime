@@ -1,4 +1,5 @@
 import { Shift } from "@prisma/client";
+import dynamic from "next/dynamic";
 
 import i18n from "@/services/i18n";
 import ShiftService from "@/services/Shift";
@@ -8,17 +9,28 @@ import ut from "@/services/Utilities/client";
 import { LocaleParams } from "@/types";
 
 import DateComponent from "@/components/Date";
-import NotesFab from "@/components/NotesFab";
-import NotesPortal from "@/components/NotesPortal";
-import ShiftButtons from "@/components/ShiftButtons";
 import ShiftStatus from "@/components/ShiftStatus";
 import ShiftTextState from "@/components/ShiftTextState";
+import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 import WelcomeTitle from "@/components/WelcomeTitle";
 
-import ShiftStatusProvider from "@/providers/ShiftStatusProvider";
-
 import { PATH_NAMES } from "@/utils/constants/pathnames";
+
+const Fab = dynamic(() => import("@/components/NotesFab"), { ssr: false });
+const Notes = dynamic(() => import("@/components/NotesPortal"), { ssr: false });
+const ShiftProvider = dynamic(() => import("@/providers/ShiftStatusProvider"));
+const Buttons = dynamic(() => import("@/components/ShiftButtons"), {
+  ssr: false,
+  loading: () => (
+    <>
+      <Stack classes="h-full w-full" spacing={10} alignItems="center" justifyContent="between">
+        <Skeleton classes="h-12 w-full" />
+        <Skeleton classes="h-12 w-full" />
+      </Stack>
+    </>
+  ),
+});
 
 export default async function Home({ params }: { params: LocaleParams }) {
   const isLocaleSupported = new i18n(params.locale).isLocaleSupported();
@@ -42,14 +54,13 @@ export default async function Home({ params }: { params: LocaleParams }) {
           <WelcomeTitle user={user} />
           <DateComponent locale={params.locale} />
         </Stack>
-
-        <ShiftStatusProvider user={user} shiftOpen={shiftUnclosed}>
+        <ShiftProvider user={user} shiftOpen={shiftUnclosed}>
           <ShiftTextState />
           <ShiftStatus />
-          <ShiftButtons />
-          <NotesFab />
-          <NotesPortal />
-        </ShiftStatusProvider>
+          <Buttons />
+          <Fab />
+          <Notes />
+        </ShiftProvider>
       </Stack>
     </>
   );

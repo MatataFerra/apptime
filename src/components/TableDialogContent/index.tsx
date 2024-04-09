@@ -51,7 +51,7 @@ function TableDialogContent({ shift, user, shortDate, getHours, calculateEarning
         <Text as="span" classes="font-bold">
           Hourly Rate:
         </Text>{" "}
-        {user?.profile?.hourlyRate ? `$${user?.profile?.hourlyRate}` : "..."}
+        {shift?.hourValue ? `$${shift?.hourValue}` : "..."}
       </Text>
 
       <Text>

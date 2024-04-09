@@ -47,13 +47,13 @@ class Dashboard implements DashboardInterface {
     return total;
   }
 
-  get hourValue() {
-    return this.user.profile?.hourlyRate ?? 0;
-  }
+  // get hourValue() {
+  //   return this.user.shifts?.hourlyRate ?? 0;
+  // }
 
-  get minuteValue() {
-    return this.hourValue / 60;
-  }
+  // get minuteValue() {
+  //   return this.hourValue / 60;
+  // }
 
   get lastDayRegistered() {
     if (this.user.shifts.length === 0) return "There is no data";
@@ -65,13 +65,15 @@ class Dashboard implements DashboardInterface {
   estimatedWeeklyEarnings({ weekStartsOn = "monday" }: { weekStartsOn?: keyof typeof DAYS } = {}) {
     return this.user.shifts.reduce((acc, shift) => {
       const amount = shift.amount ?? 0;
+      const hourValue = shift.hourValue ?? 0;
+      const minuteValue = hourValue / 60;
 
       if (
         isThisWeek(new Date(shift.startDate), {
           weekStartsOn: DAYS[weekStartsOn as keyof typeof DAYS],
         })
       ) {
-        const total = amount * this.minuteValue;
+        const total = amount * minuteValue;
         const newValue = acc + total;
 
         return newValue;
@@ -86,7 +88,7 @@ class Dashboard implements DashboardInterface {
       shiftsLen: this.shiftsLen,
       hoursWorked: ShiftService.convertAmountInDecimal(this.hoursWorked),
       averageHoursWorkedPerDay: ShiftService.convertAmountInDecimal(this.averageHoursWorkedPerDay),
-      hourValue: this.hourValue,
+      hourValue: 0,
       lastDayRegistered: this.lastDayRegistered,
       estimatedWeeklyEarnings: this.estimatedWeeklyEarnings(),
     };

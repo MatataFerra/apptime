@@ -29,7 +29,6 @@ export interface DashboardInterface {
   get shiftsLen(): number;
   get hoursWorked(): number;
   get averageHoursWorkedPerDay(): number;
-  get hourValue(): number;
   get lastDayRegistered(): string;
   estimatedWeeklyEarnings({ weekStartsOn }: { weekStartsOn?: keyof typeof DAYS }): number;
   dashboardData(): {

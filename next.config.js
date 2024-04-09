@@ -3,6 +3,11 @@ const withNextIntl = require('next-intl/plugin')();
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
   images: {
     remotePatterns: [{
       protocol: 'https',

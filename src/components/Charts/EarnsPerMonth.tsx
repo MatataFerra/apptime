@@ -26,7 +26,7 @@ function EarnsPerMonth() {
   const earningsByMonthData = Object.entries(group ?? {}).map(([month, shifts]) => {
     const earnings = shifts
       .filter((shift) => shift.isClosed)
-      .map((shift) => ShiftService.calculateEarnings({ shift, profile: user?.profile! }));
+      .map((shift) => ShiftService.calculateEarnings({ shift }));
 
     return {
       month,

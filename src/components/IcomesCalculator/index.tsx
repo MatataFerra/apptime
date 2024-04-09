@@ -76,16 +76,10 @@ function IncomesCalculator() {
           min={0}
           {...register("holiday-pay")}
         />
-        <Input
-          type="number"
-          label="Times"
-          description="multiply the value by the times"
-          min={1}
-          {...register("times")}
-        />
+        <Input type="number" label="How many times?" min={1} {...register("times")} />
       </Stack>
       <Stack orientation="vertical">
-        <Text classes="text-lg font-bold">You are going to winning:</Text>
+        <Text classes="text-lg font-bold">You are going to earn:</Text>
         <Text classes="font-bold">
           {calculate
             ? `${new Intl.NumberFormat("en-US", {

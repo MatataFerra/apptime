@@ -33,15 +33,9 @@ function TableHistoryRow({ shift }: { shift: Shift }) {
   const queryClient = useQueryClient();
   const { user, update, deleteShift } = useDashboardContext((state) => state);
 
-  const calculateEarnings = useCallback(
-    (shift: Shift) => {
-      return ShiftService.calculateEarnings({
-        profile: user?.profile ?? null,
-        shift,
-      });
-    },
-    [user]
-  );
+  const calculateEarnings = useCallback((shift: Shift) => {
+    return ShiftService.calculateEarnings({ shift });
+  }, []);
 
   const { mutate } = useMutation({
     mutationFn: api.deleteShift.bind(api) as unknown as ({

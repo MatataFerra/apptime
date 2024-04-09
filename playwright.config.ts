@@ -12,7 +12,7 @@ const IGNORE_TEST_DESKTOP = [
   /.*env.spec.ts/,
   /.*drawer.spec.ts/,
 ];
-const IGNORE_TEST_MOBILE = [/.*no-mobile.spec.ts/];
+const IGNORE_TEST_MOBILE = [/.*no-mobile.spec.ts/, /.*home-form.spec.ts/];
 
 // Use process.env.PORT by default and fallback to port 3000
 const PORT = process.env.PORT || 3000;

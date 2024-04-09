@@ -110,6 +110,14 @@ module.exports = {
           to: { transform: "translateX(-100%)" },
           from: { transform: "translateX(0)" },
         },
+        'fade-in':  {
+          '0%': {
+              opacity: '0',
+          },
+          '100%': {
+              opacity: '1',
+          },
+        },
 
         'fade-down': {
           '0%': {
@@ -202,6 +210,7 @@ module.exports = {
         "dissapear-up": "dissapear-up 0.5s ease-in-out forwards",
         "backdrop-blurry": "backdrop-blurry 0.5s ease-in-out forwards",
         ripple: "ripple .5s ease-in-out",
+        "fade-in": "fade-in .5s ease-out",
       },
     },
   },

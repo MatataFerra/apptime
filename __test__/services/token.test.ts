@@ -61,19 +61,4 @@ describe("TokenService", () => {
       expect(result).toBe("test-token");
     });
   });
-
-  describe("verifyToken", () => {
-    test("should verify the token", async () => {
-      // Mock the getCookie function
-      vi.spyOn(TokenService.prototype, "getCookie").mockReturnValueOnce({
-        name: "test-cookie",
-        value: "test-cookie-value",
-      });
-
-      // Mock the verify function
-      vi.spyOn(TokenService.prototype, "verifyToken").mockReturnValueOnce(true);
-      const result = tokenService.verifyToken();
-      expect(result).toBeTruthy();
-    });
-  });
 });

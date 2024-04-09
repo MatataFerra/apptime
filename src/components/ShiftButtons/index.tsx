@@ -4,12 +4,12 @@ import { useEffect } from "react";
 
 import ShiftService from "@/services/Shift";
 
-import StartShiftDialog from "@/components/Dialogs/StartShiftDialog";
+import ShiftFinishButton from "@/components/ShiftFinishButton";
+import ShiftStartDialog from "@/components/ShiftStartDialog";
 import Stack from "@/components/ui/Stack";
 
 import useButtonStatus from "@/hooks/useButtonStatus";
 
-import FinishShiftDialog from "../Dialogs/FinishShiftDialog";
 import { useShiftStateContext } from "@/store/useShiftStatusStore";
 
 function ShiftButtons() {
@@ -24,8 +24,8 @@ function ShiftButtons() {
 
   return (
     <Stack classes="h-full w-full" spacing={10} alignItems="center" justifyContent="between">
-      <StartShiftDialog triggerStatus={buttonStatus?.startButton} />
-      <FinishShiftDialog triggerStatus={buttonStatus?.finishButton} />
+      <ShiftStartDialog triggerStatus={buttonStatus?.startButton} />
+      <ShiftFinishButton buttonStatus={buttonStatus.finishButton} />
     </Stack>
   );
 }
