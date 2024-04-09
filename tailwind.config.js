@@ -119,6 +119,15 @@ module.exports = {
           },
         },
 
+        'fade-out': {
+          '0%': {
+              opacity: '1',
+          },
+          '100%': {
+              opacity: '0',
+          },
+        },
+
         'fade-down': {
           '0%': {
               opacity: '0',
@@ -211,6 +220,7 @@ module.exports = {
         "backdrop-blurry": "backdrop-blurry 0.5s ease-in-out forwards",
         ripple: "ripple .5s ease-in-out",
         "fade-in": "fade-in .5s ease-out",
+        "fade-out": "fade-out .5s ease-out",
       },
     },
   },

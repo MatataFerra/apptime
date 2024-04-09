@@ -17,12 +17,20 @@ interface AuthServiceInterface {
   user: Omit<User, "id">;
   session?: SessionStorage;
   login(type_account: string, callbackUrl: string): Promise<void>;
-  logout(): Promise<void>;
   register(user: Omit<User, "id">): Promise<User>;
 }
 
 /** Authentication service
  * - [ ] Forgot Password
+ * @description This service is responsible for handling all authentication related operations
+ * @class Auth
+ * @implements {AuthServiceInterface}
+ * @param {Omit<User, "id">} user
+ * @method login
+ * @method register
+ * @method getSession
+ * @method logout
+ * @method oauthUser
  */
 class Auth implements AuthServiceInterface {
   user: Omit<User, "id">;
@@ -44,8 +52,8 @@ class Auth implements AuthServiceInterface {
     });
   }
 
-  async logout() {
-    await signOut();
+  static logout() {
+    signOut();
   }
 
   async register(): Promise<User> {

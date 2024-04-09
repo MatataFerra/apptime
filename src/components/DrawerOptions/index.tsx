@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 
 import Icon from "@/components/ui/Icons";
 import Stack from "@/components/ui/Stack";
@@ -27,9 +28,9 @@ function DrawerOptions() {
     router.push("/incomes");
   }
 
-  function handleHome() {
+  function handleLogout() {
     toggle();
-    router.push("/");
+    signOut();
   }
 
   return (
@@ -40,10 +41,10 @@ function DrawerOptions() {
             data-testid="fast-charge"
             as="button"
             grid
-            cols="20% 1fr"
+            cols="10% 1fr"
             spacing={4}
             alignItems="center"
-            classes="relative w-full px-1 py-2 text-left active:after:absolute active:after:inset-0 active:after:-z-10 active:after:rounded-xl active:after:bg-slate-100"
+            classes="relative w-full px-4 py-2 text-left active:after:absolute active:after:inset-0 active:after:-z-10 active:after:bg-slate-100"
             onClick={handleFastCharge}
           >
             <Icon.lightning className="justify-self-center" />
@@ -53,10 +54,10 @@ function DrawerOptions() {
             data-testid="history-shifts"
             as="button"
             grid
-            cols="20% 1fr"
+            cols="10% 1fr"
             spacing={4}
             alignItems="center"
-            classes="relative w-full px-1 py-2 text-left active:after:absolute active:after:inset-0 active:after:-z-10 active:after:rounded-xl active:after:bg-slate-100"
+            classes="relative w-full px-4 py-2 text-left active:after:absolute active:after:inset-0 active:after:-z-10 active:after:bg-slate-100"
             onClick={handleHistoryShifts}
           >
             <Icon.clock className="justify-self-center" />
@@ -65,20 +66,23 @@ function DrawerOptions() {
           <Stack
             as="button"
             grid
-            cols="20% 1fr"
+            cols="10% 1fr"
             spacing={4}
             alignItems="center"
-            classes="relative w-full px-1 py-2 text-left active:after:absolute active:after:inset-0 active:after:-z-10 active:after:rounded-xl active:after:bg-slate-100"
+            classes="relative w-full px-4 py-2 text-left active:after:absolute active:after:inset-0 active:after:-z-10 active:after:bg-slate-100"
             onClick={handleEstimateIncome}
           >
             <Icon.calculator className="justify-self-center" />
             <Text classes="select-none font-bold">Estimate income</Text>
           </Stack>
         </Stack>
-        <Stack>
-          <Stack as="button" onClick={handleHome}>
-            <Icon.home className="justify-self-center" />
+        <Stack classes="group items-center p-4">
+          <Stack as="button" classes="cursor-pointer" onClick={handleLogout}>
+            <Icon.logout className="size-10 justify-self-center" />
           </Stack>
+          <Text classes="animate-fade-out invisible transition-all duration-500 group-hover:visible group-hover:animate-fade-in">
+            Logout
+          </Text>
         </Stack>
       </Stack>
     </>

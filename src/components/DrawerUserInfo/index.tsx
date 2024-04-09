@@ -9,15 +9,15 @@ async function DrawerUserInfo() {
 
   return (
     <>
-      <Stack spacing={4}>
+      <Stack spacing={4} classes="p-4">
         {user?.image && (
           <Image classes="rounded-full" src={user.image} alt="logo" width={50} height={50} />
         )}
         <Stack orientation="vertical" spacing={0}>
-          <Text gradient="secondary" classes="font-bold tracking-widest">
+          <Text gradient="secondary" classes="text-sm font-bold tracking-widest">
             {user?.name}
           </Text>
-          <Text classes="w-full tracking-widest">menú</Text>
+          <Text classes="w-full text-xs tracking-widest">menú</Text>
         </Stack>
       </Stack>
     </>
