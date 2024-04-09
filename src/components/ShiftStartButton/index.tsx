@@ -20,11 +20,15 @@ type SuccessShiftResponse = {
   shift: Shift;
 };
 
+type Props = {
+  title?: string;
+};
+
 function checkData(data: unknown): data is SuccessShiftResponse {
   return typeof data === "object" && data !== null;
 }
 
-function ShiftStartButton() {
+function ShiftStartButton({ title = "Save config & start" }: Props) {
   const { data, errors } = useShiftData((state) => state);
   const { user, updateShiftsInfo, updateShiftStatus, createShift, updateShiftUnclosed } =
     useShiftStateContext((state) => state);
@@ -81,10 +85,10 @@ function ShiftStartButton() {
         variant="black"
         disabled={errors}
         type="submit"
-        classes="w-full p-2 text-sm"
+        classes="w-full border border-transparent p-2 text-sm"
         onClick={onStartShift}
       >
-        Save config & start
+        {title}
       </Button>
     </DialogClose>
   );
