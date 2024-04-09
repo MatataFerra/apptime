@@ -24,18 +24,17 @@ export const BUTTON_VARIANTS = {
   gradient_secondary: "border_gradient_2",
   google: "bg-white text-black p-3 border border-gray-300 shadow-button",
   outlined: "bg-white text-black p-3",
-  white:
-    "bg-white text-black p-3 border border-black shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px]",
+  white: "bg-white text-black p-3 border border-slate-800 shadow-button",
   disabled: "bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-100 p-3 cursor-not-allowed",
   black:
-    "bg-black text-white p-3 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px]",
+    "bg-slate-950 text-white p-3 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px]",
   teal: "bg-light-blue text-white p-3 text-black shadow-button active:shadow-button-inner",
   "post-it": "bg-post-it-button text-white p-3 text-black shadow-button active:shadow-button-inner",
 };
 
 export const INPUT_VARIANTS = {
   default:
-    "h-[69px] w-full rounded-md bg-white text-2xl shadow-input focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent",
+    "h-full w-full rounded-md bg-white text-base shadow-input focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent",
   error:
     "bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent",
   success:
@@ -43,7 +42,7 @@ export const INPUT_VARIANTS = {
   warning:
     "bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent",
   info: "bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent",
-  plane: "h-[69px] w-full rounded-md bg-white text-2xl",
+  plane: "h-full w-full rounded-md bg-white text-base",
   radio: "",
   underline:
     "bg-transparent border-b-2 pl-0 border-gray-400 rounded-none focus:border-blue-600 focus:outline-none",

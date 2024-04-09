@@ -80,3 +80,9 @@ export const FULL_MONTHS_NAMES = [
 ] as const;
 
 export const NEXT_AUTH_SESSION_TOKEN = "__Secure-next-auth.session-token";
+
+export const TAX_CODES = {
+  M: 0,
+  CAE: 1,
+  NONE: 2,
+} as const;

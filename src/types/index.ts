@@ -2,7 +2,7 @@ import { HTMLAttributes } from "react";
 
 import { z } from "zod";
 
-import { SUPPORTED_LOCALES } from "@/utils/constants";
+import { SUPPORTED_LOCALES, TAX_CODES } from "@/utils/constants";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 import { SuscribeSchema } from ".";
@@ -49,3 +49,5 @@ export type LoginInputs = {
   email: string;
   password: string;
 };
+
+export type TaxCodes = (typeof TAX_CODES)[keyof typeof TAX_CODES];
