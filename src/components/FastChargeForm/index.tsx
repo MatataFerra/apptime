@@ -222,7 +222,7 @@ function FastChargeForm() {
           type="number"
           {...register("holiday-pay-rate")}
         />
-        <Stack orientation="horizontal" classes="flex-wrap">
+        <Stack orientation="horizontal" wrap>
           <Stack alignItems="center">
             <Input
               classes="size-4"

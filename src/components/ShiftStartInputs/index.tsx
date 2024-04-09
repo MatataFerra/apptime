@@ -43,7 +43,7 @@ function ShiftStartInputs() {
   }, [holidayPayRate, hourValue, setErrors, unpaidBreaks]);
 
   return (
-    <Stack orientation="horizontal" alignItems="center" classes="flex-wrap">
+    <Stack orientation="horizontal" alignItems="center" wrap>
       <Input
         containerClasses="input-flex"
         description="Hour value"
