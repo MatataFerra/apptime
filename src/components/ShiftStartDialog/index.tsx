@@ -1,14 +1,18 @@
 "use client";
 
+import { useMemo } from "react";
+
+import isEmpty from "lodash/isEmpty";
+
+import ShiftService from "@/services/Shift";
+
 import Trigger from "@/components/ShiftDialog/trigger";
 import ShiftStartStepTwo from "@/components/ShiftStartStepTwo";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/Dialog";
+import { Dialog, DialogContent } from "@/components/ui/Dialog";
+
+import ShiftStartHasConfigStep from "../ShiftStartHasConfigStep";
+import { useShiftData } from "@/store/useShiftData";
+import { useShiftStateContext } from "@/store/useShiftStatusStore";
 
 type Props = {
   triggerStatus:
@@ -20,18 +24,51 @@ type Props = {
 };
 
 function ShiftStartDialog({ triggerStatus }: Props) {
+  const { step, setData, setStep } = useShiftData((state) => state);
+  const { user } = useShiftStateContext((state) => state);
+  const hasConfig = useMemo(
+    () => !isEmpty(ShiftService.getLastConfigShift(user?.shifts)),
+    [user?.shifts]
+  );
+  const last = useMemo(() => ShiftService.getLastConfigShift(user?.shifts), [user?.shifts]);
+
+  function resetData() {
+    setStep("HasConfig");
+    setData({
+      holidayPay: last?.holidayPay,
+      holidayPayRate: last?.holidayPayRate,
+      taxCode: last?.taxCode,
+      unpaidBreaks: last?.unpaidBreaks,
+      hourValue: last?.hourValue,
+    });
+  }
+
   return (
     <>
-      <Dialog>
+      <Dialog
+        onOpenChange={(open) => {
+          if (open) {
+            if (hasConfig) {
+              setStep("HasConfig");
+              setData({
+                holidayPay: last?.holidayPay,
+                holidayPayRate: last?.holidayPayRate,
+                taxCode: last?.taxCode,
+                unpaidBreaks: last?.unpaidBreaks,
+                hourValue: last?.hourValue,
+              });
+            } else {
+              setStep("ShiftInfo");
+            }
+          }
+
+          resetData();
+        }}
+      >
         <Trigger status={triggerStatus} />
         <DialogContent className="min-h-[300px] w-10/12">
-          <DialogHeader className="text-left">
-            <DialogTitle>Set shift before start</DialogTitle>
-            <DialogDescription>
-              Please fill in the following details to start your shift
-            </DialogDescription>
-          </DialogHeader>
-          <ShiftStartStepTwo />
+          {hasConfig && step === "HasConfig" && <ShiftStartHasConfigStep />}
+          {step === "ShiftInfo" && <ShiftStartStepTwo />}
         </DialogContent>
       </Dialog>
     </>
