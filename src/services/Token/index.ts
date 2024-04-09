@@ -1,5 +1,3 @@
-import { verify } from "jsonwebtoken";
-import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { cookies as cookieStore } from "next/headers";
 import { decode, encode } from "next-auth/jwt";
 
@@ -44,17 +42,6 @@ class TokenService implements TokenServiceInterface {
     const cookie = cookieStore().get(this.cookie);
 
     if (!cookie) return cookieStore().get(NEXT_AUTH_SESSION_TOKEN);
-  }
-
-  verifyToken(secret?: string) {
-    const cookie = this.getCookie();
-    const appSecret = secret ?? process.env.NEXTAUTH_SECRET;
-    try {
-      const result = verify(cookie?.value ?? "", appSecret);
-      if (result) return true;
-    } catch (error) {
-      return null;
-    }
   }
 
   static async createToken(data: { email: string; name: string; picture: string; sub: string }) {

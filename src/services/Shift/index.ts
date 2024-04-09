@@ -2,11 +2,17 @@ import { Shift } from "@prisma/client";
 import { differenceInMinutes } from "date-fns";
 import { cloneDeep } from "lodash";
 
-import { UserType } from "@/types";
-
 import prisma from "../../../prisma/client";
 
 type ShiftWithoutId = Omit<Shift, "id">;
+
+type ShiftConfig = {
+  hourValue: ShiftWithoutId["hourValue"];
+  holidayPay: ShiftWithoutId["holidayPay"];
+  holidayPayRate: ShiftWithoutId["holidayPayRate"];
+  taxCode: ShiftWithoutId["taxCode"];
+  unpaidBreaks: ShiftWithoutId["unpaidBreaks"];
+};
 
 interface ShiftServiceInterface {
   shift: ShiftWithoutId;
@@ -65,6 +71,11 @@ class ShiftService implements ShiftServiceInterface {
         isPublicHoliday: this.shift.isPublicHoliday,
         notes: this.shift.notes,
         publicHolidayWorked: this.shift.publicHolidayWorked,
+        holidayPay: this.shift.holidayPay,
+        hourValue: this.shift.hourValue,
+        holidayPayRate: this.shift.holidayPayRate,
+        taxCode: this.shift.taxCode,
+        unpaidBreaks: this.shift.unpaidBreaks,
       },
     });
 
@@ -73,20 +84,21 @@ class ShiftService implements ShiftServiceInterface {
 
   static calculateEarnings({
     shift,
-    profile,
     startDate,
     endDate,
     isPublicHoliday,
+    hourValue,
   }: {
     shift?: Omit<Shift, "id">;
-    profile: UserType["profile"];
+    hourValue?: number;
     startDate?: string;
     endDate?: string;
     isPublicHoliday?: boolean;
   }) {
     let amount = 0;
     let holidayRate = 1;
-    let minuteRate = profile?.hourlyRate ? profile?.hourlyRate / 60 : 1;
+    const hourJobValue = shift?.hourValue ?? hourValue;
+    let minuteRate = hourJobValue ? hourJobValue / 60 : 0;
 
     if (startDate && endDate) {
       const start = new Date(startDate ?? "");
@@ -173,6 +185,38 @@ class ShiftService implements ShiftServiceInterface {
       },
       {} as Record<string, Shift[]>
     );
+  }
+
+  static getLastConfigShift(shifts: Shift[] | undefined): ShiftConfig | null {
+    const lastShift = shifts?.at(-1);
+
+    if (!lastShift) return null;
+
+    const config = {
+      hourValue: lastShift?.hourValue,
+      holidayPay: lastShift?.holidayPay,
+      holidayPayRate: lastShift?.holidayPayRate,
+      taxCode: lastShift?.taxCode,
+      unpaidBreaks: lastShift?.unpaidBreaks,
+    };
+
+    return config;
+  }
+
+  static convertHourlyRateInMinuteRate(hourlyRate: Shift["hourValue"]) {
+    return hourlyRate / 60;
+  }
+
+  static convertHourInFloat(hour: string) {
+    const [hourPart, minutePart] = hour.split(":");
+    return Number(hourPart) + Number(minutePart) / 60;
+  }
+
+  static convertFloatInHour(float: number) {
+    const hour = Math.floor(float);
+    const minute = Math.round((float - hour) * 60);
+
+    return `${hour.toString().padStart(2, "0")}:${minute}`;
   }
 
   closeShift() {

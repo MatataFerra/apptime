@@ -22,7 +22,7 @@ describe("IncomesCalculator", () => {
     render(<IncomesCalculator />);
     const hoursInput = screen.getByLabelText("Hours");
     const valueInput = screen.getByLabelText("Value hour");
-    const timesInput = screen.getByLabelText("Times");
+    const timesInput = screen.getByLabelText("How many times?");
 
     fireEvent.change(hoursInput, { target: { value: "08:00" } });
     fireEvent.change(valueInput, { target: { value: 10 } });
@@ -38,7 +38,7 @@ describe("IncomesCalculator", () => {
     const expectedResult = hours * value * times + (hours * value * times * holidayPay) / 100;
 
     const expectedIncome = `$${expectedResult.toFixed(2)} 🤑`;
-    const incomeText = screen.getByText("You are going to winning:");
+    const incomeText = screen.getByText("You are going to earn:");
     expect(incomeText.nextSibling?.textContent).toBe(expectedIncome);
   });
 

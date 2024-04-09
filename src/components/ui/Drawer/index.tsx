@@ -37,7 +37,7 @@ function Drawer({ children, isOpen, ...rest }: Props) {
         )}
         <Stack
           orientation="vertical"
-          classes={cn(`absolute inset-0 w-3/4 bg-white p-4`, rest.classes)}
+          classes={cn(`absolute inset-0 w-[70%] bg-white`, rest.classes)}
         >
           {children}
         </Stack>

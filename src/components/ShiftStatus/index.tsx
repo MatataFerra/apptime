@@ -1,13 +1,7 @@
-"use client";
-
-import UnfilledForm from "@/components/ShiftStatus/UnfilledForm";
 import ShiftTrack from "@/components/ShiftTrack";
 import Stack from "@/components/ui/Stack";
 
-import { useShiftStateContext } from "@/store/useShiftStatusStore";
-
 function ShiftStatus() {
-  const user = useShiftStateContext((state) => state.user);
   return (
     <Stack
       orientation="vertical"
@@ -16,10 +10,7 @@ function ShiftStatus() {
       spacing={6}
       justifyContent="center"
     >
-      {!user?.formCompleted ? <UnfilledForm /> : <ShiftTrack />}
-
-      {/* <ShiftTrack /> */}
-      {/* <ShiftRecorded /> */}
+      <ShiftTrack />
     </Stack>
   );
 }

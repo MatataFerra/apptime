@@ -69,6 +69,11 @@ export const userShiftsMocked: Shift[] = datesMock.map((date, i) => {
     isPublicHoliday: i === 8 ? true : false,
     publicHolidayWorked: i === 8 ? true : false,
     notes: "mocked shift",
+    holidayPay: true,
+    holidayPayRate: 8,
+    hourValue: 10.5,
+    taxCode: 0,
+    unpaidBreaks: 1,
   };
 });
 

@@ -1,14 +1,20 @@
 import { ReactElement } from "react";
 
+import dynamic from "next/dynamic";
 import { notFound, redirect } from "next/navigation";
 
 import UserService from "@/services/User";
 import ut from "@/services/Utilities/client";
 
-import DrawerMenu from "@/components/DrawerMenu";
-import DrawerUserInfo from "@/components/DrawerUserInfo";
-import Ham from "@/components/Ham";
 import Header from "@/components/ui/Header";
+import Skeleton from "@/components/ui/Skeleton";
+
+const Drawer = dynamic(() => import("@/components/DrawerMenu"), { ssr: false });
+const DrawerUserInfo = dynamic(() => import("@/components/DrawerUserInfo"), { ssr: false });
+const Ham = dynamic(() => import("@/components/Ham"), {
+  ssr: false,
+  loading: () => <Skeleton classes="h-10 w-20" />,
+});
 
 interface Props {
   children: ReactElement;
@@ -33,9 +39,9 @@ export default async function HomeLayout({ children, params }: Props) {
         <Header position="between">
           <Ham />
         </Header>
-        <DrawerMenu>
+        <Drawer>
           <DrawerUserInfo />
-        </DrawerMenu>
+        </Drawer>
         {children}
       </main>
     </>

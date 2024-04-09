@@ -1,12 +1,11 @@
-import { Profile, Shift } from "@prisma/client";
+import { Shift } from "@prisma/client";
+
+import ShiftService from "@/services/Shift";
 
 import { UserType } from "@/types";
 
-import ProfileService from "../Profile";
-
 type PayServiceType = {
   publicHolidayParams: {
-    profile: Profile;
     shift: Omit<Shift, "id">;
   };
 
@@ -17,12 +16,12 @@ type PayServiceType = {
 
 class PayService {
   static publicHolidayPay(params: PayServiceType["publicHolidayParams"]) {
-    const { profile, shift } = params;
+    const { shift } = params;
     const amount = shift.amount ?? 0;
     let rate: number = 1;
-    const hourlyRate = ProfileService.convertHourlyRateInMinuteRate(profile.hourlyRate);
+    const hourlyRate = ShiftService.convertHourlyRateInMinuteRate(shift.hourValue);
 
-    if (shift.publicHolidayWorked) rate = profile.holidayPayRate ?? 1;
+    if (shift.publicHolidayWorked) rate = 1.5;
 
     const holidayPay = amount * hourlyRate * rate;
 
@@ -30,12 +29,12 @@ class PayService {
   }
 
   static regularDayPay(params: PayServiceType["publicHolidayParams"]) {
-    const { profile, shift } = params;
+    const { shift } = params;
 
     if (!shift.isClosed) return 0;
 
     const amount = shift.amount ?? 0;
-    const hourlyRate = ProfileService.convertHourlyRateInMinuteRate(profile.hourlyRate);
+    const hourlyRate = ShiftService.convertHourlyRateInMinuteRate(shift.hourValue);
 
     const regularPay = amount * hourlyRate;
 
@@ -55,7 +54,6 @@ class PayService {
 
       if (curr.isPublicHoliday) {
         const publicHolidayPay = PayService.publicHolidayPay({
-          profile: user.profile as Profile,
           shift: curr,
         });
 
@@ -63,7 +61,6 @@ class PayService {
       }
 
       const regularPay = PayService.regularDayPay({
-        profile: user.profile as Profile,
         shift: curr,
       });
 

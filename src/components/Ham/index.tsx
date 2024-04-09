@@ -15,7 +15,7 @@ function Ham() {
       classes="w-fit"
       onClick={() => toggleDrawer()}
     >
-      <Img src="/assets/ham-menu.svg" alt="arrow-left" width={50} height={50} />
+      <Img src="/assets/ham-menu.svg" alt="arrow-left" classes="size-12" width={0} height={0} />
     </Button>
   );
 }

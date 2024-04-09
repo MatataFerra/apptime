@@ -2,7 +2,7 @@ import { User } from "@prisma/client";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
-import ProfileService from "@/services/Profile";
+import ShiftService from "@/services/Shift";
 
 import { FormErrors, FormStore, FormStoreData } from "@/types/store";
 
@@ -14,14 +14,11 @@ export const useFormStore = create(
         surname: "",
       },
       profile: {
-        startHour: 0,
-        endHour: 0,
-        extraNightShiftPay: 0,
-        holidayPay: false,
-        holidayPayRate: 0,
-        hourlyRate: 0,
-        nightShift: false,
-        unpaidBreaks: 0,
+        firstName: "",
+        lastName: "",
+        address: "",
+        city: "",
+        country: "",
       },
 
       formErrors: {
@@ -59,7 +56,7 @@ export const useFormStore = create(
 
       detectInputType: (value: string) => {
         if (value.includes(":")) {
-          return ProfileService.convertHourInFloat(value);
+          return ShiftService.convertHourInFloat(value);
         }
 
         return Number(value);
@@ -76,9 +73,6 @@ export const useFormStore = create(
                 formErrors: {
                   ...state.formErrors,
                   name: user.name.length === 0,
-                  startHour: profile.startHour === 0,
-                  endHour: profile.endHour === 0,
-                  hourlyRate: profile.hourlyRate === 0,
                 },
               };
             }

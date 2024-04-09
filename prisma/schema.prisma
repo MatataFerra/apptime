@@ -1,8 +1,12 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// TAX CODES
+// 0 - M
+// 1 - CAE
+
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
 }
 
@@ -20,6 +24,11 @@ model Shift {
   publicHolidayWorked Boolean @default(false)
   isClosed            Boolean @default(false)
   notes               String?
+  hourValue           Float
+  holidayPay          Boolean
+  holidayPayRate      Float?
+  unpaidBreaks        Float?
+  taxCode             Int? @default(0)
   User                User?   @relation(fields: [userId], references: [id])
   userId              String?
 }
@@ -31,8 +40,8 @@ model User {
   image           String?
   name            String
   password        String?
-  type_account    String             @default("CREDENTIALS")
-  role            String             @default("USER")
+  type_account    String           @default("CREDENTIALS")
+  role            String           @default("USER")
   online          Boolean          @default(false)
   formCompleted   Boolean          @default(false)
   isActive        Boolean          @default(true)
@@ -42,17 +51,14 @@ model User {
 }
 
 model Profile {
-  id                 Int     @id @default(autoincrement())
-  hourlyRate         Float
-  startHour          Float
-  endHour            Float
-  nightShift         Boolean
-  extraNightShiftPay Float?
-  holidayPay         Boolean
-  holidayPayRate     Float?
-  unpaidBreaks       Float?
-  User               User?   @relation(fields: [userId], references: [id])
-  userId             String? @unique
+  id        Int     @id @default(autoincrement())
+  firstName String
+  lastName  String?
+  address   String?
+  city      String?
+  country   String?
+  User      User?   @relation(fields: [userId], references: [id])
+  userId    String? @unique
 }
 
 model PasswordAttemps {
@@ -64,18 +70,7 @@ model PasswordAttemps {
 }
 
 model WaitingListDesktop {
-  id        Int     @id @default(autoincrement())
-  email     String  @unique
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
   createdAt DateTime @default(now())
 }
-
-// enum Type {
-//   OAUTH
-//   CREDENTIALS
-// }
-
-// enum Role {
-//   USER
-//   ADMIN
-//   SUPER_USER
-// }

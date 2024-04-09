@@ -101,7 +101,7 @@ describe("Toast", () => {
     });
 
     const toastElement = screen.queryAllByRole("status")[0];
-    expect(toastElement).toHaveClass("bg-blue-500");
+    expect(toastElement).toHaveClass("bg-sky-500");
   });
 
   test("should render toast with action and match snap", () => {

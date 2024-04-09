@@ -98,19 +98,15 @@ function FastChargeForm() {
   }, [finishDateWatch, finishTimeWatch, formatEnd, formatStart, startDateWatch, startTimeWatch]);
 
   const calculateEarnings = useMemo(() => {
-    if (user?.profile) {
-      const earnings = ShiftService.calculateEarnings({
-        profile: user.profile,
-        startDate: formatStart,
-        endDate: formatEnd,
-        isPublicHoliday: fastWorkedWatch,
-      });
+    const earnings = ShiftService.calculateEarnings({
+      startDate: formatStart,
+      endDate: formatEnd,
+      isPublicHoliday: fastWorkedWatch,
+      hourValue: 27,
+    });
 
-      return isNaN(earnings) ? 0 : earnings;
-    }
-
-    return 0;
-  }, [user?.profile, fastWorkedWatch, formatEnd, formatStart]);
+    return isNaN(earnings) ? 0 : earnings;
+  }, [fastWorkedWatch, formatEnd, formatStart]);
 
   function onSubmit(formData: FastChargeInputs) {
     const parseData: FastChargeInputsParsed = {
@@ -118,6 +114,11 @@ function FastChargeForm() {
       endDate: formatEnd,
       isPublicHoliday: formData["fast-holiday"],
       isWorked: formData["fast-worked"],
+      /*cambiar valores después*/
+      holidayPay: !!Number(formData["holiday-pay-rate"]),
+      holidayPayRate: formData["holiday-pay-rate"],
+      hourValue: formData["hour-value"],
+      unpaidBreaks: formData["unpaid-breaks"],
     };
 
     if (isBefore(new Date(finishDateWatch), new Date(startDateWatch))) {
@@ -157,9 +158,16 @@ function FastChargeForm() {
 
   return (
     <>
-      <Stack as="form" grid cols={2} id="fast-charge" onSubmit={handleSubmit(onSubmit)}>
+      <Stack
+        as="form"
+        orientation="horizontal"
+        id="fast-charge"
+        classes="flex-wrap"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         <Input
-          classes="w-full min-w-40 text-base"
+          containerClasses="input-flex"
+          classes="h-fit w-full min-w-20 text-base"
           label="Start date"
           type="date"
           // create a function to get the current year, give more flexibility
@@ -167,8 +175,8 @@ function FastChargeForm() {
           {...register("start-date")}
         />
         <Input
-          containerClasses="[&>small]:text-red-600 [&>small]:text-[.5rem] [&>small]:mt-0"
-          classes="w-full min-w-40 text-left text-base"
+          containerClasses="[&>small]:text-red-600 [&>small]:text-[.5rem] [&>small]:mt-0 input-flex"
+          classes="h-fit w-full text-left text-base"
           label="Finish date"
           type="date"
           isError={!!errors["finish-date"]}
@@ -177,31 +185,61 @@ function FastChargeForm() {
           {...register("finish-date")}
         />
         <Input
-          classes="w-full min-w-40 text-left text-base"
+          containerClasses="input-flex"
+          classes="h-fit w-full text-left text-base"
           label="Start time"
           type="time"
           {...register("start-time")}
         />
         <Input
-          containerClasses="[&>small]:text-red-600 [&>small]:text-[.5rem] [&>small]:mt-0"
-          classes="w-full min-w-40 text-left text-base"
+          containerClasses="[&>small]:text-red-600 [&>small]:text-[.5rem] [&>small]:mt-0 input-flex"
+          classes="h-fit w-full min-w-20 text-left text-base"
           label="Finish time"
           type="time"
           isError={!!errors["finish-time"]}
           description={errors["finish-time"]?.message}
           {...register("finish-time")}
         />
-        <Stack alignItems="center">
-          <Input classes="size-4" type="checkbox" id="fast-holiday" {...register("fast-holiday")} />
-          <Text as="label" htmlFor="fast-holiday">
-            is it a public holiday?
-          </Text>
-        </Stack>
-        <Stack alignItems="center">
-          <Input classes="size-4" type="checkbox" id="fast-worked" {...register("fast-worked")} />
-          <Text as="label" htmlFor="fast-worked">
-            did you work it?
-          </Text>
+        <Input
+          containerClasses="input-flex"
+          classes="h-fit w-full min-w-20 text-left text-base"
+          label="Hour value"
+          type="number"
+          {...register("hour-value")}
+        />
+        <Input
+          containerClasses="input-flex"
+          classes="w-full min-w-20 text-left text-base"
+          label="Unpaid breaks"
+          type="number"
+          {...register("unpaid-breaks")}
+        />
+        <Input
+          containerClasses="input-flex"
+          classes="w-full min-w-20 text-left text-base"
+          label="Holiday pay rate"
+          measure="%"
+          type="number"
+          {...register("holiday-pay-rate")}
+        />
+        <Stack orientation="horizontal" wrap>
+          <Stack alignItems="center">
+            <Input
+              classes="size-4"
+              type="checkbox"
+              id="fast-holiday"
+              {...register("fast-holiday")}
+            />
+            <Text as="label" htmlFor="fast-holiday">
+              is it a public holiday?
+            </Text>
+          </Stack>
+          <Stack alignItems="center">
+            <Input classes="size-4" type="checkbox" id="fast-worked" {...register("fast-worked")} />
+            <Text as="label" htmlFor="fast-worked">
+              did you work it?
+            </Text>
+          </Stack>
         </Stack>
       </Stack>
       <Stack orientation="vertical">

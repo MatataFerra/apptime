@@ -1,4 +1,3 @@
-import { User } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { getToken, JWT } from "next-auth/jwt";
 
@@ -10,10 +9,6 @@ import { SearchParamsSchema } from "@/types";
 import { QUERY_PARAMS } from "@/utils/constants";
 
 import prisma from "#/prisma/client";
-
-function checkIsAdmin(user: User) {
-  return user.role === "ADMIN";
-}
 
 function parseEmailFromParams(token: JWT | null, email: string | null) {
   if (token?.role !== "ADMIN") return token?.email;

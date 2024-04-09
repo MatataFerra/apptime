@@ -44,7 +44,11 @@ export interface InputMeasureProps extends InputProps {
 export type FastChargeInputs = z.infer<typeof FastChargeFormSchema>;
 export type FastChargeInputsParsed = {
   startDate: string;
+  hourValue: number;
   endDate: string;
   isPublicHoliday: boolean;
   isWorked: boolean;
+  holidayPay: boolean;
+  holidayPayRate: number;
+  unpaidBreaks: number;
 };

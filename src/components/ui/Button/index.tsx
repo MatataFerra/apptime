@@ -28,7 +28,7 @@ function Button<E extends React.ElementType = typeof ButtonDefaultAsType>(
     <Component
       className={cn(
         "w-40 cursor-pointer rounded-lg text-center",
-        BUTTON_VARIANTS[variant],
+        props.disabled ? BUTTON_VARIANTS["disabled"] : BUTTON_VARIANTS[variant],
         classes?.trim()
       )}
       {...rest}

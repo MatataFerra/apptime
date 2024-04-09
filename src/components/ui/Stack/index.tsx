@@ -22,6 +22,7 @@ type StackOwnProps<E extends React.ElementType> = {
   grid?: boolean;
   cols?: number | string;
   rows?: number | string;
+  wrap?: boolean;
 };
 
 type Props<E extends React.ElementType> = StackOwnProps<E> &
@@ -52,6 +53,7 @@ function Stack<E extends React.ElementType = typeof StackDefaultAsType>({
   grid,
   cols,
   rows,
+  wrap,
   ...props
 }: Props<E>): React.ReactElement {
   const Component = as || StackDefaultAsType;
@@ -63,6 +65,7 @@ function Stack<E extends React.ElementType = typeof StackDefaultAsType>({
           grid ? "grid" : STACK_ORIENTATION[orientation],
           !grid && STACK_JUSTIFY[justifyContent],
           !grid && STACK_ALIGN[alignItems],
+          wrap && "flex-wrap",
           classes
         )}
         style={{

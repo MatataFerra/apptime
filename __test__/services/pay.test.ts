@@ -1,6 +1,5 @@
-import { Profile } from "@prisma/client";
 import _ from "lodash";
-import { describe, expect,test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import PayService from "@/services/Pay";
 
@@ -10,8 +9,10 @@ describe("Test Pay Service", () => {
   test("Should calculate publicHolidayPay", function () {
     const user = _.cloneDeep(userMocked);
     const publicHolidayPay = PayService.publicHolidayPay({
-      profile: user.profile as Profile,
-      shift: user.shifts.at(-1)!,
+      shift: {
+        ...user.shifts.at(-1)!,
+        hourValue: 10.5,
+      },
     });
 
     /*
@@ -31,8 +32,10 @@ describe("Test Pay Service", () => {
   test("Should calculate regularDayPay", function () {
     const user = _.cloneDeep(userMocked);
     const regularPay = PayService.regularDayPay({
-      profile: user.profile as Profile,
-      shift: user.shifts[0],
+      shift: {
+        ...user.shifts.at(0)!,
+        hourValue: 10.5,
+      },
     });
 
     /*

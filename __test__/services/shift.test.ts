@@ -65,6 +65,11 @@ describe("ShiftService", () => {
         isClosed: true,
         endDate: now.toString(),
         amount: DIFFERENCE_SHIFT,
+        holidayPay: true,
+        holidayPayRate: 8,
+        hourValue: 10.5,
+        taxCode: 0,
+        unpaidBreaks: 1,
       });
     });
 
@@ -128,7 +133,6 @@ describe("ShiftService", () => {
         .build() as Shift;
 
       const publicHoliday = PayService.publicHolidayPay({
-        profile: profileMock.profile,
         shift,
       });
 
@@ -163,7 +167,6 @@ describe("ShiftService", () => {
         .build() as Shift;
 
       const publicHoliday = PayService.publicHolidayPay({
-        profile: profileMock.profile,
         shift,
       });
 
@@ -184,7 +187,7 @@ describe("ShiftService", () => {
     });
   });
 
-  describe("Should calculate  earnings", () => {
+  describe("Should calculate earnings", () => {
     test("Should calculate the earnings of a shift", () => {
       const mock: Shift = {
         ...shiftMock.shift,
@@ -194,10 +197,7 @@ describe("ShiftService", () => {
 
       const shift = new ShiftService(mock).differenceInMinsBetweenStartAndEnd().build();
 
-      const earnings = ShiftService.calculateEarnings({
-        profile: profileMock.profile,
-        shift,
-      });
+      const earnings = ShiftService.calculateEarnings({ shift });
 
       expect(earnings).toBe(5.25);
     });
@@ -213,7 +213,6 @@ describe("ShiftService", () => {
       const shift = new ShiftService(mock).differenceInMinsBetweenStartAndEnd().build();
 
       const earnings = ShiftService.calculateEarnings({
-        profile: profileMock.profile,
         shift,
       });
 
@@ -223,11 +222,35 @@ describe("ShiftService", () => {
     test("Should calculate the earnings when user pass start and end dates instead shift", () => {
       const start = now.toString();
       const end = addMinutes(now, DIFFERENCE_SHIFT).toString();
+      const {
+        holidayPay,
+        holidayPayRate,
+        hourValue,
+        isClosed,
+        isPublicHoliday,
+        notes,
+        publicHolidayWorked,
+        taxCode,
+        unpaidBreaks,
+        userId,
+      } = shiftMock.shift;
 
       const earnings = ShiftService.calculateEarnings({
-        profile: profileMock.profile,
-        startDate: start,
-        endDate: end,
+        shift: {
+          amount: DIFFERENCE_SHIFT,
+          holidayPay,
+          holidayPayRate,
+          hourValue,
+          isClosed,
+          endDate: end,
+          isPublicHoliday: false,
+          notes,
+          publicHolidayWorked,
+          startDate: start,
+          taxCode,
+          unpaidBreaks,
+          userId,
+        },
       });
 
       expect(earnings).toBe(5.25);
@@ -236,12 +259,35 @@ describe("ShiftService", () => {
     test("Should calculate the earnings when user pass start and end dates instead shift and is public holiday", () => {
       const start = now.toString();
       const end = addMinutes(now, DIFFERENCE_SHIFT).toString();
+      const {
+        holidayPay,
+        holidayPayRate,
+        hourValue,
+        isClosed,
+        isPublicHoliday,
+        notes,
+        publicHolidayWorked,
+        taxCode,
+        unpaidBreaks,
+        userId,
+      } = shiftMock.shift;
 
       const earnings = ShiftService.calculateEarnings({
-        profile: profileMock.profile,
-        startDate: start,
-        endDate: end,
-        isPublicHoliday: true,
+        shift: {
+          amount: DIFFERENCE_SHIFT,
+          holidayPay,
+          holidayPayRate,
+          hourValue,
+          isClosed,
+          endDate: end,
+          isPublicHoliday: true,
+          notes,
+          publicHolidayWorked,
+          startDate: start,
+          taxCode,
+          unpaidBreaks,
+          userId,
+        },
       });
 
       expect(earnings).toBe(7.88);
