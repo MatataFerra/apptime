@@ -32,7 +32,7 @@ function DrawerMenu({ children }: Props) {
           </Button>
         </Stack>
         <Stack orientation="vertical" classes="my-2 w-full">
-          <Line color="bg-black" />
+          <Line color="bg-stone-300" />
         </Stack>
         <DrawerOptions />
       </Drawer>
