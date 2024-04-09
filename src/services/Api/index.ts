@@ -89,6 +89,12 @@ class ApiService extends ApiBaseService {
 
     return response;
   }
+
+  static async delay(ms: number) {
+    // eslint-disable-next-line no-console
+    const response = console.log("delayed", ms);
+    return new Promise((resolve) => setTimeout(() => resolve(response), ms));
+  }
 }
 
 export default ApiService;
