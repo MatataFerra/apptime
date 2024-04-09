@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import isEmpty from "lodash/isEmpty";
 
@@ -67,8 +67,7 @@ function ShiftStartDialog({ triggerStatus }: Props) {
       >
         <Trigger status={triggerStatus} />
         <DialogContent className="min-h-[300px] w-10/12">
-          {hasConfig && step === "HasConfig" && <ShiftStartHasConfigStep />}
-          {step === "ShiftInfo" && <ShiftStartStepTwo />}
+          {hasConfig && step === "HasConfig" ? <ShiftStartHasConfigStep /> : <ShiftStartStepTwo />}
         </DialogContent>
       </Dialog>
     </>

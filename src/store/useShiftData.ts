@@ -14,9 +14,6 @@ export type ShiftStep = (typeof ShiftStep)[keyof typeof ShiftStep];
 
 interface ShiftData {
   data: Omit<Shift, "id">;
-
-  userHasConfig: boolean;
-
   step: ShiftStep;
   errors: boolean;
   setErrors: (errors: boolean) => void;
@@ -42,7 +39,6 @@ export const useShiftData = create(
         taxCode: 0,
         unpaidBreaks: 1,
       },
-      userHasConfig: false,
       errors: false,
       step: ShiftStep.HasConfig,
       setData: (data) => set((state) => ({ ...state, data: { ...state.data, ...data } })),
