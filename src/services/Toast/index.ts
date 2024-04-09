@@ -9,7 +9,7 @@ const TOAST_STYLE = {
   success: "bg-green-500 text-white",
   error: "bg-red-500 text-white",
   warning: "bg-yellow-500 text-gray-900",
-  info: "bg-blue-500 text-gray-700",
+  info: "bg-sky-500 text-white",
   plain: "bg-white text-gray-700",
 } as const;
 
