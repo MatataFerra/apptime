@@ -45,6 +45,13 @@ function ShiftFinishButton({ buttonStatus }: Props) {
   });
 
   function onFinishShift() {
+    Toast({
+      message: "Closing shift",
+      type: "plain",
+      description: "Updating status, please wait...",
+      action: <Loader.spinner bg="text-black" spinColor="fill-slate-100" />,
+      duration: 2000,
+    });
     const updateShift = getShift(shift?.id);
     mutate.mutate({
       body: {
