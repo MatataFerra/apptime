@@ -2,11 +2,17 @@ import { Shift } from "@prisma/client";
 import { differenceInMinutes } from "date-fns";
 import { cloneDeep } from "lodash";
 
-import { UserType } from "@/types";
-
 import prisma from "../../../prisma/client";
 
 type ShiftWithoutId = Omit<Shift, "id">;
+
+type ShiftConfig = {
+  hourValue: ShiftWithoutId["hourValue"];
+  holidayPay: ShiftWithoutId["holidayPay"];
+  holidayPayRate: ShiftWithoutId["holidayPayRate"];
+  taxCode: ShiftWithoutId["taxCode"];
+  unpaidBreaks: ShiftWithoutId["unpaidBreaks"];
+};
 
 interface ShiftServiceInterface {
   shift: ShiftWithoutId;
@@ -179,6 +185,22 @@ class ShiftService implements ShiftServiceInterface {
       },
       {} as Record<string, Shift[]>
     );
+  }
+
+  static getLastConfigShift(shifts: Shift[] | undefined): ShiftConfig | null {
+    const lastShift = shifts?.at(-1);
+
+    if (!lastShift) return null;
+
+    const config = {
+      hourValue: lastShift?.hourValue,
+      holidayPay: lastShift?.holidayPay,
+      holidayPayRate: lastShift?.holidayPayRate,
+      taxCode: lastShift?.taxCode,
+      unpaidBreaks: lastShift?.unpaidBreaks,
+    };
+
+    return config;
   }
 
   static convertHourlyRateInMinuteRate(hourlyRate: Shift["hourValue"]) {
