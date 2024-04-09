@@ -158,9 +158,16 @@ function FastChargeForm() {
 
   return (
     <>
-      <Stack as="form" grid cols={3} id="fast-charge" onSubmit={handleSubmit(onSubmit)}>
+      <Stack
+        as="form"
+        orientation="horizontal"
+        id="fast-charge"
+        classes="flex-wrap"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         <Input
-          classes="w-full min-w-20 text-base"
+          containerClasses="input-flex"
+          classes="h-fit w-full min-w-20 text-base"
           label="Start date"
           type="date"
           // create a function to get the current year, give more flexibility
@@ -168,8 +175,8 @@ function FastChargeForm() {
           {...register("start-date")}
         />
         <Input
-          containerClasses="[&>small]:text-red-600 [&>small]:text-[.5rem] [&>small]:mt-0"
-          classes="w-full min-w-20 text-left text-base"
+          containerClasses="[&>small]:text-red-600 [&>small]:text-[.5rem] [&>small]:mt-0 input-flex"
+          classes="h-fit w-full text-left text-base"
           label="Finish date"
           type="date"
           isError={!!errors["finish-date"]}
@@ -178,14 +185,15 @@ function FastChargeForm() {
           {...register("finish-date")}
         />
         <Input
-          classes="w-full min-w-20 text-left text-base"
+          containerClasses="input-flex"
+          classes="h-fit w-full text-left text-base"
           label="Start time"
           type="time"
           {...register("start-time")}
         />
         <Input
-          containerClasses="[&>small]:text-red-600 [&>small]:text-[.5rem] [&>small]:mt-0"
-          classes="w-full min-w-20 text-left text-base"
+          containerClasses="[&>small]:text-red-600 [&>small]:text-[.5rem] [&>small]:mt-0 input-flex"
+          classes="h-fit w-full min-w-20 text-left text-base"
           label="Finish time"
           type="time"
           isError={!!errors["finish-time"]}
@@ -193,37 +201,45 @@ function FastChargeForm() {
           {...register("finish-time")}
         />
         <Input
-          classes="w-full min-w-20 text-left text-base"
+          containerClasses="input-flex"
+          classes="h-fit w-full min-w-20 text-left text-base"
           label="Hour value"
           type="number"
           {...register("hour-value")}
         />
         <Input
-          containerClasses="[&>small]:mt-0"
+          containerClasses="input-flex"
           classes="w-full min-w-20 text-left text-base"
-          label="Breaks"
-          description="Number of unpaid breaks"
+          label="Unpaid breaks"
           type="number"
           {...register("unpaid-breaks")}
         />
         <Input
+          containerClasses="input-flex"
           classes="w-full min-w-20 text-left text-base"
           label="Holiday pay rate"
           measure="%"
           type="number"
           {...register("holiday-pay-rate")}
         />
-        <Stack alignItems="center">
-          <Input classes="size-4" type="checkbox" id="fast-holiday" {...register("fast-holiday")} />
-          <Text as="label" htmlFor="fast-holiday">
-            is it a public holiday?
-          </Text>
-        </Stack>
-        <Stack alignItems="center">
-          <Input classes="size-4" type="checkbox" id="fast-worked" {...register("fast-worked")} />
-          <Text as="label" htmlFor="fast-worked">
-            did you work it?
-          </Text>
+        <Stack orientation="horizontal" classes="flex-wrap">
+          <Stack alignItems="center">
+            <Input
+              classes="size-4"
+              type="checkbox"
+              id="fast-holiday"
+              {...register("fast-holiday")}
+            />
+            <Text as="label" htmlFor="fast-holiday">
+              is it a public holiday?
+            </Text>
+          </Stack>
+          <Stack alignItems="center">
+            <Input classes="size-4" type="checkbox" id="fast-worked" {...register("fast-worked")} />
+            <Text as="label" htmlFor="fast-worked">
+              did you work it?
+            </Text>
+          </Stack>
         </Stack>
       </Stack>
       <Stack orientation="vertical">
