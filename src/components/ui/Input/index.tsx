@@ -29,7 +29,7 @@ function Input(props: InputProps, ref: Ref<HTMLInputElement>): ReactElement<Inpu
         >
           <label
             htmlFor={rest.type === "radio" ? `${rest.name}-${label}` : rest.name}
-            className={cn("text-sm", labelClasses ? labelClasses : "")}
+            className={cn("text-xs", labelClasses ? labelClasses : "")}
           >
             <span className="flex gap-1">
               {label} {isRequired && <span className="font-bold text-red-500">*</span>}
