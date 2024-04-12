@@ -17,7 +17,7 @@ import { ApiResponse } from "@/types/api_response";
 
 import List from "@/components/ListRegister";
 import Form from "@/components/ui/Form";
-import Input from "@/components/ui/Input";
+import Input from "@/components/ui/Input_v2";
 import Loader from "@/components/ui/Loader";
 import Stack from "@/components/ui/Stack";
 
@@ -163,23 +163,9 @@ function RegisterForm() {
         autoComplete="off"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <Stack as="fieldset" spacing={4} orientation="vertical">
-          <Input
-            classes="h-[69px] w-full rounded-md border border-gray-900 bg-white text-2xl shadow-input"
-            variant="default"
-            type="email"
-            label="email"
-            labelClasses="m-0 text-sm"
-            {...register("email")}
-          />
-          <Input
-            classes="h-[69px] w-full rounded-md border border-gray-900 bg-white text-2xl shadow-input"
-            variant="default"
-            type="password"
-            label="password"
-            labelClasses="m-0 text-sm"
-            {...register("password")}
-          />
+        <Stack spacing={4} orientation="vertical">
+          <Input basis="basis-0" type="email" label="email" {...register("email")} />
+          <Input basis="basis-0" type="password" label="password" {...register("password")} />
         </Stack>
         <List errors={passedErrors} password={passwordWatched} />
       </Form>

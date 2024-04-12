@@ -41,6 +41,15 @@ function ShiftFinishButton({ buttonStatus }: Props) {
         duration: 1000,
       });
     },
+    onError: () => {
+      Toast({
+        message: "Error",
+        type: "error",
+        description: "An error occurred while updating your shift",
+        action: <Loader.spinner bg="text-black" spinColor="fill-gray-50" />,
+        duration: 1000,
+      });
+    },
     gcTime: 1000,
   });
 

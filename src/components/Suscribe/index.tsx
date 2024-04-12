@@ -11,7 +11,7 @@ import api from "@/services/Api";
 import { Inputs, SuscribeSchema } from "@/types";
 
 import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
+import Input from "@/components/ui/Input_v2";
 import Loader from "@/components/ui/Loader";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
@@ -62,7 +62,6 @@ function Suscribe() {
         onKeyDown={onKeyPress}
       >
         <Input
-          variant="default"
           placeholder="username@email.com"
           classes="h-full w-full text-sm shadow-sm"
           type="text"

@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import ShiftStartPublicHolidayDropdown from "@/components/ShiftStartPublicHolidayDropdown";
 import ShiftStartTaxCodeDropdown from "@/components/ShiftStartTaxCodeDropdown";
-import Input from "@/components/ui/Input";
+import Input from "@/components/ui/Input_v2";
 import Stack from "@/components/ui/Stack";
 
 import { useShiftData } from "@/store/useShiftData";
@@ -43,49 +43,49 @@ function ShiftStartInputs() {
   }, [holidayPayRate, hourValue, setErrors, unpaidBreaks]);
 
   return (
-    <Stack orientation="horizontal" alignItems="center" wrap>
-      <Input
-        containerClasses="input-flex"
-        description="Hour value"
-        measure="$"
-        type="number"
-        min={0}
-        {...register("hourValue", {
-          onChange: (e) => {
-            setData({ hourValue: Number(e.target.value) });
-          },
-        })}
-      />
-      <Input
-        containerClasses="input-flex"
-        description="Holiday Pay"
-        measure="%"
-        type="number"
-        min={0}
-        defaultValue={8}
-        {...register("holidayPayRate", {
-          onChange: (e) => {
-            setData({ holidayPayRate: Number(e.target.value), holidayPay: true });
-          },
-        })}
-      />
-      <Input
-        containerClasses="input-flex"
-        description="Unpaid Breaks"
-        type="number"
-        min={0}
-        max={5}
-        defaultValue={1}
-        {...register("unpaidBreaks", {
-          onChange: (e) => {
-            setData({ unpaidBreaks: Number(e.target.value) });
-          },
-        })}
-      />
-
-      <ShiftStartTaxCodeDropdown />
-      <ShiftStartPublicHolidayDropdown />
-    </Stack>
+    <>
+      <Stack orientation="horizontal" alignItems="center" wrap>
+        <Input
+          description="Hour value"
+          measure="$"
+          type="number"
+          min={0}
+          {...register("hourValue", {
+            onChange: (e) => {
+              setData({ hourValue: Number(e.target.value) });
+            },
+          })}
+        />
+        <Input
+          description="Holiday Pay"
+          measure="%"
+          type="number"
+          min={0}
+          defaultValue={8}
+          {...register("holidayPayRate", {
+            onChange: (e) => {
+              setData({ holidayPayRate: Number(e.target.value), holidayPay: true });
+            },
+          })}
+        />
+        <Input
+          description="Unpaid Breaks"
+          type="number"
+          min={0}
+          max={5}
+          defaultValue={1}
+          {...register("unpaidBreaks", {
+            onChange: (e) => {
+              setData({ unpaidBreaks: Number(e.target.value) });
+            },
+          })}
+        />
+      </Stack>
+      <Stack orientation="vertical" classes="h-20">
+        <ShiftStartTaxCodeDropdown />
+        <ShiftStartPublicHolidayDropdown />
+      </Stack>
+    </>
   );
 }
 
