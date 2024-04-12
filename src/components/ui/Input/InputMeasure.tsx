@@ -23,7 +23,7 @@ function InputMeasure(props: InputProps, ref: Ref<HTMLInputElement>) {
                 : "focus-within:ring-blue-600"
             } ${
               classes ? classes : ""
-            } h-auto w-full items-center rounded-md border border-gray-200 bg-white px-2 py-1 shadow-input focus-within:border-transparent focus-within:outline-none focus-within:ring-2`}
+            } h-auto w-full items-center rounded-md border border-gray-200 bg-white px-2 py-2 shadow-input focus-within:border-transparent focus-within:outline-none focus-within:ring-2`}
           >
             <input
               id={rest.name}

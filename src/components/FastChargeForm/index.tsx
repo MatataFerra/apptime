@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { format, isBefore, isEqual } from "date-fns";
-import { isNaN } from "lodash";
+import isNaN from "lodash/isNaN";
 import { useLocale } from "next-intl";
 
 import DateHumanizer from "@/services/Date";
@@ -18,7 +18,7 @@ import { type FastChargeInputs, type FastChargeInputsParsed } from "@/types/form
 
 import PopoverBase from "@/components/Popover";
 import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
+import Input from "@/components/ui/Input_v2";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
@@ -47,6 +47,7 @@ function FastChargeForm() {
   const startTimeWatch = watch("start-time");
   const finishTimeWatch = watch("finish-time");
   const fastWorkedWatch = watch("fast-worked");
+  const hourValue = watch("hour-value");
 
   const thisYear = new Date(Date.now()).getFullYear().toString();
 
@@ -102,11 +103,11 @@ function FastChargeForm() {
       startDate: formatStart,
       endDate: formatEnd,
       isPublicHoliday: fastWorkedWatch,
-      hourValue: 27,
+      hourValue: Number(hourValue),
     });
 
     return isNaN(earnings) ? 0 : earnings;
-  }, [fastWorkedWatch, formatEnd, formatStart]);
+  }, [fastWorkedWatch, formatEnd, formatStart, hourValue]);
 
   function onSubmit(formData: FastChargeInputs) {
     const parseData: FastChargeInputsParsed = {
@@ -114,11 +115,10 @@ function FastChargeForm() {
       endDate: formatEnd,
       isPublicHoliday: formData["fast-holiday"],
       isWorked: formData["fast-worked"],
-      /*cambiar valores después*/
       holidayPay: !!Number(formData["holiday-pay-rate"]),
-      holidayPayRate: formData["holiday-pay-rate"],
-      hourValue: formData["hour-value"],
-      unpaidBreaks: formData["unpaid-breaks"],
+      holidayPayRate: Number(formData["holiday-pay-rate"]),
+      hourValue: Number(formData["hour-value"]),
+      unpaidBreaks: Number(formData["unpaid-breaks"]),
     };
 
     if (isBefore(new Date(finishDateWatch), new Date(startDateWatch))) {
@@ -162,21 +162,18 @@ function FastChargeForm() {
         as="form"
         orientation="horizontal"
         id="fast-charge"
-        classes="flex-wrap"
+        wrap
         onSubmit={handleSubmit(onSubmit)}
       >
         <Input
-          containerClasses="input-flex"
-          classes="h-fit w-full min-w-20 text-base"
+          classes="h-full"
           label="Start date"
           type="date"
-          // create a function to get the current year, give more flexibility
           max={format(new Date(`${thisYear}-12-31`), "yyyy-MM-dd")}
           {...register("start-date")}
         />
         <Input
-          containerClasses="[&>small]:text-red-600 [&>small]:text-[.5rem] [&>small]:mt-0 input-flex"
-          classes="h-fit w-full text-left text-base"
+          classes="h-full"
           label="Finish date"
           type="date"
           isError={!!errors["finish-date"]}
@@ -184,16 +181,8 @@ function FastChargeForm() {
           max={format(new Date(`${thisYear}-12-31`), "yyyy-MM-dd")}
           {...register("finish-date")}
         />
+        <Input label="Start time" type="time" {...register("start-time")} />
         <Input
-          containerClasses="input-flex"
-          classes="h-fit w-full text-left text-base"
-          label="Start time"
-          type="time"
-          {...register("start-time")}
-        />
-        <Input
-          containerClasses="[&>small]:text-red-600 [&>small]:text-[.5rem] [&>small]:mt-0 input-flex"
-          classes="h-fit w-full min-w-20 text-left text-base"
           label="Finish time"
           type="time"
           isError={!!errors["finish-time"]}
@@ -201,22 +190,16 @@ function FastChargeForm() {
           {...register("finish-time")}
         />
         <Input
-          containerClasses="input-flex"
-          classes="h-fit w-full min-w-20 text-left text-base"
           label="Hour value"
           type="number"
+          isError={!!errors["hour-value"]}
+          description={errors["hour-value"]?.message}
+          measure="$"
+          measurePlace="left"
           {...register("hour-value")}
         />
+        <Input label="Unpaid breaks" type="number" {...register("unpaid-breaks")} />
         <Input
-          containerClasses="input-flex"
-          classes="w-full min-w-20 text-left text-base"
-          label="Unpaid breaks"
-          type="number"
-          {...register("unpaid-breaks")}
-        />
-        <Input
-          containerClasses="input-flex"
-          classes="w-full min-w-20 text-left text-base"
           label="Holiday pay rate"
           measure="%"
           type="number"
@@ -224,8 +207,8 @@ function FastChargeForm() {
         />
         <Stack orientation="horizontal" wrap>
           <Stack alignItems="center">
-            <Input
-              classes="size-4"
+            <input
+              className="size-4"
               type="checkbox"
               id="fast-holiday"
               {...register("fast-holiday")}
@@ -235,7 +218,12 @@ function FastChargeForm() {
             </Text>
           </Stack>
           <Stack alignItems="center">
-            <Input classes="size-4" type="checkbox" id="fast-worked" {...register("fast-worked")} />
+            <input
+              className="size-4"
+              type="checkbox"
+              id="fast-worked"
+              {...register("fast-worked")}
+            />
             <Text as="label" htmlFor="fast-worked">
               did you work it?
             </Text>

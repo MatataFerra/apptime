@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 
 import ShiftService from "@/services/Shift";
 
-import Input from "@/components/ui/Input";
+import Input from "@/components/ui/Input_v2";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 

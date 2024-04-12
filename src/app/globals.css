@@ -168,3 +168,4 @@ div[data-radio-state="false"] .animate_fade_out {
 .input-flex{
   @apply flex-grow-[2] flex-shrink-[1] basis-[120px]
 }
+
