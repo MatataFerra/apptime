@@ -2,8 +2,11 @@ import { Shift } from "@prisma/client";
 
 import { UserType } from "@/types";
 
+import Button from "@/components/ui/Button";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
+
+import { DialogFooter } from "../ui/Dialog";
 
 type Props = {
   shift: Shift;
