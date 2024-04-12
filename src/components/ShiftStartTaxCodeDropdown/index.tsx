@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import { TaxCodes } from "@/types";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,7 +35,7 @@ function ShiftStartTaxCodeDropdown() {
 
   function onChangeTaxCode(value: string) {
     setTaxCode(value);
-    setData({ taxCode: Number(value) as 0 | 1 | 2 });
+    setData({ taxCode: value ? (Number(value) as TaxCodes) : 2 });
   }
 
   return (
