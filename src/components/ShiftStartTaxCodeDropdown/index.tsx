@@ -39,7 +39,7 @@ function ShiftStartTaxCodeDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="h-9 w-full flex-shrink-[1] flex-grow-[2] basis-[120px] self-baseline px-2 py-1 text-xs shadow-input">
-        Select Tax Code ({taxCodeSelected})
+        Tax Code ({taxCodeSelected})
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-48">
         <DropdownMenuRadioGroup value={taxCode} onValueChange={onChangeTaxCode}>

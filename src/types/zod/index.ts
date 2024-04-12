@@ -135,15 +135,21 @@ const PasswordSchema = z.object({
 */
 
 export const FastChargeFormSchema = z.object({
-  "start-date": z.string().length(10),
-  "finish-date": z.string().length(10),
-  "start-time": z.string().length(5),
-  "finish-time": z.string().length(5),
+  "start-date": z.string(),
+  "finish-date": z.string(),
+  "start-time": z.string(),
+  "finish-time": z.string(),
   "fast-holiday": z.boolean(),
   "fast-worked": z.boolean(),
-  "hour-value": z.number().int().positive(),
-  "unpaid-breaks": z.number().int().positive().max(10),
-  "holiday-pay-rate": z.number().int().positive(),
+  "hour-value": z.string().refine((value) => !!value, {
+    message: "Hour value must be greater than 0",
+  }),
+  "unpaid-breaks": z.string().refine((value) => !!value, {
+    message: "Unpaid breaks must be greater than 0",
+  }),
+  "holiday-pay-rate": z.string().refine((value) => !!value, {
+    message: "Holiday pay rate must be greater than 0",
+  }),
 });
 
 /**

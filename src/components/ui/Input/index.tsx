@@ -47,6 +47,7 @@ function Input(props: InputProps, ref: Ref<HTMLInputElement>): ReactElement<Inpu
 }
 
 /**
+ * @deprecated Use Input_v2 instead
  * Input component
  * @prop {String} classes - Tailwind classes
  * @prop {String} containerClasses - Tailwind classes

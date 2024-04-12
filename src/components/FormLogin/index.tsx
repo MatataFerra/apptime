@@ -10,7 +10,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { LoginInputs } from "@/types";
 
 import Form from "@/components/ui/Form";
-import Input from "@/components/ui/Input";
+import Input from "@/components/ui/Input_v2";
 import Loader from "@/components/ui/Loader";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
@@ -87,27 +87,22 @@ export default function FormLogin() {
         <section className="grid grid-rows-[1fr,2rem,auto] gap-3 self-center">
           <fieldset className="flex flex-col gap-4">
             <Input
-              classes="border border-gray-900"
               variant="default"
               type="email"
               label="email"
-              labelClasses="m-0 text-sm"
+              basis="basis-0"
               isError={!!errors.password?.message?.trim()}
               {...register("email")}
             />
             <Input
-              classes="border border-gray-900"
-              variant="default"
               type="password"
               label="password"
-              labelClasses="m-0 text-sm"
+              basis="basis-0"
               isError={!!errors.password?.message?.trim()}
+              description={errors.password?.message}
               {...register("password")}
             />
           </fieldset>
-          {errors.password?.message && (
-            <span className="text-sm font-bold text-red-500">{errors.password?.message}</span>
-          )}
           <p className="row-start-3 text-xl">
             {t("account.has_account")}{" "}
             <Link
