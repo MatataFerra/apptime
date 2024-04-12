@@ -41,7 +41,7 @@
     "hourValue": 10.5,
     "holidayPay": true,
     "holidayPayRate": 8,
-    "unpaidBreaks": 1,
+    "unpaidBreaks": 0,
     "taxCode": 0,
     "userId": "2"
   }

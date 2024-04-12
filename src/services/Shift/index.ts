@@ -1,5 +1,5 @@
 import { Shift } from "@prisma/client";
-import { differenceInMinutes } from "date-fns";
+import { differenceInMinutes, intervalToDuration, minutesToSeconds } from "date-fns";
 import { cloneDeep } from "lodash";
 
 import prisma from "../../../prisma/client";
@@ -88,16 +88,21 @@ class ShiftService implements ShiftServiceInterface {
     endDate,
     isPublicHoliday,
     hourValue,
+    unpaidBreaks,
   }: {
     shift?: Omit<Shift, "id">;
     hourValue?: number;
     startDate?: string;
     endDate?: string;
     isPublicHoliday?: boolean;
+    unpaidBreaks?: number;
   }) {
     let amount = 0;
     let holidayRate = 1;
     const hourJobValue = shift?.hourValue ?? hourValue;
+    const unpaidBreaksValue = shift?.unpaidBreaks ?? unpaidBreaks;
+    const minutesUnpaids = (unpaidBreaksValue ?? 0) * 30;
+
     let minuteRate = hourJobValue ? hourJobValue / 60 : 0;
 
     if (startDate && endDate) {
@@ -117,7 +122,9 @@ class ShiftService implements ShiftServiceInterface {
       holidayRate = 1.5;
     }
 
-    const earnings = amount * minuteRate * holidayRate;
+    const totalTime = amount - minutesUnpaids;
+
+    const earnings = totalTime * minuteRate * holidayRate;
 
     return Math.round(earnings * 100) / 100;
   }

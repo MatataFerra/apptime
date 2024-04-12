@@ -8,10 +8,9 @@ import ShiftService from "@/services/Shift";
 
 import { now } from "@/utils/constants";
 
-import profileMock from "../../mocks/profile.prisma.json";
 import shiftMock from "../../mocks/shift.prisma.json";
 
-const DIFFERENCE_SHIFT = 30;
+const DIFFERENCE_SHIFT = 300;
 // let start = "";
 // let end = "";
 
@@ -69,7 +68,7 @@ describe("ShiftService", () => {
         holidayPayRate: 8,
         hourValue: 10.5,
         taxCode: 0,
-        unpaidBreaks: 1,
+        unpaidBreaks: 0,
       });
     });
 
@@ -106,7 +105,7 @@ describe("ShiftService", () => {
 
       const shift = new ShiftService(mock).differenceInMinsBetweenStartAndEnd().build();
 
-      expect(shift.amount).toBe(30);
+      expect(shift.amount).toBe(300);
     });
 
     test("should calculate the holiday pay when was not worked", () => {
@@ -136,7 +135,7 @@ describe("ShiftService", () => {
         shift,
       });
 
-      expect(publicHoliday).toBe(5.25);
+      expect(publicHoliday).toBe(52.5);
     });
 
     test("should calculate the holiday pay when was worked", async () => {
@@ -170,7 +169,7 @@ describe("ShiftService", () => {
         shift,
       });
 
-      expect(publicHoliday).toBe(7.875);
+      expect(publicHoliday).toBe(78.75);
     });
 
     test("Should change the status of the shift to closed", () => {
@@ -199,7 +198,22 @@ describe("ShiftService", () => {
 
       const earnings = ShiftService.calculateEarnings({ shift });
 
-      expect(earnings).toBe(5.25);
+      expect(earnings).toBe(52.5);
+    });
+
+    test("Should calculate the earnings of a shift with 2 unpaid breaks", () => {
+      const mock: Shift = {
+        ...shiftMock.shift,
+        startDate: now.toString(),
+        endDate: addMinutes(now, DIFFERENCE_SHIFT).toString(),
+        unpaidBreaks: 2,
+      };
+
+      const shift = new ShiftService(mock).differenceInMinsBetweenStartAndEnd().build();
+
+      const earnings = ShiftService.calculateEarnings({ shift });
+
+      expect(earnings).toBe(42);
     });
 
     test("Should calculate the earnings of a shift when is public holiday", () => {
@@ -216,7 +230,7 @@ describe("ShiftService", () => {
         shift,
       });
 
-      expect(earnings).toBe(7.88);
+      expect(earnings).toBe(78.75);
     });
 
     test("Should calculate the earnings when user pass start and end dates instead shift", () => {
@@ -253,7 +267,7 @@ describe("ShiftService", () => {
         },
       });
 
-      expect(earnings).toBe(5.25);
+      expect(earnings).toBe(52.5);
     });
 
     test("Should calculate the earnings when user pass start and end dates instead shift and is public holiday", () => {
@@ -290,7 +304,7 @@ describe("ShiftService", () => {
         },
       });
 
-      expect(earnings).toBe(7.88);
+      expect(earnings).toBe(78.75);
     });
   });
 });
