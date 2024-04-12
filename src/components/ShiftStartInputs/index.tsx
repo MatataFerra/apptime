@@ -14,19 +14,28 @@ import Stack from "@/components/ui/Stack";
 import { useShiftData } from "@/store/useShiftData";
 
 const InputsSchema = z.object({
-  hourValue: z.number().min(1),
-  holidayPayRate: z.number().min(0).max(100),
-  unpaidBreaks: z.number().min(0).max(5),
+  hourValue: z
+    .string()
+    .min(1)
+    .refine((value) => !!value, {
+      message: "Hour value is required",
+    }),
+  holidayPayRate: z.string().refine((value) => !!value, {
+    message: "Holiday pay rate is required",
+  }),
+  unpaidBreaks: z.string().refine((value) => !!value, {
+    message: "Unpaid breaks is required",
+  }),
 });
 
 function ShiftStartInputs() {
-  const { setData, setErrors, data } = useShiftData((state) => state);
+  const { setData, setErrors } = useShiftData((state) => state);
   const { register, watch } = useForm({
     resolver: zodResolver(InputsSchema),
     defaultValues: {
-      hourValue: data.hourValue,
-      holidayPayRate: data.holidayPayRate,
-      unpaidBreaks: data.unpaidBreaks,
+      hourValue: "",
+      holidayPayRate: "8",
+      unpaidBreaks: "1",
     },
   });
 
@@ -42,6 +51,19 @@ function ShiftStartInputs() {
     if (hourValue && holidayPayRate && unpaidBreaks) setErrors(false);
   }, [holidayPayRate, hourValue, setErrors, unpaidBreaks]);
 
+  useEffect(() => {
+    if (hourValue) setData({ hourValue: Number(hourValue) });
+  }, [hourValue, setData]);
+
+  useEffect(() => {
+    if (holidayPayRate)
+      setData({ holidayPayRate: holidayPayRate ? Number(holidayPayRate) : 8, holidayPay: true });
+  }, [holidayPayRate, setData]);
+
+  useEffect(() => {
+    if (unpaidBreaks) setData({ unpaidBreaks: unpaidBreaks ? Number(unpaidBreaks) : 1 });
+  }, [unpaidBreaks, setData]);
+
   return (
     <>
       <Stack orientation="horizontal" alignItems="center" wrap>
@@ -49,36 +71,25 @@ function ShiftStartInputs() {
           description="Hour value"
           measure="$"
           type="number"
+          required
           min={0}
-          {...register("hourValue", {
-            onChange: (e) => {
-              setData({ hourValue: Number(e.target.value) });
-            },
-          })}
+          {...register("hourValue", {})}
         />
         <Input
           description="Holiday Pay"
           measure="%"
           type="number"
           min={0}
-          defaultValue={8}
-          {...register("holidayPayRate", {
-            onChange: (e) => {
-              setData({ holidayPayRate: Number(e.target.value), holidayPay: true });
-            },
-          })}
+          required
+          {...register("holidayPayRate", {})}
         />
         <Input
           description="Unpaid Breaks"
           type="number"
           min={0}
           max={5}
-          defaultValue={1}
-          {...register("unpaidBreaks", {
-            onChange: (e) => {
-              setData({ unpaidBreaks: Number(e.target.value) });
-            },
-          })}
+          required
+          {...register("unpaidBreaks", {})}
         />
       </Stack>
       <Stack orientation="vertical" classes="h-20">

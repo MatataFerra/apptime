@@ -55,6 +55,15 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
         });
       }
     },
+
+    onError: () => {
+      Toast({
+        message: "Error creating shift, please try again",
+        type: "error",
+      });
+
+      updateShiftStatus(false);
+    },
   });
 
   function onStartShift() {
@@ -68,11 +77,11 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
         isPublicHoliday: data.isPublicHoliday,
         notes: "",
         publicHolidayWorked: data.publicHolidayWorked,
-        hourValue: data.hourValue,
-        holidayPay: data.holidayPay,
-        holidayPayRate: data.holidayPayRate,
-        taxCode: data.taxCode as TaxCodes,
-        unpaidBreaks: data.unpaidBreaks,
+        hourValue: Number(data.hourValue),
+        holidayPay: data.holidayPay ?? false,
+        holidayPayRate: Number(data.holidayPayRate),
+        taxCode: data.taxCode ? (data.taxCode as TaxCodes) : 2,
+        unpaidBreaks: Number(data.unpaidBreaks),
       },
     });
 
