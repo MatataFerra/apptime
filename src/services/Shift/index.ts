@@ -1,6 +1,6 @@
 import { Shift } from "@prisma/client";
-import { differenceInMinutes, intervalToDuration, minutesToSeconds } from "date-fns";
-import { cloneDeep } from "lodash";
+import { differenceInMinutes } from "date-fns";
+import cloneDeep from "lodash/cloneDeep";
 
 import prisma from "../../../prisma/client";
 
@@ -89,6 +89,8 @@ class ShiftService implements ShiftServiceInterface {
     isPublicHoliday,
     hourValue,
     unpaidBreaks,
+    holidayPayRate,
+    hoursWorked,
   }: {
     shift?: Omit<Shift, "id">;
     hourValue?: number;
@@ -96,9 +98,14 @@ class ShiftService implements ShiftServiceInterface {
     endDate?: string;
     isPublicHoliday?: boolean;
     unpaidBreaks?: number;
+    holidayPayRate?: number;
+    hoursWorked?: number;
   }) {
+    const MIN_MINUTES_WORKED = 8 * 60;
     let amount = 0;
+    let totalTime = 0;
     let holidayRate = 1;
+    const holidayPayRateValue = (shift?.holidayPayRate ?? holidayPayRate ?? 1) / 100 + 1;
     const hourJobValue = shift?.hourValue ?? hourValue;
     const unpaidBreaksValue = shift?.unpaidBreaks ?? unpaidBreaks;
     const minutesUnpaids = (unpaidBreaksValue ?? 0) * 30;
@@ -110,6 +117,8 @@ class ShiftService implements ShiftServiceInterface {
       const end = new Date(endDate ?? "");
 
       amount = differenceInMinutes(end, start);
+    } else if (hoursWorked) {
+      amount = hoursWorked * 60;
     } else {
       const start = new Date(shift?.startDate ?? "");
       const end = new Date(shift?.endDate ?? "");
@@ -122,9 +131,13 @@ class ShiftService implements ShiftServiceInterface {
       holidayRate = 1.5;
     }
 
-    const totalTime = amount - minutesUnpaids;
+    if (amount < MIN_MINUTES_WORKED) {
+      totalTime = amount;
+    } else {
+      totalTime = amount - minutesUnpaids;
+    }
 
-    const earnings = totalTime * minuteRate * holidayRate;
+    const earnings = totalTime * minuteRate * holidayRate * holidayPayRateValue;
 
     return Math.round(earnings * 100) / 100;
   }

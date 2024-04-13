@@ -2,11 +2,8 @@ import { Shift } from "@prisma/client";
 
 import { UserType } from "@/types";
 
-import Button from "@/components/ui/Button";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
-
-import { DialogFooter } from "../ui/Dialog";
 
 type Props = {
   shift: Shift;
@@ -16,7 +13,7 @@ type Props = {
   calculateEarnings: (shift: Shift) => number;
 };
 
-function TableDialogContent({ shift, user, shortDate, getHours, calculateEarnings }: Props) {
+function TableDialogContent({ shift, shortDate, getHours, calculateEarnings }: Props) {
   return (
     <Stack grid cols={2}>
       <Text>
@@ -52,9 +49,16 @@ function TableDialogContent({ shift, user, shortDate, getHours, calculateEarning
 
       <Text>
         <Text as="span" classes="font-bold">
-          Hourly Rate:
+          Hour Value:
         </Text>{" "}
         {shift?.hourValue ? `$${shift?.hourValue}` : "..."}
+      </Text>
+
+      <Text>
+        <Text as="span" classes="font-bold">
+          Holiday Pay Rate:
+        </Text>{" "}
+        {shift?.holidayPayRate ? `${shift?.holidayPayRate}%` : "..."}
       </Text>
 
       <Text>
