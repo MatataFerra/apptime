@@ -42,12 +42,15 @@ function CarouselChart() {
       >
         <CarouselContent>
           <ChartEmpty data={user?.shifts as unknown as Shift[]}>
-            <CarouselItem>
-              <Text gradient="title" classes="mb-2 text-lg">
-                Earnings per month (year: {new Date().getFullYear().toString()})
-              </Text>
-              <EarnsPerMonth />
-            </CarouselItem>
+            {/* 
+              Data is not available for this chart
+              <CarouselItem>
+                <Text gradient="title" classes="mb-2 text-lg">
+                  Earnings per month (year: {new Date().getFullYear().toString()})
+                </Text>
+                <EarnsPerMonth />
+              </CarouselItem> 
+            */}
             <CarouselItem>
               <Text gradient="secondary" classes="mb-2 text-lg">
                 Earnings per day

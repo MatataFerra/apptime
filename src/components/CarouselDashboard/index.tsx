@@ -80,7 +80,6 @@ async function CarouselDashboard({ params }: Props) {
     lastDayRegistered: lastDay,
     averageHoursWorkedPerDay: averageHours,
     estimatedWeeklyEarnings: estimatedWeekly,
-    hourValue: hourVal,
     hoursWorked: hoursWork,
   };
 
