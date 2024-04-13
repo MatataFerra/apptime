@@ -15,11 +15,9 @@ import TableElement from "@/components/ui/TableElement";
 
 import TableDialog from "../TableDialog";
 import TableDialogContent from "../TableDialogContent";
-import { useDashboardContext } from "@/store/useDashboardStore";
 
 function TableHistoryRow({ shift }: { shift: Shift }) {
   const locale = useLocale() as Locale;
-  const { user } = useDashboardContext((state) => state);
 
   const calculateEarnings = useCallback((shift: Shift) => {
     return ShiftService.calculateEarnings({ shift });
@@ -41,15 +39,7 @@ function TableHistoryRow({ shift }: { shift: Shift }) {
     <TableDialog
       title="Info about this shift"
       shift={shift}
-      content={
-        <TableDialogContent
-          shift={shift}
-          user={user}
-          shortDate={shortDate}
-          getHours={getHours}
-          calculateEarnings={calculateEarnings}
-        />
-      }
+      content={<TableDialogContent shift={shift} />}
     >
       <TableElement as="tr" type="tr">
         <TableElement>{shortDate(shift.startDate)}</TableElement>
@@ -58,7 +48,7 @@ function TableHistoryRow({ shift }: { shift: Shift }) {
         </TableElement>
         <TableElement>${String(calculateEarnings(shift))}</TableElement>
         <TableElement align="center">
-          {shift?.isPublicHoliday ? <Icon.star style={{ color: "#97881a" }} /> : null}
+          {shift?.isPublicHoliday ? <Icon.star style={{ color: "#00f5d4" }} /> : null}
         </TableElement>
       </TableElement>
     </TableDialog>

@@ -1,44 +1,43 @@
 import { Shift } from "@prisma/client";
 
-import { UserType } from "@/types";
+import DateHumanizer from "@/services/Date";
+import ShiftService from "@/services/Shift";
 
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
 type Props = {
   shift: Shift;
-  user: UserType | null | undefined;
-  shortDate: (date: string) => string;
-  getHours: (amount: number) => number;
-  calculateEarnings: (shift: Shift) => number;
 };
 
-function TableDialogContent({ shift, shortDate, getHours, calculateEarnings }: Props) {
+function TableDialogContent({ shift }: Props) {
   return (
     <Stack grid cols={2}>
       <Text>
         <Text as="span" classes="font-bold">
           Start Date:
         </Text>{" "}
-        {shortDate(shift.startDate)}
+        {new DateHumanizer("short").humanizeDate(new Date(shift.startDate))}
       </Text>
       <Text>
         <Text as="span" classes="font-bold">
           End Date:
         </Text>{" "}
-        {shift.endDate ? shortDate(shift.endDate) : "..."}
+        {shift.endDate ? new DateHumanizer("short").humanizeDate(new Date(shift.endDate)) : "..."}
       </Text>
       <Text>
         <Text as="span" classes="font-bold">
           Hours worked:
         </Text>{" "}
-        {shift?.amount ? `${String(getHours(shift?.amount ?? 0))}h` : "..."}
+        {shift?.amount
+          ? `${String(ShiftService.convertAmountInDecimal(shift?.amount ?? 0))}h`
+          : "..."}
       </Text>
       <Text>
         <Text as="span" classes="font-bold">
           Earnings:
         </Text>{" "}
-        ${String(calculateEarnings(shift))}
+        ${String(ShiftService.calculateEarnings({ shift }))}
       </Text>
       <Text>
         <Text as="span" classes="font-bold">

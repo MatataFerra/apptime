@@ -16,6 +16,7 @@ import Button from "@/components/ui/Button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -23,7 +24,9 @@ import {
 } from "@/components/ui/Dialog";
 import Stack from "@/components/ui/Stack";
 
+import TableDialogEditShift from "../TableDialogEditShift";
 import { useDashboardContext } from "@/store/useDashboardStore";
+import { useTableStore } from "@/store/useTableStore";
 
 type Props = PropsWithChildren<{
   title: string;
@@ -32,6 +35,7 @@ type Props = PropsWithChildren<{
 }>;
 
 function TableDialog({ title, content, shift, children }: Props) {
+  const { setStep, step } = useTableStore((state) => state);
   const { user, update, deleteShift } = useDashboardContext((state) => state);
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -42,7 +46,7 @@ function TableDialog({ title, content, shift, children }: Props) {
       id: number;
     }) => Promise<SuccessApiResponse<UserType>>,
 
-    onMutate: async () => {
+    onMutate: () => {
       Toast({
         type: "info",
         message: "Deleting shift...",
@@ -63,38 +67,63 @@ function TableDialog({ title, content, shift, children }: Props) {
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
       router.refresh();
     },
   });
   return (
     <>
-      <Dialog>
+      <Dialog
+        onOpenChange={(open) => {
+          if (!open) {
+            setTimeout(() => {
+              setStep("info");
+            }, 100);
+          }
+        }}
+      >
         <DialogTrigger asChild>{children}</DialogTrigger>
-
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="border-b border-gray-800 py-2">{title}</DialogTitle>
-          </DialogHeader>
-          {content}
-          <DialogFooter>
-            <Stack orientation="horizontal" spacing={4} justifyContent="end">
-              <Button type="button" size="sm" variant="white" classes="active:shadow-button-inner">
-                Edit
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="danger"
-                onClick={() => {
-                  deleteShift(shift.id);
-                  mutate({ id: shift.id });
-                }}
-              >
-                Delete
-              </Button>
-            </Stack>
-          </DialogFooter>
+          {step === "info" ? (
+            <>
+              <DialogHeader>
+                <DialogTitle className="border-b border-gray-800 py-2">{title}</DialogTitle>
+              </DialogHeader>
+              {content}
+              <DialogFooter>
+                <Stack orientation="horizontal" spacing={4} justifyContent="end">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="white"
+                    classes="active:shadow-button-inner"
+                    onClick={() => setStep("edit")}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="danger"
+                    onClick={() => {
+                      deleteShift(shift.id);
+                      mutate({ id: shift.id });
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </Stack>
+              </DialogFooter>
+            </>
+          ) : (
+            <>
+              <DialogHeader className="text-left">
+                <DialogTitle className="py-2">Edit shift</DialogTitle>
+                <DialogDescription>You can edit the shift details here.</DialogDescription>
+              </DialogHeader>
+              <TableDialogEditShift shift={shift} user={user} />
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </>

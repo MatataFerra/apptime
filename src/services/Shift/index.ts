@@ -82,6 +82,30 @@ class ShiftService implements ShiftServiceInterface {
     return createShift;
   }
 
+  async update({ shiftId }: { shiftId: number }) {
+    const updateShift = await prisma.shift.update({
+      where: {
+        id: shiftId,
+      },
+      data: {
+        startDate: this.shift.startDate,
+        endDate: this.shift.endDate,
+        amount: this.shift.amount,
+        isClosed: this.shift.isClosed,
+        isPublicHoliday: this.shift.isPublicHoliday,
+        notes: this.shift.notes,
+        publicHolidayWorked: this.shift.publicHolidayWorked,
+        holidayPay: this.shift.holidayPay,
+        hourValue: this.shift.hourValue,
+        holidayPayRate: this.shift.holidayPayRate,
+        taxCode: this.shift.taxCode,
+        unpaidBreaks: this.shift.unpaidBreaks,
+      },
+    });
+
+    return updateShift;
+  }
+
   static calculateEarnings({
     shift,
     startDate,
