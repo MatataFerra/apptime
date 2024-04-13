@@ -76,4 +76,6 @@ const TAILWIND_COLORS = {
   rose: "rose",
   gray: "gray",
   stone: "stone",
+  sky: "sky",
+  slate: "slate",
 } as const;

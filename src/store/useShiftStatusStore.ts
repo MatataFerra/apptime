@@ -184,35 +184,20 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
           new Date(lastShiftClosed?.endDate ?? "")
         );
 
-        const dateHumanized = getter?.shifts?.reduce(
-          (acc, curr) => {
-            if (curr?.endDate === null) return acc;
+        const shiftsEarnings = getter?.shifts?.reduce((acc, curr) => {
+          if (curr?.endDate === null) return acc;
 
-            const { diff } = ShiftService.differenceInHHmm(
-              new Date(curr?.startDate ?? ""),
-              new Date(curr?.endDate ?? "")
-            );
+          const earns = acc + ShiftService.calculateEarnings({ shift: curr });
 
-            const costMinute = curr?.hourValue / 60;
-
-            const costDiff = diff * costMinute;
-            const earns = acc.earns + costDiff;
-
-            return {
-              earns: earns,
-            };
-          },
-          {
-            earns: 0,
-          }
-        );
+          return earns;
+        }, 0);
 
         return {
           ...state,
           shiftsInfo: {
             ...state.shiftsInfo,
             date: humanizeDateLastShiftClosed,
-            earns: dateHumanized?.earns ?? 0,
+            earns: shiftsEarnings ?? 0,
             text: distanceLastShiftClosed?.text ?? "",
             isLoading: false,
             isEmpty: !getter?.shifts?.length,

@@ -68,6 +68,7 @@ function ShiftStartInputs() {
     <>
       <Stack orientation="horizontal" alignItems="center" wrap>
         <Input
+          data-testid="hourValue"
           description="Hour value"
           measure="$"
           type="number"

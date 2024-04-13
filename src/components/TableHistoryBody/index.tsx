@@ -1,6 +1,6 @@
 "use client";
 
-import { isEmpty } from "lodash";
+import isEmpty from "lodash/isEmpty";
 
 import ShiftService from "@/services/Shift";
 
@@ -16,14 +16,14 @@ function TableHistoryBody() {
     <TableBody>
       {isEmpty(user?.shifts) ? (
         <tr>
-          <td colSpan={3} className="text-center">
+          <td colSpan={4} className="text-center">
             No shifts found
           </td>
         </tr>
       ) : (
-        ShiftService.shiftsSorted(user?.shifts, { desc: false })?.map((shift) => (
-          <TableHistoryRow key={shift.id} shift={shift} />
-        ))
+        ShiftService.shiftsSorted(user?.shifts, { desc: false })
+          ?.filter((shift) => shift.isClosed)
+          .map((shift) => <TableHistoryRow key={shift.id} shift={shift} />)
       )}
     </TableBody>
   );

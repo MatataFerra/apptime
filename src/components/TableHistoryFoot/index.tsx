@@ -10,7 +10,7 @@ type Props = {
   colsNumber: number;
 };
 
-const EMPTY_COLS = 2;
+const MIN_COLS = 3;
 
 async function TableHistoryFoot({ colsNumber }: Props) {
   const user = await UserService.getSessionUser();
@@ -40,7 +40,7 @@ async function TableHistoryFoot({ colsNumber }: Props) {
       </TableElement>
       <TableElement>{`${sumHours()?.toFixed(2)}`}h</TableElement>
       <TableElement>${`${totalEarnings()?.toFixed(2)}`}</TableElement>
-      {Array.from({ length: colsNumber - EMPTY_COLS }, (_, i) => (
+      {Array.from({ length: colsNumber - MIN_COLS }, (_, i) => (
         <TableElement key={i} />
       ))}
     </TableFoot>

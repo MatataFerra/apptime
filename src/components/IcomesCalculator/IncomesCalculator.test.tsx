@@ -22,7 +22,7 @@ describe("IncomesCalculator", () => {
     render(<IncomesCalculator />);
     const hoursInput = screen.getByLabelText("Hours");
     const valueInput = screen.getByLabelText("Value hour");
-    const timesInput = screen.getByLabelText("How many times?");
+    const timesInput = screen.getByLabelText("How many days?");
 
     fireEvent.change(hoursInput, { target: { value: "08:00" } });
     fireEvent.change(valueInput, { target: { value: 10 } });
