@@ -38,9 +38,9 @@
     "isPublicHoliday": false,
     "publicHolidayWorked": false,
     "notes": "",
-    "hourValue": 10.5,
+    "hourValue": 10,
     "holidayPay": true,
-    "holidayPayRate": 8,
+    "holidayPayRate": 0,
     "unpaidBreaks": 0,
     "taxCode": 0,
     "userId": "2"

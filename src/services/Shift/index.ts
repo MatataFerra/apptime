@@ -129,7 +129,11 @@ class ShiftService implements ShiftServiceInterface {
     let amount = 0;
     let totalTime = 0;
     let holidayRate = 1;
-    const holidayPayRateValue = (shift?.holidayPayRate ?? holidayPayRate ?? 1) / 100 + 1;
+    const holidayPayRateValue = !!shift?.holidayPayRate
+      ? shift.holidayPayRate / 100 + 1
+      : !!holidayPayRate
+        ? holidayPayRate / 100 + 1
+        : 1;
     const hourJobValue = shift?.hourValue ?? hourValue;
     const unpaidBreaksValue = shift?.unpaidBreaks ?? unpaidBreaks;
     const minutesUnpaids = (unpaidBreaksValue ?? 0) * 30;
