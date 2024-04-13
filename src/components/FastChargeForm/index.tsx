@@ -48,6 +48,8 @@ function FastChargeForm() {
   const finishTimeWatch = watch("finish-time");
   const fastWorkedWatch = watch("fast-worked");
   const hourValue = watch("hour-value");
+  const holidayPayRate = watch("holiday-pay-rate");
+  const unpaidBreaks = watch("unpaid-breaks");
 
   const thisYear = new Date(Date.now()).getFullYear().toString();
 
@@ -104,10 +106,12 @@ function FastChargeForm() {
       endDate: formatEnd,
       isPublicHoliday: fastWorkedWatch,
       hourValue: Number(hourValue),
+      holidayPayRate: Number(holidayPayRate),
+      unpaidBreaks: Number(unpaidBreaks),
     });
 
     return isNaN(earnings) ? 0 : earnings;
-  }, [fastWorkedWatch, formatEnd, formatStart, hourValue]);
+  }, [fastWorkedWatch, formatEnd, formatStart, hourValue, holidayPayRate, unpaidBreaks]);
 
   function onSubmit(formData: FastChargeInputs) {
     const parseData: FastChargeInputsParsed = {

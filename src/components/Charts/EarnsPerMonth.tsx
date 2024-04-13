@@ -20,7 +20,7 @@ console.error = (...args: any) => {
 };
 
 function EarnsPerMonth() {
-  const { user, initialShifts } = useDashboardContext((state) => state);
+  const { initialShifts } = useDashboardContext((state) => state);
   const group = new ChartService(initialShifts ?? []).groupByMonths; // [ "Jan": [{}, {}], "Feb": [{}, {}]
 
   const earningsByMonthData = Object.entries(group ?? {}).map(([month, shifts]) => {
@@ -47,7 +47,7 @@ function EarnsPerMonth() {
     <Chart
       data={earnsByMonthSortedData}
       legend="Payment per Month"
-      color="bg-violet-800"
+      color="bg-violet-500"
       showDates
     />
   );

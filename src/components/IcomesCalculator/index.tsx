@@ -14,6 +14,7 @@ type IncomesInputs = {
   value: number;
   times: number;
   "holiday-pay": number;
+  "unpaid-breaks": number;
 };
 
 function IncomesCalculator() {
@@ -23,6 +24,7 @@ function IncomesCalculator() {
   const value = watch("value");
   const holidayPay = watch("holiday-pay");
   const times = watch("times");
+  const unpaidBreaks = watch("unpaid-breaks");
 
   const hoursMemo = useMemo(() => {
     if (!hours) return 0;
@@ -37,28 +39,22 @@ function IncomesCalculator() {
   }, [hours]);
 
   const calculate = useMemo(() => {
-    if (!hoursMemo || !value) return 0;
+    const total = ShiftService.calculateEarnings({
+      holidayPayRate: holidayPay,
+      hoursWorked: hoursMemo,
+      hourValue: value,
+      unpaidBreaks,
+      isPublicHoliday: false,
+    });
 
-    let holidayPayRate = 1;
-    let multiply = 1;
+    let multiply = !!times ? times : 1;
 
-    if (holidayPay) {
-      holidayPayRate = holidayPay;
-    }
-
-    if (times) {
-      multiply = times;
-    }
-
-    const total = hoursMemo * Number(value) * Number(multiply);
-    const holiday = (total * holidayPayRate) / 100;
-
-    return total + holiday;
-  }, [hoursMemo, value, holidayPay, times]);
+    return total * multiply;
+  }, [holidayPay, hoursMemo, unpaidBreaks, value, times]);
 
   return (
     <>
-      <Stack grid cols={2} spacing={4}>
+      <Stack spacing={4} wrap>
         <Input type="time" label="Hours" {...register("hours")} />
         <Input
           type="number"
@@ -76,7 +72,8 @@ function IncomesCalculator() {
           min={0}
           {...register("holiday-pay")}
         />
-        <Input type="number" label="How many times?" min={1} {...register("times")} />
+        <Input type="number" label="How many days?" min={1} {...register("times")} />
+        <Input type="number" label="Unpaid breaks" min={1} {...register("unpaid-breaks")} />
       </Stack>
       <Stack orientation="vertical">
         <Text classes="text-lg font-bold">You are going to earn:</Text>

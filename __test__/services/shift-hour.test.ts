@@ -1,6 +1,5 @@
 import { describe, expect, test } from "vitest";
 
-import ProfileService from "@/services/Profile";
 import ShiftService from "@/services/Shift";
 
 describe("Profile Service", () => {

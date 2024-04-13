@@ -24,7 +24,7 @@ type Props = {
 function EarnsPerDay({ user }: Props) {
   const earnsPerDay = new ChartService(user?.shifts ?? []).earnsPerDay();
 
-  return <Chart data={earnsPerDay} legend="Shift payment per Day" color={"bg-green-500"} />;
+  return <Chart data={earnsPerDay} legend="Shift payment per Day" color={"bg-sky-500"} />;
 }
 
 export default EarnsPerDay;

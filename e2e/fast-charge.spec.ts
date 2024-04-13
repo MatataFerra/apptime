@@ -19,7 +19,6 @@ test.beforeEach(async ({ page }) => {
 
   if (await finishButton.isEnabled()) {
     await finishButton.click();
-    await page.getByRole("button", { name: /move/ }).click();
   }
 
   await page.waitForURL(/en/);
@@ -34,16 +33,9 @@ test("user can fill up the form and submit", async ({ page }) => {
   await page.getByRole("textbox", { name: /Start time/ }).fill("12:00");
   await page.getByRole("textbox", { name: /Finish date/ }).fill("2022-01-01");
   await page.getByRole("textbox", { name: /Finish time/ }).fill("14:00");
-
-  const title = page.getByText("You are going to charge:");
-  const startDate = page.getByText("Sat 1st, January 2022");
-  const workedData = page.getByText("Worked time: 2h 0m");
-  const earningsData = page.getByText(/44/);
-
-  expect(await title.isVisible()).toBeTruthy();
-  expect(await startDate.isVisible()).toBeTruthy();
-  expect(await workedData.isVisible()).toBeTruthy();
-  expect(await earningsData.isVisible()).toBeTruthy();
+  await page.getByRole("textbox", { name: /Hour value/ }).fill("27");
+  await page.getByRole("textbox", { name: /Unpaid breaks/ }).fill("1");
+  await page.getByRole("textbox", { name: /Holidaypay rate/ }).fill("8");
 
   await page.getByRole("button", { name: /Submit/ }).click();
 

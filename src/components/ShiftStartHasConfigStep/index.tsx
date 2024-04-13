@@ -39,7 +39,7 @@ function ShiftStartHasConfigStep() {
           </Stack>
         </DialogTitle>
       </DialogHeader>
-      <Stack orientation="vertical">
+      <Stack orientation="vertical" alignItems="center">
         <ul className="grid grid-cols-2 gap-x-3 gap-y-2 text-left text-sm text-gray-500 dark:text-gray-400">
           <li className="flex items-center space-x-1">
             <svg

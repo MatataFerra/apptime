@@ -1,6 +1,6 @@
 import { Shift } from "@prisma/client";
 import { differenceInMinutes } from "date-fns";
-import { cloneDeep } from "lodash";
+import cloneDeep from "lodash/cloneDeep";
 
 import prisma from "../../../prisma/client";
 
@@ -82,22 +82,62 @@ class ShiftService implements ShiftServiceInterface {
     return createShift;
   }
 
+  async update({ shiftId }: { shiftId: number }) {
+    const updateShift = await prisma.shift.update({
+      where: {
+        id: shiftId,
+      },
+      data: {
+        startDate: this.shift.startDate,
+        endDate: this.shift.endDate,
+        amount: this.shift.amount,
+        isClosed: this.shift.isClosed,
+        isPublicHoliday: this.shift.isPublicHoliday,
+        notes: this.shift.notes,
+        publicHolidayWorked: this.shift.publicHolidayWorked,
+        holidayPay: this.shift.holidayPay,
+        hourValue: this.shift.hourValue,
+        holidayPayRate: this.shift.holidayPayRate,
+        taxCode: this.shift.taxCode,
+        unpaidBreaks: this.shift.unpaidBreaks,
+      },
+    });
+
+    return updateShift;
+  }
+
   static calculateEarnings({
     shift,
     startDate,
     endDate,
     isPublicHoliday,
     hourValue,
+    unpaidBreaks,
+    holidayPayRate,
+    hoursWorked,
   }: {
     shift?: Omit<Shift, "id">;
     hourValue?: number;
     startDate?: string;
     endDate?: string;
     isPublicHoliday?: boolean;
+    unpaidBreaks?: number;
+    holidayPayRate?: number;
+    hoursWorked?: number;
   }) {
+    const MIN_MINUTES_WORKED = 8 * 60;
     let amount = 0;
+    let totalTime = 0;
     let holidayRate = 1;
+    const holidayPayRateValue = !!shift?.holidayPayRate
+      ? shift.holidayPayRate / 100 + 1
+      : !!holidayPayRate
+        ? holidayPayRate / 100 + 1
+        : 1;
     const hourJobValue = shift?.hourValue ?? hourValue;
+    const unpaidBreaksValue = shift?.unpaidBreaks ?? unpaidBreaks;
+    const minutesUnpaids = (unpaidBreaksValue ?? 0) * 30;
+
     let minuteRate = hourJobValue ? hourJobValue / 60 : 0;
 
     if (startDate && endDate) {
@@ -105,6 +145,8 @@ class ShiftService implements ShiftServiceInterface {
       const end = new Date(endDate ?? "");
 
       amount = differenceInMinutes(end, start);
+    } else if (hoursWorked) {
+      amount = hoursWorked * 60;
     } else {
       const start = new Date(shift?.startDate ?? "");
       const end = new Date(shift?.endDate ?? "");
@@ -117,7 +159,13 @@ class ShiftService implements ShiftServiceInterface {
       holidayRate = 1.5;
     }
 
-    const earnings = amount * minuteRate * holidayRate;
+    if (amount < MIN_MINUTES_WORKED) {
+      totalTime = amount;
+    } else {
+      totalTime = amount - minutesUnpaids;
+    }
+
+    const earnings = totalTime * minuteRate * holidayRate * holidayPayRateValue;
 
     return Math.round(earnings * 100) / 100;
   }
