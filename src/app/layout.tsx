@@ -1,7 +1,7 @@
 import React from "react";
 
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Poppins } from "next/font/google";
-import { notFound } from "next/navigation";
 
 import { LocaleParams } from "@/types";
 
@@ -28,7 +28,10 @@ const poppinsFont = Poppins({
 function Layout({ children, params }: { children: React.ReactNode; params: LocaleParams }) {
   return (
     <html lang={params.locale} className={cn(poppinsFont.className)}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <SpeedInsights />
+      </body>
     </html>
   );
 }
