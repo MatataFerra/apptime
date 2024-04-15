@@ -1,31 +1,35 @@
-"use client";
+import DateHumanizer from "@/services/Date";
+import ShiftService from "@/services/Shift";
+import UserService from "@/services/User";
 
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
-import { useShiftStateContext } from "@/store/useShiftStatusStore";
-
-function ShiftTrackInfo() {
-  const { date, earns, text, isLoading, isEmpty } = useShiftStateContext(
-    (state) => state.shiftsInfo
+async function ShiftTrackInfo() {
+  const user = await UserService.getSessionUser();
+  const lastShift = user?.shifts.at(-1);
+  const dateHumanized = new DateHumanizer("long").humanizeDate(
+    new Date(lastShift?.startDate ?? "")
   );
+  const earnings = user?.shifts.reduce((acc, shift) => {
+    if (shift.isClosed) {
+      acc += ShiftService.calculateEarnings({ shift });
+    }
+
+    return acc;
+  }, 0);
 
   return (
     <>
-      {isEmpty ? (
+      {user?.shifts.length === 0 ? (
         <Text classes="mx-0 my-auto block text-center text-xl text-red-700">
           {"You haven't started your shift yet! Please press the 'Start Shift' button."}
         </Text>
       ) : (
         <Stack as="div" orientation="vertical">
-          <Text>
-            {isLoading
-              ? "loading data..."
-              : !!text
-                ? `last shift tracked: ${text} (${date})`
-                : "waiting for the first shift"}
-          </Text>
-          <Text>money earn at the moment: {`${earns.toFixed(2)}`}$</Text>
+          <Text>{`last shift tracked: ${dateHumanized ?? "no date available"}`}</Text>
+          <Text>total shifts tracked: {user?.shifts.length}</Text>
+          <Text>money earn at the moment: {`${earnings?.toFixed(2)}`}$</Text>
         </Stack>
       )}
     </>
