@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 import api from "@/services/Api/Shift";
 import Toast from "@/services/Toast";
@@ -17,6 +18,7 @@ type Props = {
 
 function ShiftFinishButton({ buttonStatus }: Props) {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const {
     user,
@@ -33,6 +35,7 @@ function ShiftFinishButton({ buttonStatus }: Props) {
       updateShiftsInfo();
       updateShiftUnclosed();
       queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
+      router.refresh();
       Toast({
         message: "Shift updated",
         type: "success",

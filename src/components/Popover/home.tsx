@@ -10,7 +10,7 @@ function PopoverHome() {
   const t = useTranslations("home");
   return (
     <Popover>
-      <PopoverTrigger className="self-start">
+      <PopoverTrigger className="self-start" aria-label="state shift info">
         <Icon.mark />
       </PopoverTrigger>
       <PopoverContent side="top" className="w-60">

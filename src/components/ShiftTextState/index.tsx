@@ -26,16 +26,9 @@ function ShiftTextState() {
   return (
     <Text as="h2" classes="flex gap-1 text-2xl">
       State:{" "}
-      {isLoading ? (
-        <Skeleton classes="h-8 w-20" />
-      ) : (
-        <Text
-          as="span"
-          classes={`${checkCloseShift() ? "text-green-500" : "text-red-500"} text-2xl`}
-        >
-          {checkCloseShift() ? "online" : "offline"}
-        </Text>
-      )}
+      <Text as="span" classes={`${checkCloseShift() ? "text-green-500" : "text-red-500"} text-2xl`}>
+        {checkCloseShift() ? "online" : "offline"}
+      </Text>
       <PopoverHome />
     </Text>
   );
