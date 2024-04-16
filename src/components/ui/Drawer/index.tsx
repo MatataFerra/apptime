@@ -1,10 +1,7 @@
 "use client";
 
-import { ReactElement } from "react";
-
 import { CSSClassNames } from "@/types";
 
-import Portal from "@/components/ui/Portal";
 import Stack from "@/components/ui/Stack";
 
 import { cn } from "@/utils/helpers/styleMerger";
@@ -13,35 +10,28 @@ import useDelayed from "@/hooks/useDelayed";
 interface Props extends React.HTMLAttributes<HTMLElement> {
   isOpen: boolean;
   classes?: CSSClassNames;
-  children: ReactElement | ReactElement[];
+  children: React.ReactElement | React.ReactElement[];
   handleOutsideClick?: () => void;
 }
 
-function Drawer({ children, isOpen, ...rest }: Props) {
+function Drawer({ children, isOpen, handleOutsideClick, ...rest }: Props) {
   //delay the animation of the drawer
-  const isOpenDelayed = useDelayed(isOpen, 500);
+  const delayOpen = useDelayed(isOpen, 100);
 
   return (
     <>
-      <Portal
-        isOn={isOpenDelayed}
-        classes={`w-1/2 transition-all ${isOpen ? "[&>section]:animate-show-left" : "[&>section]:animate-show-right"}`}
-        {...rest}
-      >
-        {isOpen && (
-          <Stack
-            as="div"
-            classes={`absolute top-0 h-svh w-full animate-backdrop-blurry bg-[#80808033] transition-all`}
-            onClick={rest.handleOutsideClick}
-          />
-        )}
+      {delayOpen && (
         <Stack
+          spacing={0}
           orientation="vertical"
-          classes={cn(`absolute inset-0 w-[70%] bg-white`, rest.classes)}
+          classes={cn(
+            `absolute transition-all ${isOpen ? "animate-fade-in" : "animate-fade-out"}`,
+            rest.classes
+          )}
         >
           {children}
         </Stack>
-      </Portal>
+      )}
     </>
   );
 }

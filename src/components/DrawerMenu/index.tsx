@@ -19,7 +19,10 @@ function DrawerMenu({ children }: Props) {
 
   return (
     <>
-      <Drawer isOpen={isOpen} handleOutsideClick={() => toggle()}>
+      <Drawer
+        isOpen={isOpen}
+        classes="top-3/4 isolate z-10 h-[60dvh] w-7/12 rounded-lg border border-slate-100/70 bg-gradient-to-b from-white via-stone-100/95 to-slate-300/35 shadow-2xl backdrop-blur-md"
+      >
         <Stack justifyContent="between" classes="z-10 w-full">
           {children}
           <Button
@@ -28,10 +31,10 @@ function DrawerMenu({ children }: Props) {
             classes="w-fit bg-transparent"
             onClick={() => toggle()}
           >
-            <Icon.cancel />
+            <Icon.cancel className="scale-50 transform" />
           </Button>
         </Stack>
-        <Stack orientation="vertical" classes="my-2 w-full">
+        <Stack as="div" orientation="vertical" classes="w-full">
           <Line color="bg-stone-300" />
         </Stack>
         <DrawerOptions />
