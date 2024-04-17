@@ -22,6 +22,7 @@ function Drawer({ children, isOpen, handleOutsideClick, ...rest }: Props) {
     <>
       {delayOpen && (
         <Stack
+          data-testid="drawer-menu"
           spacing={0}
           orientation="vertical"
           classes={cn(
