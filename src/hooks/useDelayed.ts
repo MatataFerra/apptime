@@ -4,14 +4,19 @@ function useDelayed(state: unknown, delay: number) {
   const [stateDelayed, seStateDalayed] = useState(false);
 
   useEffect(() => {
-    if (state) {
+    let timeout: NodeJS.Timeout;
+    if (state && !stateDelayed) {
       seStateDalayed(true);
-    } else {
-      setTimeout(() => {
+    } else if (!state && stateDelayed) {
+      timeout = setTimeout(() => {
         seStateDalayed(false);
       }, delay);
     }
-  }, [state, delay]);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [state, delay, stateDelayed]);
 
   return stateDelayed;
 }
