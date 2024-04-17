@@ -3,8 +3,6 @@ import React from "react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Poppins } from "next/font/google";
 
-import { LocaleParams } from "@/types";
-
 import { cn } from "@/utils/helpers/styleMerger";
 
 import "@/app/globals.css";
@@ -25,9 +23,9 @@ const poppinsFont = Poppins({
   fallback: ["system-ui"],
 });
 
-function Layout({ children, params }: { children: React.ReactNode; params: LocaleParams }) {
+function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang={params.locale} className={cn(poppinsFont.className)}>
+    <html className={cn(poppinsFont.className)}>
       <body>
         {children}
         <SpeedInsights />

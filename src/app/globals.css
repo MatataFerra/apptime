@@ -169,3 +169,7 @@ div[data-radio-state="false"] .animate_fade_out {
   @apply flex-grow-[2] flex-shrink-[1] basis-[120px]
 }
 
+.drawer-option {
+  @apply relative w-full px-4 py-2 text-left active:after:absolute active:after:inset-0 active:after:-z-10 active:after:bg-slate-100 hover:after:bg-slate-100/80 hover:after:absolute hover:after:inset-0 hover:after:-z-10;
+}
+

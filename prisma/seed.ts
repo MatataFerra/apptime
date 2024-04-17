@@ -59,7 +59,7 @@ function addUsersMocked(): Omit<User, "id">[] {
       name: `User Testing ${i}`,
       emailVerified: null,
       formCompleted: false,
-      image: "/assets/user-profile.webp",
+      image: "/assets/avatar.svg",
       online: false,
       password: hashSync(`Secreto${i}!`, 10),
       type_account: "CREDENTIALS",

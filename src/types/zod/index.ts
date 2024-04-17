@@ -39,7 +39,7 @@ const UserModelSchema = z.object({
   }),
   email: z.string().email(),
   emailVerified: z.date().nullable(),
-  image: z.string().nullable().default("/assets/user-profile.webp"),
+  image: z.string().nullable().default("/assets/avatar.svg"),
   name: z.string().default("User"),
   password: z.string(),
   online: z.boolean().default(false),
