@@ -28,6 +28,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
   try {
     const buildShift = new ShiftService({ ...parsedBody.data })
       .closeShift()
+      .typeShift()
       .checkPublicHoliday()
       .differenceInMinsBetweenStartAndEnd()
       .build();
@@ -92,7 +93,7 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
     if (!deletedShift) {
       return NextResponse.json(
         {
-          ...ErrorFactory.createError("ShiftNotFound"),
+          error: ErrorFactory.createError("ShiftNotFound"),
           response: false,
         },
         { status: 404 }
@@ -111,7 +112,7 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return NextResponse.json(
         {
-          ...ErrorFactory.createError("CustomError", {
+          error: ErrorFactory.createError("CustomError", {
             error: error.meta,
           }),
           response: false,
@@ -121,7 +122,7 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
     }
     return NextResponse.json(
       {
-        ...ErrorFactory.createError("InternalServer"),
+        error: ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }

@@ -8,4 +8,5 @@ export const PATH_NAMES = {
   FAST_CHARGE: "/fast-charge",
   ICOMES: "/incomes",
   FORM: "/form",
+  PRODUCTION: "/production",
 } as const;
