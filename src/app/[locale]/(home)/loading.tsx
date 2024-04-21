@@ -5,9 +5,9 @@ export default function LoadingHome() {
   return (
     <>
       <Stack classes="h-full w-full" orientation="vertical" spacing={4}>
-        <Skeleton classes="h-20 w-full" />
-        <Skeleton classes="h-20 w-full" />
-        <Skeleton classes="h-20 w-full" />
+        <Skeleton classes="h-full w-full" />
+        <Skeleton classes="h-full w-full" />
+        <Skeleton classes="h-full w-full" />
       </Stack>
     </>
   );
