@@ -9,24 +9,36 @@ import Text from "@/components/ui/Text";
 
 import { useDrawerStore } from "@/store/useDrawerStore";
 
+const DRAWER_OPTIONS = [
+  {
+    id: "fast-charge",
+    label: "Fast charge",
+    dataTestId: "fast-charge",
+    url: "/fast-charge",
+  },
+  {
+    id: "history-shifts",
+    label: "History of shifts",
+    dataTestId: "history-shifts",
+    url: "/history-shifts",
+  },
+  {
+    id: "estimate-income",
+    label: "Estimate income",
+    dataTestId: "estimate-income",
+    url: "/incomes",
+  },
+  {
+    id: "production-job",
+    label: "Production Job",
+    dataTestId: "production-job",
+    url: "/production",
+  },
+];
+
 function DrawerOptions() {
   const router = useRouter();
   const toggle = useDrawerStore((state) => state.toggle);
-
-  function handleHistoryShifts() {
-    toggle();
-    router.push("/history-shifts");
-  }
-
-  function handleFastCharge() {
-    toggle();
-    router.push("/fast-charge");
-  }
-
-  function handleEstimateIncome() {
-    toggle();
-    router.push("/incomes");
-  }
 
   function handleLogout() {
     toggle();
@@ -37,32 +49,21 @@ function DrawerOptions() {
     <>
       <Stack grid rows="1fr auto" classes="h-full w-full">
         <Stack as="div" orientation="vertical" spacing={0} classes="w-full divide-y">
-          <Stack
-            data-testid="fast-charge"
-            as="button"
-            alignItems="center"
-            classes="drawer-option"
-            onClick={handleFastCharge}
-          >
-            <Text classes="select-none font-medium">Fast charge</Text>
-          </Stack>
-          <Stack
-            data-testid="history-shifts"
-            as="button"
-            alignItems="center"
-            classes="drawer-option"
-            onClick={handleHistoryShifts}
-          >
-            <Text classes="select-none font-medium">History of shifts</Text>
-          </Stack>
-          <Stack
-            as="button"
-            alignItems="center"
-            classes="drawer-option"
-            onClick={handleEstimateIncome}
-          >
-            <Text classes="select-none font-medium">Estimate income</Text>
-          </Stack>
+          {DRAWER_OPTIONS.map((option) => (
+            <Stack
+              key={option.id}
+              data-testid={option.dataTestId}
+              as="button"
+              alignItems="center"
+              classes="drawer-option"
+              onClick={() => {
+                router.push(option.url);
+                toggle();
+              }}
+            >
+              <Text classes="select-none font-medium">{option.label}</Text>
+            </Stack>
+          ))}
         </Stack>
         <Stack classes="items-center p-4">
           <Stack as="button" classes="cursor-pointer" onClick={handleLogout}>
