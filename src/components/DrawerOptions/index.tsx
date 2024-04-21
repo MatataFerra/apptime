@@ -17,6 +17,18 @@ const DRAWER_OPTIONS = [
     url: "/fast-charge",
   },
   {
+    id: "production-job",
+    label: "Production Job",
+    dataTestId: "production-job",
+    url: "/production",
+  },
+  {
+    id: "track-time",
+    label: "Track time",
+    dataTestId: "track-time",
+    url: "/track",
+  },
+  {
     id: "history-shifts",
     label: "History of shifts",
     dataTestId: "history-shifts",
@@ -27,12 +39,6 @@ const DRAWER_OPTIONS = [
     label: "Estimate income",
     dataTestId: "estimate-income",
     url: "/incomes",
-  },
-  {
-    id: "production-job",
-    label: "Production Job",
-    dataTestId: "production-job",
-    url: "/production",
   },
 ];
 

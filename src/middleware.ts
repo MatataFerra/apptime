@@ -91,5 +91,8 @@ export const config = {
     "/production",
     "/es/production",
     "/en/production",
+    "/track",
+    "/es/track",
+    "/en/track",
   ],
 };
