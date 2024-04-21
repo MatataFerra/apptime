@@ -26,7 +26,7 @@ function Drawer({ children, isOpen, handleOutsideClick, ...rest }: Props) {
           spacing={0}
           orientation="vertical"
           classes={cn(
-            `absolute transition-all ${isOpen ? "animate-fade-in" : "animate-fade-out"}`,
+            `absolute transition-all duration-300 ${isOpen ? "animate-fade-in" : "animate-fade-out"}`,
             rest.classes
           )}
         >
