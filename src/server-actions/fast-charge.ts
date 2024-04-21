@@ -28,6 +28,9 @@ export default async function onSubmitFastCharge(data: FastChargeInputsParsed) {
     holidayPayRate: data.holidayPayRate,
     unpaidBreaks: data.unpaidBreaks,
     userId: currentUser.id,
+    itemQuantity: null,
+    itemValue: null,
+    typeShift: "FAST",
   })
     .closeShift()
     .checkPublicHoliday()
