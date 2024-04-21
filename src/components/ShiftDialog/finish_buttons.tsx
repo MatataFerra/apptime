@@ -5,6 +5,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/services/Api/Shift";
 import Toast from "@/services/Toast";
 
+import { TypeShift } from "@/types";
+
 import DialogClose from "@/components/ShiftDialog/FinishDialogModule/DialogClose";
 import Button from "@/components/ui/Button";
 import Loader from "@/components/ui/Loader";
@@ -60,6 +62,7 @@ function FinishDialogButtons() {
         publicHolidayWorked: updateShift?.publicHolidayWorked,
         startDate: updateShift?.startDate,
         userId: updateShift?.userId,
+        typeShift: (updateShift?.typeShift as TypeShift) ?? "FAST",
       },
       id: updateShift?.id,
     });

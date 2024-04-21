@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   if (!userId) {
     return NextResponse.json(
       {
-        ...ErrorFactory.createError("QueryNotProvided"),
+        error: ErrorFactory.createError("QueryNotProvided"),
         response: false,
       },
       { status: 400 }
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     if (shift.length === 0) {
       return NextResponse.json(
         {
-          ...ErrorFactory.createError("ShiftNotFound"),
+          error: ErrorFactory.createError("ShiftNotFound"),
           response: false,
         },
         { status: 400 }
@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       {
-        ...ErrorFactory.createError("InternalServer"),
+        error: ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }
@@ -84,7 +84,23 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-  const shiftTransform = new ShiftService(parsedBody.data).checkPublicHoliday().build();
+  const shiftTransform = new ShiftService(parsedBody.data).checkPublicHoliday().typeShift().build();
+
+  if (
+    shiftTransform.typeShift === "PRODUCTION" &&
+    !shiftTransform.itemValue &&
+    !shiftTransform.itemQuantity
+  ) {
+    return NextResponse.json(
+      {
+        error: ErrorFactory.createError("DataProvidedIsNotValid", {
+          message: "Item value and quantity must be provided",
+        }),
+        response: false,
+      },
+      { status: 400 }
+    );
+  }
 
   try {
     const shift = await new ShiftService(shiftTransform).create({

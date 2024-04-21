@@ -10,6 +10,12 @@ type Props = {
   shift: Shift;
 };
 
+const TYPE_SHIFT = {
+  PRODUCTION: "Production",
+  TRACK: "Hourly",
+  FAST: "Hourly",
+} as const;
+
 function TableDialogContent({ shift }: Props) {
   return (
     <Stack grid cols={2}>
@@ -26,18 +32,48 @@ function TableDialogContent({ shift }: Props) {
         {shift.endDate ? new DateHumanizer("short").humanizeDate(new Date(shift.endDate)) : "..."}
       </Text>
       <Text>
-        <Text as="span" classes="font-bold">
-          Hours worked:
-        </Text>{" "}
-        {shift?.amount
-          ? `${String(ShiftService.convertAmountInDecimal(shift?.amount ?? 0))}h`
-          : "..."}
+        {shift.typeShift === "PRODUCTION" ? (
+          <>
+            <Text as="span" classes="font-bold">
+              Item Value:
+            </Text>{" "}
+            {shift.itemValue ? `$${shift.itemValue}` : "..."}
+          </>
+        ) : (
+          <>
+            <Text as="span" classes="font-bold">
+              Hours worked:
+            </Text>{" "}
+            {shift?.amount
+              ? `${String(ShiftService.convertAmountInDecimal(shift?.amount ?? 0))}h`
+              : "..."}
+          </>
+        )}
       </Text>
+      {shift.typeShift === "PRODUCTION" ? (
+        <Text>
+          <Text as="span" classes="font-bold">
+            Item Quantity:
+          </Text>{" "}
+          {shift.itemQuantity ? `${shift.itemQuantity}` : "..."}
+        </Text>
+      ) : null}
       <Text>
         <Text as="span" classes="font-bold">
           Earnings:
         </Text>{" "}
-        ${String(ShiftService.calculateEarnings({ shift }))}
+        {shift.typeShift === "PRODUCTION"
+          ? `$${String(
+              ShiftService.calculateProductionEarnings({
+                hourValue: shift.hourValue,
+                itemValue: shift.itemValue,
+                itemQuantity: shift.itemQuantity,
+                holidayPayRate: shift.holidayPayRate,
+                isPublicHoliday: shift.isPublicHoliday,
+                publicHolidayWorked: shift.publicHolidayWorked,
+              }).toFixed(2)
+            )}`
+          : `$${String(ShiftService.calculateEarnings({ shift }))}`}
       </Text>
       <Text>
         <Text as="span" classes="font-bold">
@@ -65,6 +101,12 @@ function TableDialogContent({ shift }: Props) {
           Notes:
         </Text>{" "}
         {shift?.notes ? shift.notes : "..."}
+      </Text>
+      <Text>
+        <Text as="span" classes="font-bold">
+          Type of Shift:
+        </Text>{" "}
+        {shift?.typeShift ? TYPE_SHIFT[shift.typeShift as keyof typeof TYPE_SHIFT] : "..."}
       </Text>
     </Stack>
   );

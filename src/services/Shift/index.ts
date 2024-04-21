@@ -2,25 +2,26 @@ import { Shift } from "@prisma/client";
 import { differenceInMinutes } from "date-fns";
 import cloneDeep from "lodash/cloneDeep";
 
+import { type ShiftCreate } from "@/types";
+
 import prisma from "../../../prisma/client";
 
-type ShiftWithoutId = Omit<Shift, "id">;
-
 type ShiftConfig = {
-  hourValue: ShiftWithoutId["hourValue"];
-  holidayPay: ShiftWithoutId["holidayPay"];
-  holidayPayRate: ShiftWithoutId["holidayPayRate"];
-  taxCode: ShiftWithoutId["taxCode"];
-  unpaidBreaks: ShiftWithoutId["unpaidBreaks"];
+  hourValue: ShiftCreate["hourValue"];
+  holidayPay: ShiftCreate["holidayPay"];
+  holidayPayRate: ShiftCreate["holidayPayRate"];
+  taxCode: ShiftCreate["taxCode"];
+  unpaidBreaks: ShiftCreate["unpaidBreaks"];
 };
 
 interface ShiftServiceInterface {
-  shift: ShiftWithoutId;
+  shift: ShiftCreate;
   create: ({ userId }: { userId: string }) => Promise<Shift>;
   differenceInMinsBetweenStartAndEnd: () => void;
   closeShift: () => void;
   checkPublicHoliday: () => void;
-  build: () => Omit<Shift, "id">;
+  typeShift: () => void;
+  build: () => ShiftCreate;
 }
 
 /**
@@ -41,8 +42,8 @@ interface ShiftServiceInterface {
  * @method build - Returns the shift
  */
 class ShiftService implements ShiftServiceInterface {
-  shift: ShiftWithoutId;
-  constructor(shift: ShiftWithoutId) {
+  shift: ShiftCreate;
+  constructor(shift: ShiftCreate) {
     this.shift = cloneDeep(shift);
   }
 
@@ -76,6 +77,9 @@ class ShiftService implements ShiftServiceInterface {
         holidayPayRate: this.shift.holidayPayRate,
         taxCode: this.shift.taxCode,
         unpaidBreaks: this.shift.unpaidBreaks,
+        itemQuantity: this.shift.itemQuantity,
+        itemValue: this.shift.itemValue,
+        typeShift: this.shift.typeShift,
       },
     });
 
@@ -100,10 +104,39 @@ class ShiftService implements ShiftServiceInterface {
         holidayPayRate: this.shift.holidayPayRate,
         taxCode: this.shift.taxCode,
         unpaidBreaks: this.shift.unpaidBreaks,
+        itemQuantity: this.shift.itemQuantity,
+        itemValue: this.shift.itemValue,
+        typeShift: this.shift.typeShift,
       },
     });
 
     return updateShift;
+  }
+
+  static calculateProductionEarnings({
+    itemValue,
+    itemQuantity,
+    hourValue,
+    holidayPayRate,
+    publicHolidayWorked,
+    isPublicHoliday,
+  }: {
+    itemValue: ShiftCreate["itemValue"];
+    itemQuantity: ShiftCreate["itemQuantity"];
+    hourValue: ShiftCreate["hourValue"];
+    publicHolidayWorked: ShiftCreate["publicHolidayWorked"];
+    holidayPayRate: ShiftCreate["holidayPayRate"];
+    isPublicHoliday: ShiftCreate["isPublicHoliday"];
+  }) {
+    let publicHolidayRate = 1;
+    let holidayPayRateValue = !!holidayPayRate ? holidayPayRate / 100 + 1 : 1;
+    if (!itemValue || !itemQuantity || !hourValue) return 0;
+
+    if (publicHolidayWorked) {
+      publicHolidayRate = 1.5;
+    }
+
+    return itemValue * itemQuantity * publicHolidayRate * holidayPayRateValue;
   }
 
   static calculateEarnings({
@@ -128,12 +161,11 @@ class ShiftService implements ShiftServiceInterface {
     const MIN_MINUTES_WORKED = 8 * 60;
     let amount = 0;
     let totalTime = 0;
-    let holidayRate = 1;
-    const holidayPayRateValue = !!shift?.holidayPayRate
-      ? shift.holidayPayRate / 100 + 1
-      : !!holidayPayRate
-        ? holidayPayRate / 100 + 1
-        : 1;
+    let publicHolidayRate = 1;
+    const holidayPayRateValue = this.getHolidayPayRateValue(
+      holidayPayRate ?? 0,
+      shift?.holidayPayRate
+    );
     const hourJobValue = shift?.hourValue ?? hourValue;
     const unpaidBreaksValue = shift?.unpaidBreaks ?? unpaidBreaks;
     const minutesUnpaids = (unpaidBreaksValue ?? 0) * 30;
@@ -156,7 +188,7 @@ class ShiftService implements ShiftServiceInterface {
     if (amount <= 0) amount = 0;
 
     if (shift?.isPublicHoliday || isPublicHoliday) {
-      holidayRate = 1.5;
+      publicHolidayRate = 1.5;
     }
 
     if (amount < MIN_MINUTES_WORKED) {
@@ -165,7 +197,7 @@ class ShiftService implements ShiftServiceInterface {
       totalTime = amount - minutesUnpaids;
     }
 
-    const earnings = totalTime * minuteRate * holidayRate * holidayPayRateValue;
+    const earnings = totalTime * minuteRate * publicHolidayRate * holidayPayRateValue;
 
     return Math.round(earnings * 100) / 100;
   }
@@ -213,7 +245,7 @@ class ShiftService implements ShiftServiceInterface {
     });
   }
 
-  static convertAmountInDecimal(amount: ShiftWithoutId["amount"]): number {
+  static convertAmountInDecimal(amount: ShiftCreate["amount"]): number {
     const validAmount = amount ?? 0;
     return Math.round((validAmount / 60) * 100) / 100;
   }
@@ -251,7 +283,7 @@ class ShiftService implements ShiftServiceInterface {
     return config;
   }
 
-  static convertHourlyRateInMinuteRate(hourlyRate: Shift["hourValue"]) {
+  static convertHourlyRateInMinuteRate(hourlyRate: ShiftCreate["hourValue"]) {
     return hourlyRate / 60;
   }
 
@@ -265,6 +297,17 @@ class ShiftService implements ShiftServiceInterface {
     const minute = Math.round((float - hour) * 60);
 
     return `${hour.toString().padStart(2, "0")}:${minute}`;
+  }
+
+  private static getHolidayPayRateValue(
+    holidayPayRate?: number,
+    shiftHolidayPay?: ShiftCreate["holidayPayRate"]
+  ) {
+    return !!shiftHolidayPay
+      ? shiftHolidayPay / 100 + 1
+      : !!holidayPayRate
+        ? holidayPayRate / 100 + 1
+        : 1;
   }
 
   closeShift() {
@@ -294,6 +337,14 @@ class ShiftService implements ShiftServiceInterface {
       this.shift.isPublicHoliday = true;
 
       return this;
+    }
+
+    return this;
+  }
+
+  typeShift() {
+    if (this.shift.itemValue && this.shift.itemQuantity) {
+      this.shift.typeShift = "PRODUCTION";
     }
 
     return this;

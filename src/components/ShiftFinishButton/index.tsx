@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import api from "@/services/Api/Shift";
 import Toast from "@/services/Toast";
 
+import { TypeShift } from "@/types";
+
 import Button from "@/components/ui/Button";
 import Loader from "@/components/ui/Loader";
 
@@ -76,6 +78,7 @@ function ShiftFinishButton({ buttonStatus }: Props) {
         publicHolidayWorked: updateShift?.publicHolidayWorked,
         startDate: updateShift?.startDate,
         userId: updateShift?.userId,
+        typeShift: (updateShift?.typeShift as TypeShift) ?? "TRACK",
       },
       id: updateShift?.id,
     });

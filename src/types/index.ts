@@ -2,13 +2,21 @@ import { HTMLAttributes } from "react";
 
 import { z } from "zod";
 
+import { ShiftCreateSchema, ShiftModelSchema, SuscribeSchema } from "@/types";
+
 import { SUPPORTED_LOCALES, TAX_CODES } from "@/utils/constants";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-import { SuscribeSchema } from ".";
-
 export * from "@/types/services";
 export * from "@/types/zod";
+
+/*
+  Shift
+*/
+
+export type ShiftCreate = z.infer<typeof ShiftCreateSchema>;
+export type ShiftSchema = z.infer<typeof ShiftModelSchema>;
+export type TypeShift = "PRODUCTION" | "FAST" | "TRACK";
 
 /* 
   Routes types

@@ -1,24 +1,33 @@
-import { Shift } from "@prisma/client";
+import dynamic from "next/dynamic";
 
 import i18n from "@/services/i18n";
-import ShiftService from "@/services/Shift";
 import UserService from "@/services/User";
 import ut from "@/services/Utilities/client";
 
 import { LocaleParams } from "@/types";
 
 import DateComponent from "@/components/Date";
-import NotesFab from "@/components/NotesFab";
-import NotesPortal from "@/components/NotesPortal";
-import ShiftButtons from "@/components/ShiftButtons";
-import ShiftStatus from "@/components/ShiftStatus";
-import ShiftTextState from "@/components/ShiftTextState";
+import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 import WelcomeTitle from "@/components/WelcomeTitle";
 
-import ShiftStatusProvider from "@/providers/ShiftStatusProvider";
-
 import { PATH_NAMES } from "@/utils/constants/pathnames";
+
+const DynamicShiftTrackStatus = dynamic(() => import("@/components/ShiftTrackStatus"), {
+  ssr: false,
+  loading: () => (
+    <>
+      <Stack orientation="vertical" classes="w-full" spacing={8}>
+        <Skeleton classes="h-8 w-1/3" />
+        <Skeleton classes="h-[25dvh] w-full" />
+      </Stack>
+      <Stack classes="h-full w-full" spacing={10} alignItems="center" justifyContent="between">
+        <Skeleton classes="h-12 w-full" />
+        <Skeleton classes="h-12 w-full" />
+      </Stack>
+    </>
+  ),
+});
 
 export default async function Home({ params }: { params: LocaleParams }) {
   const isLocaleSupported = new i18n(params.locale).isLocaleSupported();
@@ -33,8 +42,6 @@ export default async function Home({ params }: { params: LocaleParams }) {
     return ut.redirectTo(PATH_NAMES.LOGIN);
   }
 
-  const shiftUnclosed = ShiftService.findUnClosedShift(user?.shifts) as Shift | null;
-
   return (
     <>
       <Stack orientation="vertical" spacing={8}>
@@ -42,13 +49,7 @@ export default async function Home({ params }: { params: LocaleParams }) {
           <WelcomeTitle user={user} />
           <DateComponent locale={params.locale} />
         </Stack>
-        <ShiftStatusProvider user={user} shiftOpen={shiftUnclosed}>
-          <ShiftTextState />
-          <ShiftStatus />
-          <ShiftButtons />
-          <NotesFab />
-          <NotesPortal />
-        </ShiftStatusProvider>
+        <DynamicShiftTrackStatus />
       </Stack>
     </>
   );

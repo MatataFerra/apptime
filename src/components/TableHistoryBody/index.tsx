@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+
 import isEmpty from "lodash/isEmpty";
 
 import ShiftService from "@/services/Shift";
@@ -11,17 +13,20 @@ import { useDashboardContext } from "@/store/useDashboardStore";
 
 function TableHistoryBody() {
   const { user } = useDashboardContext((state) => state);
+  const hourlyWorkedShift = useMemo(() => {
+    return user?.shifts?.filter((shift) => shift.typeShift !== "PRODUCTION");
+  }, [user?.shifts]);
 
   return (
     <TableBody>
-      {isEmpty(user?.shifts) ? (
+      {isEmpty(hourlyWorkedShift) ? (
         <tr>
           <td colSpan={4} className="text-center">
             No shifts found
           </td>
         </tr>
       ) : (
-        ShiftService.shiftsSorted(user?.shifts, { desc: false })
+        ShiftService.shiftsSorted(hourlyWorkedShift, { desc: false })
           ?.filter((shift) => shift.isClosed)
           .map((shift) => <TableHistoryRow key={shift.id} shift={shift} />)
       )}

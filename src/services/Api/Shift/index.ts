@@ -1,8 +1,12 @@
-import { Shift } from "@prisma/client";
+import { z } from "zod";
 
 import ApiBaseService from "@/services/Api/base";
 
+import { ShiftCreateSchema } from "@/types";
+
 import { API_ENDPOINTS } from "@/utils/constants/endpoints";
+
+type ShiftSchema = z.infer<typeof ShiftCreateSchema>;
 
 class ApiShiftService extends ApiBaseService {
   constructor() {
@@ -13,7 +17,7 @@ class ApiShiftService extends ApiBaseService {
     body,
     id,
   }: {
-    body: Partial<Omit<Shift, "id">>;
+    body: Partial<ShiftSchema>;
     id: number | null | undefined;
   }) {
     const response = await this.put({
@@ -24,7 +28,7 @@ class ApiShiftService extends ApiBaseService {
     return response;
   }
 
-  static async createShift({ body }: { body: Omit<Shift, "id"> }) {
+  static async createShift({ body }: { body: ShiftSchema }) {
     const response = await this.post({
       endpoint: `${API_ENDPOINTS.SHIFT}`,
       body,
