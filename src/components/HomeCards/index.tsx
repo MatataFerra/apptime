@@ -18,8 +18,8 @@ function HomeCards() {
         onClick={() => router.push(PATH_NAMES.FAST_CHARGE)}
         classes="bg-pos-0 hover:bg-pos-100 bg-size-200 group relative h-full w-full cursor-pointer overflow-hidden rounded-lg bg-gradient-to-tl from-teal-500 via-sky-300 to-blue-500 font-medium shadow-input transition-all duration-500"
       >
-        <div className="bg-lightning absolute inset-0 h-full w-full bg-[length:100px] bg-left bg-no-repeat transition-all delay-100 duration-500 hover:bg-[length:200px] hover:bg-[-20%_center]" />
-        <Text classes="text-3xl transition-all group-hover:text-4xl group-hover:font-semibold">
+        <div className="bg-lightning absolute inset-0 h-full w-full bg-[length:80px] bg-left bg-no-repeat opacity-30 transition-all delay-75 duration-500 group-hover:bg-[length:200px] group-hover:bg-[-30%_center] group-hover:opacity-80" />
+        <Text classes="group z-10 text-2xl transition-all group-hover:text-3xl group-hover:font-semibold">
           Fast Charge
         </Text>
       </Stack>
@@ -29,8 +29,8 @@ function HomeCards() {
         onClick={() => router.push(PATH_NAMES.TRACK)}
         classes="bg-pos-0 hover:bg-pos-100 bg-size-200 group relative h-full w-full cursor-pointer rounded-lg bg-gradient-to-tl from-green-500 via-lime-400 to-emerald-400 font-medium shadow-input transition-all duration-500"
       >
-        <div className="bg-clock absolute inset-0 h-full w-full bg-[length:100px] bg-left bg-no-repeat transition-all delay-100 duration-500 hover:bg-[length:200px] hover:bg-[-20%_center]" />
-        <Text classes="text-3xl transition-all group-hover:text-4xl group-hover:font-semibold">
+        <div className="bg-clock absolute inset-0 h-full w-full bg-[length:80px] bg-left bg-no-repeat opacity-30 transition-all delay-75 duration-500 group-hover:bg-[length:200px] group-hover:bg-[-30%_center] group-hover:opacity-80" />
+        <Text classes="group z-10 text-2xl transition-all group-hover:text-3xl group-hover:font-semibold">
           Track your time
         </Text>
       </Stack>
@@ -40,8 +40,8 @@ function HomeCards() {
         onClick={() => router.push(PATH_NAMES.PRODUCTION)}
         classes="bg-pos-0 hover:bg-pos-100 bg-size-200 group relative h-full w-full cursor-pointer rounded-lg bg-gradient-to-tl from-red-500 via-amber-400 to-amber-400 font-medium shadow-input transition-all duration-500"
       >
-        <div className="bg-box absolute inset-0 h-full w-full bg-[length:100px] bg-left bg-no-repeat transition-all delay-100 duration-500 hover:bg-[length:200px] hover:bg-[-20%_center]" />
-        <Text classes="text-3xl transition-all group-hover:text-4xl group-hover:font-semibold">
+        <div className="bg-box absolute inset-0 h-full w-full bg-[length:80px] bg-left bg-no-repeat opacity-30 transition-all delay-75 duration-500 group-hover:bg-[length:200px] group-hover:bg-[-30%_center] group-hover:opacity-80" />
+        <Text classes="grooup z-10 text-2xl transition-all group-hover:text-3xl group-hover:font-semibold">
           Production Job
         </Text>
       </Stack>

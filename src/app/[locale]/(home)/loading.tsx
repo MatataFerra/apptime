@@ -4,7 +4,7 @@ import Stack from "@/components/ui/Stack";
 export default function LoadingHome() {
   return (
     <>
-      <Stack orientation="vertical" spacing={8}>
+      <Stack classes="h-full w-full" orientation="vertical" spacing={4}>
         <Skeleton classes="h-20 w-full" />
         <Skeleton classes="h-20 w-full" />
         <Skeleton classes="h-20 w-full" />
