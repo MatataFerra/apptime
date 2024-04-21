@@ -7,13 +7,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { format, isBefore, isEqual } from "date-fns";
 import isNaN from "lodash/isNaN";
-import { useLocale } from "next-intl";
 
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
 import Toast from "@/services/Toast";
 
-import { FastChargeFormSchema, Locale } from "@/types";
+import { FastChargeFormSchema } from "@/types";
 import { type FastChargeInputs, type FastChargeInputsParsed } from "@/types/forms";
 
 import PopoverBase from "@/components/Popover";
@@ -22,12 +21,12 @@ import Input from "@/components/ui/Input_v2";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
+import useHumanizeDate from "@/hooks/useHumanizeDate";
 import useUser from "@/hooks/useUser";
 
 import onSubmitFastCharge from "@/server-actions/fast-charge";
 
 function FastChargeForm() {
-  const locale = useLocale() as Locale;
   const queryClient = useQueryClient();
   const {
     handleSubmit,
@@ -41,6 +40,7 @@ function FastChargeForm() {
     resolver: zodResolver(FastChargeFormSchema),
   });
   const { data: user } = useUser();
+  const humanizeStartDate = useHumanizeDate({ date: watch("start-date") });
 
   const startDateWatch = watch("start-date");
   const finishDateWatch = watch("finish-date");
@@ -76,16 +76,6 @@ function FastChargeForm() {
 
     return date;
   }, [finishDateWatch, finishTimeWatch]);
-
-  const humanizeStartDate = useMemo(() => {
-    const humanized = startDateWatch
-      ? new DateHumanizer("today").humanizeDate(new Date(startDateWatch), {
-          locale: locale,
-        })
-      : null;
-
-    return humanized ? humanized : "waiting...";
-  }, [startDateWatch, locale]);
 
   const shift = useMemo(() => {
     if (startDateWatch && finishDateWatch && startTimeWatch && finishTimeWatch) {

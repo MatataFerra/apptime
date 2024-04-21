@@ -13,12 +13,18 @@ export default async function onEditShift(data: Shift) {
     return null;
   }
 
+  const shift = {
+    ...data,
+    typeShift: data.typeShift as "TRACK" | "FAST" | "PRODUCTION",
+  };
+
   try {
-    const buildShift = new ShiftService(data)
+    const buildShift = new ShiftService(shift)
       .checkPublicHoliday()
       .differenceInMinsBetweenStartAndEnd()
       .closeShift()
       .build();
+
     const updateShift = await new ShiftService(buildShift).update({ shiftId: data.id });
     revalidatePath("/[locale]/(home)/history-shifts", "page");
 

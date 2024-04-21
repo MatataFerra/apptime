@@ -2,6 +2,26 @@ import { z } from "zod";
 
 import Password from "@/services/Auth/password";
 
+/*
+  Index Schemas:
+
+  - Shift
+  - Profile
+  - User
+  - SearchParams
+  - Suscribe
+  - Validate password
+  - Fast Charge Form
+  - Production Form Job
+  - Enum to handle errors
+*/
+
+/*
+===================================================================
+-------------------------Shift-------------------------------------
+===================================================================
+*/
+
 const ShiftModelSchema = z.object({
   id: z.number({
     required_error: "Id must be provided correctly",
@@ -14,12 +34,31 @@ const ShiftModelSchema = z.object({
   notes: z.string().nullable(),
   startDate: z.string(),
   hourValue: z.number(),
+  itemValue: z.number().nullable(),
+  itemQuantity: z.number().nullable(),
+  typeShift: z.enum(["TRACK", "FAST", "PRODUCTION"]).default("TRACK"),
   holidayPay: z.boolean(),
   holidayPayRate: z.number().nullable(),
   unpaidBreaks: z.number().nullable(),
   taxCode: z.number().nullable(),
   userId: z.string().nullable(),
 });
+
+const ShiftCreateSchema = ShiftModelSchema.omit({
+  id: true,
+}).refine((values) => Object.keys(values).length > 0, {
+  message: "One of the fields must be defined",
+});
+
+const ShiftUpdateSchema = ShiftModelSchema.omit({
+  id: true,
+});
+
+/*
+===================================================================
+-------------------------Profile-----------------------------------
+===================================================================
+*/
 
 const ProfileSchema = z.object({
   id: z.number({
@@ -32,6 +71,23 @@ const ProfileSchema = z.object({
   country: z.string().nullable(),
   userId: z.string().nullable(),
 });
+
+const ProfileCreateSchema = ProfileSchema.omit({
+  id: true,
+}).refine((values) => Object.keys(values).length > 0, {
+  message: "One of the fields must be defined",
+});
+
+const ProfileUpdateSchema = ProfileSchema.partial().refine(
+  (values) => Object.keys(values).length > 0,
+  { message: "One of the fields must be defined" }
+);
+
+/*
+===================================================================
+-------------------------User--------------------------------------
+===================================================================
+*/
 
 const UserModelSchema = z.object({
   id: z.string({
@@ -71,26 +127,14 @@ const UserCreateSchema = UserModelSchema.omit({
   message: "One of the fields must be defined",
 });
 
-const ProfileUpdateSchema = ProfileSchema.partial().refine(
-  (values) => Object.keys(values).length > 0,
-  { message: "One of the fields must be defined" }
-);
+/*
+============================================================================
+============================================================================
+*/
 
-const ProfileCreateSchema = ProfileSchema.omit({
-  id: true,
-}).refine((values) => Object.keys(values).length > 0, {
-  message: "One of the fields must be defined",
-});
-
-const ShiftCreateSchema = ShiftModelSchema.omit({
-  id: true,
-}).refine((values) => Object.keys(values).length > 0, {
-  message: "One of the fields must be defined",
-});
-
-const ShiftUpdateSchema = ShiftModelSchema.omit({
-  id: true,
-});
+/* 
+  SearchParams Schema
+*/
 
 const SearchParamsSchema = z.object({
   shifts: z.string().nullable(),
@@ -134,7 +178,7 @@ const PasswordSchema = z.object({
   Fast Charge Schema
 */
 
-export const FastChargeFormSchema = z.object({
+const FastChargeFormSchema = z.object({
   "start-date": z.string(),
   "finish-date": z.string(),
   "start-time": z.string(),
@@ -150,6 +194,29 @@ export const FastChargeFormSchema = z.object({
   "holiday-pay-rate": z.string().refine((value) => !!value, {
     message: "Holiday pay rate must be greater than 0",
   }),
+});
+
+/* 
+  Production Form Job Schema
+*/
+
+const ProductionJobFormSchema = z.object({
+  "start-date": z.string(),
+  "finish-date": z.string(),
+  "hour-value": z.string().refine((value) => !!value, {
+    message: "Hour value must be greater than 0",
+  }),
+  "item-value": z.string().refine((value) => !!value, {
+    message: "Hour value must be greater than 0",
+  }),
+  "item-quantity": z.string().refine((value) => !!value, {
+    message: "Hour value must be greater than 0",
+  }),
+  "holiday-pay-rate": z.string().refine((value) => !!value, {
+    message: "Holiday pay rate must be greater than 0",
+  }),
+  "is-public-holiday": z.boolean(),
+  "is-worked": z.boolean(),
 });
 
 /**
@@ -174,8 +241,10 @@ const HandleErrorTypeSchema = z.enum([
 ]);
 
 export {
+  FastChargeFormSchema,
   HandleErrorTypeSchema,
   PasswordSchema,
+  ProductionJobFormSchema,
   ProfileCreateSchema,
   ProfileSchema,
   ProfileUpdateSchema,

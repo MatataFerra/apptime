@@ -1,5 +1,7 @@
-import api from "@/services/Api/Shift";
+import ShiftService from "@/services/Shift";
 import Toast from "@/services/Toast";
+
+import { type TypeShift } from "@/types";
 
 import Button from "@/components/ui/Button";
 import Stack from "@/components/ui/Stack";
@@ -18,7 +20,12 @@ function NotesButtons() {
     if (notes.length <= 3) return;
     if (!shift) return;
 
-    await api.updateShift({ body: { ...shift, notes }, id: shift.id });
+    await new ShiftService({
+      ...shift,
+      notes,
+      typeShift: (shift.typeShift as TypeShift) ?? "TRACK",
+    }).update({ shiftId: shift.id });
+
     updateShift({ notes, id: shift.id });
 
     Toast({

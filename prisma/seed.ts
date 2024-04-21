@@ -6,21 +6,8 @@ import { addDays, addMinutes, differenceInMinutes, isToday as isTheDateToday } f
 
 import prisma from "./client";
 
-const now = new Date(Date.now());
 const today = new Date();
 const myToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0);
-
-const datesMock = [
-  now, // today
-  addDays(now, -1), // yesterday
-  addDays(now, -2), // one day before yesterday
-  addDays(now, 1), // tomorrow
-  addDays(now, 2), // one day after tomorrow
-  addDays(now, 8), // one day after one week after
-  addDays(now, 7), // one week after
-  addDays(now, -7), // one week before
-  addDays(now, -8), // one day before one week before
-];
 
 const newDatesMock = [
   myToday, // today at 12:00
@@ -45,6 +32,9 @@ function addShiftsForSeed(user: User, dates: Array<Date>): Omit<Shift, "id">[] {
       holidayPayRate: 8,
       unpaidBreaks: 1,
       taxCode: 1,
+      itemQuantity: i === 2 ? 520 : null,
+      itemValue: i === 2 ? 0.23 : null,
+      typeShift: i === 2 ? "PRODUCTION" : "TRACK",
       notes: `mocked shift number ${i} from user ${user?.name}`,
     };
   });
@@ -122,6 +112,9 @@ async function main() {
         holidayPayRate: shiftData.holidayPayRate,
         taxCode: shiftData.taxCode,
         unpaidBreaks: shiftData.unpaidBreaks,
+        itemQuantity: shiftData.itemQuantity,
+        itemValue: shiftData.itemValue,
+        typeShift: shiftData.typeShift,
       },
     });
   }

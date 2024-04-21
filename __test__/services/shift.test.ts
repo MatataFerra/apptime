@@ -5,15 +5,13 @@ import { describe, expect, test } from "vitest";
 
 import ShiftService from "@/services/Shift";
 
+import { TypeShift } from "@/types";
+
 import { now } from "@/utils/constants";
 
 import shiftMock from "../../mocks/shift.prisma.json";
 
 const DIFFERENCE_SHIFT = 300;
-// let start = "";
-// let end = "";
-
-// let SHIFT_MOCK: any = {};
 
 describe("ShiftService", () => {
   describe("Check if shift builds correctly", () => {
@@ -21,6 +19,7 @@ describe("ShiftService", () => {
 
     const SHIFT_MOCK = {
       ...shiftMock.shift,
+      typeShift: "TRACK" as TypeShift,
       startDate: start,
       endDate: null,
     };
@@ -47,7 +46,7 @@ describe("ShiftService", () => {
     });
 
     test("should return the shift with all transformations", () => {
-      const shift = new ShiftService({ ...SHIFT_MOCK, isClosed: true })
+      const shift = new ShiftService({ ...SHIFT_MOCK, isClosed: true, typeShift: "TRACK" })
         .closeShift()
         .checkPublicHoliday()
         .differenceInMinsBetweenStartAndEnd()
@@ -68,6 +67,9 @@ describe("ShiftService", () => {
         hourValue: 10,
         taxCode: 0,
         unpaidBreaks: 0,
+        itemQuantity: null,
+        itemValue: null,
+        typeShift: "TRACK",
       });
     });
 
@@ -76,6 +78,7 @@ describe("ShiftService", () => {
         ...shiftMock.shift,
         startDate: start,
         endDate: addDays(now, 1).toString(),
+        typeShift: "TRACK",
       })
         .closeShift()
         .build();
@@ -84,6 +87,24 @@ describe("ShiftService", () => {
       expect(shift.endDate).toBe(addDays(now, 1).toString());
       expect(shift.endDate).not.toBe(now.toString());
       expect(SHIFT_MOCK.endDate).toBeNull();
+    });
+
+    test("should build a production shift", () => {
+      const shift = new ShiftService({
+        ...shiftMock.shift,
+        startDate: start,
+        endDate: addDays(now, 1).toString(),
+        typeShift: "FAST" as TypeShift,
+        itemValue: 10,
+        itemQuantity: 10,
+      })
+        .closeShift()
+        .typeShift()
+        .build();
+
+      expect(shift.itemValue).toBe(10);
+      expect(shift.itemQuantity).toBe(10);
+      expect(shift.typeShift).toBe("PRODUCTION");
     });
   });
 
@@ -95,7 +116,9 @@ describe("ShiftService", () => {
         endDate: addMinutes(now, DIFFERENCE_SHIFT).toString(),
       };
 
-      const shift = new ShiftService(mock).differenceInMinsBetweenStartAndEnd().build();
+      const shift = new ShiftService({ ...mock, typeShift: mock.typeShift as TypeShift })
+        .differenceInMinsBetweenStartAndEnd()
+        .build();
 
       const earnings = ShiftService.calculateEarnings({ shift });
 
@@ -105,12 +128,15 @@ describe("ShiftService", () => {
     test("Should calculate the earnings of a shift with 2 unpaid breaks", () => {
       const mock: Shift = {
         ...shiftMock.shift,
+        typeShift: "TRACK" as TypeShift,
         startDate: now.toString(),
         endDate: addMinutes(now, 480).toString(),
         unpaidBreaks: 2,
       };
 
-      const shift = new ShiftService(mock).differenceInMinsBetweenStartAndEnd().build();
+      const shift = new ShiftService({ ...mock, typeShift: mock.typeShift as TypeShift })
+        .differenceInMinsBetweenStartAndEnd()
+        .build();
 
       const earnings = ShiftService.calculateEarnings({ shift });
 
@@ -126,7 +152,9 @@ describe("ShiftService", () => {
         publicHolidayWorked: true,
       };
 
-      const shift = new ShiftService(mock).differenceInMinsBetweenStartAndEnd().build();
+      const shift = new ShiftService({ ...mock, typeShift: mock.typeShift as TypeShift })
+        .differenceInMinsBetweenStartAndEnd()
+        .build();
 
       const earnings = ShiftService.calculateEarnings({
         shift,
@@ -162,6 +190,32 @@ describe("ShiftService", () => {
       });
 
       expect(earnings).toBe(75);
+    });
+
+    test("Should calculate the earnings of a production shift", () => {
+      const mock: Shift = {
+        ...shiftMock.shift,
+        typeShift: "PRODUCTION" as TypeShift,
+        startDate: now.toString(),
+        endDate: addMinutes(now, 480).toString(),
+        itemValue: 10,
+        itemQuantity: 10,
+      };
+
+      const shift = new ShiftService({ ...mock, typeShift: mock.typeShift as TypeShift })
+        .differenceInMinsBetweenStartAndEnd()
+        .build();
+
+      const earnings = ShiftService.calculateProductionEarnings({
+        hourValue: shift.hourValue,
+        itemValue: shift.itemValue,
+        itemQuantity: shift.itemQuantity,
+        holidayPayRate: shift.holidayPayRate,
+        isPublicHoliday: shift.isPublicHoliday,
+        publicHolidayWorked: shift.publicHolidayWorked,
+      });
+
+      expect(earnings).toBe(100);
     });
   });
 });

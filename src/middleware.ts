@@ -88,5 +88,8 @@ export const config = {
     "/incomes",
     "/es/incomes",
     "/en/incomes",
+    "/production",
+    "/es/production",
+    "/en/production",
   ],
 };

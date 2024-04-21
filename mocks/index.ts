@@ -74,6 +74,9 @@ export const userShiftsMocked: Shift[] = datesMock.map((date, i) => {
     hourValue: 10.5,
     taxCode: 0,
     unpaidBreaks: 1,
+    itemQuantity: i === 5 ? 520 : null,
+    itemValue: i === 5 ? 0.23 : null,
+    typeShift: i === 5 ? "PRODUCTION" : "TRACK",
   };
 });
 

@@ -6,8 +6,8 @@ SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 echo "SCRIPT_PATH: ${SCRIPT_PATH}/prisma-migrate.sh"
 
 # Cargar variables de entorno desde el archivo .env.development
-if [[ -f "${SCRIPT_PATH}/../.env.development" ]]; then
-  export $(cat "${SCRIPT_PATH}/../.env.development" | xargs)
+if [[ -f "${SCRIPT_PATH}/../.env.local" ]]; then
+  export $(cat "${SCRIPT_PATH}/../.env.local" | xargs)
 fi
 
 # Verificar si se proporcionó un argumento (nombre de migración)

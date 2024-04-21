@@ -82,6 +82,9 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
         holidayPayRate: Number(data.holidayPayRate),
         taxCode: data.taxCode ? (data.taxCode as TaxCodes) : 2,
         unpaidBreaks: Number(data.unpaidBreaks),
+        itemQuantity: null,
+        itemValue: null,
+        typeShift: "TRACK",
       },
     });
 

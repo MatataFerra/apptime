@@ -2,8 +2,6 @@ import { Shift } from "@prisma/client";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
-import { type TaxCodes } from "@/types";
-
 const ShiftStep = {
   PublicHoliday: "PublicHoliday",
   ShiftInfo: "ShiftInfo",
@@ -38,6 +36,9 @@ export const useShiftData = create(
         holidayPayRate: 8,
         taxCode: 0,
         unpaidBreaks: 1,
+        itemQuantity: null,
+        itemValue: null,
+        typeShift: "TRACK",
       },
       errors: false,
       step: ShiftStep.HasConfig,

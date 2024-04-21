@@ -13,6 +13,9 @@
       "holidayPayRate": 8,
       "unpaidBreaks": 1,
       "taxCode": 0,
+      "itemValue": null,
+      "itemQuantity": null,
+      "typeShift": "TRACK",
       "userId": "1"
     },
     {
@@ -28,6 +31,9 @@
       "holidayPayRate": 8,
       "unpaidBreaks": 1,
       "taxCode": 0,
+      "itemValue": null,
+      "itemQuantity": null,
+      "typeShift": "TRACK",
       "userId": "1"
     }
   ],
@@ -43,6 +49,9 @@
     "holidayPayRate": 0,
     "unpaidBreaks": 0,
     "taxCode": 0,
+    "itemValue": null,
+    "itemQuantity": null,
+    "typeShift": "TRACK",
     "userId": "2"
   }
 }
