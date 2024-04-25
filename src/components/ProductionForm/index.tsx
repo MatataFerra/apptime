@@ -14,7 +14,6 @@ import Toast from "@/services/Toast";
 import { ProductionJobFormSchema } from "@/types";
 import { type ProductionInputs } from "@/types/forms";
 
-import PopoverBase from "@/components/Popover";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input_v2";
 import Stack from "@/components/ui/Stack";
@@ -23,6 +22,7 @@ import Text from "@/components/ui/Text";
 import useHumanizeDate from "@/hooks/useHumanizeDate";
 import useUser from "@/hooks/useUser";
 
+import FormReport from "../FormReport/index";
 import onSubmitProductionJob from "@/server-actions/production-job";
 
 function ProductionJobForm() {
@@ -112,7 +112,7 @@ function ProductionJobForm() {
       duration: 3000,
     });
 
-    onSubmitProductionJob(parseData).then((response) => {
+    onSubmitProductionJob(parseData).then((response: any) => {
       if (response) {
         queryClient.invalidateQueries({
           queryKey: ["user", user?.email],
@@ -207,17 +207,11 @@ function ProductionJobForm() {
           </Stack>
         </Stack>
       </Stack>
-      <Stack orientation="vertical">
-        <Text variant="subtitle" classes="text-sm">
-          You are going to upload:
-        </Text>
-        <Text classes="text-sm">Start date: {humanizeStartDate}</Text>
-        <Text classes="text-sm">Worked time: {shift?.text ? shift.text : "expecting data..."}</Text>
-        <Text classes="text-sm">
-          Estimated earnings: <PopoverBase content={`Without taxes`} classes="w-fit" /> ${" "}
-          {String(calculateProductionEarn.toFixed(2))}
-        </Text>
-      </Stack>
+      <FormReport
+        startDate={humanizeStartDate}
+        workedTime={shift?.text}
+        earnings={calculateProductionEarn}
+      />
       <Stack justifyContent="end" classes="w-full">
         <Button type="submit" variant="black" form="production-job">
           Submit

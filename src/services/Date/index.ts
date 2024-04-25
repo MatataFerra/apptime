@@ -1,4 +1,4 @@
-import { format, formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow, isValid } from "date-fns";
 import { enUS, es, Locale } from "date-fns/locale";
 
 import type { DateHumanizerStrategy, Locale as possibleLocale } from "@/types";
@@ -93,6 +93,8 @@ export default class DateHumanizer {
   }
 
   private format(date: Date, dateFormat: string, locale?: "es" | "en") {
-    return format(date, dateFormat, { locale: this.locale[locale || "en"] });
+    //! DELETE Date.now()
+    const validDate = isValid(date) ? date : Date.now();
+    return format(validDate, dateFormat, { locale: this.locale[locale || "en"] });
   }
 }

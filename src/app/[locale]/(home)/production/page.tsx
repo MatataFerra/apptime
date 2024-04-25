@@ -1,19 +1,47 @@
-import { LocaleParams } from "@/types";
+import dynamic from "next/dynamic";
 
-import ProductionForm from "@/components/ProductionForm";
+import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
 
-export default async function ProductionJob({ params }: { params: LocaleParams }) {
+const ProductionForm = dynamic(() => import("@/components/ProductionForm"), {
+  ssr: false,
+  loading: () => (
+    <>
+      <Stack orientation="vertical" classes="w-full">
+        <Stack orientation="horizontal" wrap classes="w-full">
+          <Skeleton classes="input-flex min-h-12 w-full" />
+          <Skeleton classes="input-flex min-h-12 w-full" />
+          <Skeleton classes="input-flex min-h-12 w-full" />
+          <Skeleton classes="input-flex min-h-12 w-full" />
+          <Skeleton classes="input-flex min-h-12 w-full" />
+          <Skeleton classes="input-flex min-h-12 w-full" />
+          <Skeleton classes="input-flex min-h-12 w-full" />
+        </Stack>
+        <Stack orientation="horizontal" classes="w-full">
+          <Skeleton classes="h-5 w-full" />
+          <Skeleton classes="h-5 w-full" />
+        </Stack>
+      </Stack>
+      <Stack orientation="vertical" classes="h-full w-full">
+        <Skeleton classes="h-32 w-full" />
+      </Stack>
+      <Stack justifyContent="end" classes="h-full w-full">
+        <Skeleton classes="h-12 w-32" />
+      </Stack>
+    </>
+  ),
+});
+
+const ProductionTitle = dynamic(() => import("@/components/ModuleTitle"), {
+  ssr: false,
+  loading: () => <Skeleton classes="h-60 w-40" />,
+});
+
+export default async function ProductionJob() {
   return (
     <>
       <Stack orientation="vertical" spacing={6}>
-        <Stack orientation="vertical">
-          <Text gradient="title" classes={`text-2xl font-bold`}>
-            Production Job
-          </Text>
-          <Text>module to track your production work</Text>
-        </Stack>
+        <ProductionTitle title="Production Job" subtitle="module to track your production work" />
         <ProductionForm />
       </Stack>
     </>
