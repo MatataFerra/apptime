@@ -179,10 +179,19 @@ const PasswordSchema = z.object({
 */
 
 const FastChargeFormSchema = z.object({
-  "start-date": z.string(),
-  "finish-date": z.string(),
-  "start-time": z.string(),
-  "finish-time": z.string(),
+  "start-date": z.string().refine((value) => !!value, {
+    message: "Start date must be provided",
+  }),
+
+  "finish-date": z.string().refine((value) => !!value, {
+    message: "Finish date must be provided",
+  }),
+  "start-time": z.string().refine((value) => !!value, {
+    message: "Start time must be provided",
+  }),
+  "finish-time": z.string().refine((value) => !!value, {
+    message: "Finish time must be provided",
+  }),
   "fast-holiday": z.boolean(),
   "fast-worked": z.boolean(),
   "hour-value": z.string().refine((value) => !!value, {
@@ -203,9 +212,6 @@ const FastChargeFormSchema = z.object({
 const ProductionJobFormSchema = z.object({
   "start-date": z.string(),
   "finish-date": z.string(),
-  "hour-value": z.string().refine((value) => !!value, {
-    message: "Hour value must be greater than 0",
-  }),
   "item-value": z.string().refine((value) => !!value, {
     message: "Hour value must be greater than 0",
   }),

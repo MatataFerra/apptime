@@ -1,8 +1,6 @@
 import { User } from "@prisma/client";
 import { getServerSession } from "next-auth";
 
-import TokenService from "@/services/Token";
-
 import { UserType } from "@/types";
 
 import { USER_ROLES } from "@/utils/constants";
@@ -94,16 +92,6 @@ class UserService {
 
       return acc;
     }, {});
-  }
-
-  static async authenticatedUser() {
-    const token = await new TokenService("next-auth.session-token").decodedCookieData();
-
-    if (!token) return null;
-
-    const user = await UserService.findUniqueUser({ email: token.email });
-
-    return user;
   }
 
   static async getSessionUser() {

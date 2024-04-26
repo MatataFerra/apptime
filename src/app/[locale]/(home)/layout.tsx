@@ -1,14 +1,18 @@
 import { ReactElement } from "react";
 
+import dynamic from "next/dynamic";
 import { notFound, redirect } from "next/navigation";
 
 import UserService from "@/services/User";
 import ut from "@/services/Utilities/client";
 
-import Drawer from "@/components/DrawerMenu";
 import DrawerUserInfo from "@/components/DrawerUserInfo";
 import Ham from "@/components/Ham";
 import Header from "@/components/ui/Header";
+
+const DynamicDrawer = dynamic(() => import("@/components/DrawerMenu"), {
+  ssr: false,
+});
 
 interface Props {
   children: ReactElement;
@@ -32,9 +36,9 @@ export default async function HomeLayout({ children, params }: Props) {
       <main className="grid h-[100dvh] grid-rows-[auto,1fr] gap-8 p-4">
         <Header position="between" classes="relative">
           <Ham />
-          <Drawer>
+          <DynamicDrawer>
             <DrawerUserInfo />
-          </Drawer>
+          </DynamicDrawer>
         </Header>
         {children}
       </main>

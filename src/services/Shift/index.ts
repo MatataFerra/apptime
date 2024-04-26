@@ -116,21 +116,19 @@ class ShiftService implements ShiftServiceInterface {
   static calculateProductionEarnings({
     itemValue,
     itemQuantity,
-    hourValue,
     holidayPayRate,
     publicHolidayWorked,
     isPublicHoliday,
   }: {
     itemValue: ShiftCreate["itemValue"];
     itemQuantity: ShiftCreate["itemQuantity"];
-    hourValue: ShiftCreate["hourValue"];
     publicHolidayWorked: ShiftCreate["publicHolidayWorked"];
     holidayPayRate: ShiftCreate["holidayPayRate"];
     isPublicHoliday: ShiftCreate["isPublicHoliday"];
   }) {
     let publicHolidayRate = 1;
     let holidayPayRateValue = !!holidayPayRate ? holidayPayRate / 100 + 1 : 1;
-    if (!itemValue || !itemQuantity || !hourValue) return 0;
+    if (!itemValue || !itemQuantity) return 0;
 
     if (publicHolidayWorked) {
       publicHolidayRate = 1.5;

@@ -4,9 +4,11 @@ import { signIn, signOut } from "next-auth/react";
 
 import PasswordService from "@/services/Auth/password";
 import ErrorFactory from "@/services/Error/factory";
+import TokenService from "@/services/Token";
 import UserService from "@/services/User";
 
 import { authOptions } from "@/utils/auth";
+import { NEXT_AUTH_SESSION_TOKEN } from "@/utils/constants";
 
 import prisma from "#/prisma/client";
 
@@ -97,7 +99,11 @@ class Auth implements AuthServiceInterface {
       throw ErrorFactory.createError("BodyNotProvided");
     }
 
-    const user = await UserService.authenticatedUser();
+    const token = await new TokenService(NEXT_AUTH_SESSION_TOKEN).decodedCookieData();
+
+    if (!token) return null;
+    const user = await UserService.findUniqueUser({ email: token.email });
+
     if (!user) {
       return await prisma.user.create({
         data: {
