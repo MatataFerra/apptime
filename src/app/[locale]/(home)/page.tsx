@@ -16,9 +16,9 @@ const HomeCards = dynamic(() => import("@/components/HomeCards"), {
   loading: () => (
     <>
       <Stack classes="h-full w-full" orientation="vertical" spacing={4}>
-        <Skeleton classes="h-28 w-full" />
-        <Skeleton classes="h-28 w-full" />
-        <Skeleton classes="h-28 w-full" />
+        <Skeleton classes="h-full w-full" />
+        <Skeleton classes="h-full w-full" />
+        <Skeleton classes="h-full w-full" />
       </Stack>
     </>
   ),
