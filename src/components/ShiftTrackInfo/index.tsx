@@ -6,12 +6,13 @@ import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
 async function ShiftTrackInfo() {
-  const user = await UserService.getSessionUser();
-  const lastShift = user?.shifts.at(-1);
+  const getUser = await UserService.getSessionUser();
+
+  const lastShift = getUser?.shifts.at(-1);
   const dateHumanized = new DateHumanizer("long").humanizeDate(
     new Date(lastShift?.startDate ?? "")
   );
-  const earnings = user?.shifts.reduce((acc, shift) => {
+  const earnings = getUser?.shifts.reduce((acc, shift) => {
     if (shift.isClosed) {
       acc += ShiftService.calculateEarnings({ shift });
     }
@@ -21,14 +22,14 @@ async function ShiftTrackInfo() {
 
   return (
     <>
-      {user?.shifts.length === 0 ? (
+      {getUser?.shifts.length === 0 ? (
         <Text classes="mx-0 my-auto block text-center text-xl text-red-700">
           {"You haven't started your shift yet! Please press the 'Start Shift' button."}
         </Text>
       ) : (
         <Stack as="div" orientation="vertical">
           <Text>{`last shift tracked: ${dateHumanized ?? "no date available"}`}</Text>
-          <Text>total shifts tracked: {user?.shifts.length}</Text>
+          <Text>total shifts tracked: {getUser?.shifts.length}</Text>
           <Text>money earn at the moment: {`${earnings?.toFixed(2)}`}$</Text>
         </Stack>
       )}

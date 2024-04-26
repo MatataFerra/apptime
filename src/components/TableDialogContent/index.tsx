@@ -65,7 +65,6 @@ function TableDialogContent({ shift }: Props) {
         {shift.typeShift === "PRODUCTION"
           ? `$${String(
               ShiftService.calculateProductionEarnings({
-                hourValue: shift.hourValue,
                 itemValue: shift.itemValue,
                 itemQuantity: shift.itemQuantity,
                 holidayPayRate: shift.holidayPayRate,

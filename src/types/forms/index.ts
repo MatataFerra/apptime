@@ -60,7 +60,6 @@ export type ProductionInputs = z.infer<typeof ProductionJobFormSchema>;
 export type ProductionInputsParsed = {
   startDate: string;
   endDate: string;
-  hourValue: number;
   itemValue: number;
   itemQuantity: number;
   holidayPayRate: number;
