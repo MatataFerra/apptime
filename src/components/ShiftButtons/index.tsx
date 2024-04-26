@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect } from "react";
 
 import ShiftService from "@/services/Shift";

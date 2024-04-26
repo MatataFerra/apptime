@@ -212,9 +212,6 @@ const FastChargeFormSchema = z.object({
 const ProductionJobFormSchema = z.object({
   "start-date": z.string(),
   "finish-date": z.string(),
-  "hour-value": z.string().refine((value) => !!value, {
-    message: "Hour value must be greater than 0",
-  }),
   "item-value": z.string().refine((value) => !!value, {
     message: "Hour value must be greater than 0",
   }),

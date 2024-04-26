@@ -207,7 +207,6 @@ describe("ShiftService", () => {
         .build();
 
       const earnings = ShiftService.calculateProductionEarnings({
-        hourValue: shift.hourValue,
         itemValue: shift.itemValue,
         itemQuantity: shift.itemQuantity,
         holidayPayRate: shift.holidayPayRate,

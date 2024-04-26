@@ -19,7 +19,6 @@ function TablePerProductionRow({ shift }: { shift: Shift }) {
 
   const calculateEarnings = useCallback((shift: Shift) => {
     return ShiftService.calculateProductionEarnings({
-      hourValue: shift.hourValue,
       itemValue: shift.itemValue,
       itemQuantity: shift.itemQuantity,
       holidayPayRate: shift.holidayPayRate,

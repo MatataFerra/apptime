@@ -24,6 +24,7 @@ export default async function onSubmitFastCharge(data: ProductionInputsParsed) {
     unpaidBreaks: 0,
     userId: currentUser.id,
     typeShift: "PRODUCTION",
+    hourValue: 0,
   })
     .closeShift()
     .typeShift()

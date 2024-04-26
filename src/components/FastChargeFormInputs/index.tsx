@@ -60,6 +60,13 @@ function FastChargeFormInputs() {
   }, [startDate, setValue, touchedFields, setValues, errors, clearErrors]);
 
   function onSubmit(formData: FastChargeInputs) {
+    Toast({
+      type: "info",
+      message: "Your request is being processed",
+      description: "Please wait a moment...",
+      duration: 1000,
+    });
+
     if (isBefore(new Date(finishDate ?? ""), new Date(startDate ?? ""))) {
       setError("finish-date", {
         type: "manual",
@@ -118,6 +125,13 @@ function FastChargeFormInputs() {
           queryKey: ["user", user?.email],
         });
       }
+
+      Toast({
+        type: "error",
+        message: "Error",
+        description: "An error occurred while creating the shift",
+        duration: 3000,
+      });
     });
   }
 

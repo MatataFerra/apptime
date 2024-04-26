@@ -6,10 +6,8 @@ import ut from "@/services/Utilities/client";
 
 import { LocaleParams } from "@/types";
 
-import DateComponent from "@/components/Date";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
-import WelcomeTitle from "@/components/WelcomeTitle";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
@@ -27,6 +25,21 @@ const DynamicShiftTrackStatus = dynamic(() => import("@/components/ShiftTrackSta
       </Stack>
     </>
   ),
+});
+
+const WelcomeTitle = dynamic(() => import("@/components/WelcomeTitle"), {
+  ssr: false,
+  loading: () => (
+    <Stack as="div" orientation="vertical" spacing={4}>
+      <Skeleton classes="h-12 w-60" />
+      <Skeleton classes="h-12 w-28" />
+    </Stack>
+  ),
+});
+
+const DateComponent = dynamic(() => import("@/components/Date"), {
+  ssr: false,
+  loading: () => <Skeleton classes="h-4 w-44" />,
 });
 
 export default async function Track({ params }: { params: LocaleParams }) {

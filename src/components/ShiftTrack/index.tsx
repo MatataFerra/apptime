@@ -1,6 +1,11 @@
+import dynamic from "next/dynamic";
+
 import ShiftTrackInfo from "@/components/ShiftTrackInfo";
-import ShiftTrackTitle from "@/components/ShiftTrackTitle";
 import Stack from "@/components/ui/Stack";
+
+const ShiftTrackTitle = dynamic(() => import("@/components/ShiftTrackTitle"), {
+  ssr: false,
+});
 
 function ShiftTrack() {
   return (

@@ -42,7 +42,6 @@ function FastChargeForm() {
   return (
     <>
       <FastChargeFormInputs />
-
       <FormReport />
       <Stack justifyContent="end" classes="w-full">
         <Button type="submit" variant="black" form="fast-charge">
