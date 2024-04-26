@@ -1,5 +1,3 @@
-"use client";
-
 import { Shift } from "@prisma/client";
 import dynamic from "next/dynamic";
 

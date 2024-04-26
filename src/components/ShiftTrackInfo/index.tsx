@@ -1,30 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
-
-import api from "@/services/Api";
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
-
-import { UserType } from "@/types";
+import UserService from "@/services/User";
 
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
-import useUser from "@/hooks/useUser";
-
-function ShiftTrackInfo() {
-  const { data: user } = useUser();
-  const { data } = useQuery({
-    queryKey: ["user", user?.email],
-    queryFn: () =>
-      api.getUserByEmail.bind(api)({
-        email: user?.email,
-        shifts: true,
-        profile: true,
-        hasEnvUrl: false,
-      }),
-  });
-
-  const getUser = data?.user as UserType;
+async function ShiftTrackInfo() {
+  const getUser = await UserService.getSessionUser();
 
   const lastShift = getUser?.shifts.at(-1);
   const dateHumanized = new DateHumanizer("long").humanizeDate(

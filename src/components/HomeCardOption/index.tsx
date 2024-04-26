@@ -22,18 +22,15 @@ function HomeCardOption({ gradient: { from, via, to }, title, path, bgImage }: P
 
   return (
     <Stack
-      style={{
-        backgroundSize: "200% 200%",
-      }}
       justifyContent="center"
       alignItems="center"
       onClick={() => router.push(path)}
-      classes={`group relative h-full w-full cursor-pointer rounded-lg bg-gradient-to-tl bg-pos-0 font-medium shadow-input transition-all duration-500 hover:bg-pos-100 ${from} ${via} ${to}`}
+      classes={`group relative h-28 w-full cursor-pointer rounded-lg bg-gradient-to-tl bg-pos-0 font-medium shadow-input transition-all duration-500 hover:bg-pos-100 ${from} ${via} ${to}`}
     >
       <div
-        className={`absolute inset-0 h-full w-full ${bgImage} bg-[length:80px] bg-left bg-no-repeat opacity-10 transition-all delay-75 duration-500 group-hover:bg-[length:200px] group-hover:bg-[-30%_center] group-hover:opacity-50`}
+        className={`absolute inset-0 h-28 w-full ${bgImage} bg-[length:80px] bg-left bg-no-repeat opacity-10 transition-all delay-75 duration-500 group-hover:bg-[length:200px] group-hover:bg-[-30%_center] group-hover:opacity-50`}
       />
-      <Text classes="group z-10 text-pretty text-2xl font-semibold">{title}</Text>
+      <Text classes="group z-10 text-pretty text-xl font-semibold">{title}</Text>
     </Stack>
   );
 }

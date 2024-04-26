@@ -1,3 +1,5 @@
+"use client";
+
 import { useMemo } from "react";
 
 import ShiftService from "@/services/Shift";
