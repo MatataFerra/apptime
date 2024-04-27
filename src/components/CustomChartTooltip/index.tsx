@@ -1,4 +1,4 @@
-import { FULL_MONTHS_NAMES } from "@/utils/constants";
+import { FULL_MONTHS_NAMES, TYPE_SHIFT } from "@/utils/constants";
 
 /**
  * @name CustomChartTooltip
@@ -12,7 +12,7 @@ import { FULL_MONTHS_NAMES } from "@/utils/constants";
  */
 function CustomChartTooltip({ active, payload, label, legend, customLegend, showDates }: any) {
   if (active && payload && payload.length) {
-    const { dates, shiftsWorked } = payload[0].payload;
+    const { dates, shiftsWorked, type } = payload[0].payload;
 
     const sumValue = payload.reduce((acc: number, curr: any) => {
       if (typeof curr.value === "string") return;
@@ -34,6 +34,7 @@ function CustomChartTooltip({ active, payload, label, legend, customLegend, show
         ) : (
           <div>
             <p className="text-md w-full py-1 text-gray-900">{`${legend}: $${sumValue.toFixed(2)} `}</p>
+            <p className="text-md w-full py-1 text-gray-900">{`Type of shift: ${TYPE_SHIFT[type as keyof typeof TYPE_SHIFT]} `}</p>
             <p className="w-full text-sm text-gray-800">{`${findMonthName !== -1 ? `Number of shifts worked: ${shiftsWorked}` : ""}`}</p>
             {showDates && (
               <ul className="w-full list-inside list-disc text-sm text-violet-600">

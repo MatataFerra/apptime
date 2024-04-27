@@ -1,4 +1,4 @@
-import { Profile, Shift } from "@prisma/client";
+import { Shift } from "@prisma/client";
 
 import type { EarnsMonthData } from "@/types";
 
@@ -37,6 +37,7 @@ class Chart {
       .map((shift) => ({
         date: new DateHumanizer("short").humanizeDate(new Date(shift.startDate)),
         earnings: ShiftService.calculateEarnings({ shift }),
+        type: shift.typeShift,
       }));
 
     return data;

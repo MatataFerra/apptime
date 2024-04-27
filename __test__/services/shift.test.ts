@@ -206,12 +206,8 @@ describe("ShiftService", () => {
         .differenceInMinsBetweenStartAndEnd()
         .build();
 
-      const earnings = ShiftService.calculateProductionEarnings({
-        itemValue: shift.itemValue,
-        itemQuantity: shift.itemQuantity,
-        holidayPayRate: shift.holidayPayRate,
-        isPublicHoliday: shift.isPublicHoliday,
-        publicHolidayWorked: shift.publicHolidayWorked,
+      const earnings = ShiftService.calculateEarnings({
+        shift,
       });
 
       expect(earnings).toBe(100);

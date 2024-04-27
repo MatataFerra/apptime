@@ -42,12 +42,11 @@ function ProductionFormReport() {
       itemValue: Number(itemValue ?? 0),
       itemQuantity: Number(itemQuantity),
       holidayPayRate: Number(holidayPayRate),
-      isPublicHoliday: !!isPublicHoliday,
       publicHolidayWorked: !!publicHolidayWorked,
     });
 
     return isNaN(earnings) ? 0 : earnings;
-  }, [holidayPayRate, isPublicHoliday, publicHolidayWorked, itemQuantity, itemValue]);
+  }, [holidayPayRate, publicHolidayWorked, itemQuantity, itemValue]);
 
   return (
     <FormReport

@@ -6,15 +6,11 @@ import ShiftService from "@/services/Shift";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
+import { TYPE_SHIFT } from "@/utils/constants";
+
 type Props = {
   shift: Shift;
 };
-
-const TYPE_SHIFT = {
-  PRODUCTION: "Production",
-  TRACK: "Hourly",
-  FAST: "Hourly",
-} as const;
 
 function TableDialogContent({ shift }: Props) {
   return (
@@ -68,7 +64,6 @@ function TableDialogContent({ shift }: Props) {
                 itemValue: shift.itemValue,
                 itemQuantity: shift.itemQuantity,
                 holidayPayRate: shift.holidayPayRate,
-                isPublicHoliday: shift.isPublicHoliday,
                 publicHolidayWorked: shift.publicHolidayWorked,
               }).toFixed(2)
             )}`
