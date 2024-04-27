@@ -9,8 +9,14 @@ import CustomChartTooltip from "@/components/CustomChartTooltip";
 import BarGradient from "@/components/ui/BarGradient";
 import ChartLegend from "@/components/ui/ChartLegend";
 
+type Data = {
+  earnings: number;
+  date: string;
+  type: string;
+};
+
 type Props = {
-  data: any[] | Record<string, any>[] | undefined;
+  data: Data[] | Record<string, any>[] | undefined;
   color: Color;
   legend?: string;
   barColor?: string;

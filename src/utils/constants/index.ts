@@ -86,3 +86,9 @@ export const TAX_CODES = {
   CAE: 1,
   NONE: 2,
 } as const;
+
+export const TYPE_SHIFT = {
+  PRODUCTION: "Production",
+  TRACK: "Hourly",
+  FAST: "Hourly",
+} as const;
