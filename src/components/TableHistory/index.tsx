@@ -1,6 +1,7 @@
 import TableHistoryBody from "@/components/TableHistoryBody";
 import TableHistoryFoot from "@/components/TableHistoryFoot";
 import TablePerProductionBody from "@/components/TablePerProductionBody";
+import TablePerProductionFooter from "@/components/TablePerProductionFooter";
 import Stack from "@/components/ui/Stack";
 import Table from "@/components/ui/Table";
 import TableHead from "@/components/ui/TableHead";
@@ -21,7 +22,7 @@ function TableHistory() {
       <TabsContent className="m-0 rounded-lg shadow-input" value="perHour">
         <Table classes="h-full w-full table-fixed">
           <TableHead
-            classes="border border-l-0 border-r-0 border-t-0 border-b-gray-900 text-left text-xs"
+            classes="border-b border-b-gray-900 text-left text-xs"
             columnTitle={COLUMNS}
             elementClasses="p-4"
           />
@@ -38,6 +39,7 @@ function TableHistory() {
             elementClasses="p-4"
           />
           <TablePerProductionBody />
+          <TablePerProductionFooter colsNumber={COLUMNS_PER_PRODUCTION.length} />
         </Table>
       </TabsContent>
     </Tabs>
