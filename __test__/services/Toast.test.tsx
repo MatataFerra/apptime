@@ -1,7 +1,7 @@
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
-import { Toaster } from "@/components/ui/Toast/toaster";
+import Toaster from "@/components/ui/Toast/toaster";
 
 import showToast, { type ToastOptions } from "../../src/services/Toast";
 
