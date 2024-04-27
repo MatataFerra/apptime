@@ -16,7 +16,7 @@ export const BUTTON_VARIANTS = {
   primary: "shadow-button bg-aquatic p-3 font-bold text-black",
   secondary: "bg-gray-200 text-gray-800 dark:bg-gray-800 dark:text-gray-100 p-3",
   danger: "bg-red-500 text-white p-3 shadow-button active:shadow-button-inner",
-  success: "bg-green-500 text-white p-3",
+  success: "bg-green-500 text-white p-3 shadow-button active:shadow-button-inner",
   warning: "bg-yellow-500 text-white p-3",
   info: "bg-blue-500 text-white p-3 font-bold text-white shadow-button",
   rounded: "text-black p-3 rounded-full bg-transparent",

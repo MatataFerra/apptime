@@ -26,10 +26,6 @@ function TablePerProductionRow({ shift }: { shift: Shift }) {
     });
   }, []);
 
-  function getHours(minutes: number) {
-    return ShiftService.convertAmountInDecimal(minutes);
-  }
-
   return (
     <TableDialog
       title="Info about this shift"
