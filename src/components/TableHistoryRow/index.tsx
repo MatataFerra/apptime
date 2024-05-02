@@ -3,16 +3,31 @@
 import { useCallback } from "react";
 
 import { Shift } from "@prisma/client";
+import dynamic from "next/dynamic";
 
 import ShiftService from "@/services/Shift";
 
 import Icon from "@/components/ui/Icons";
+import Skeleton from "@/components/ui/Skeleton";
 import TableElement from "@/components/ui/TableElement";
 
 import useHumanizeDate from "@/hooks/useHumanizeDate";
 
-import TableDialog from "../TableDialog";
-import TableDialogContent from "../TableDialogContent";
+const TableDialog = dynamic(() => import("@/components/TableDialog"), {
+  ssr: false,
+  loading: () => (
+    <TableElement as="tr">
+      <TableElement>
+        <Skeleton classes="h-40 w-full" />
+      </TableElement>
+    </TableElement>
+  ),
+});
+
+const TableDialogContent = dynamic(() => import("@/components/TableDialogContent"), {
+  ssr: false,
+  loading: () => <Skeleton classes="h-40 w-full" />,
+});
 
 function TableHistoryRow({ shift }: { shift: Shift }) {
   const shortDate = useHumanizeDate({ date: shift.startDate, typeFormat: "short" });
