@@ -22,14 +22,9 @@ function TablePerProductionRow({ shift }: { shift: Shift }) {
       itemValue: shift.itemValue,
       itemQuantity: shift.itemQuantity,
       holidayPayRate: shift.holidayPayRate,
-      isPublicHoliday: shift.isPublicHoliday,
       publicHolidayWorked: shift.publicHolidayWorked,
     });
   }, []);
-
-  function getHours(minutes: number) {
-    return ShiftService.convertAmountInDecimal(minutes);
-  }
 
   return (
     <TableDialog

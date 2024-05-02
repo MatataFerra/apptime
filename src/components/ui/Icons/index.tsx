@@ -104,6 +104,26 @@ Icon.clock = function ({ ...props }: SVGProps<SVGSVGElement>) {
   );
 };
 
+Icon.box = function ({ ...props }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      xmlSpace="preserve"
+      width={200}
+      height={200}
+      viewBox="0 0 512 512"
+      {...props}
+    >
+      <path
+        d="M502.553 103.887 258.381.541 0 109.895v122.316l20.618 8.729v171.813l233.213 98.706 237.551-100.542V238.923L512 230.201V107.885l-9.447-3.998zM240.506 472.204 51.575 392.242V246.141l188.931 79.962v146.101zm0-171.314L51.575 220.92v-.491L30.957 211.7v-67.235l209.55 88.699v67.726zm11.609-88.026L44.138 124.83l214.243-90.672 207.969 88.026-214.235 90.68zm208.31 177.541-196.701 83.25V326.103l196.701-83.265v147.567zm20.618-181.502L263.724 300.89v-67.726l217.319-91.979v67.718z"
+        style={{
+          fill: "#000",
+        }}
+      />
+    </svg>
+  );
+};
+
 Icon.calculator = function ({ ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={26} height={26} fill="none" {...props}>

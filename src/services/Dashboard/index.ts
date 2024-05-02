@@ -64,19 +64,14 @@ class Dashboard implements DashboardInterface {
   // functionality to Pay Service and create a better abastraction
   estimatedWeeklyEarnings({ weekStartsOn = "monday" }: { weekStartsOn?: keyof typeof DAYS } = {}) {
     return this.user.shifts.reduce((acc, shift) => {
-      const amount = shift.amount ?? 0;
-      const hourValue = shift.hourValue ?? 0;
-      const minuteValue = hourValue / 60;
+      const earnings = ShiftService.calculateEarnings({ shift });
 
       if (
         isThisWeek(new Date(shift.startDate), {
           weekStartsOn: DAYS[weekStartsOn as keyof typeof DAYS],
         })
       ) {
-        const total = amount * minuteValue;
-        const newValue = acc + total;
-
-        return newValue;
+        acc += earnings;
       }
 
       return acc;

@@ -33,13 +33,13 @@ function ShiftTrackTitle() {
   return (
     <>
       {shiftUnclosed.isLoading ? (
-        <Text classes="block text-2xl">loading...</Text>
+        <Text classes="block text-lg">loading...</Text>
       ) : shiftUnclosed.shift ? (
         <>
-          <Text classes="text-2xl">shift opened {` (${shiftTime})`}</Text>
+          <Text classes="text-lg">shift opened {` (${shiftTime})`}</Text>
         </>
       ) : (
-        <Text classes="block text-2xl">No shift is being tracked</Text>
+        <Text classes="block text-lg underline">No shift is being tracked</Text>
       )}
     </>
   );

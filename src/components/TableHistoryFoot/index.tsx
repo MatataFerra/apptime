@@ -24,13 +24,17 @@ async function TableHistoryFoot({ colsNumber }: Props) {
   }
 
   function totalEarnings() {
-    return user?.shifts.reduce((acc, shift) => acc + calculateEarnings(shift), 0);
+    return user?.shifts
+      .filter((shift) => shift.typeShift !== "PRODUCTION")
+      .reduce((acc, shift) => acc + calculateEarnings(shift), 0);
   }
 
   function sumHours() {
-    return user?.shifts.reduce((acc, shift) => {
-      return acc + (shift?.amount ? getHours(shift?.amount ?? 0) : 0);
-    }, 0);
+    return user?.shifts
+      .filter((shift) => shift.typeShift !== "PRODUCTION")
+      .reduce((acc, shift) => {
+        return acc + (shift?.amount ? getHours(shift?.amount ?? 0) : 0);
+      }, 0);
   }
 
   return (

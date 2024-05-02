@@ -27,19 +27,9 @@ const DynamicShiftTrackStatus = dynamic(() => import("@/components/ShiftTrackSta
   ),
 });
 
-const WelcomeTitle = dynamic(() => import("@/components/WelcomeTitle"), {
+const TrackTitle = dynamic(() => import("@/components/ModuleTitle"), {
   ssr: false,
-  loading: () => (
-    <Stack as="div" orientation="vertical" spacing={4}>
-      <Skeleton classes="h-12 w-60" />
-      <Skeleton classes="h-12 w-28" />
-    </Stack>
-  ),
-});
-
-const DateComponent = dynamic(() => import("@/components/Date"), {
-  ssr: false,
-  loading: () => <Skeleton classes="h-4 w-44" />,
+  loading: () => <Skeleton classes="h-60 w-40" />,
 });
 
 export default async function Track({ params }: { params: LocaleParams }) {
@@ -58,10 +48,7 @@ export default async function Track({ params }: { params: LocaleParams }) {
   return (
     <>
       <Stack orientation="vertical" spacing={8}>
-        <Stack as="div" orientation="vertical" spacing={4}>
-          <WelcomeTitle user={user} />
-          <DateComponent locale={params.locale} />
-        </Stack>
+        <TrackTitle title="Track" subtitle="Get your exact time while you work" />
         <DynamicShiftTrackStatus />
       </Stack>
     </>

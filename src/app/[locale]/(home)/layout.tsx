@@ -6,12 +6,30 @@ import { notFound, redirect } from "next/navigation";
 import UserService from "@/services/User";
 import ut from "@/services/Utilities/client";
 
-import DrawerUserInfo from "@/components/DrawerUserInfo";
-import Ham from "@/components/Ham";
-import Header from "@/components/ui/Header";
+import Skeleton from "@/components/ui/Skeleton";
+import Stack from "@/components/ui/Stack";
 
 const DynamicDrawer = dynamic(() => import("@/components/DrawerMenu"), {
   ssr: false,
+});
+
+const DrawerUserInfo = dynamic(() => import("@/components/DrawerUserInfo"), {
+  ssr: false,
+});
+
+const Header = dynamic(() => import("@/components/ui/Header"), {
+  ssr: false,
+  loading: () => (
+    <Stack orientation="horizontal">
+      <Skeleton classes="h-10 w-20" />
+      <Skeleton classes="w-50 h-10" />
+    </Stack>
+  ),
+});
+
+const Ham = dynamic(() => import("@/components/Ham"), {
+  ssr: false,
+  loading: () => <Skeleton classes="h-10 w-10" />,
 });
 
 interface Props {

@@ -2,38 +2,43 @@
 
 import { useRouter } from "next/navigation";
 
+import Icon from "@/components/ui/Icons";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
 type Props = {
-  gradient: {
-    from: `from-${string}-${string}` | `from-${string}`;
-    via?: `via-${string}-${string}` | `via-${string}`;
-    to: `to-${string}-${string}` | `to-${string}`;
-  };
-
   title: string;
   path: string;
-  bgImage: "bg-box" | "bg-lightning" | "bg-clock";
 };
 
-function HomeCardOption({ gradient: { from, via, to }, title, path, bgImage }: Props) {
+function HomeCardOption({ title, path }: Props) {
   const router = useRouter();
 
   return (
     <Stack
-      style={{
-        backgroundSize: "150% 150%",
-      }}
+      orientation="vertical"
       justifyContent="center"
       alignItems="center"
       onClick={() => router.push(path)}
-      classes={`group relative h-full w-full cursor-pointer rounded-lg bg-gradient-to-tl bg-pos-0 font-medium shadow-input transition-all duration-500 hover:bg-pos-100 ${from} ${via} ${to}`}
     >
-      <div
-        className={`absolute inset-0 h-full w-full ${bgImage} bg-[length:80px] bg-left bg-no-repeat opacity-10 transition-all delay-75 duration-500 group-hover:bg-[length:200px] group-hover:bg-[-30%_center] group-hover:opacity-50`}
-      />
-      <Text classes="group z-10 select-none text-pretty text-xl font-semibold">{title}</Text>
+      <Stack
+        justifyContent="center"
+        alignItems="center"
+        classes={`size-12 cursor-pointer rounded-lg p-2 shadow-input active:shadow-inner`}
+      >
+        <div className={`size-fit`}>
+          {title === "Fast" ? (
+            <Icon.lightning />
+          ) : title === "Track" ? (
+            <Icon.clock width={26} height={26} />
+          ) : title === "Production" ? (
+            <Icon.box width={26} height={26} />
+          ) : (
+            <Icon.eye />
+          )}
+        </div>
+      </Stack>
+      <Text classes="text-xs font-medium">{title}</Text>
     </Stack>
   );
 }

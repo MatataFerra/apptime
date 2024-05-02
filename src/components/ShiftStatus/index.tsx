@@ -6,7 +6,7 @@ function ShiftStatus() {
     <Stack
       orientation="vertical"
       alignItems="center"
-      classes="border_dash min-h-[25dvh] w-full justify-center p-4"
+      classes="h-fit min-h-[30dvh] w-full justify-center bg-gradient-to-br from-white via-slate-100 to-slate-300 p-4 shadow-input"
       spacing={6}
       justifyContent="center"
     >

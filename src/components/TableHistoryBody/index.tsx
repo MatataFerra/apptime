@@ -21,7 +21,7 @@ function TableHistoryBody() {
     <TableBody>
       {isEmpty(hourlyWorkedShift) ? (
         <tr>
-          <td colSpan={4} className="text-center">
+          <td colSpan={4} className="p-8 text-center">
             No shifts found
           </td>
         </tr>
