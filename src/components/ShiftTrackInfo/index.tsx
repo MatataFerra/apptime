@@ -28,9 +28,9 @@ async function ShiftTrackInfo() {
         </Text>
       ) : (
         <Stack as="div" orientation="vertical">
-          <Text>{`last shift tracked: ${dateHumanized ?? "no date available"}`}</Text>
-          <Text>total shifts tracked: {getUser?.shifts.length}</Text>
-          <Text>money earn at the moment: {`${earnings?.toFixed(2)}`}$</Text>
+          <Text classes="text-sm">{`last shift tracked: ${dateHumanized ?? "no date available"}`}</Text>
+          <Text classes="text-sm">total shifts tracked: {getUser?.shifts.length}</Text>
+          <Text classes="text-sm">money earn at the moment: {`${earnings?.toFixed(2)}`}$</Text>
         </Stack>
       )}
     </>
