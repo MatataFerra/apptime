@@ -21,7 +21,7 @@ function DateComponent({ humanize = "today", date = new Date(), classes, locale 
   };
 
   return (
-    <Text variant="default" classes={cn("text-sm", classes)}>
+    <Text variant="default" classes={cn("text-xs", classes)}>
       {TODAY_TRANSLATIONS[locale ?? "en"]}: {dateHumanized}
     </Text>
   );
