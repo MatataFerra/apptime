@@ -6,22 +6,10 @@ import UserService from "@/services/User";
 
 import { LocaleParams } from "@/types";
 
-import Skeleton from "@/components/ui/Skeleton";
-import Stack from "@/components/ui/Stack";
-
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-const HomeCards = dynamic(() => import("@/components/HomeCards"), {
+const HomeContent = dynamic(() => import("@/components/HomeContent"), {
   ssr: false,
-  loading: () => (
-    <>
-      <Stack classes="h-full w-full" orientation="vertical" spacing={4}>
-        <Skeleton classes="h-full w-full" />
-        <Skeleton classes="h-full w-full" />
-        <Skeleton classes="h-full w-full" />
-      </Stack>
-    </>
-  ),
 });
 
 export default async function Home({ params }: { params: LocaleParams }) {
@@ -39,7 +27,7 @@ export default async function Home({ params }: { params: LocaleParams }) {
 
   return (
     <>
-      <HomeCards />
+      <HomeContent user={user} params={params} />
     </>
   );
 }

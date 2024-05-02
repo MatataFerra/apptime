@@ -1,4 +1,4 @@
-import React from "react";
+import { ReactNode } from "react";
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Poppins } from "next/font/google";
@@ -21,9 +21,10 @@ const poppinsFont = Poppins({
   subsets: ["latin"],
   variable: "--font-poppins",
   fallback: ["system-ui"],
+  preload: false,
 });
 
-function Layout({ children }: { children: React.ReactNode }) {
+function Layout({ children }: { children: ReactNode }) {
   return (
     <html className={cn(poppinsFont.className)}>
       <body>

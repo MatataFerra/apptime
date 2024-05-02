@@ -1,32 +1,18 @@
 import { notFound } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "next-auth/middleware";
-import createIntlMiddleware from "next-intl/middleware";
 
 import i18n from "@/services/i18n";
 import TokenService from "@/services/Token";
 import ut from "@/services/Utilities";
 
-import { SUPPORTED_LOCALES, USER_ROLES } from "@/utils/constants";
+import { NEXT_AUTH_SESSION_TOKEN, USER_ROLES } from "@/utils/constants";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-import { withAuthMiddleware } from "./middlewares/auth";
-import { chain } from "./middlewares/chain";
-import { i18nMiddleware } from "./middlewares/i18n";
-
-const localeDefault: any = {};
-const intlMiddleware = createIntlMiddleware({
-  locales: [...SUPPORTED_LOCALES],
-  defaultLocale: "en",
-  localePrefix: "always",
-});
-
 export default withAuth(async function middleware(req: NextRequest) {
-  intlMiddleware(req);
   const nextPathName = req.nextUrl.pathname;
   const I18N = new i18n("en");
   const locale = I18N.getLocale(req) ?? "en";
-  localeDefault.locale = locale;
   const parsedPath = i18n.parsePathname(nextPathName, locale);
 
   const pathnameIsMissingLocale = i18n.isMissingLocale(nextPathName);
@@ -38,7 +24,7 @@ export default withAuth(async function middleware(req: NextRequest) {
   }
 
   if (i18n.isRouteSupported(PATH_NAMES.ADMIN, nextPathName)) {
-    const token = await new TokenService("next-auth.session-token").decodedCookieData();
+    const token = await new TokenService(NEXT_AUTH_SESSION_TOKEN).decodedCookieData();
 
     if (token?.role !== USER_ROLES.ADMIN) {
       return ut.redirect(req, PATH_NAMES.HOME);

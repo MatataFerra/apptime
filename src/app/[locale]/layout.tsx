@@ -1,9 +1,11 @@
-import React from "react";
+import { ReactNode } from "react";
 
 import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 
 import { LocaleParams } from "@/types";
+
+import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 import "@/app/globals.css";
 
@@ -19,7 +21,7 @@ export default async function RootLayout({
   children,
   params,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   params: LocaleParams;
 }) {
   let messages;
@@ -27,7 +29,7 @@ export default async function RootLayout({
   try {
     messages = (await import(`#/messages/${params.locale}.json`)).default;
   } catch (error) {
-    redirect("/");
+    redirect(PATH_NAMES.HOME);
   }
 
   return (
