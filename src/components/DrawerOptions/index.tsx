@@ -29,10 +29,10 @@ const DRAWER_OPTIONS = [
     url: "/track",
   },
   {
-    id: "history-shifts",
-    label: "History of shifts",
-    dataTestId: "history-shifts",
-    url: "/history-shifts",
+    id: "dashboard",
+    label: "Dashboard",
+    dataTestId: "dashboard",
+    url: "/dashboard",
   },
   {
     id: "estimate-income",

@@ -1,4 +1,5 @@
 "use client";
+
 import { signIn } from "next-auth/react";
 
 import { CSSClassNames } from "@/types";
@@ -8,7 +9,7 @@ import GoogleButton from "@/components/ui/Button/Google";
 import Footer from "@/components/ui/Footer";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
-import { cm } from "@/utils/helpers/styleMerger";
+import { useSearchParams } from "next/navigation";
 
 interface Props extends Omit<React.HTMLAttributes<HTMLElement>, "className"> {
   classes?: CSSClassNames;
@@ -16,9 +17,11 @@ interface Props extends Omit<React.HTMLAttributes<HTMLElement>, "className"> {
 }
 
 function LoginFooter({ classes, idForm = "form" }: Props) {
+  const params = useSearchParams();
+
   function onGoogleAuth() {
     signIn("google", {
-      callbackUrl: PATH_NAMES.HOME,
+      callbackUrl: params.get("redirect") ?? PATH_NAMES.HOME,
     });
   }
   return (
@@ -26,7 +29,7 @@ function LoginFooter({ classes, idForm = "form" }: Props) {
       <Button
         type="submit"
         variant="primary"
-        classes={cm("w-full text-2xl font-bold")}
+        classes={"w-full text-2xl font-bold active:shadow-inner"}
         form={idForm}
       >
         Login

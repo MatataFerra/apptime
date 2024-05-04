@@ -42,10 +42,6 @@ interface Props {
 export default async function HomeLayout({ children, params }: Props) {
   const user = await UserService.getSessionUser();
 
-  if (!user) {
-    redirect(`/${params.locale}/login`);
-  }
-
   if ((!user?.role || user?.role !== "ADMIN") && ut.toBool(process.env.STAGING)) {
     return notFound();
   }

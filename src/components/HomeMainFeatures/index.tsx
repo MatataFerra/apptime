@@ -5,7 +5,7 @@ import Stack from "@/components/ui/Stack";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-const HomeCardOption = dynamic(() => import("@/components/HomeCardOption"), {
+const HomeCardOption = dynamic(() => import("@/components/ui/OptionCard"), {
   ssr: false,
   loading: () => <Skeleton classes="size-full" />,
 });

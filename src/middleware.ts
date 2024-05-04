@@ -1,6 +1,4 @@
-import { notFound } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth } from "next-auth/middleware";
 
 import i18n from "@/services/i18n";
 import TokenService from "@/services/Token";
@@ -9,7 +7,7 @@ import ut from "@/services/Utilities";
 import { NEXT_AUTH_SESSION_TOKEN, USER_ROLES } from "@/utils/constants";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-export default withAuth(async function middleware(req: NextRequest) {
+export default async function middleware(req: NextRequest) {
   const nextPathName = req.nextUrl.pathname;
   const I18N = new i18n("en");
   const locale = I18N.getLocale(req) ?? "en";
@@ -46,7 +44,7 @@ export default withAuth(async function middleware(req: NextRequest) {
       return ut.redirect(req, noMobilePath);
     }
   }
-});
+}
 
 // export default chain([withAuthMiddleware, i18nMiddleware])
 
@@ -56,15 +54,12 @@ export const config = {
     "/",
     "/es",
     "/en",
-    "/form",
-    "/es/form",
-    "/en/form",
     "/admin",
     "/es/admin",
     "/en/admin",
-    "/history-shifts",
-    "/es/history-shifts",
-    "/en/history-shifts",
+    "/dashboard",
+    "/es/dashboard",
+    "/en/dashboard",
     "/no-mobile",
     "/es/no-mobile",
     "/en/no-mobile",

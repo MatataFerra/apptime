@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import Line from "@/components/ui/Line";
 import Skeleton from "@/components/ui/Skeleton";
 import Text from "@/components/ui/Text";
+import { type UserType, type LocaleParams } from "@/types";
 
 const Stack = dynamic(() => import("@/components/ui/Stack"), {
   ssr: false,
@@ -23,7 +24,7 @@ const DateComponent = dynamic(() => import("@/components/Date"), {
   loading: () => <Skeleton classes="h-4 w-44" />,
 });
 
-const HomeCards = dynamic(() => import("@/components/HomeCards"), {
+const HomeMainFeatures = dynamic(() => import("@/components/HomeMainFeatures"), {
   ssr: false,
   loading: () => (
     <>
@@ -36,9 +37,20 @@ const HomeCards = dynamic(() => import("@/components/HomeCards"), {
   ),
 });
 
+const HomeOptions = dynamic(() => import("@/components/HomeOptions"), {
+  ssr: false,
+  loading: () => (
+    <Stack alignItems="center" classes="w-full" spacing={4}>
+      <Skeleton classes="size-5" />
+      <Skeleton classes="size-5" />
+      <Skeleton classes="size-5" />
+    </Stack>
+  ),
+});
+
 type Props = {
-  user: any;
-  params: any;
+  user?: UserType | null;
+  params: LocaleParams;
 };
 
 function HomeContent({ user, params }: Props) {
@@ -49,11 +61,18 @@ function HomeContent({ user, params }: Props) {
         <DateComponent locale={params.locale} />
       </Stack>
       <Line color="bg-stone-300" />
-      <Stack orientation="vertical">
-        <Text variant="subtitle" classes="text-center text-xs">
-          Start with a module
-        </Text>
-        <HomeCards />
+      <Stack as="menu" orientation="vertical" classes="w-full p-2" spacing={8}>
+        <Stack orientation="vertical">
+          <Text variant="subtitle" classes="text-center text-lg">
+            Main modules
+          </Text>
+          <HomeMainFeatures />
+        </Stack>
+        {/* <Line color="bg-stone-300" /> */}
+        <Stack orientation="vertical" classes="w-full">
+          <Text classes="text-center text-xs">Shortcuts</Text>
+          <HomeOptions />
+        </Stack>
       </Stack>
     </Stack>
   );

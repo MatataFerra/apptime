@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -16,6 +16,8 @@ import Loader from "@/components/ui/Loader";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 export default function FormLogin() {
+  const searchParams = useSearchParams();
+
   const {
     handleSubmit,
     register,
@@ -44,8 +46,8 @@ export default function FormLogin() {
     }
 
     signIn("credentials", {
-      callbackUrl: PATH_NAMES.HOME,
-      redirect: false,
+      callbackUrl: searchParams.get("redirect") ?? PATH_NAMES.HOME,
+      redirect: true,
       password,
       email,
     })
