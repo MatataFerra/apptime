@@ -1,13 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { usePathname, useRouter } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 
-import Icon from "@/components/ui/Icons";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
 import { useDrawerStore } from "@/store/useDrawerStore";
+import LogoutButton from "@/components/LogoutButton";
+import LoginButton from "@/components/LoginButton";
+import { PATH_NAMES } from "@/utils/constants/pathnames";
+import { useLocale } from "next-intl";
 
 const DRAWER_OPTIONS = [
   {
@@ -44,11 +47,22 @@ const DRAWER_OPTIONS = [
 
 function DrawerOptions() {
   const router = useRouter();
+  const path = usePathname();
+  const locale = useLocale();
+  const { status } = useSession();
   const toggle = useDrawerStore((state) => state.toggle);
 
   function handleLogout() {
     toggle();
-    signOut();
+    signOut({
+      callbackUrl: PATH_NAMES.HOME,
+      redirect: true,
+    });
+  }
+
+  function handleLogin() {
+    toggle();
+    router.push(`/${locale}${PATH_NAMES.LOGIN}?redirect=${path}`);
   }
 
   return (
@@ -72,9 +86,11 @@ function DrawerOptions() {
           ))}
         </Stack>
         <Stack classes="items-center p-4">
-          <Stack as="button" classes="cursor-pointer" onClick={handleLogout}>
-            <Icon.logout className="size-10 justify-self-center" />
-          </Stack>
+          {status === "authenticated" ? (
+            <LogoutButton handleLogout={handleLogout} />
+          ) : (
+            <LoginButton handleLogin={handleLogin} />
+          )}
         </Stack>
       </Stack>
     </>
