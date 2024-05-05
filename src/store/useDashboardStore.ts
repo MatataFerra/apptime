@@ -1,9 +1,10 @@
 import { createContext, useContext } from "react";
 
-import { isSameDay } from "date-fns";
+import { isWithinInterval } from "date-fns";
 import { create, useStore } from "zustand";
 
 import type { UserType } from "@/types";
+import { type DateRange } from "react-day-picker";
 
 interface DashboardStateProps {
   user: UserType | null | undefined;
@@ -13,7 +14,7 @@ interface DashboardStateProps {
 interface DashboardState extends DashboardStateProps {
   update: (props: Partial<DashboardStateProps["user"]>) => void;
   deleteShift: (id: number) => void;
-  filterByDate: (date: string) => void;
+  filterByDate: (date: DateRange | undefined) => void;
   resetShifts: () => void;
 }
 
@@ -45,9 +46,16 @@ export function createDashboardStore(initProps?: Partial<DashboardStateProps>) {
     },
     filterByDate: (date) => {
       const initial = get().initialShifts;
-      const newShifts = initial.filter((shift) =>
-        isSameDay(new Date(shift.startDate), new Date(date))
-      );
+      const newShifts = initial.filter((shift) => {
+        if (!date?.from) return false;
+        if (!date?.to) return false;
+
+        return isWithinInterval(new Date(shift.startDate), {
+          start: new Date(date?.from),
+          end: new Date(date?.to),
+        });
+      });
+      console.log("🚀 ~ newShifts ~ newShifts:", { newShifts });
 
       if (get().user) {
         set({

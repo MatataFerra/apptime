@@ -2,81 +2,41 @@
 
 import { useState } from "react";
 
-import { useLocale } from "next-intl";
-
-import ShiftService from "@/services/Shift";
-
-import { Locale } from "@/types";
-
-import Icon from "@/components/ui/Icons";
 import Stack from "@/components/ui/Stack";
+import DateRangePicker from "@/components/ui/DateRangePicker";
 
-import DateHumanizer from "../../services/Date/index";
 import { useDashboardContext } from "@/store/useDashboardStore";
+import { type DateRange } from "react-day-picker";
+import { useRangeSelected } from "@/store/useRangeSelected";
+import Button from "@/components/ui/Button";
+import Icon from "@/components/ui/Icons";
+import useDelayed from "@/hooks/useDelayed";
 
 function PickupDate() {
-  const [isReset, setIsReset] = useState(false);
-  const locale = useLocale() as Locale;
-  const { filterByDate, initialShifts, resetShifts } = useDashboardContext((state) => state);
+  const { isRangeSelected, setDate, setIsRangeSelected } = useRangeSelected((state) => state);
+  const isRangeSelectedDelayed = useDelayed(isRangeSelected, 500);
+  const { filterByDate, resetShifts } = useDashboardContext((state) => state);
 
-  type Acc = {
-    date: string;
-    value: string;
-  };
-
-  const datesSorted = ShiftService.shiftsSorted(initialShifts ?? [], { desc: false });
-  const uniqueDates = datesSorted?.reduce((acc: Acc[], shift) => {
-    const humanize = new DateHumanizer("short").humanizeDate(new Date(shift.startDate), {
-      dateFormat: "eee d, MMM yy",
-      locale,
-    });
-    const isDateExists = acc.some((date) => date.date === humanize);
-
-    if (!isDateExists) {
-      const newDate = { date: humanize, value: shift.startDate };
-      acc.push(newDate);
-    }
-    return acc;
-  }, []);
-
-  function onFilterByDate(date: string) {
-    if (date === "select") return;
-    setIsReset(false);
+  function onFilterByDate(date: DateRange | undefined) {
     filterByDate(date);
   }
 
   return (
-    <Stack as="menu" alignItems="center" classes="rounded-sm border border-slate-400 p-2">
-      <select
-        data-testid="date-filter"
-        value={isReset ? "select" : undefined}
-        defaultValue={"select"}
-        name="date"
-        id="date"
-        className="bg-transparent outline-none"
-        onChange={(e) => onFilterByDate(e.target.value)}
-      >
-        <option disabled value="select" className="border-none">
-          Select Date
-        </option>
-        {uniqueDates?.map((shift) => {
-          return (
-            <option key={shift.value} value={shift.value} className="border-none">
-              {shift.date}
-            </option>
-          );
-        })}
-      </select>
-      <Icon.cancel
-        onClick={() => {
-          setIsReset(true);
-          resetShifts();
-        }}
-        width={10}
-        height={10}
-        viewBox="0 0 20 20"
-        className="cursor-pointer transition-transform duration-100 ease-in-out active:scale-150"
-      />
+    <Stack as="nav" alignItems="center">
+      {isRangeSelectedDelayed ? (
+        <Button
+          variant="rounded"
+          classes={`size-3 p-0 ${isRangeSelected ? "animate-show-right" : "animate-hide-left"}`}
+          onClick={() => {
+            setDate(undefined);
+            setIsRangeSelected(false);
+            resetShifts();
+          }}
+        >
+          <Icon.cancel width="100%" height="100%" viewBox="0 0 20 18" />
+        </Button>
+      ) : null}
+      <DateRangePicker onDatesSelected={onFilterByDate} />
     </Stack>
   );
 }
