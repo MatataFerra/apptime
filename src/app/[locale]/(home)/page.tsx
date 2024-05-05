@@ -4,12 +4,14 @@ import { redirect } from "next/navigation";
 import i18n from "@/services/i18n";
 import UserService from "@/services/User";
 
-import { LocaleParams } from "@/types";
+import { type LocaleParams } from "@/types";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
+import Skeleton from "@/components/ui/Skeleton";
 
 const HomeContent = dynamic(() => import("@/components/HomeContent"), {
   ssr: false,
+  loading: () => <Skeleton classes="h-full w-full" />,
 });
 
 export default async function Home({ params }: { params: LocaleParams }) {
@@ -20,10 +22,6 @@ export default async function Home({ params }: { params: LocaleParams }) {
   }
 
   const user = await UserService.getSessionUser();
-
-  if (!user) {
-    return redirect(PATH_NAMES.LOGIN);
-  }
 
   return (
     <>
