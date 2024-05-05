@@ -123,14 +123,14 @@ module.exports = {
           from: { transform: "translateY(0)" },
         },
 
-        "show-left": {
-          to: { transform: "translateX(0)" },
-          from: { transform: "translateX(-100%)" },
+        "hide-left": {
+          to: { transform: "translateX(0)", opacity: 0 },
+          from: { transform: "translateX(-100%)", opacity: 1},
         },
 
         "show-right": {
-          to: { transform: "translateX(-100%)" },
-          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-100%)", opacity: 1 },
+          from: { transform: "translateX(0)", opacity: 0 },
         },
         'fade-in':  {
           '0%': {
@@ -248,7 +248,7 @@ module.exports = {
         shake: "shake 1s ease 1",
         "fade-down": "fade-down 0.5s ease-in-out",
         "fade-up": "fade-up 0.5s ease-in-out",
-        "show-left": "show-left 0.5s ease-in-out forwards",
+        "hide-left": "show-left 0.5s ease-in-out forwards",
         "show-right": "show-right 0.5s ease-in-out forwards",
         "dissapear-up": "dissapear-up 0.5s ease-in-out forwards",
         "backdrop-blurry": "backdrop-blurry 0.5s ease-in-out forwards",

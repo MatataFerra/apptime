@@ -24,21 +24,17 @@ async function TablePerProductionFooter({ colsNumber }: Props) {
     });
   }
 
-  function getHours(minutes: number) {
-    return ShiftService.convertAmountInDecimal(minutes);
-  }
-
   function totalEarnings() {
     return user?.shifts
       .filter((shift) => shift.typeShift === "PRODUCTION")
       .reduce((acc, shift) => acc + calculateEarnings(shift), 0);
   }
 
-  function sumHours() {
+  function sumProduction() {
     return user?.shifts
       .filter((shift) => shift.typeShift === "PRODUCTION")
       .reduce((acc, shift) => {
-        return acc + (shift?.amount ? getHours(shift?.amount ?? 0) : 0);
+        return acc + (shift?.itemQuantity ? shift.itemQuantity : 0);
       }, 0);
   }
 
@@ -48,7 +44,7 @@ async function TablePerProductionFooter({ colsNumber }: Props) {
         <TableElement as="th" classes="text-left">
           Totals
         </TableElement>
-        <TableElement>{`${sumHours()?.toFixed(2)}`}h</TableElement>
+        <TableElement>{`${sumProduction()?.toFixed(1)}`}</TableElement>
         <TableElement>${`${totalEarnings()?.toFixed(2)}`}</TableElement>
         {Array.from({ length: colsNumber - MIN_COLS }, (_, i) => (
           <TableElement key={i} />
