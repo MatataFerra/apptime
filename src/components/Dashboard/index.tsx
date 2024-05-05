@@ -2,10 +2,9 @@ import dynamic from "next/dynamic";
 
 import UserService from "@/services/User";
 
+import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
-
-import Skeleton from "@/components/ui/Skeleton";
 
 const CarouselChart = dynamic(() => import("@/components/CarouselChart"), {
   ssr: false,

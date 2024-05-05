@@ -1,10 +1,12 @@
 "use client";
 
 import { ReactElement, useMemo } from "react";
+
 import { usePathname, useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
-import { PATH_NAMES } from "@/utils/constants/pathnames";
 import { useSession } from "next-auth/react";
+import { useLocale } from "next-intl";
+
+import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 interface Props {
   children: ReactElement;
