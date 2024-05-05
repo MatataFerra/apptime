@@ -1,5 +1,5 @@
-import Stack from "@/components/ui/Stack";
 import Icon from "@/components/ui/Icons";
+import Stack from "@/components/ui/Stack";
 
 type Props = {
   handleLogout: () => void;

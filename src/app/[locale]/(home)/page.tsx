@@ -6,8 +6,9 @@ import UserService from "@/services/User";
 
 import { type LocaleParams } from "@/types";
 
-import { PATH_NAMES } from "@/utils/constants/pathnames";
 import Skeleton from "@/components/ui/Skeleton";
+
+import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 const HomeContent = dynamic(() => import("@/components/HomeContent"), {
   ssr: false,

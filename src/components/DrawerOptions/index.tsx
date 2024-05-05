@@ -2,15 +2,16 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
+import { useLocale } from "next-intl";
 
+import LoginButton from "@/components/LoginButton";
+import LogoutButton from "@/components/LogoutButton";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
-import { useDrawerStore } from "@/store/useDrawerStore";
-import LogoutButton from "@/components/LogoutButton";
-import LoginButton from "@/components/LoginButton";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
-import { useLocale } from "next-intl";
+
+import { useDrawerStore } from "@/store/useDrawerStore";
 
 const DRAWER_OPTIONS = [
   {

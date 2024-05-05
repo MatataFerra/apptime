@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 import { CSSClassNames } from "@/types";
@@ -9,7 +10,6 @@ import GoogleButton from "@/components/ui/Button/Google";
 import Footer from "@/components/ui/Footer";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
-import { useSearchParams } from "next/navigation";
 
 interface Props extends Omit<React.HTMLAttributes<HTMLElement>, "className"> {
   classes?: CSSClassNames;

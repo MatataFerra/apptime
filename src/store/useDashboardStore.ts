@@ -1,10 +1,10 @@
 import { createContext, useContext } from "react";
+import { type DateRange } from "react-day-picker";
 
 import { isWithinInterval } from "date-fns";
 import { create, useStore } from "zustand";
 
 import type { UserType } from "@/types";
-import { type DateRange } from "react-day-picker";
 
 interface DashboardStateProps {
   user: UserType | null | undefined;
@@ -55,7 +55,6 @@ export function createDashboardStore(initProps?: Partial<DashboardStateProps>) {
           end: new Date(date?.to),
         });
       });
-      console.log("🚀 ~ newShifts ~ newShifts:", { newShifts });
 
       if (get().user) {
         set({
