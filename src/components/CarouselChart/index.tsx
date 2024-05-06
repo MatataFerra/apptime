@@ -3,26 +3,63 @@
 import { useState } from "react";
 
 import { Shift } from "@prisma/client";
+import dynamic from "next/dynamic";
 
-import EarnsPerDay from "@/components/Charts/EarnsPerDay";
-import EarnsPerMonth from "@/components/Charts/EarnsPerMonth";
 import Button from "@/components/ui/Button";
-import {
-  Carousel,
-  CarouselApi,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/Carousel";
+import { type CarouselApi } from "@/components/ui/Carousel";
+import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
 import { cn } from "@/utils/helpers/styleMerger";
 import { useDot } from "@/hooks/useDot";
 
-import ChartEmpty from "../ChartEmpty";
 import { useDashboardContext } from "@/store/useDashboardStore";
+
+const EarnsPerDay = dynamic(() => import("@/components/Charts/EarnsPerDay"), {
+  ssr: false,
+  loading: () => <Skeleton classes="h-40 w-full" />,
+});
+
+const ChartEmpty = dynamic(() => import("@/components/ChartEmpty"), {
+  ssr: false,
+  loading: () => <Skeleton classes="h-40 w-full" />,
+});
+
+const Carousel = dynamic(() => import("@/components/ui/Carousel").then((mod) => mod.Carousel), {
+  ssr: false,
+  loading: () => <Skeleton classes="mx-auto mt-8 h-full w-full max-w-xl" />,
+});
+
+const CarouselContent = dynamic(
+  () => import("@/components/ui/Carousel").then((mod) => mod.CarouselContent),
+  {
+    ssr: false,
+  }
+);
+
+const CarouselItem = dynamic(
+  () => import("@/components/ui/Carousel").then((mod) => mod.CarouselItem),
+  {
+    ssr: false,
+  }
+);
+
+const CarouselNext = dynamic(
+  () => import("@/components/ui/Carousel").then((mod) => mod.CarouselNext),
+  {
+    ssr: false,
+    loading: () => <Skeleton classes="size-8 rounded-full" />,
+  }
+);
+
+const CarouselPrevious = dynamic(
+  () => import("@/components/ui/Carousel").then((mod) => mod.CarouselPrevious),
+  {
+    ssr: false,
+    loading: () => <Skeleton classes="size-8 rounded-full" />,
+  }
+);
 
 function CarouselChart() {
   const { user } = useDashboardContext((state) => state);

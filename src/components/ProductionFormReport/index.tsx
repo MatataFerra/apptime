@@ -1,26 +1,23 @@
-"use client";
-
 import { useMemo } from "react";
+
+import dynamic from "next/dynamic";
 
 import ShiftService from "@/services/Shift";
 
-import FormReport from "@/components/FormReport";
+import Skeleton from "@/components/ui/Skeleton";
 
 import useHumanizeDate from "@/hooks/useHumanizeDate";
 
 import { useProductionForm } from "@/store/useProductionForm";
 
+const FormReport = dynamic(() => import("@/components/FormReport"), {
+  ssr: false,
+  loading: () => <Skeleton classes="h-28 w-1/2" />,
+});
+
 function ProductionFormReport() {
   const {
-    values: {
-      startDate,
-      finishDate,
-      itemValue,
-      itemQuantity,
-      holidayPayRate,
-      isPublicHoliday,
-      publicHolidayWorked,
-    },
+    values: { startDate, finishDate, itemValue, itemQuantity, holidayPayRate, publicHolidayWorked },
   } = useProductionForm((state) => state);
 
   const humanizeStartDate = useHumanizeDate({ date: startDate ?? "" });

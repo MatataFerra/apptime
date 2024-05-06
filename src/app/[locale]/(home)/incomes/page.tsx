@@ -2,7 +2,9 @@ import IncomesCalculator from "@/components/IcomesCalculator";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
-export default async function FastCharge() {
+export const dynamic = "force-static";
+
+export default async function Incomes() {
   return (
     <Stack orientation="vertical" spacing={6}>
       <Stack orientation="vertical">

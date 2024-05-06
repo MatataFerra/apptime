@@ -33,7 +33,8 @@ type EXTENDED_COLORS =
   | "light-gold"
   | "hard-pink"
   | "light-blue"
-  | "post-it-button";
+  | "post-it-button"
+  | "ocean";
 
 type BASE_COLORS = "black" | "white";
 
