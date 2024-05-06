@@ -30,7 +30,9 @@ module.exports = {
         poison: "#2FCF38",
         salmon:"#F44C4C",
         ocean:"#0C8F8F",
+        lake:"#086363",
         rose: "#E56F8C",
+        wine: "#af0909",
         "slate-blue":"#7476ED",
         "light-gold": "#FEE954",
         "post-it-button": "#EB8F00",
@@ -144,8 +146,8 @@ module.exports = {
         },
 
         "show-right": {
-          to: { transform: "translateX(-100%)", opacity: 1 },
-          from: { transform: "translateX(0)", opacity: 0 },
+          to: { transform: "translateX(0)", opacity: 1 },
+          from: { transform: "translateX(100%)", opacity: 0 },
         },
         'fade-in':  {
           '0%': {

@@ -27,11 +27,17 @@ export default async function Compare({
             classes="w-full text-pretty"
             spacing={1}
           >
-            <Text variant="subtitle" classes="text-salmon text-lg uppercase">
+            <Text
+              variant="subtitle"
+              classes="text-wine animate-show-left -translate-x-[200%] transform text-lg uppercase transition-all delay-700"
+            >
               Production
             </Text>
             <Text classes="font-bold italic">vs.</Text>
-            <Text variant="subtitle" classes="text-ocean text-lg uppercase">
+            <Text
+              variant="subtitle"
+              classes="text-lake translate-x-[200%] animate-show-right text-lg uppercase transition-all delay-1000"
+            >
               Hourly
             </Text>
           </Stack>

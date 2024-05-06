@@ -116,8 +116,11 @@ function CompareReport() {
           )}
         </Stack>
       ) : (
-        <Text variant="subtitle" classes="animate-fade-in text-xs">
-          Please fill out the form to compare wages
+        <Text
+          variant="subtitle"
+          classes="animate-fade-in self-center justify-self-center text-center text-sm"
+        >
+          No comparison yet
         </Text>
       )}
     </Stack>
