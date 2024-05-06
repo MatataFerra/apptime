@@ -1,9 +1,10 @@
 "use client";
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -26,7 +27,6 @@ export default function FormLogin() {
     formState: { errors },
   } = useForm<LoginInputs>();
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const locale = useLocale();
   const t = useTranslations("login");
 
@@ -62,10 +62,6 @@ export default function FormLogin() {
               shouldFocus: true,
             }
           );
-        }
-
-        if (res?.ok && !res.error) {
-          router.push(PATH_NAMES.HOME);
         }
       })
       .finally(() => setLoading(false));

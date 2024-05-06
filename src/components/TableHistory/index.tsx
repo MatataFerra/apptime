@@ -1,14 +1,46 @@
-import TableHistoryBody from "@/components/TableHistoryBody";
-import TableHistoryFoot from "@/components/TableHistoryFoot";
-import TablePerProductionBody from "@/components/TablePerProductionBody";
-import TablePerProductionFooter from "@/components/TablePerProductionFooter";
+import dynamic from "next/dynamic";
+
 import Stack from "@/components/ui/Stack";
 import Table from "@/components/ui/Table";
-import TableHead from "@/components/ui/TableHead";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 
 const COLUMNS = ["Day", "Hours", "Earnings", "Public Holiday"] as const;
 const COLUMNS_PER_PRODUCTION = ["Day", "Production", "Earnings", "Public Holiday"] as const;
+
+const TableHistoryBody = dynamic(() => import("@/components/TableHistoryBody"), {
+  ssr: false,
+});
+
+const TablePerProductionBody = dynamic(() => import("@/components/TablePerProductionBody"), {
+  ssr: false,
+});
+
+const TableHistoryFoot = dynamic(() => import("@/components/TableHistoryFoot"), {
+  ssr: false,
+});
+
+const TablePerProductionFooter = dynamic(() => import("@/components/TablePerProductionFooter"), {
+  ssr: false,
+});
+
+const TableHead = dynamic(() => import("@/components/ui/TableHead"), {
+  ssr: false,
+});
+
+const Tabs = dynamic(() => import("@/components/ui/Tabs").then((mod) => mod.Tabs), {
+  ssr: false,
+});
+
+const TabsContent = dynamic(() => import("@/components/ui/Tabs").then((mod) => mod.TabsContent), {
+  ssr: false,
+});
+
+const TabsList = dynamic(() => import("@/components/ui/Tabs").then((mod) => mod.TabsList), {
+  ssr: false,
+});
+
+const TabsTrigger = dynamic(() => import("@/components/ui/Tabs").then((mod) => mod.TabsTrigger), {
+  ssr: false,
+});
 
 function TableHistory() {
   return (

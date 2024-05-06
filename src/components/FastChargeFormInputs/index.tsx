@@ -1,5 +1,3 @@
-"use client";
-
 import { type ChangeEvent, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
@@ -236,7 +234,7 @@ function FastChargeFormInputs() {
               type="checkbox"
               id="fast-holiday"
               {...register("fast-holiday", {
-                onChange: (e) => {
+                onChange: (e: ChangeEvent<HTMLInputElement>) => {
                   setValues({
                     fastHoliday: e.target.checked as boolean,
                   });
@@ -253,7 +251,7 @@ function FastChargeFormInputs() {
               type="checkbox"
               id="fast-worked"
               {...register("fast-worked", {
-                onChange: (e) => {
+                onChange: (e: ChangeEvent<HTMLInputElement>) => {
                   setValues({
                     fastWorked: e.target.checked as boolean,
                   });
