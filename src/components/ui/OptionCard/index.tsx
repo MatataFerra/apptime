@@ -2,10 +2,12 @@
 
 import { useRouter } from "next/navigation";
 
+import { type CSSClassNames } from "@/types";
+
 import Icon from "@/components/ui/Icons";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
-import { type CSSClassNames } from "@/types";
+
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 type Props = {

@@ -1,14 +1,17 @@
 "use client";
 
 import { HTMLAttributes, useEffect } from "react";
-import { CalendarIcon } from "@radix-ui/react-icons";
-import { format } from "date-fns";
 import { type DateRange } from "react-day-picker";
 
-import { cn } from "@/utils/helpers/styleMerger";
+import { CalendarIcon } from "@radix-ui/react-icons";
+import { format } from "date-fns";
+
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/Calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
+
+import { cn } from "@/utils/helpers/styleMerger";
+
 import { useRangeSelected } from "@/store/useRangeSelected";
 
 interface DateRangePickerProps extends Omit<HTMLAttributes<HTMLDivElement>, "className"> {
@@ -25,7 +28,7 @@ function DateRangePicker({ classes, onDatesSelected }: DateRangePickerProps) {
     } else {
       setIsRangeSelected(false);
     }
-  }, [date?.from, date?.to]);
+  }, [date?.from, date?.to, setIsRangeSelected]);
 
   return (
     <div className={cn("grid gap-2", classes)}>

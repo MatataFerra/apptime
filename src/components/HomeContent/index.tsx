@@ -1,9 +1,10 @@
 import dynamic from "next/dynamic";
 
+import { type LocaleParams, type UserType } from "@/types";
+
 import Line from "@/components/ui/Line";
 import Skeleton from "@/components/ui/Skeleton";
 import Text from "@/components/ui/Text";
-import { type UserType, type LocaleParams } from "@/types";
 
 const Stack = dynamic(() => import("@/components/ui/Stack"), {
   ssr: false,
@@ -57,7 +58,7 @@ function HomeContent({ user, params }: Props) {
   return (
     <Stack orientation="vertical" spacing={8}>
       <Stack as="div" orientation="vertical" spacing={4}>
-        <WelcomeTitle user={user} />
+        <WelcomeTitle />
         <DateComponent locale={params.locale} />
       </Stack>
       <Line color="bg-stone-300" />

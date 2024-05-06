@@ -27,6 +27,13 @@ module.exports = {
 
       colors: {
         aquatic: "#13EFA0",
+        poison: "#2FCF38",
+        salmon:"#F44C4C",
+        ocean:"#0C8F8F",
+        lake:"#086363",
+        rose: "#E56F8C",
+        wine: "#af0909",
+        "slate-blue":"#7476ED",
         "light-gold": "#FEE954",
         "post-it-button": "#EB8F00",
         "hard-pink": "#FF2B91",
@@ -128,9 +135,19 @@ module.exports = {
           from: { transform: "translateX(-100%)", opacity: 1},
         },
 
+        "hide-right": {
+          to: { transform: "translateX(0)", opacity: 0 },
+          from: { transform: "translateX(100%)", opacity: 1},
+        },
+
+        "show-left": {
+          to: { transform: "translateX(0)", opacity: 1 },
+          from: { transform: "translateX(-100%)", opacity: 0 },
+        },
+
         "show-right": {
-          to: { transform: "translateX(-100%)", opacity: 1 },
-          from: { transform: "translateX(0)", opacity: 0 },
+          to: { transform: "translateX(0)", opacity: 1 },
+          from: { transform: "translateX(100%)", opacity: 0 },
         },
         'fade-in':  {
           '0%': {
@@ -250,6 +267,8 @@ module.exports = {
         "fade-up": "fade-up 0.5s ease-in-out",
         "hide-left": "show-left 0.5s ease-in-out forwards",
         "show-right": "show-right 0.5s ease-in-out forwards",
+        "hide-right": "hide-right 0.5s ease-in-out forwards",
+        "show-left": "show-left 0.5s ease-in-out forwards",
         "dissapear-up": "dissapear-up 0.5s ease-in-out forwards",
         "backdrop-blurry": "backdrop-blurry 0.5s ease-in-out forwards",
         ripple: "ripple .5s ease-in-out",

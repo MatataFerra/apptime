@@ -4,11 +4,11 @@
     "no-console": "warn",
     "func-style": ["error", "declaration", { "allowArrowFunctions": false }],
     "@tanstack/query/exhaustive-deps": "error",
-    "@tanstack/query/prefer-query-object-syntax": "error",
     "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error"
   },
   "plugins": ["@tanstack/query", "simple-import-sort"],
+  "ignorePatterns": ["node_modules/", ".next/", "out/", "playwright-report/"],
 
   "overrides": [
     // override "simple-import-sort" config

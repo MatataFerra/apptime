@@ -1,4 +1,4 @@
-import { isValid } from "date-fns";
+import dynamic from "next/dynamic";
 
 import Dashboard from "@/services/Dashboard";
 import DateHumanizer from "@/services/Date";
@@ -6,10 +6,32 @@ import UserService from "@/services/User";
 
 import { LocaleParams } from "@/types";
 
-import Card from "@/components/ui/Card";
-import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/Carousel";
+import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
+
+const Card = dynamic(() => import("@/components/ui/Card"), {
+  ssr: false,
+});
+
+const Carousel = dynamic(() => import("@/components/ui/Carousel").then((mod) => mod.Carousel), {
+  ssr: false,
+  loading: () => <Skeleton classes="mx-auto mt-8 h-full w-full max-w-xl" />,
+});
+
+const CarouselContent = dynamic(
+  () => import("@/components/ui/Carousel").then((mod) => mod.CarouselContent),
+  {
+    ssr: false,
+  }
+);
+
+const CarouselItem = dynamic(
+  () => import("@/components/ui/Carousel").then((mod) => mod.CarouselItem),
+  {
+    ssr: false,
+  }
+);
 
 type Props = {
   params: LocaleParams;
@@ -39,7 +61,7 @@ async function CarouselDashboard({ params }: Props) {
     hoursWorked,
   } = !user ? defaultValues : new Dashboard(user).dashboardData();
 
-  const humanizedLastDayRegistered = isValid(new Date(lastDayRegistered))
+  const humanizedLastDayRegistered = !!new Date(lastDayRegistered).valueOf()
     ? new DateHumanizer("short").humanizeDate(new Date(lastDayRegistered), {
         locale: params.locale,
       })

@@ -9,6 +9,7 @@ function Ham() {
   const toggleDrawer = useDrawerStore((state) => state.toggle);
   return (
     <Button
+      aria-label="Toggle drawer"
       data-testid="ham"
       type="button"
       variant="outlined"

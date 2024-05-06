@@ -76,8 +76,8 @@ function IncomesCalculator() {
         <Input type="number" label="Unpaid breaks" min={1} {...register("unpaid-breaks")} />
       </Stack>
       <Stack orientation="vertical">
-        <Text classes="text-lg font-bold">You are going to earn:</Text>
-        <Text classes="font-bold">
+        <Text classes="text-base font-bold">You are going to earn:</Text>
+        <Text classes="text-base font-bold">
           {calculate
             ? `${new Intl.NumberFormat("en-US", {
                 style: "currency",

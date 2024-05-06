@@ -1,10 +1,12 @@
 "use client";
 
 import { ReactElement, useMemo } from "react";
+
 import { usePathname, useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
-import { PATH_NAMES } from "@/utils/constants/pathnames";
 import { useSession } from "next-auth/react";
+import { useLocale } from "next-intl";
+
+import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 interface Props {
   children: ReactElement;
@@ -21,7 +23,9 @@ export default function HomeTemplate({ children }: Props) {
       `/${locale}`,
       `/${locale}${PATH_NAMES.NO_MOBILE}`,
       `/${locale}${PATH_NAMES.LOGIN}`,
-      `${locale}${PATH_NAMES.REGISTER}`,
+      `/${locale}${PATH_NAMES.REGISTER}`,
+      `/${locale}${PATH_NAMES.COMPARE}`,
+      `/${locale}${PATH_NAMES.INCOMES}`,
     ],
     [locale]
   );
