@@ -10,6 +10,11 @@ export const GRADIENTS = {
   title: "from-hard-pink to-common-orange",
   secondary: "from-blue-600 via-purple-500 to-orange-500",
   error: "from-red-300 via-red-500 to-red-700",
+  poison: "from-light-blue to-poison",
+  aquatic: "from-aquatic to-salmon",
+  broom: "from-common-orange to-slate-blue",
+  ocean: "from-ocean to-hard-pink",
+  logo: "from-light-blue via-slate-blue to-rose",
 };
 
 export const BUTTON_VARIANTS = {
