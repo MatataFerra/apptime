@@ -23,7 +23,9 @@ export default function HomeTemplate({ children }: Props) {
       `/${locale}`,
       `/${locale}${PATH_NAMES.NO_MOBILE}`,
       `/${locale}${PATH_NAMES.LOGIN}`,
-      `${locale}${PATH_NAMES.REGISTER}`,
+      `/${locale}${PATH_NAMES.REGISTER}`,
+      `/${locale}${PATH_NAMES.COMPARE}`,
+      `/${locale}${PATH_NAMES.INCOMES}`,
     ],
     [locale]
   );
