@@ -72,6 +72,7 @@ async function authOptions(req: NextApiRequest & NextRequest, res: NextResponse 
         const sessionAccessToken = assign(sessionDeepClone, {
           accessToken: token.accessToken,
           type_account: token.type_account,
+          role: token.role,
         });
 
         if (sessionAccessToken.type_account === "google") {
