@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactElement, useMemo } from "react";
+import { type PropsWithChildren, useMemo } from "react";
 
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -8,11 +8,7 @@ import { useLocale } from "next-intl";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-interface Props {
-  children: ReactElement;
-}
-
-export default function HomeTemplate({ children }: Props) {
+export default function HomeTemplate({ children }: PropsWithChildren<{}>) {
   const path = usePathname();
   const { status } = useSession();
   const router = useRouter();
