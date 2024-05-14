@@ -57,6 +57,12 @@ const DRAWER_OPTIONS: Option[] = [
     dataTestId: "compare",
     url: "/compare",
   },
+  {
+    id: "settings",
+    label: "Settings",
+    dataTestId: "settings",
+    url: "/settings",
+  },
 ];
 
 function DrawerOptions() {

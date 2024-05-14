@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import { ReactElement } from "react";
 
 import { CSSClassNames } from "@/types";
 import { TAILWIND_COLOR } from "@/types/tailwind";
