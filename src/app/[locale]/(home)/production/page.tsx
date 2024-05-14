@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
-const ProductionForm = dynamic(() => import("@/components/ProductionForm"), {
+const ProductionForm = dynamic(() => import("@/components/modules/Production/Form"), {
   ssr: false,
   loading: () => (
     <>
@@ -32,7 +32,7 @@ const ProductionForm = dynamic(() => import("@/components/ProductionForm"), {
   ),
 });
 
-const ProductionTitle = dynamic(() => import("@/components/ModuleTitle"), {
+const Title = dynamic(() => import("@/components/structures/share/ModuleTitle"), {
   ssr: false,
   loading: () => <Skeleton classes="h-60 w-40" />,
 });
@@ -41,7 +41,7 @@ export default async function ProductionJob() {
   return (
     <>
       <Stack orientation="vertical" spacing={6}>
-        <ProductionTitle title="Production Job" subtitle="module to track your production work" />
+        <Title title="Production Job" subtitle="module to track your production work" />
         <ProductionForm />
       </Stack>
     </>

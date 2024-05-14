@@ -5,7 +5,7 @@ import ColorService from "@/services/Color";
 
 import type { Color } from "@/types";
 
-import CustomChartTooltip from "@/components/CustomChartTooltip";
+import CustomChartTooltip from "@/components/structures/Chart/Tooltip";
 import BarGradient from "@/components/ui/BarGradient";
 import ChartLegend from "@/components/ui/ChartLegend";
 
