@@ -76,8 +76,10 @@ function Report() {
             </Stack>
           ) : (
             <>
-              <Text classes="text-sm">Production wage: ${compareWages.productionWage}</Text>
-              <Text classes="text-sm">Hourly wage: ${compareWages.hourlyWage}</Text>
+              <Text classes="text-sm">
+                Production wage: ${compareWages.productionWage.toFixed(2)}
+              </Text>
+              <Text classes="text-sm">Hourly wage: ${compareWages.hourlyWage.toFixed(2)}</Text>
 
               <Popover>
                 <PopoverTrigger className="w-full">

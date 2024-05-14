@@ -26,6 +26,7 @@ function Inputs() {
 
   const {
     setValues,
+    reset: resetValues,
     values: { startDate, finishDate, finishTime, startTime },
   } = useFastChargeStore((state) => state);
 
@@ -36,6 +37,7 @@ function Inputs() {
     setFocus,
     setError,
     handleSubmit,
+    reset,
     clearErrors,
   } = useForm<FastChargeInputs>({
     resolver: zodResolver(FastChargeFormSchema),
@@ -121,9 +123,13 @@ function Inputs() {
           message: "Shift created successfully",
         });
 
+        resetValues();
+
         queryClient.invalidateQueries({
           queryKey: ["user", user?.email],
         });
+
+        return reset();
       }
 
       Toast({

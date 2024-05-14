@@ -51,7 +51,7 @@ function Form() {
     <>
       <Inputs />
       <Report />
-      <SubmitForm />
+      <SubmitForm form="production-job" />
     </>
   );
 }

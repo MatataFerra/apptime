@@ -19,7 +19,7 @@ import onSubmitProductionJob from "@/server-actions/production-job";
 import { useProductionForm } from "@/store/useProductionForm";
 
 function Inputs() {
-  const { setValues } = useProductionForm((state) => state);
+  const { setValues, reset: resetValues } = useProductionForm((state) => state);
   const queryClient = useQueryClient();
   const { data: user } = useUser();
   const {
@@ -76,6 +76,8 @@ function Inputs() {
           description: "Shift created successfully",
           duration: 3000,
         });
+
+        resetValues();
 
         return reset();
       }

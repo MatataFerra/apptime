@@ -4,8 +4,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useLocale } from "next-intl";
 
-import LoginButton from "@/components/structures/Auth/Login";
-import LogoutButton from "@/components/structures/Auth/Logout";
+import Login from "@/components/structures/Auth/Login";
+import Logout from "@/components/structures/Auth/Logout";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
@@ -13,7 +13,14 @@ import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 import { useDrawerStore } from "@/store/useDrawerStore";
 
-const DRAWER_OPTIONS = [
+type Option = {
+  id: string;
+  label: string;
+  dataTestId: string;
+  url: string;
+};
+
+const DRAWER_OPTIONS: Option[] = [
   {
     id: "fast-charge",
     label: "Fast charge",
@@ -43,6 +50,12 @@ const DRAWER_OPTIONS = [
     label: "Estimate income",
     dataTestId: "estimate-income",
     url: "/incomes",
+  },
+  {
+    id: "compare",
+    label: "Compare",
+    dataTestId: "compare",
+    url: "/compare",
   },
 ];
 
@@ -88,9 +101,9 @@ function DrawerOptions() {
         </Stack>
         <Stack classes="items-center p-4">
           {status === "authenticated" ? (
-            <LogoutButton handleLogout={handleLogout} />
+            <Logout handleLogout={handleLogout} />
           ) : (
-            <LoginButton handleLogin={handleLogin} />
+            <Login handleLogin={handleLogin} />
           )}
         </Stack>
       </Stack>

@@ -1,37 +1,45 @@
 "use client";
 
+import { HTMLAttributes, ReactNode, useRef } from "react";
+
+import { useOnClickOutside } from "usehooks-ts";
+
 import { CSSClassNames } from "@/types";
 
+import Box from "@/components/ui/Box";
 import Stack from "@/components/ui/Stack";
 
 import { cn } from "@/utils/helpers/styleMerger";
 import useDelayed from "@/hooks/useDelayed";
 
-interface Props extends React.HTMLAttributes<HTMLElement> {
+interface Props extends HTMLAttributes<HTMLElement> {
   isOpen: boolean;
   classes?: CSSClassNames;
-  children: React.ReactElement | React.ReactElement[];
+  children: ReactNode;
   handleOutsideClick?: () => void;
 }
 
 function Drawer({ children, isOpen, handleOutsideClick, ...rest }: Props) {
   //delay the animation of the drawer
   const delayOpen = useDelayed(isOpen, 100);
+  const ref = useRef<HTMLDivElement>(null);
+  useOnClickOutside([ref], () => {
+    isOpen && handleOutsideClick && handleOutsideClick();
+  });
 
   return (
     <>
       {delayOpen && (
-        <Stack
+        <Box
+          ref={ref}
           data-testid="drawer-menu"
-          spacing={0}
-          orientation="vertical"
           classes={cn(
-            `absolute transition-all duration-300 ${isOpen ? "animate-fade-in" : "animate-fade-out"}`,
+            `absolute flex flex-col transition-all duration-300 ${isOpen ? "animate-fade-in" : "animate-fade-out"}`,
             rest.classes
           )}
         >
           {children}
-        </Stack>
+        </Box>
       )}
     </>
   );

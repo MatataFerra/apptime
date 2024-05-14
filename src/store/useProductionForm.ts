@@ -37,6 +37,7 @@ interface Production {
   setValues: (values: Partial<Production["values"]>) => void;
   setError: (error: keyof Production["errors"], value: boolean) => void;
   setFocus: (focus: keyof Production["focus"], value: boolean) => void;
+  reset: () => void;
 }
 
 export const useProductionForm = create<Production>((set, get) => ({
@@ -78,4 +79,17 @@ export const useProductionForm = create<Production>((set, get) => ({
   setValues: (values) => set({ values: { ...get().values, ...values } }),
   setError: (error, value) => set({ errors: { ...get().errors, [error]: value } }),
   setFocus: (focus, value) => set({ focus: { ...get().focus, [focus]: value } }),
+  reset: () =>
+    set({
+      values: {
+        finishDate: "",
+        holidayPayRate: "",
+        isPublicHoliday: false,
+        itemQuantity: "",
+        itemValue: "",
+        publicHolidayWorked: false,
+        startDate: "",
+        unpaidBreaks: "",
+      },
+    }),
 }));

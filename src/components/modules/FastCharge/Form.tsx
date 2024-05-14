@@ -51,7 +51,7 @@ function Form() {
     <>
       <Inputs />
       <Report />
-      <Submit />
+      <Submit form="fast-charge" />
     </>
   );
 }
