@@ -7,7 +7,7 @@ import utClient from "@/services/Utilities/client";
 
 import LayoutDesktop from "@/components/Layout/LayoutDesktop";
 import LayoutMobile from "@/components/Layout/LayoutMobile";
-import NoScreenCompatibility from "@/components/NoScreenCompatibility";
+import Compatibility from "@/components/modules/Desktop/Compatibility";
 
 export default async function AuthLayout({ children }: { children: ReactElement }) {
   const userAgent = headers().get("user-agent") ?? "";
@@ -17,7 +17,7 @@ export default async function AuthLayout({ children }: { children: ReactElement 
   if (!isMobile) {
     return (
       <LayoutDesktop>
-        <NoScreenCompatibility />
+        <Compatibility />
       </LayoutDesktop>
     );
   }

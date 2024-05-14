@@ -5,7 +5,7 @@ import UserService from "@/services/User";
 
 import { type LocaleParams } from "@/types";
 
-import HomeContent from "@/components/HomeContent";
+import Content from "@/components/modules/Home/Content";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
@@ -21,9 +21,5 @@ export default async function Home({ params }: { params: LocaleParams }) {
 
   const user = await UserService.getSessionUser();
 
-  return (
-    <>
-      <HomeContent user={user} params={params} />
-    </>
-  );
+  return <Content user={user} params={params} />;
 }

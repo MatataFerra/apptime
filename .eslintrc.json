@@ -28,7 +28,8 @@
               // @types
               ["^@/types"],
               // @Components
-              ["^@/modules", "^@/layouts", "^@/components"],
+              ["^@/layouts"],
+              ["^@/components","^@/components/modules", "^@/components/structures", "^@/components/ui"],
               ["^@/providers"],
               ["^@/utils", "^@/hooks", "^@/styles", "^@/constants"],
               

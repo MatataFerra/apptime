@@ -1,11 +1,5 @@
-import FooterLogin from "@/components/FooterLogin";
-import FormLogin from "@/components/FormLogin";
+import Content from "@/components/modules/Login/Content";
 
 export default async function Login() {
-  return (
-    <>
-      <FormLogin />
-      <FooterLogin idForm="formLogin" />
-    </>
-  );
+  return <Content />;
 }
