@@ -31,7 +31,7 @@ function CompareButton() {
         <Button
           size="sm"
           variant="white"
-          classes="order-1 w-fit animate-show-left shadow-button active:shadow-button-inner"
+          classes="order-1 size-8 animate-show-left shadow-button active:shadow-button-inner"
           onClick={() => reset()}
         >
           <Icon.reset width={"100%"} height="100%" className="scale-50 transform" />
