@@ -5,11 +5,11 @@ import dynamic from "next/dynamic";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
-const DynamicDrawer = dynamic(() => import("@/components/DrawerMenu"), {
+const Drawer = dynamic(() => import("@/components/modules/Drawer/Menu"), {
   ssr: false,
 });
 
-const DrawerUserInfo = dynamic(() => import("@/components/DrawerUserInfo"), {
+const UserInfo = dynamic(() => import("@/components/structures/Drawer/UserInfo"), {
   ssr: false,
 });
 
@@ -23,7 +23,7 @@ const Header = dynamic(() => import("@/components/ui/Header"), {
   ),
 });
 
-const Ham = dynamic(() => import("@/components/Ham"), {
+const Ham = dynamic(() => import("@/components/structures/share/Ham"), {
   ssr: false,
   loading: () => <Skeleton classes="h-10 w-10" />,
 });
@@ -41,9 +41,9 @@ export default async function HomeLayout({ children, params }: Props) {
       <main className="grid h-[100dvh] grid-rows-[auto,1fr] gap-8 p-4">
         <Header position="between" classes="relative">
           <Ham />
-          <DynamicDrawer>
-            <DrawerUserInfo />
-          </DynamicDrawer>
+          <Drawer>
+            <UserInfo />
+          </Drawer>
         </Header>
         {children}
       </main>

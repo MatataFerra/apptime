@@ -5,7 +5,7 @@ import { LocaleParams } from "@/types";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
-const CarouselCards = dynamic(() => import("@/components/CarouselDashboard"), {
+const CarouselCards = dynamic(() => import("@/components/modules/Dashboard/CarouselCards"), {
   ssr: false,
   loading: () => (
     <Stack classes="h-full w-full max-w-[90svw] overflow-hidden">
@@ -16,7 +16,7 @@ const CarouselCards = dynamic(() => import("@/components/CarouselDashboard"), {
   ),
 });
 
-const Dashboard = dynamic(() => import("@/components/Dashboard"), {
+const Dashboard = dynamic(() => import("@/components/modules/Dashboard/Dashboard"), {
   ssr: false,
   loading: () => (
     <>

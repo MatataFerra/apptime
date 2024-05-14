@@ -11,7 +11,7 @@ import Stack from "@/components/ui/Stack";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-const DynamicShiftTrackStatus = dynamic(() => import("@/components/ShiftTrackStatus"), {
+const Status = dynamic(() => import("@/components/modules/Track/Status"), {
   ssr: false,
   loading: () => (
     <>
@@ -27,7 +27,7 @@ const DynamicShiftTrackStatus = dynamic(() => import("@/components/ShiftTrackSta
   ),
 });
 
-const TrackTitle = dynamic(() => import("@/components/ModuleTitle"), {
+const Title = dynamic(() => import("@/components/structures/share/ModuleTitle"), {
   ssr: false,
   loading: () => <Skeleton classes="h-60 w-40" />,
 });
@@ -48,8 +48,8 @@ export default async function Track({ params }: { params: LocaleParams }) {
   return (
     <>
       <Stack orientation="vertical" spacing={8}>
-        <TrackTitle title="Track" subtitle="Get your exact time while you work" />
-        <DynamicShiftTrackStatus />
+        <Title title="Track" subtitle="Get your exact time while you work" />
+        <Status />
       </Stack>
     </>
   );

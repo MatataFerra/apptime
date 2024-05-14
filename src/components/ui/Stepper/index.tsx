@@ -2,7 +2,7 @@ import { Fragment } from "react";
 
 import { FormStep } from "@/types/forms";
 
-import NumberRoundBadge from "@/components/NumberRoundBadge";
+import RoundBadge from "@/components/structures/share/RoundBadge";
 import Line from "@/components/ui/Line";
 import Stack from "@/components/ui/Stack";
 
@@ -39,7 +39,7 @@ function Stepper({ steps = ARRAY }: Props) {
               justifyContent="center"
               classes="flex w-full flex-row gap-2 text-xs"
             >
-              <NumberRoundBadge index={index} id={id} title={title} />
+              <RoundBadge index={index} id={id} title={title} />
             </Stack>
             {index !== steps.length - 1 && <Line id={id} />}
           </Fragment>

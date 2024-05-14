@@ -1,10 +1,7 @@
 import { type LocaleParams } from "@/types";
 
-import CompareButton from "@/components/CompareButton";
-import CompareForm from "@/components/CompareForm";
-import CompareReport from "@/components/CompareReport";
+import Content from "@/components/modules/Compare/Content";
 import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
 
 export const dynamic = "force-static";
 
@@ -18,39 +15,7 @@ export default async function Compare({
   return (
     <>
       <Stack orientation="vertical" classes="h-fit w-full" spacing={8}>
-        <Stack as="article" orientation="vertical" spacing={2} classes="w-full">
-          <Stack
-            as="div"
-            orientation="horizontal"
-            alignItems="center"
-            justifyContent="center"
-            classes="w-full text-pretty"
-            spacing={1}
-          >
-            <Text
-              variant="subtitle"
-              classes="text-wine animate-show-left -translate-x-[200%] transform text-lg uppercase transition-all delay-700"
-            >
-              Production
-            </Text>
-            <Text classes="font-bold italic">vs.</Text>
-            <Text
-              variant="subtitle"
-              classes="text-lake translate-x-[200%] animate-show-right text-lg uppercase transition-all delay-1000"
-            >
-              Hourly
-            </Text>
-          </Stack>
-          <Text classes="mx-auto my-0 w-3/4 text-pretty text-center text-[0.5rem]">
-            Compare wages to see which option is{" "}
-            <Text as="span" classes="underline">
-              better
-            </Text>
-          </Text>
-        </Stack>
-        <CompareForm />
-        <CompareButton />
-        <CompareReport />
+        <Content />
       </Stack>
     </>
   );

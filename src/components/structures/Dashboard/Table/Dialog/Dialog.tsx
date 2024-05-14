@@ -1,0 +1,133 @@
+"use client";
+
+import { PropsWithChildren } from "react";
+
+import { Shift } from "@prisma/client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+
+import api from "@/services/Api/Shift";
+import Toast from "@/services/Toast";
+
+import { UserType } from "@/types";
+import { SuccessApiResponse } from "@/types/api_response";
+
+import TableDialogEditShift from "@/components/structures/Dashboard/Table/Dialog/Edit";
+import Button from "@/components/ui/Button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/Dialog";
+import Stack from "@/components/ui/Stack";
+
+import { useDashboardContext } from "@/store/useDashboardStore";
+import { useTableStore } from "@/store/useTableStore";
+
+type Props = PropsWithChildren<{
+  title: string;
+  shift: Shift;
+  content: React.ReactNode;
+}>;
+
+function TableDialog({ title, content, shift, children }: Props) {
+  const { setStep, step } = useTableStore((state) => state);
+  const { user, update, deleteShift } = useDashboardContext((state) => state);
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const { mutate } = useMutation({
+    mutationFn: api.deleteShift.bind(api) as unknown as ({
+      id,
+    }: {
+      id: number;
+    }) => Promise<SuccessApiResponse<UserType>>,
+
+    onMutate: () => {
+      Toast({
+        type: "info",
+        message: "Deleting shift...",
+        duration: 2000,
+      });
+    },
+
+    onSuccess: () => {
+      Toast({
+        type: "success",
+        message: "Shift deleted successfully!",
+        duration: 2000,
+      });
+    },
+
+    onError: () => {
+      update({ shifts: user?.shifts });
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
+      router.refresh();
+    },
+  });
+  return (
+    <>
+      <Dialog
+        onOpenChange={(open) => {
+          if (!open) {
+            setTimeout(() => {
+              setStep("info");
+            }, 100);
+          }
+        }}
+      >
+        <DialogTrigger asChild>{children}</DialogTrigger>
+        <DialogContent>
+          {step === "info" ? (
+            <>
+              <DialogHeader>
+                <DialogTitle className="border-b border-gray-800 py-2">{title}</DialogTitle>
+              </DialogHeader>
+              {content}
+              <DialogFooter>
+                <Stack orientation="horizontal" spacing={4} justifyContent="end">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="white"
+                    classes="active:shadow-button-inner"
+                    onClick={() => setStep("edit")}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="danger"
+                    onClick={() => {
+                      deleteShift(shift.id);
+                      mutate({ id: shift.id });
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </Stack>
+              </DialogFooter>
+            </>
+          ) : (
+            <>
+              <DialogHeader className="text-left">
+                <DialogTitle className="py-2">Edit shift</DialogTitle>
+                <DialogDescription>You can edit the shift details here.</DialogDescription>
+              </DialogHeader>
+              <TableDialogEditShift shift={shift} user={user} />
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+export default TableDialog;
