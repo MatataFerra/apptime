@@ -11,4 +11,5 @@ export const PATH_NAMES = {
   PRODUCTION: "/production",
   TRACK: "/track",
   COMPARE: "/compare",
+  SETTINGS: "/settings",
 } as const;
