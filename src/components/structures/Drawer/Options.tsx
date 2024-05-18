@@ -87,7 +87,7 @@ function DrawerOptions() {
 
   return (
     <>
-      <Stack grid rows="1fr auto" classes="h-full w-full">
+      <Stack grid rows="1fr auto" cols="1fr" classes="h-full w-full">
         <Stack as="div" orientation="vertical" spacing={0} classes="w-full divide-y">
           {DRAWER_OPTIONS.map((option) => (
             <Stack
