@@ -244,6 +244,7 @@ const HandleErrorTypeSchema = z.enum([
   "DataProvidedIsNotValid",
   "PasswordSchema",
   "CustomError",
+  "SettingsNotUpdated",
 ]);
 
 export {
