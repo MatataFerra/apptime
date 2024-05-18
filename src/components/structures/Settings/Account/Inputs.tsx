@@ -47,14 +47,6 @@ function Inputs() {
         data={values.account.name}
         onHandleChange={onChangeInputs}
       />
-      <InputForm
-        id="email"
-        loading={isLoading}
-        fallback={<Skeleton classes="h-5 w-20"></Skeleton>}
-        label={SETTINGS_FIELDS.account.email}
-        data={values.account.email}
-        onHandleChange={onChangeInputs}
-      />
     </Stack>
   );
 }

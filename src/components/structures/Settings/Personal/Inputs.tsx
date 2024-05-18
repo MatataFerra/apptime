@@ -74,22 +74,6 @@ function Inputs() {
         data={values.personal.city}
         onHandleChange={onChangeInputs}
       />
-      <InputForm
-        id="firstname"
-        loading={isLoading}
-        fallback={<Skeleton classes="h-5 w-20"></Skeleton>}
-        label={SETTINGS_FIELDS.personal.firstname}
-        data={values.personal.firstname}
-        onHandleChange={onChangeInputs}
-      />
-      <InputForm
-        id="lastname"
-        loading={isLoading}
-        fallback={<Skeleton classes="h-5 w-20"></Skeleton>}
-        label={SETTINGS_FIELDS.personal.lastname}
-        data={values.personal.lastname}
-        onHandleChange={onChangeInputs}
-      />
     </Stack>
   );
 }
