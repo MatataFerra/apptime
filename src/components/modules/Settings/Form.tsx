@@ -17,7 +17,11 @@ function Form() {
     onUpdateSettings(values);
   }
   return (
-    <FormBase classes="flex w-full flex-col" onSubmit={handleSubmit(onSubmitForm)} id="settings">
+    <FormBase
+      classes="flex w-full flex-col gap-4"
+      onSubmit={handleSubmit(onSubmitForm)}
+      id="settings"
+    >
       <Account />
       <Shift />
       <Personal />
