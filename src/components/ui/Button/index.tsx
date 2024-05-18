@@ -12,7 +12,7 @@ type ButtonOwnProps<E extends React.ElementType> = {
   as?: E;
   classes?: CSSClassNames;
   variant?: Variants;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
 };
 type Variants = keyof typeof BUTTON_VARIANTS;
 
@@ -26,6 +26,7 @@ function Button<E extends React.ElementType = typeof ButtonDefaultAsType>(
   const Component = as || ButtonDefaultAsType;
 
   const SIZE = {
+    xs: "w-16 h-6 p-0.5 text-xs",
     sm: "w-20 h-8 p-1 text-sm",
     md: "w-28 h-10 p-2 text-base",
     lg: "w-40 h-12 p-3",
