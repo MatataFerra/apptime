@@ -13,7 +13,7 @@ type Props = {
  */
 function Box(props: PropsWithChildren<Props>, ref: Ref<HTMLElement>) {
   return (
-    <section className={props.classes} ref={ref}>
+    <section className={props.classes} ref={ref} {...props}>
       {props.children}
     </section>
   );

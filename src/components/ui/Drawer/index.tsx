@@ -7,7 +7,6 @@ import { useOnClickOutside } from "usehooks-ts";
 import { CSSClassNames } from "@/types";
 
 import Box from "@/components/ui/Box";
-import Stack from "@/components/ui/Stack";
 
 import { cn } from "@/utils/helpers/styleMerger";
 import useDelayed from "@/hooks/useDelayed";
@@ -32,11 +31,11 @@ function Drawer({ children, isOpen, handleOutsideClick, ...rest }: Props) {
       {delayOpen && (
         <Box
           ref={ref}
-          data-testid="drawer-menu"
           classes={cn(
             `absolute flex flex-col transition-all duration-300 ${isOpen ? "animate-fade-in" : "animate-fade-out"}`,
             rest.classes
           )}
+          {...rest}
         >
           {children}
         </Box>
