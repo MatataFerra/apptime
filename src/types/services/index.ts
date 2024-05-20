@@ -1,16 +1,21 @@
-import { Profile, Shift, User } from "@prisma/client";
+import { Hourly, Production, Profile, Shift, User } from "@prisma/client";
 import { JWT } from "next-auth/jwt";
 import { z } from "zod";
 
 import type { BG_TAILWIND_COLOR, FROM_TO_TAILWIND_COLOR } from "@/types/tailwind";
-
-import { HandleErrorTypeSchema } from "../zod";
+import { HandleErrorTypeSchema } from "@/types/zod";
 
 // Types
 export type UserType = User & {
-  shifts: Shift[];
+  shifts: Shifts;
   profile: Profile | null;
 };
+
+export type Shifts = Shift & {
+  productions: Production[];
+  hourlies: Hourly[];
+};
+
 export type HandleErrorType = z.infer<typeof HandleErrorTypeSchema>;
 
 export type DashboardUserType = UserType;

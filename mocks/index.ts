@@ -1,5 +1,7 @@
-import { Profile, Shift, User } from "@prisma/client";
+import { Hourly, Production, Profile, Shift, User } from "@prisma/client";
 import { addDays, addMinutes, differenceInMinutes } from "date-fns";
+
+import { UserType } from "@/types";
 
 import { generateRandomID } from "@/utils/helpers/generateRandomID";
 
@@ -59,25 +61,50 @@ export const userMockedParsed: User = {
 };
 
 export const userShiftsMocked: Shift[] = datesMock.map((date, i) => {
-  return {
+  const shift: UserType["shifts"] = {
     id: i,
     userId: userMockedParsed.id,
-    startDate: date.toString(),
-    endDate: addMinutes(date, 125 + i).toString(),
-    amount: differenceInMinutes(addMinutes(date, 125 + i), date),
-    isClosed: true,
-    isPublicHoliday: i === 8 ? true : false,
-    publicHolidayWorked: i === 8 ? true : false,
-    notes: "mocked shift",
-    holidayPay: true,
-    holidayPayRate: 8,
-    hourValue: 10.5,
-    taxCode: 0,
-    unpaidBreaks: 1,
-    itemQuantity: i === 5 ? 520 : null,
-    itemValue: i === 5 ? 0.23 : null,
-    typeShift: i === 5 ? "PRODUCTION" : "TRACK",
+    productions: [],
+    hourlies: [],
   };
+  const production: Production = {
+    startDate: date.toString(),
+    endDate: addMinutes(date, 125).toString(),
+    itemValue: 10,
+    itemQuantity: 10,
+    holidayPay: true,
+    holidayPayRate: 0,
+    taxCode: 0,
+    amount: 0,
+    isClosed: false,
+    id: i + 1,
+    isPublicHoliday: false,
+    notes: "",
+    publicHolidayWorked: false,
+    shiftId: shift.id,
+  };
+
+  const hourly: Hourly = {
+    startDate: date.toString(),
+    endDate: addMinutes(date, 125).toString(),
+    hourValue: 10,
+    holidayPay: true,
+    holidayPayRate: 0,
+    taxCode: 0,
+    amount: 0,
+    isClosed: false,
+    id: i + 1,
+    isPublicHoliday: false,
+    notes: "",
+    publicHolidayWorked: false,
+    unpaidBreaks: 0,
+    shiftId: shift.id,
+  };
+
+  shift.productions.push(production);
+  shift.hourlies.push(hourly);
+
+  return shift;
 });
 
 export const profileParsed: Profile = {

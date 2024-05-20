@@ -22,24 +22,11 @@ datasource db {
 }
 
 model Shift {
-  id                  Int     @id @default(autoincrement())
-  startDate           String
-  endDate             String?
-  amount              Float?
-  isPublicHoliday     Boolean @default(false)
-  publicHolidayWorked Boolean @default(false)
-  isClosed            Boolean @default(false)
-  notes               String?
-  hourValue           Float
-  itemValue           Float?
-  itemQuantity        Float?
-  holidayPay          Boolean
-  holidayPayRate      Float?
-  unpaidBreaks        Float?
-  taxCode             Int?    @default(0)
-  typeShift           String  @default("TRACK")
-  User                User?   @relation(fields: [userId], references: [id])
-  userId              String?
+  id         Int          @id @default(autoincrement())
+  userId     String?      @unique
+  Production Production[]
+  Hourly     Hourly[]
+  User       User?        @relation(fields: [userId], references: [id])
 }
 
 model User {
@@ -54,7 +41,7 @@ model User {
   online          Boolean          @default(false)
   formCompleted   Boolean          @default(false)
   isActive        Boolean          @default(true)
-  shifts          Shift[]
+  shifts          Shift?
   profile         Profile?
   config          Config?
   passwordAttemps PasswordAttemps?
@@ -69,6 +56,68 @@ model Profile {
   country   String?
   User      User?   @relation(fields: [userId], references: [id])
   userId    String? @unique
+}
+
+model Production {
+  id                  Int            @id @default(autoincrement())
+  startDate           String
+  endDate             String?
+  amount              Float?
+  isPublicHoliday     Boolean        @default(false)
+  publicHolidayWorked Boolean        @default(false)
+  isClosed            Boolean        @default(false)
+  notes               String?
+  itemValue           Float?
+  itemQuantity        Float?
+  holidayPay          Boolean
+  holidayPayRate      Float?
+  taxCode             Int?           @default(0)
+  shiftId             Int?
+  taxes               Tax[]
+  contributions       Contribution[]
+  Shift               Shift?         @relation(fields: [shiftId], references: [id])
+}
+
+model Hourly {
+  id                  Int            @id @default(autoincrement())
+  startDate           String
+  endDate             String?
+  amount              Float?
+  isPublicHoliday     Boolean        @default(false)
+  publicHolidayWorked Boolean        @default(false)
+  isClosed            Boolean        @default(false)
+  notes               String?
+  hourValue           Float
+  holidayPay          Boolean
+  holidayPayRate      Float?
+  unpaidBreaks        Float?
+  taxCode             Int?           @default(0)
+  shiftId             Int?
+  taxes               Tax[]
+  contributions       Contribution[]
+  Shift               Shift?         @relation(fields: [shiftId], references: [id])
+}
+
+model Tax {
+  id           Int         @id @default(autoincrement())
+  name         String
+  value        Float
+  description  String?
+  hourlyId     Int?
+  productionId Int?
+  Production   Production? @relation(fields: [productionId], references: [id])
+  Hourly       Hourly?     @relation(fields: [hourlyId], references: [id])
+}
+
+model Contribution {
+  id           Int         @id @default(autoincrement())
+  name         String
+  value        Float
+  description  String?
+  hourlyId     Int?
+  productionId Int?
+  Production   Production? @relation(fields: [productionId], references: [id])
+  Hourly       Hourly?     @relation(fields: [hourlyId], references: [id])
 }
 
 model Config {
