@@ -24,7 +24,6 @@ describe("ShiftService", () => {
       itemQuantity: 10,
       holidayPay: true,
       holidayPayRate: 0,
-      taxCode: 0,
       amount: 0,
       isClosed: false,
       id: 1,
@@ -40,7 +39,6 @@ describe("ShiftService", () => {
       hourValue: 10,
       holidayPay: true,
       holidayPayRate: 0,
-      taxCode: 0,
       amount: 0,
       isClosed: false,
       id: 1,
@@ -98,7 +96,6 @@ describe("ShiftService", () => {
         holidayPay: true,
         holidayPayRate: 0,
         hourValue: 10,
-        taxCode: 0,
         unpaidBreaks: 0,
         shiftId: 1,
       });

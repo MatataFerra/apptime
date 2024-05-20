@@ -27,7 +27,12 @@ export async function GET(req: NextRequest) {
       },
 
       include: {
-        shifts: true,
+        shifts: {
+          include: {
+            Hourly: true,
+            Production: true,
+          },
+        },
         profile: true,
       },
     });

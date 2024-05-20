@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import { Shift, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import { hashSync } from "bcryptjs";
 import { addDays, addMinutes, differenceInMinutes, isToday as isTheDateToday } from "date-fns";
 
@@ -17,29 +17,36 @@ const newDatesMock = [
   addDays(myToday, -4), // three days before yesterday
 ];
 
-function addShiftsForSeed(user: User, dates: Array<Date>): Omit<Shift, "id">[] {
-  const datesMocked = dates.map((date, i) => {
-    return {
-      userId: user?.id,
-      startDate: date.toString(),
-      endDate: isTheDateToday(date) ? null : addMinutes(date, 125 + i).toString(),
-      amount: isTheDateToday(date) ? 0 : differenceInMinutes(addMinutes(date, 125 + i), date),
-      isClosed: isTheDateToday(date) ? false : true,
-      isPublicHoliday: false,
-      publicHolidayWorked: false,
-      hourValue: 27,
-      holidayPay: true,
-      holidayPayRate: 8,
-      unpaidBreaks: 1,
-      taxCode: 1,
-      itemQuantity: i === 2 ? 520 : null,
-      itemValue: i === 2 ? 0.23 : null,
-      typeShift: i === 2 ? "PRODUCTION" : "TRACK",
-      notes: `mocked shift number ${i} from user ${user?.name}`,
-    };
-  });
+function addProductionShiftsForSeed(dates: Array<Date>) {
+  return dates.map((date, i) => ({
+    startDate: date.toString(),
+    endDate: isTheDateToday(date) ? null : addMinutes(date, 125 + i).toString(),
+    amount: isTheDateToday(date) ? 0 : differenceInMinutes(addMinutes(date, 125 + i), date),
+    isClosed: isTheDateToday(date) ? false : true,
+    itemValue: i === 2 ? 0.023 : null,
+    itemQuantity: i === 2 ? 520 : null,
+    holidayPay: true,
+    holidayPayRate: 0,
+    isPublicHoliday: false,
+    notes: `This is a note for the shift ${i + 1}`,
+    publicHolidayWorked: false,
+  }));
+}
 
-  return datesMocked;
+function addHourlyShiftsForSeed(dates: Array<Date>) {
+  return dates.map((date, i) => ({
+    startDate: date.toString(),
+    endDate: isTheDateToday(date) ? null : addMinutes(date, 125 + i).toString(),
+    amount: isTheDateToday(date) ? 0 : differenceInMinutes(addMinutes(date, 125 + i), date),
+    isClosed: isTheDateToday(date) ? false : true,
+    hourValue: 27,
+    holidayPay: true,
+    holidayPayRate: 0,
+    isPublicHoliday: false,
+    notes: "",
+    publicHolidayWorked: false,
+    unpaidBreaks: 0,
+  }));
 }
 
 function addUsersMocked(): Omit<User, "id">[] {
@@ -96,32 +103,45 @@ async function main() {
     return;
   }
 
-  for (const shiftData of addShiftsForSeed(firstUser, newDatesMock)) {
-    await prisma.shift.create({
+  const shiftCreated = await prisma.shift.create({
+    data: {
+      user: {
+        connect: {
+          id: firstUser.id,
+        },
+      },
+    },
+  });
+
+  for (const prodShift of addProductionShiftsForSeed(newDatesMock)) {
+    await prisma.production.create({
       data: {
-        userId: shiftData.userId,
-        startDate: shiftData.startDate,
-        endDate: shiftData.endDate,
-        amount: shiftData.amount,
-        isClosed: shiftData.isClosed,
-        isPublicHoliday: shiftData.isPublicHoliday,
-        publicHolidayWorked: shiftData.publicHolidayWorked,
-        notes: shiftData.notes,
-        holidayPay: shiftData.holidayPay,
-        hourValue: shiftData.hourValue,
-        holidayPayRate: shiftData.holidayPayRate,
-        taxCode: shiftData.taxCode,
-        unpaidBreaks: shiftData.unpaidBreaks,
-        itemQuantity: shiftData.itemQuantity,
-        itemValue: shiftData.itemValue,
-        typeShift: shiftData.typeShift,
+        shift: {
+          connect: {
+            id: shiftCreated.id,
+          },
+        },
+        ...prodShift,
+      },
+    });
+  }
+
+  for (const hourlyShift of addHourlyShiftsForSeed(newDatesMock)) {
+    await prisma.hourly.create({
+      data: {
+        shift: {
+          connect: {
+            id: shiftCreated.id,
+          },
+        },
+        ...hourlyShift,
       },
     });
   }
 
   await prisma.profile.create({
     data: {
-      User: {
+      user: {
         connect: {
           id: firstUser.id,
         },
@@ -136,7 +156,7 @@ async function main() {
 
   await prisma.profile.create({
     data: {
-      User: {
+      user: {
         connect: {
           id: secondUser.id,
         },
@@ -175,6 +195,8 @@ async function main() {
 async function clearDatabase() {
   const transaction = await prisma.$transaction([
     prisma.shift.deleteMany(),
+    prisma.production.deleteMany(),
+    prisma.hourly.deleteMany(),
     prisma.user.deleteMany(),
     prisma.profile.deleteMany(),
   ]);

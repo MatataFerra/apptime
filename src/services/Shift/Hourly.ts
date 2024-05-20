@@ -106,7 +106,6 @@ class HourlyService {
       hourValue: this.shift.hourValue,
       holidayPay: this.shift.holidayPay,
       holidayPayRate: this.shift.holidayPayRate,
-      taxCode: this.shift.taxCode,
       unpaidBreaks: this.shift.unpaidBreaks,
     };
   }
@@ -120,7 +119,6 @@ class HourlyService {
       hourValue: lastShift?.hourValue,
       holidayPay: lastShift?.holidayPay,
       holidayPayRate: lastShift?.holidayPayRate,
-      taxCode: lastShift?.taxCode,
       unpaidBreaks: lastShift?.unpaidBreaks,
     };
 

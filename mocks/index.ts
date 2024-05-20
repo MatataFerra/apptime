@@ -1,5 +1,5 @@
-import { Hourly, Production, Profile, Shift, User } from "@prisma/client";
-import { addDays, addMinutes, differenceInMinutes } from "date-fns";
+import { Profile, User } from "@prisma/client";
+import { addDays, addMinutes } from "date-fns";
 
 import { UserType } from "@/types";
 
@@ -13,6 +13,7 @@ import userMock from "../mocks/user.prisma.json";
  * @example Mon May 29 2023 13:18:42 GMT+1200 (hora estándar de Nueva Zelanda)
  */
 export const now = new Date("2023-05-29T01:18:42.494Z");
+export const real = new Date(Date.now());
 
 /**
  * @summary Dates mock for testing the dashboard service
@@ -41,15 +42,15 @@ export const now = new Date("2023-05-29T01:18:42.494Z");
  *
  */
 export const datesMock = [
-  now, // today
-  addDays(now, -1), // yesterday
-  addDays(now, -2), // one day before yesterday
-  addDays(now, 1), // tomorrow
-  addDays(now, 2), // one day after tomorrow
-  addDays(now, 8), // one day after one week after
-  addDays(now, 7), // one week after
-  addDays(now, -7), // one week before
-  addDays(now, -8), // one day before one week before
+  real, // today
+  addDays(real, -1), // yesterday
+  addDays(real, -2), // one day before yesterday
+  addDays(real, 1), // tomorrow
+  addDays(real, 2), // one day after tomorrow
+  addDays(real, 3), // one day after one week after
+  addDays(real, 4), // one week after
+  addDays(real, 5), // one week before
+  addDays(real, -8), // one day before one week before
 ];
 
 export const userMockedParsed: User = {
@@ -60,60 +61,52 @@ export const userMockedParsed: User = {
   id: generateRandomID("uuid"),
 };
 
-export const userShiftsMocked: Shift[] = datesMock.map((date, i) => {
-  const shift: UserType["shifts"] = {
-    id: i,
-    userId: userMockedParsed.id,
-    productions: [],
-    hourlies: [],
-  };
-  const production: Production = {
+export const userShiftsMocked: UserType["shifts"] = {
+  id: 1,
+  userId: userMockedParsed.id,
+  productions: datesMock.map((date, i) => ({
     startDate: date.toString(),
-    endDate: addMinutes(date, 125).toString(),
+    endDate: addMinutes(date, 125 + i).toString(),
     itemValue: 10,
     itemQuantity: 10,
     holidayPay: true,
     holidayPayRate: 0,
     taxCode: 0,
-    amount: 0,
+    amount: 125 + i,
     isClosed: false,
     id: i + 1,
     isPublicHoliday: false,
     notes: "",
     publicHolidayWorked: false,
-    shiftId: shift.id,
-  };
-
-  const hourly: Hourly = {
+    shiftId: 1,
+  })),
+  hourlies: datesMock.map((date, i) => ({
     startDate: date.toString(),
-    endDate: addMinutes(date, 125).toString(),
+    endDate: addMinutes(date, 125 + i).toString(),
     hourValue: 10,
     holidayPay: true,
     holidayPayRate: 0,
     taxCode: 0,
-    amount: 0,
+    amount: 125 + i,
     isClosed: false,
     id: i + 1,
     isPublicHoliday: false,
     notes: "",
     publicHolidayWorked: false,
     unpaidBreaks: 0,
-    shiftId: shift.id,
-  };
-
-  shift.productions.push(production);
-  shift.hourlies.push(hourly);
-
-  return shift;
-});
+    shiftId: 1,
+  })),
+};
 
 export const profileParsed: Profile = {
   ...profileMock.profile,
   userId: userMockedParsed.id,
 };
 
-export const userMocked = {
+export const userMocked: UserType = {
   ...userMockedParsed,
-  shifts: userShiftsMocked,
+  shifts: {
+    ...userShiftsMocked,
+  },
   profile: profileParsed,
 };

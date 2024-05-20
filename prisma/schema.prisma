@@ -24,9 +24,9 @@ datasource db {
 model Shift {
   id         Int          @id @default(autoincrement())
   userId     String?      @unique
-  Production Production[]
-  Hourly     Hourly[]
-  User       User?        @relation(fields: [userId], references: [id])
+  production Production[]
+  hourly     Hourly[]
+  user       User?        @relation(fields: [userId], references: [id])
 }
 
 model User {
@@ -54,7 +54,7 @@ model Profile {
   address   String?
   city      String?
   country   String?
-  User      User?   @relation(fields: [userId], references: [id])
+  user      User?   @relation(fields: [userId], references: [id])
   userId    String? @unique
 }
 
@@ -71,11 +71,10 @@ model Production {
   itemQuantity        Float?
   holidayPay          Boolean
   holidayPayRate      Float?
-  taxCode             Int?           @default(0)
   shiftId             Int?
   taxes               Tax[]
   contributions       Contribution[]
-  Shift               Shift?         @relation(fields: [shiftId], references: [id])
+  shift               Shift?         @relation(fields: [shiftId], references: [id])
 }
 
 model Hourly {
@@ -91,11 +90,10 @@ model Hourly {
   holidayPay          Boolean
   holidayPayRate      Float?
   unpaidBreaks        Float?
-  taxCode             Int?           @default(0)
   shiftId             Int?
   taxes               Tax[]
   contributions       Contribution[]
-  Shift               Shift?         @relation(fields: [shiftId], references: [id])
+  shift               Shift?         @relation(fields: [shiftId], references: [id])
 }
 
 model Tax {
@@ -105,8 +103,8 @@ model Tax {
   description  String?
   hourlyId     Int?
   productionId Int?
-  Production   Production? @relation(fields: [productionId], references: [id])
-  Hourly       Hourly?     @relation(fields: [hourlyId], references: [id])
+  production   Production? @relation(fields: [productionId], references: [id])
+  jourly       Hourly?     @relation(fields: [hourlyId], references: [id])
 }
 
 model Contribution {
@@ -116,14 +114,14 @@ model Contribution {
   description  String?
   hourlyId     Int?
   productionId Int?
-  Production   Production? @relation(fields: [productionId], references: [id])
-  Hourly       Hourly?     @relation(fields: [hourlyId], references: [id])
+  production   Production? @relation(fields: [productionId], references: [id])
+  hourly       Hourly?     @relation(fields: [hourlyId], references: [id])
 }
 
 model Config {
   id           Int     @id @default(autoincrement())
   weekStartsOn String  @default("MONDAY")
-  User         User?   @relation(fields: [userId], references: [id])
+  user         User?   @relation(fields: [userId], references: [id])
   userId       String? @unique
 }
 

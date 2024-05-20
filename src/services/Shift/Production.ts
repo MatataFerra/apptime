@@ -78,7 +78,6 @@ class ProductionService {
       itemQuantity: this.shift.itemQuantity,
       holidayPay: this.shift.holidayPay,
       holidayPayRate: this.shift.holidayPayRate,
-      taxCode: this.shift.taxCode,
     };
   }
 
@@ -92,7 +91,6 @@ class ProductionService {
       itemQuantity: lastShift?.itemQuantity,
       holidayPay: lastShift?.holidayPay,
       holidayPayRate: lastShift?.holidayPayRate,
-      taxCode: lastShift?.taxCode,
     };
 
     return config;

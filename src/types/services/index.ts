@@ -30,7 +30,7 @@ export interface InterfaceConfig {
 }
 
 export interface DashboardInterface {
-  user: DashboardUserType;
+  user: UserType;
   get shiftsLen(): number;
   get hoursWorked(): number;
   get averageHoursWorkedPerDay(): number;
