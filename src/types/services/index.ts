@@ -7,13 +7,13 @@ import { HandleErrorTypeSchema } from "@/types/zod";
 
 // Types
 export type UserType = User & {
-  shifts: Shifts;
+  shifts: Shifts | null;
   profile: Profile | null;
 };
 
 export type Shifts = Shift & {
-  productions: Production[];
-  hourlies: Hourly[];
+  production: Production[];
+  hourly: Hourly[];
 };
 
 export type HandleErrorType = z.infer<typeof HandleErrorTypeSchema>;

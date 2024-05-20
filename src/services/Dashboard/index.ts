@@ -27,18 +27,21 @@ class Dashboard implements DashboardInterface {
   }
 
   get shiftsLen() {
-    const production = this.user.shifts.productions.length;
-    const hourly = this.user.shifts.hourlies.length;
+    if (!this.user.shifts) return 0;
+    const production = this.user.shifts.production.length;
+    const hourly = this.user.shifts.hourly.length;
     return production + hourly;
   }
 
   get hoursWorked() {
-    const production = this.user.shifts.productions.reduce((acc, shift) => {
+    if (!this.user.shifts) return 0;
+
+    const production = this.user.shifts.production.reduce((acc, shift) => {
       const amount = shift?.amount ?? 0;
       return acc + amount;
     }, 0);
 
-    const hourly = this.user.shifts.hourlies.reduce((acc, shift) => {
+    const hourly = this.user.shifts.hourly.reduce((acc, shift) => {
       const amount = shift?.amount ?? 0;
       return acc + amount;
     }, 0);
@@ -57,20 +60,32 @@ class Dashboard implements DashboardInterface {
   }
 
   get lastProductionShift() {
-    return max(this.user.shifts.productions.map((shift) => new Date(shift.startDate)));
+    if (!this.user?.shifts) return null;
+    return max(this.user.shifts.production.map((shift) => new Date(shift.startDate)));
   }
 
   get lastHourlyShift() {
-    return max(this.user.shifts.hourlies.map((shift) => new Date(shift.startDate)));
+    if (!this.user?.shifts) return null;
+    return max(this.user?.shifts?.hourly.map((shift) => new Date(shift.startDate)));
   }
 
   get lastDayRegistered() {
-    if (this.user.shifts.hourlies.length === 0) return "There is no data";
-    return max([new Date(this.lastProductionShift), new Date(this.lastHourlyShift)]).toString();
+    if (!this.user?.shifts) return "There is no data";
+    if (!this.lastProductionShift && !this.lastHourlyShift) return "There is no data";
+    if (!this.lastProductionShift && this.lastHourlyShift)
+      return new Date(this.lastHourlyShift).toString();
+    if (this.lastProductionShift && !this.lastHourlyShift)
+      return new Date(this.lastProductionShift).toString();
+    return max([
+      new Date(this.lastProductionShift ?? ""),
+      new Date(this.lastHourlyShift ?? ""),
+    ]).toString();
   }
 
   estimatedWeeklyEarnings({ weekStartsOn = "monday" }: { weekStartsOn?: keyof typeof DAYS } = {}) {
-    const production = this.user.shifts.productions.reduce((acc, shift) => {
+    if (!this.user.shifts) return 0;
+
+    const production = this.user.shifts?.production.reduce((acc, shift) => {
       const earnings = new ShiftService(shift).calculateEarnings();
 
       if (
@@ -84,7 +99,7 @@ class Dashboard implements DashboardInterface {
       return acc;
     }, 0);
 
-    const hourly = this.user.shifts.hourlies.reduce((acc, shift) => {
+    const hourly = this.user.shifts?.hourly?.reduce((acc, shift) => {
       const earnings = new ShiftService(shift).calculateEarnings();
 
       if (

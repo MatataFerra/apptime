@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   if (!userId) {
     return NextResponse.json(
       {
-        ...ErrorFactory.createError("QueryNotProvided"),
+        error: ErrorFactory.createError("QueryNotProvided"),
         response: false,
       },
       { status: 404 }
@@ -29,8 +29,8 @@ export async function GET(req: NextRequest) {
       include: {
         shifts: {
           include: {
-            Hourly: true,
-            Production: true,
+            hourly: true,
+            production: true,
           },
         },
         profile: true,
@@ -40,12 +40,33 @@ export async function GET(req: NextRequest) {
     if (!user) {
       return NextResponse.json(
         {
-          ...ErrorFactory.createError("UserNotFound"),
+          error: ErrorFactory.createError("UserNotFound"),
           response: false,
         },
         { status: 404 }
       );
     }
+
+    const t = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      emailVerified: user.emailVerified,
+      formCompleted: user.formCompleted,
+      image: user.image,
+      password: user.password,
+      isActive: user.isActive,
+      type_account: user.type_account,
+      online: user.online,
+      shifts: {
+        id: user.shifts?.id,
+        userId: "1",
+        production: [],
+        hourly: [],
+      },
+      profile: null,
+    };
 
     const dashboardService = new DashboardService(user);
 
@@ -59,7 +80,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       {
-        ...ErrorFactory.createError("InternalServer"),
+        error: ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }

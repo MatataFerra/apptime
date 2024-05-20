@@ -64,7 +64,7 @@ export const userMockedParsed: User = {
 export const userShiftsMocked: UserType["shifts"] = {
   id: 1,
   userId: userMockedParsed.id,
-  productions: datesMock.map((date, i) => ({
+  production: datesMock.map((date, i) => ({
     startDate: date.toString(),
     endDate: addMinutes(date, 125 + i).toString(),
     itemValue: 10,
@@ -80,7 +80,7 @@ export const userShiftsMocked: UserType["shifts"] = {
     publicHolidayWorked: false,
     shiftId: 1,
   })),
-  hourlies: datesMock.map((date, i) => ({
+  hourly: datesMock.map((date, i) => ({
     startDate: date.toString(),
     endDate: addMinutes(date, 125 + i).toString(),
     hourValue: 10,
