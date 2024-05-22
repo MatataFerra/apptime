@@ -38,6 +38,7 @@ function OptionCard({ title, path, classes }: Props) {
       onClick={() => router.push(path ?? PATH_NAMES.HOME)}
     >
       <Stack
+        data-testid={`option-card-${path?.split("/")[1]}`}
         as="figure"
         justifyContent="center"
         alignItems="center"

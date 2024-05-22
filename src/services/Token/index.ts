@@ -42,6 +42,8 @@ class TokenService implements TokenServiceInterface {
     const cookie = cookieStore().get(this.cookie);
 
     if (!cookie) return cookieStore().get(NEXT_AUTH_SESSION_TOKEN);
+
+    return cookie;
   }
 
   static async createToken(data: { email: string; name: string; picture: string; sub: string }) {
