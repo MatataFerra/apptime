@@ -1,17 +1,19 @@
-import { Prisma, Shift } from "@prisma/client";
+import { Hourly, Prisma, Production } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 import ErrorFactory from "@/services/Error/factory";
 import ShiftService from "@/services/Shift";
 
-import { RouteParams, ShiftUpdateSchema } from "@/types";
+import { BaseShiftSchema, RouteParams, TypeShift } from "@/types";
+
+import { isProductionShift } from "@/utils/helpers/isProductionShift";
 
 import prisma from "#/prisma/client";
 
 export async function PUT(req: NextRequest, { params }: RouteParams) {
-  const body: Omit<Shift, "id"> = await req.json();
-  const parsedBody = ShiftUpdateSchema.safeParse(body);
+  const body: Production | Hourly = await req.json();
+  const parsedBody = BaseShiftSchema.safeParse(body);
 
   if (!parsedBody.success) {
     return NextResponse.json(
@@ -26,21 +28,25 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
   }
 
   try {
-    const buildShift = new ShiftService({ ...parsedBody.data })
+    const buildShift = new ShiftService(body)
       .closeShift()
-      .typeShift()
       .checkPublicHoliday()
       .differenceInMinsBetweenStartAndEnd()
       .build();
 
-    const updatedShift = await prisma.shift.update({
-      where: {
-        id: Number(params.id),
-      },
-      data: {
-        ...buildShift,
-      },
-    });
+    const updatedShift = isProductionShift(buildShift as Production | Hourly)
+      ? await prisma.production.update({
+          where: {
+            id: Number(params.id),
+          },
+          data: buildShift,
+        })
+      : await prisma.hourly.update({
+          where: {
+            id: Number(params.id),
+          },
+          data: buildShift,
+        });
 
     if (!updatedShift) {
       return NextResponse.json(

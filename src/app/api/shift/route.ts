@@ -1,10 +1,7 @@
-import { Prisma, Shift } from "@prisma/client";
+import { Shift } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 import ErrorFactory from "@/services/Error/factory";
-import ShiftService from "@/services/Shift";
-
-import { ShiftCreateSchema } from "@/types";
 
 import { QUERY_PARAMS } from "@/utils/constants";
 
@@ -27,6 +24,11 @@ export async function GET(req: NextRequest) {
     const shift = await prisma.shift.findMany({
       where: {
         userId: userId,
+      },
+
+      select: {
+        hourly: true,
+        production: true,
       },
     });
 
@@ -61,21 +63,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const body: Shift = await req.json();
-  const parsedBody = ShiftCreateSchema.safeParse(body);
 
-  if (!parsedBody.success) {
-    return NextResponse.json(
-      {
-        error: ErrorFactory.createError("DataProvidedIsNotValid", {
-          error: parsedBody.error,
-        }),
-        response: false,
-      },
-      { status: 400 }
-    );
-  }
-
-  if (!parsedBody.data.userId) {
+  if (!body?.userId) {
     return NextResponse.json(
       {
         error: ErrorFactory.createError("BodyNotProvided"),
@@ -84,27 +73,16 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-  const shiftTransform = new ShiftService(parsedBody.data).checkPublicHoliday().typeShift().build();
-
-  if (
-    shiftTransform.typeShift === "PRODUCTION" &&
-    !shiftTransform.itemValue &&
-    !shiftTransform.itemQuantity
-  ) {
-    return NextResponse.json(
-      {
-        error: ErrorFactory.createError("DataProvidedIsNotValid", {
-          message: "Item value and quantity must be provided",
-        }),
-        response: false,
-      },
-      { status: 400 }
-    );
-  }
 
   try {
-    const shift = await new ShiftService(shiftTransform).create({
-      userId: parsedBody.data.userId,
+    const shift = await prisma.shift.create({
+      data: {
+        user: {
+          connect: {
+            id: body?.userId,
+          },
+        },
+      },
     });
 
     return NextResponse.json(
@@ -116,16 +94,6 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientValidationError) {
-      return NextResponse.json(
-        {
-          error: ErrorFactory.createError("PrismaClientFields"),
-          response: false,
-        },
-        { status: 400 }
-      );
-    }
-
     return NextResponse.json(
       {
         error: ErrorFactory.createError("InternalServer"),

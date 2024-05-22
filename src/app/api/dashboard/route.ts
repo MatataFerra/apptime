@@ -47,27 +47,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const t = {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-      emailVerified: user.emailVerified,
-      formCompleted: user.formCompleted,
-      image: user.image,
-      password: user.password,
-      isActive: user.isActive,
-      type_account: user.type_account,
-      online: user.online,
-      shifts: {
-        id: user.shifts?.id,
-        userId: "1",
-        production: [],
-        hourly: [],
-      },
-      profile: null,
-    };
-
     const dashboardService = new DashboardService(user);
 
     return NextResponse.json({

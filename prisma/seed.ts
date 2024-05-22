@@ -70,7 +70,7 @@ async function main() {
   await clearDatabase();
 
   for (const userData of addUsersMocked()) {
-    await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         email: userData.email,
         name: userData.name,
@@ -84,11 +84,24 @@ async function main() {
         isActive: userData.isActive,
       },
     });
+
+    await prisma.shift.create({
+      data: {
+        user: {
+          connect: {
+            id: user.id,
+          },
+        },
+      },
+    });
   }
 
   const firstUser = await prisma.user.findUnique({
     where: {
       email: [...addUsersMocked()][1].email,
+    },
+    include: {
+      shifts: true,
     },
   });
 
@@ -103,22 +116,12 @@ async function main() {
     return;
   }
 
-  const shiftCreated = await prisma.shift.create({
-    data: {
-      user: {
-        connect: {
-          id: firstUser.id,
-        },
-      },
-    },
-  });
-
   for (const prodShift of addProductionShiftsForSeed(newDatesMock)) {
     await prisma.production.create({
       data: {
         shift: {
           connect: {
-            id: shiftCreated.id,
+            id: firstUser.shifts?.id,
           },
         },
         ...prodShift,
@@ -131,7 +134,7 @@ async function main() {
       data: {
         shift: {
           connect: {
-            id: shiftCreated.id,
+            id: firstUser.shifts?.id,
           },
         },
         ...hourlyShift,

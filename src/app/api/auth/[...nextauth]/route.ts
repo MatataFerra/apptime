@@ -1,5 +1,6 @@
 import { compare } from "bcryptjs";
-import { assign, cloneDeep } from "lodash";
+import assign from "lodash/assign";
+import cloneDeep from "lodash/cloneDeep";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextRequest, NextResponse } from "next/server";
 import NextAuth from "next-auth";
@@ -86,7 +87,7 @@ async function authOptions(req: NextApiRequest & NextRequest, res: NextResponse 
         return sessionAccessToken;
       },
 
-      async jwt({ token, account, session }) {
+      async jwt({ token, account }) {
         if (account) {
           const userFounded = await UserService.findUniqueUser({
             email: token?.email ?? "",
