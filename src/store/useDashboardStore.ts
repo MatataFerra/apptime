@@ -8,7 +8,7 @@ import type { UserType } from "@/types";
 
 interface DashboardStateProps {
   user: UserType | null | undefined;
-  initialShifts: UserType["shifts"];
+  initialShifts: UserType["shifts"] | undefined;
 }
 
 interface DashboardState extends DashboardStateProps {
@@ -23,7 +23,7 @@ type DashboardStateStore = ReturnType<typeof createDashboardStore>;
 export function createDashboardStore(initProps?: Partial<DashboardStateProps>) {
   const DEFAULT_PROPS: DashboardStateProps = {
     user: initProps?.user || null,
-    initialShifts: initProps?.initialShifts || initProps?.user?.shifts || [],
+    initialShifts: initProps?.initialShifts || initProps?.user?.shifts,
   };
   return create<DashboardState>()((set, get) => ({
     ...DEFAULT_PROPS,
@@ -32,21 +32,41 @@ export function createDashboardStore(initProps?: Partial<DashboardStateProps>) {
       set({ ...get(), ...props });
     },
     deleteShift: (id) => {
-      const newShifts = get().user?.shifts.filter((shift) => shift.id !== id);
+      const hourly = get().user?.shifts?.hourly.filter((shift) => shift.id !== id);
+      const production = get().user?.shifts?.production.filter((shift) => shift.id !== id);
 
       if (get().user) {
         set({
           user: {
             ...(get().user as UserType),
-            shifts: newShifts ?? [],
+            shifts: {
+              id: get().user?.shifts?.id ?? 0,
+              userId: get().user?.shifts?.userId ?? "",
+              hourly: hourly ?? [],
+              production: production ?? [],
+            },
           },
-          initialShifts: newShifts ?? [],
+          initialShifts: {
+            id: get().initialShifts?.id ?? 0,
+            userId: get().initialShifts?.userId ?? "",
+            hourly: hourly ?? [],
+            production: production ?? [],
+          },
         });
       }
     },
     filterByDate: (date) => {
       const initial = get().initialShifts;
-      const newShifts = initial.filter((shift) => {
+      const production = initial?.production?.filter((shift) => {
+        if (!date?.from) return false;
+        if (!date?.to) return false;
+
+        return isWithinInterval(new Date(shift.startDate), {
+          start: new Date(date?.from),
+          end: new Date(date?.to),
+        });
+      });
+      const hourly = initial?.hourly?.filter((shift) => {
         if (!date?.from) return false;
         if (!date?.to) return false;
 
@@ -60,7 +80,12 @@ export function createDashboardStore(initProps?: Partial<DashboardStateProps>) {
         set({
           user: {
             ...(get().user as UserType),
-            shifts: newShifts ?? [],
+            shifts: {
+              id: get().user?.shifts?.id ?? 0,
+              userId: get().user?.shifts?.userId ?? "",
+              hourly: hourly ?? [],
+              production: production ?? [],
+            },
           },
         });
       }
@@ -70,7 +95,12 @@ export function createDashboardStore(initProps?: Partial<DashboardStateProps>) {
         set({
           user: {
             ...(get().user as UserType),
-            shifts: get().initialShifts,
+            shifts: {
+              id: get().user?.shifts?.id ?? 0,
+              userId: get().user?.shifts?.userId ?? "",
+              hourly: get().initialShifts?.hourly ?? [],
+              production: get().initialShifts?.production ?? [],
+            },
           },
         });
       }
