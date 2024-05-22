@@ -13,12 +13,12 @@ import useDelayed from "@/hooks/useDelayed";
 
 interface Props extends HTMLAttributes<HTMLElement> {
   isOpen: boolean;
-  classes?: CSSClassNames;
+  classes?: string;
   children: ReactNode;
   handleOutsideClick?: () => void;
 }
 
-function Drawer({ children, isOpen, handleOutsideClick, ...rest }: Props) {
+function Drawer({ children, isOpen, handleOutsideClick, classes, ...rest }: Props) {
   //delay the animation of the drawer
   const delayOpen = useDelayed(isOpen, 100);
   const ref = useRef<HTMLDivElement>(null);
@@ -31,9 +31,9 @@ function Drawer({ children, isOpen, handleOutsideClick, ...rest }: Props) {
       {delayOpen && (
         <Box
           ref={ref}
+          role="dialog"
           classes={cn(
-            `absolute flex flex-col transition-all duration-300 ${isOpen ? "animate-fade-in" : "animate-fade-out"}`,
-            rest.classes
+            `absolute flex flex-col transition-all duration-300 ${isOpen ? "animate-fade-in" : "animate-fade-out"} ${classes}`
           )}
           {...rest}
         >
