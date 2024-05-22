@@ -27,17 +27,24 @@ function StartDialog({ triggerStatus }: Props) {
   const { step, setData, setStep } = useShiftData((state) => state);
   const { user } = useShiftStateContext((state) => state);
   const hasConfig = useMemo(
-    () => !isEmpty(ShiftService.getLastConfigShift(user?.shifts)),
+    () => !isEmpty(ShiftService.getLastConfigShift(user?.shifts?.hourly)),
     [user?.shifts]
   );
-  const last = useMemo(() => ShiftService.getLastConfigShift(user?.shifts), [user?.shifts]);
+  const last = useMemo(
+    () => ShiftService.getLastConfigShift(user?.shifts?.hourly),
+    [user?.shifts?.hourly]
+  ) as {
+    holidayPay: boolean;
+    holidayPayRate: number;
+    unpaidBreaks: number;
+    hourValue: number;
+  };
 
   function resetData() {
     setStep("HasConfig");
     setData({
       holidayPay: last?.holidayPay,
       holidayPayRate: last?.holidayPayRate,
-      taxCode: last?.taxCode,
       unpaidBreaks: last?.unpaidBreaks,
       hourValue: last?.hourValue,
     });
@@ -53,7 +60,6 @@ function StartDialog({ triggerStatus }: Props) {
               setData({
                 holidayPay: last?.holidayPay,
                 holidayPayRate: last?.holidayPayRate,
-                taxCode: last?.taxCode,
                 unpaidBreaks: last?.unpaidBreaks,
                 hourValue: last?.hourValue,
               });
