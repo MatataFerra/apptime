@@ -2,6 +2,9 @@ export const TEXT_VARIANTS = {
   default: "text-gray-800 dark:text-gray-100",
   title: "text-4xl font-bold text-gray-800 dark:text-gray-100",
   subtitle: "text-xl font-bold text-gray-800 dark:text-gray-100",
+  body: "text-base text-gray-800 dark:text-gray-100",
+  small: "text-sm text-gray-800 dark:text-gray-100",
+  label: "text-sm font-bold text-gray-800 dark:text-gray-100",
   error: "text-red-600 dark:text-red-400",
   success: "text-green-600 dark:text-green-400",
 };
