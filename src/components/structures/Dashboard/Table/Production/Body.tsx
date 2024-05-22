@@ -2,9 +2,11 @@
 
 import { useMemo } from "react";
 
+import { Production } from "@prisma/client";
 import isEmpty from "lodash/isEmpty";
 
 import ShiftService from "@/services/Shift";
+import ProductionService from "@/services/Shift/Production";
 
 import Row from "@/components/structures/Dashboard/Table/Production/Row";
 import TableBody from "@/components/ui/TableBody";
@@ -14,8 +16,8 @@ import { useDashboardContext } from "@/store/useDashboardStore";
 function ProductionBody() {
   const { user } = useDashboardContext((state) => state);
   const productionShifts = useMemo(() => {
-    return user?.shifts?.filter((shift) => shift.typeShift === "PRODUCTION");
-  }, [user?.shifts]);
+    return user?.shifts?.production;
+  }, [user?.shifts?.production]);
 
   return (
     <TableBody>
@@ -28,7 +30,7 @@ function ProductionBody() {
       ) : (
         ShiftService.shiftsSorted(productionShifts, { desc: false })
           ?.filter((shift) => shift.isClosed)
-          .map((shift) => <Row key={shift.id} shift={shift} />)
+          .map((shift) => <Row key={shift.id} shift={shift as Production} />)
       )}
     </TableBody>
   );

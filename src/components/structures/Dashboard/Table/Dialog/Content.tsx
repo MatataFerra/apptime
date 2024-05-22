@@ -1,15 +1,17 @@
-import { Shift } from "@prisma/client";
+import { Hourly, Production } from "@prisma/client";
 
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
+import ProductionService from "@/services/Shift/Production";
 
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
 import { TYPE_SHIFT } from "@/utils/constants";
+import { isProductionShift } from "@/utils/helpers/isProductionShift";
 
 type Props = {
-  shift: Shift;
+  shift: Production | Hourly;
 };
 
 function TableDialogContent({ shift }: Props) {
@@ -28,7 +30,7 @@ function TableDialogContent({ shift }: Props) {
         {shift.endDate ? new DateHumanizer("short").humanizeDate(new Date(shift.endDate)) : "..."}
       </Text>
       <Text>
-        {shift.typeShift === "PRODUCTION" ? (
+        {isProductionShift(shift) ? (
           <>
             <Text as="span" classes="font-bold">
               Item Value:
@@ -46,7 +48,7 @@ function TableDialogContent({ shift }: Props) {
           </>
         )}
       </Text>
-      {shift.typeShift === "PRODUCTION" ? (
+      {isProductionShift(shift) ? (
         <Text>
           <Text as="span" classes="font-bold">
             Item Quantity:
@@ -58,16 +60,16 @@ function TableDialogContent({ shift }: Props) {
         <Text as="span" classes="font-bold">
           Earnings:
         </Text>{" "}
-        {shift.typeShift === "PRODUCTION"
+        {isProductionShift(shift)
           ? `$${String(
-              ShiftService.calculateProductionEarnings({
+              ProductionService.earnings({
                 itemValue: shift.itemValue,
                 itemQuantity: shift.itemQuantity,
                 holidayPayRate: shift.holidayPayRate,
                 publicHolidayWorked: shift.publicHolidayWorked,
               }).toFixed(2)
             )}`
-          : `$${String(ShiftService.calculateEarnings({ shift }))}`}
+          : `$${String(new ShiftService(shift).calculateEarnings())}`}
       </Text>
       <Text>
         <Text as="span" classes="font-bold">
@@ -76,12 +78,14 @@ function TableDialogContent({ shift }: Props) {
         {shift?.isPublicHoliday ? "✅" : "❌"}
       </Text>
 
-      <Text>
-        <Text as="span" classes="font-bold">
-          Hour Value:
-        </Text>{" "}
-        {shift?.hourValue ? `$${shift?.hourValue}` : "..."}
-      </Text>
+      {!isProductionShift(shift) ? (
+        <Text>
+          <Text as="span" classes="font-bold">
+            Hour Value:
+          </Text>{" "}
+          {shift?.hourValue ? `$${shift?.hourValue}` : "..."}
+        </Text>
+      ) : null}
 
       <Text>
         <Text as="span" classes="font-bold">
@@ -100,7 +104,7 @@ function TableDialogContent({ shift }: Props) {
         <Text as="span" classes="font-bold">
           Type of Shift:
         </Text>{" "}
-        {shift?.typeShift ? TYPE_SHIFT[shift.typeShift as keyof typeof TYPE_SHIFT] : "..."}
+        {isProductionShift(shift) ? TYPE_SHIFT.PRODUCTION : TYPE_SHIFT.TRACK}
       </Text>
     </Stack>
   );

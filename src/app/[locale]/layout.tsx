@@ -7,7 +7,7 @@ import { LocaleParams } from "@/types";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-import "@/app/globals.css";
+import "../globals.css";
 
 const Providers = dynamic(() => import("@/providers/Providers"), {
   ssr: false,

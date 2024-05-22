@@ -1,5 +1,6 @@
 import { User } from "@prisma/client";
-import _ from "lodash";
+import has from "lodash/has";
+import isEmpty from "lodash/isEmpty";
 import { NextRequest, NextResponse } from "next/server";
 
 import AuthService from "@/services/Auth";
@@ -22,6 +23,18 @@ export async function POST(req: NextRequest) {
       ...parsedBody.data,
     }).register();
 
+    if (!isEmpty(newUser)) {
+      await prisma?.shift.create({
+        data: {
+          user: {
+            connect: {
+              id: newUser.id,
+            },
+          },
+        },
+      });
+    }
+
     return NextResponse.json(
       {
         message: "success",
@@ -31,7 +44,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error: unknown) {
-    if (_.has(error, "type_error")) {
+    if (has(error, "type_error")) {
       return NextResponse.json(
         {
           error,

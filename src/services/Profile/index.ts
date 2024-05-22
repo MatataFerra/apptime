@@ -1,6 +1,6 @@
-import { Profile, Shift } from "@prisma/client";
+import { Profile } from "@prisma/client";
 
-import prisma from "@/../prisma/client";
+import prisma from "#/prisma/client";
 
 class ProfileService {
   profile: Profile;
@@ -18,7 +18,7 @@ class ProfileService {
   }) {
     const profileCreated = await prisma.profile.create({
       data: {
-        User: {
+        user: {
           connect: {
             id: userId,
           },

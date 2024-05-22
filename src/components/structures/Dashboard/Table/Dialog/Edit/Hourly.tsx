@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 
-import { Shift } from "@prisma/client";
+import { Hourly } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { format, isBefore } from "date-fns";
 import isEqual from "lodash/isEqual";
@@ -22,7 +22,7 @@ import onEditShift from "@/server-actions/edit-shift";
 import { useTableStore } from "@/store/useTableStore";
 
 type Props = {
-  shift: Shift;
+  shift: Hourly;
   user: UserType | null | undefined;
 };
 

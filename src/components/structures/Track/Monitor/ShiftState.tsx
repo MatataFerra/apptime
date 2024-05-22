@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import isEmpty from "lodash/isEmpty";
 import { useInterval } from "usehooks-ts";
 
 import ShiftService from "@/services/Shift";
@@ -34,7 +35,7 @@ function ShiftState() {
     <>
       {shiftUnclosed.isLoading ? (
         <Text classes="block text-lg">loading...</Text>
-      ) : shiftUnclosed.shift ? (
+      ) : !isEmpty(shiftUnclosed.shift) ? (
         <>
           <Text classes="text-lg">shift opened {` (${shiftTime})`}</Text>
         </>

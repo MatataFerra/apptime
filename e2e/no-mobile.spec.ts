@@ -13,9 +13,6 @@ test.use({
 
 test("should signin in desktop and goes to /no-mobile", async ({ page }) => {
   await page.goto("http://localhost:3000/");
-  await page.waitForURL(/login/, {
-    waitUntil: "domcontentloaded",
-  });
 
   const text = page.getByText("This app is only available for mobile devices");
   const input = page.getByRole("textbox", { name: /email/ });

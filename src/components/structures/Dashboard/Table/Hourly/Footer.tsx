@@ -1,4 +1,4 @@
-import { Shift } from "@prisma/client";
+import { Hourly, Shift } from "@prisma/client";
 
 import ShiftService from "@/services/Shift";
 import UserService from "@/services/User";
@@ -15,8 +15,8 @@ const MIN_COLS = 3;
 async function HourlyFooter({ colsNumber }: Props) {
   const user = await UserService.getSessionUser();
 
-  function calculateEarnings(shift: Shift) {
-    return ShiftService.calculateEarnings({ shift });
+  function calculateEarnings(shift: Hourly) {
+    return new ShiftService(shift).calculateEarnings();
   }
 
   function getHours(minutes: number) {
@@ -24,17 +24,13 @@ async function HourlyFooter({ colsNumber }: Props) {
   }
 
   function totalEarnings() {
-    return user?.shifts
-      .filter((shift) => shift.typeShift !== "PRODUCTION")
-      .reduce((acc, shift) => acc + calculateEarnings(shift), 0);
+    return user?.shifts?.hourly.reduce((acc, shift) => acc + calculateEarnings(shift), 0);
   }
 
   function sumHours() {
-    return user?.shifts
-      .filter((shift) => shift.typeShift !== "PRODUCTION")
-      .reduce((acc, shift) => {
-        return acc + (shift?.amount ? getHours(shift?.amount ?? 0) : 0);
-      }, 0);
+    return user?.shifts?.hourly.reduce((acc, shift) => {
+      return acc + (shift?.amount ? getHours(shift?.amount ?? 0) : 0);
+    }, 0);
   }
 
   return (

@@ -1,7 +1,7 @@
-import { Shift } from "@prisma/client";
+import { Hourly, Shift } from "@prisma/client";
 import dynamic from "next/dynamic";
 
-import ShiftService from "@/services/Shift";
+import HourlyService from "@/services/Shift/Hourly";
 import UserService from "@/services/User";
 import ut from "@/services/Utilities/client";
 
@@ -33,7 +33,7 @@ async function Status() {
     return ut.redirectTo(PATH_NAMES.LOGIN);
   }
 
-  const shiftUnclosed = ShiftService.findUnClosedShift(user?.shifts) as Shift | null;
+  const shiftUnclosed = HourlyService.findUnClosedShift(user?.shifts?.hourly) as Hourly | null;
 
   return <Track user={user} shiftUnclosed={shiftUnclosed} />;
 }

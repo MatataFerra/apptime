@@ -6,21 +6,23 @@ import { useLocale } from "next-intl";
 
 import Login from "@/components/structures/Auth/Login";
 import Logout from "@/components/structures/Auth/Logout";
+import Option from "@/components/structures/Drawer/Option";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
+import Title from "./Title";
 import { useDrawerStore } from "@/store/useDrawerStore";
 
-type Option = {
+type DrawerOption = {
   id: string;
   label: string;
   dataTestId: string;
   url: string;
 };
 
-const DRAWER_OPTIONS: Option[] = [
+const MODULES: DrawerOption[] = [
   {
     id: "fast-charge",
     label: "Fast charge",
@@ -39,12 +41,9 @@ const DRAWER_OPTIONS: Option[] = [
     dataTestId: "track-time",
     url: "/track",
   },
-  {
-    id: "dashboard",
-    label: "Dashboard",
-    dataTestId: "dashboard",
-    url: "/dashboard",
-  },
+];
+
+const FEATURES: DrawerOption[] = [
   {
     id: "estimate-income",
     label: "Estimate income",
@@ -56,6 +55,22 @@ const DRAWER_OPTIONS: Option[] = [
     label: "Compare",
     dataTestId: "compare",
     url: "/compare",
+  },
+];
+
+const USER_OPTIONS: DrawerOption[] = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    dataTestId: "dashboard",
+    url: "/dashboard",
+  },
+
+  {
+    id: "settings",
+    label: "Settings",
+    dataTestId: "settings",
+    url: "/settings",
   },
 ];
 
@@ -81,25 +96,33 @@ function DrawerOptions() {
 
   return (
     <>
-      <Stack grid rows="1fr auto" classes="h-full w-full">
-        <Stack as="div" orientation="vertical" spacing={0} classes="w-full divide-y">
-          {DRAWER_OPTIONS.map((option) => (
-            <Stack
-              key={option.id}
-              data-testid={option.dataTestId}
-              as="button"
-              alignItems="center"
-              classes="drawer-option"
-              onClick={() => {
-                router.push(option.url);
-                toggle();
-              }}
-            >
-              <Text classes="select-none font-medium">{option.label}</Text>
-            </Stack>
-          ))}
+      <Stack grid rows="1fr 1fr" cols="1fr" classes="h-full w-full">
+        <Stack
+          as="div"
+          orientation="vertical"
+          spacing={0}
+          classes="w-full divide-y divide-sky-300/50"
+        >
+          <Stack as="div" orientation="vertical" classes="w-full py-2">
+            <Title title="User options" />
+            {USER_OPTIONS.map((option) => (
+              <Option key={option.id} option={option} />
+            ))}
+          </Stack>
+          <Stack as="div" orientation="vertical" classes="w-full py-2">
+            <Title title="Modules" />
+            {MODULES.map((option) => (
+              <Option key={option.id} option={option} />
+            ))}
+          </Stack>
+          <Stack as="div" orientation="vertical" classes="w-full py-2">
+            <Title title="Features" />
+            {FEATURES.map((option) => (
+              <Option key={option.id} option={option} />
+            ))}
+          </Stack>
         </Stack>
-        <Stack classes="items-center p-4">
+        <Stack classes="items-center px-4">
           {status === "authenticated" ? (
             <Logout handleLogout={handleLogout} />
           ) : (

@@ -79,6 +79,16 @@ export const FULL_MONTHS_NAMES = [
   "December",
 ] as const;
 
+export const WEEK_DAYS = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thrusday",
+  "friday",
+  "saturday",
+  "sunday",
+] as const;
+
 export const NEXT_AUTH_SESSION_TOKEN = "__Secure-next-auth.session-token";
 
 export const TAX_CODES = {

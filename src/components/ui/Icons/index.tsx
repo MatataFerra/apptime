@@ -152,6 +152,15 @@ Icon.calculator = function ({ ...props }: SVGProps<SVGSVGElement>) {
   );
 };
 
+Icon.chevron = function ({ ...props }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" {...props}>
+      <path fill="#fff" d="M0 0h24v24H0z" />
+      <path stroke="#000" strokeLinecap="round" strokeLinejoin="round" d="m7 14.5 5-5 5 5" />
+    </svg>
+  );
+};
+
 Icon.home = function ({ ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={36} height={32} fill="none" {...props}>

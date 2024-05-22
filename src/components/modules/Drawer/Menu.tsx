@@ -1,9 +1,5 @@
 "use client";
 
-import { useRef } from "react";
-
-import { useOnClickOutside } from "usehooks-ts";
-
 import Options from "@/components/structures/Drawer/Options";
 import Button from "@/components/ui/Button";
 import Drawer from "@/components/ui/Drawer";

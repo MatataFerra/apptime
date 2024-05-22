@@ -1,16 +1,27 @@
 import { createContext, useContext } from "react";
 
-import { Shift } from "@prisma/client";
+import { Hourly, Production, Profile, Shift, User } from "@prisma/client";
 import { create, useStore } from "zustand";
 
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
+import HourlyService from "@/services/Shift/Hourly";
 
-import type { UserStore } from "@/types/store";
+type UserShiftStateType = Omit<User, "password"> & {
+  shifts: Partial<Shifts> | null;
+  profile: Profile | null;
+};
+
+type Shifts = Shift & {
+  production: Production[];
+  hourly: Hourly[];
+};
+
+type ShiftType = Hourly | Production;
 
 interface ShiftStateProps {
-  user: UserStore;
-  shiftUnclosed: { shift: Shift | null; isLoading: boolean };
+  user: Partial<UserShiftStateType> | null;
+  shiftUnclosed: { shift: Partial<Hourly> | null; isLoading: boolean };
 
   isShiftActive: boolean;
   clickOnSave: boolean;
@@ -39,12 +50,12 @@ interface ShiftStateProps {
 }
 
 interface ShiftState extends ShiftStateProps {
-  setUser: (user: UserStore) => void;
-  getShift: (id: number | undefined) => Shift | undefined;
+  setUser: (user: Partial<UserShiftStateType> | null) => void;
+  getShift: (id: number | undefined) => Hourly | undefined;
   setButtonClicked: (button: Partial<ShiftStateProps["buttonClicked"]>) => void;
-  updateShift: (shift: Partial<Shift>) => void;
+  updateShift: (shift: Partial<ShiftType>) => void;
   setClickOnSave: (state: boolean) => void;
-  createShift: (shift: Shift) => void;
+  createShift: (shift: Hourly) => void;
   updateShiftsInfo: () => void;
   updateShiftStatus: (state: boolean | undefined) => void;
   updateShiftUnclosed: () => void;
@@ -90,7 +101,7 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
   return create<ShiftState>()((set, get) => ({
     ...DEFAULT_PROPS,
     ...initProps,
-    setUser: (user: UserStore) => {
+    setUser: (user: Partial<UserShiftStateType> | null) => {
       set((state) => {
         return {
           ...state,
@@ -99,39 +110,50 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
       });
     },
     getShift: (id: number | undefined) => {
-      const getter = get()?.user;
       if (!id) return undefined;
-      return getter?.shifts?.find((shift) => shift?.id === id);
+
+      const hourly = get()?.user?.shifts?.hourly;
+
+      return hourly?.find((h) => h.id === id);
     },
-    updateShift: (shift: Partial<Shift>) => {
+    updateShift: (shift: Partial<ShiftType>) => {
       set((state) => {
         return {
           ...state,
           user: {
             ...state.user,
-            shifts: state.user?.shifts?.map((s) => {
-              if (s.id === shift.id)
-                return {
-                  ...s,
-                  ...shift,
-                };
-              return s;
-            }),
+            shifts: {
+              id: state.user?.shifts?.id as number,
+              userId: state.user?.shifts?.userId as string,
+              hourly: state.user?.shifts?.hourly?.map((h) => {
+                if (h.id === shift.id) return { ...h, ...shift };
+                return h;
+              }),
+              production: state.user?.shifts?.production?.map((p) => {
+                if (p.id === shift.id) return { ...p, ...shift };
+                return p;
+              }),
+            },
           },
           shiftsInfo: {
             ...state.shiftsInfo,
-            isEmpty: !state.user?.shifts?.length,
+            isEmpty: !state.user?.shifts?.hourly?.length && !state.user?.shifts?.production?.length,
           },
         };
       });
     },
-    createShift: (shift: Shift) => {
+    createShift: (shift: Hourly) => {
       set((state) => {
         return {
           ...state,
           user: {
             ...state.user,
-            shifts: [...(state?.user?.shifts ?? []), shift],
+            shifts: {
+              id: state.user?.shifts?.id as number,
+              userId: state.user?.shifts?.userId as string,
+              hourly: state.user?.shifts?.hourly?.concat(shift),
+              production: state.user?.shifts?.production,
+            },
           },
         };
       });
@@ -161,9 +183,7 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
 
         const getter = get()?.user;
 
-        const lastShiftClosed = ShiftService.shiftsSorted(getter?.shifts)?.find((shift) => {
-          return shift?.endDate !== null;
-        });
+        const lastShiftClosed = ShiftService.getLatestShift(getter?.shifts);
 
         if (!lastShiftClosed)
           return {
@@ -171,7 +191,7 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
             shiftsInfo: {
               ...state.shiftsInfo,
               isLoading: false,
-              isEmpty: !getter?.shifts?.length,
+              isEmpty: !getter?.shifts?.hourly?.length && !getter?.shifts?.production?.length,
             },
           };
 
@@ -184,12 +204,12 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
           new Date(lastShiftClosed?.endDate ?? "")
         );
 
-        const shiftsEarnings = getter?.shifts?.reduce((acc, curr) => {
-          if (curr?.endDate === null) return acc;
+        const hourlyEarnings = getter?.shifts?.hourly?.reduce((acc, curr) => {
+          return acc + new ShiftService(curr).calculateEarnings();
+        }, 0);
 
-          const earns = acc + ShiftService.calculateEarnings({ shift: curr });
-
-          return earns;
+        const productionEarnings = getter?.shifts?.production?.reduce((acc, curr) => {
+          return acc + new ShiftService(curr).calculateEarnings();
         }, 0);
 
         return {
@@ -197,10 +217,10 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
           shiftsInfo: {
             ...state.shiftsInfo,
             date: humanizeDateLastShiftClosed,
-            earns: shiftsEarnings ?? 0,
+            earns: (hourlyEarnings ?? 0) + (productionEarnings ?? 0),
             text: distanceLastShiftClosed?.text ?? "",
             isLoading: false,
-            isEmpty: !getter?.shifts?.length,
+            isEmpty: !getter?.shifts?.hourly?.length && !getter?.shifts?.production?.length,
           },
         };
       });
@@ -216,12 +236,14 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
     updateShiftUnclosed: () => {
       set((state) => {
         const getter = get()?.user;
-        const lastShift = ShiftService.findUnClosedShift(getter?.shifts || []);
+        const lastShift = HourlyService.findUnClosedShift(getter?.shifts?.hourly);
 
         return {
           ...state,
           shiftUnclosed: {
-            shift: lastShift ?? null,
+            shift: {
+              ...lastShift,
+            },
             isLoading: false,
           },
         };
@@ -261,6 +283,6 @@ export const ShiftStatusContext = createContext<ShiftStateStore | null>(null);
 
 export function useShiftStateContext<T>(selector: (state: ShiftState) => T): T {
   const store = useContext(ShiftStatusContext);
-  if (!store) throw new Error("Missing BearContext.Provider in the tree");
+  if (!store) throw new Error("Missing ShiftContext.Provider in the tree");
   return useStore(store, selector);
 }

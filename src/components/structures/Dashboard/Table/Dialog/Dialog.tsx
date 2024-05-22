@@ -1,8 +1,8 @@
 "use client";
 
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, ReactNode } from "react";
 
-import { Shift } from "@prisma/client";
+import { Hourly, Production, Shift } from "@prisma/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -30,8 +30,8 @@ import { useTableStore } from "@/store/useTableStore";
 
 type Props = PropsWithChildren<{
   title: string;
-  shift: Shift;
-  content: React.ReactNode;
+  shift: Hourly | Production;
+  content: ReactNode;
 }>;
 
 function TableDialog({ title, content, shift, children }: Props) {

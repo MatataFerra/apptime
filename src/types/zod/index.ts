@@ -22,26 +22,58 @@ import Password from "@/services/Auth/password";
 ===================================================================
 */
 
-const ShiftModelSchema = z.object({
-  id: z.number({
-    required_error: "Id must be provided correctly",
-  }),
-  amount: z.number().nullable(),
+const BaseShiftSchema = z.object({
+  startDate: z.string(),
   endDate: z.string().nullable(),
+  amount: z.number().nullable(),
   isClosed: z.boolean(),
   isPublicHoliday: z.boolean(),
   publicHolidayWorked: z.boolean(),
   notes: z.string().nullable(),
-  startDate: z.string(),
-  hourValue: z.number(),
-  itemValue: z.number().nullable(),
-  itemQuantity: z.number().nullable(),
-  typeShift: z.enum(["TRACK", "FAST", "PRODUCTION"]).default("TRACK"),
   holidayPay: z.boolean(),
   holidayPayRate: z.number().nullable(),
   unpaidBreaks: z.number().nullable(),
-  taxCode: z.number().nullable(),
+  shiftId: z.number().nullable(),
+});
+
+const ProductionShiftSchema = BaseShiftSchema.merge(
+  z.object({
+    id: z.number({
+      required_error: "Id must be provided correctly",
+    }),
+    itemValue: z.number().nullable(),
+    itemQuantity: z.number().nullable(),
+  })
+);
+
+const HourlyShiftSchema = BaseShiftSchema.merge(
+  z.object({
+    id: z.number({
+      required_error: "Id must be provided correctly",
+    }),
+    hourValue: z.number().nullable(),
+  })
+);
+
+const ShiftModelSchema = z.object({
+  id: z.number({
+    required_error: "Id must be provided correctly",
+  }),
+  hourly: z.array(HourlyShiftSchema).nullable(),
+  production: z.array(ProductionShiftSchema).nullable(),
   userId: z.string().nullable(),
+});
+
+const ProductionCreateSchema = ProductionShiftSchema.omit({
+  id: true,
+}).refine((values) => Object.keys(values).length > 0, {
+  message: "One of the fields must be defined",
+});
+
+const HourlyCreateSchema = HourlyShiftSchema.omit({
+  id: true,
+}).refine((values) => Object.keys(values).length > 0, {
+  message: "One of the fields must be defined",
 });
 
 const ShiftCreateSchema = ShiftModelSchema.omit({
@@ -51,6 +83,14 @@ const ShiftCreateSchema = ShiftModelSchema.omit({
 });
 
 const ShiftUpdateSchema = ShiftModelSchema.omit({
+  id: true,
+});
+
+const ProductionUpdateSchema = ProductionShiftSchema.omit({
+  id: true,
+});
+
+const HourlyUpdateSchema = HourlyShiftSchema.omit({
   id: true,
 });
 
@@ -244,13 +284,21 @@ const HandleErrorTypeSchema = z.enum([
   "DataProvidedIsNotValid",
   "PasswordSchema",
   "CustomError",
+  "SettingsNotUpdated",
 ]);
 
 export {
+  BaseShiftSchema,
   FastChargeFormSchema,
   HandleErrorTypeSchema,
+  HourlyCreateSchema,
+  HourlyShiftSchema,
+  HourlyUpdateSchema,
   PasswordSchema,
+  ProductionCreateSchema,
   ProductionJobFormSchema,
+  ProductionShiftSchema,
+  ProductionUpdateSchema,
   ProfileCreateSchema,
   ProfileSchema,
   ProfileUpdateSchema,

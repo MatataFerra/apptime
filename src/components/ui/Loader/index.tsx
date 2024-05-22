@@ -4,7 +4,7 @@ import Text from "@/components/ui/Text";
 
 import { cn } from "@/utils/helpers/styleMerger";
 
-import styles from "@/components/ui/Loader/loader.module.css";
+import styles from "./loader.module.css";
 
 interface Loader {
   children?: React.ReactElement | React.ReactElement[];

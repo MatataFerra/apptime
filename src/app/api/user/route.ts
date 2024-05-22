@@ -56,7 +56,12 @@ export async function GET(req: NextRequest) {
         email: parsedSearchParams?.data?.email ?? "",
       },
       include: {
-        shifts: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
+        shifts: {
+          include: {
+            hourly: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
+            production: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
+          },
+        },
         profile: JSON.parse(parsedSearchParams.data.profile ?? "false"),
       },
     });

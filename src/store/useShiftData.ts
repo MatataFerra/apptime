@@ -1,4 +1,4 @@
-import { Shift } from "@prisma/client";
+import { Hourly, Shift } from "@prisma/client";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
@@ -11,7 +11,7 @@ const ShiftStep = {
 export type ShiftStep = (typeof ShiftStep)[keyof typeof ShiftStep];
 
 interface ShiftData {
-  data: Omit<Shift, "id">;
+  data: Omit<Hourly, "id">;
   step: ShiftStep;
   errors: boolean;
   setErrors: (errors: boolean) => void;
@@ -23,8 +23,7 @@ export const useShiftData = create(
   devtools<ShiftData>(
     (set, get) => ({
       data: {
-        hourValue: 27,
-        userId: "",
+        hourValue: 0,
         startDate: new Date().toString(),
         isClosed: false,
         amount: 0,
@@ -34,11 +33,8 @@ export const useShiftData = create(
         publicHolidayWorked: false,
         holidayPay: true,
         holidayPayRate: 8,
-        taxCode: 0,
-        unpaidBreaks: 1,
-        itemQuantity: null,
-        itemValue: null,
-        typeShift: "TRACK",
+        unpaidBreaks: 0,
+        shiftId: null,
       },
       errors: false,
       step: ShiftStep.HasConfig,

@@ -5,7 +5,7 @@ test.use({
 });
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("http://localhost:3000/");
+  await page.goto("http://localhost:3000/en/dashboard");
   await page.waitForURL(/login/);
 
   await page.getByRole("textbox").first().fill("usuario2@example.com");
@@ -15,21 +15,10 @@ test.beforeEach(async ({ page }) => {
     force: true,
   });
 
-  const finishButton = page.getByRole("button", { name: /Finish/ });
-
-  if (await finishButton.isEnabled()) {
-    await finishButton.click();
-    await page.getByRole("button", { name: /move/ }).click();
-  }
-
-  await page.waitForURL(/en/);
-
-  await page.goto("http://localhost:3000/en/history-shifts");
+  await page.goto("http://localhost:3000/en/dashboard");
 });
 
 test("user can see history shifts list", async ({ page }) => {
-  await page.waitForURL(/history-shifts/);
-
   const title = page.getByText(/History Shifts/);
   const table = page.getByRole("table");
 

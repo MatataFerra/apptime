@@ -1,6 +1,6 @@
-import { Shift } from "@prisma/client";
+import { Production } from "@prisma/client";
 
-import ShiftService from "@/services/Shift";
+import ProductionService from "@/services/Shift/Production";
 import UserService from "@/services/User";
 
 import TableElement from "@/components/ui/TableElement";
@@ -15,8 +15,8 @@ const MIN_COLS = 3;
 async function ProductionFooter({ colsNumber }: Props) {
   const user = await UserService.getSessionUser();
 
-  function calculateEarnings(shift: Shift) {
-    return ShiftService.calculateProductionEarnings({
+  function calculateEarnings(shift: Production) {
+    return ProductionService.earnings({
       holidayPayRate: shift?.holidayPayRate ?? 0,
       itemQuantity: shift?.itemQuantity ?? 0,
       itemValue: shift?.itemValue ?? 0,
@@ -25,17 +25,13 @@ async function ProductionFooter({ colsNumber }: Props) {
   }
 
   function totalEarnings() {
-    return user?.shifts
-      .filter((shift) => shift.typeShift === "PRODUCTION")
-      .reduce((acc, shift) => acc + calculateEarnings(shift), 0);
+    return user?.shifts?.production.reduce((acc, shift) => acc + calculateEarnings(shift), 0);
   }
 
   function sumProduction() {
-    return user?.shifts
-      .filter((shift) => shift.typeShift === "PRODUCTION")
-      .reduce((acc, shift) => {
-        return acc + (shift?.itemQuantity ? shift.itemQuantity : 0);
-      }, 0);
+    return user?.shifts?.production.reduce((acc, shift) => {
+      return acc + (shift?.itemQuantity ? shift.itemQuantity : 0);
+    }, 0);
   }
 
   return (

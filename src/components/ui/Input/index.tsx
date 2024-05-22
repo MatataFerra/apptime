@@ -60,10 +60,11 @@ const input = forwardRef(function Input(
 
       <div
         className={cn(
-          "flex w-full items-center justify-between rounded-lg border border-gray-200 bg-transparent px-2 py-2",
+          "flex w-full items-center justify-between rounded-lg bg-transparent px-2 py-2",
           type === "radio" || type === "checkbox"
             ? INPUT_VARIANTS["radio"]
             : INPUT_VARIANTS[variant],
+          variant === "underline" ? "border-none" : "border border-gray-200",
           isError ? "border-2 border-red-600 focus:ring-red-600" : "",
           "h-fit min-h-12",
           "gap-2",
@@ -76,7 +77,10 @@ const input = forwardRef(function Input(
           type={type}
           autoComplete="off"
           className={cn(
-            "h-full w-full border-none outline-none",
+            variant === "underline"
+              ? "border-b-2 border-b-slate-200 transition-colors hover:border-b-slate-400/60 focus:border-b-blue-600"
+              : "border-none",
+            "h-full w-full outline-none",
             measurePlace === "left" ? "order-2" : "order-1"
           )}
           {...props}

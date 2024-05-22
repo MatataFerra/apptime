@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import dynamic from "next/dynamic";
 
 import ShiftService from "@/services/Shift";
+import ProductionService from "@/services/Shift/Production";
 
 import Skeleton from "@/components/ui/Skeleton";
 
@@ -35,7 +36,7 @@ function Report() {
   }, [startDate, finishDate]);
 
   const calculateProductionEarn = useMemo(() => {
-    const earnings = ShiftService.calculateProductionEarnings({
+    const earnings = ProductionService.earnings({
       itemValue: Number(itemValue ?? 0),
       itemQuantity: Number(itemQuantity),
       holidayPayRate: Number(holidayPayRate),
