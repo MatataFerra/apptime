@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-import { Shift } from "@prisma/client";
+import { Hourly, Shift } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 
 import api from "@/services/Api";
@@ -14,12 +14,15 @@ import { createShiftStatusStore, ShiftStatusContext } from "@/store/useShiftStat
 type Props = {
   children: React.ReactNode;
   user: Omit<UserType, "password"> | null;
-  shiftOpen: Shift | null;
+  shiftOpen: Hourly | null;
 };
 
 function ShiftStatusProvider({ children, user, shiftOpen }: Props) {
   const store = useRef(
-    createShiftStatusStore({ user: user, shiftUnclosed: { shift: shiftOpen, isLoading: false } })
+    createShiftStatusStore({
+      user: user,
+      shiftUnclosed: { shift: shiftOpen, isLoading: false },
+    })
   ).current;
   const query = useQuery({
     queryKey: ["user", user?.email],

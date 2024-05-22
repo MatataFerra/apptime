@@ -2,9 +2,9 @@
 
 import { useCallback } from "react";
 
-import { Shift } from "@prisma/client";
+import { Production } from "@prisma/client";
 
-import ShiftService from "@/services/Shift";
+import ProductionService from "@/services/Shift/Production";
 
 import Content from "@/components/structures/Dashboard/Table/Dialog/Content";
 import Dialog from "@/components/structures/Dashboard/Table/Dialog/Dialog";
@@ -13,11 +13,11 @@ import TableElement from "@/components/ui/TableElement";
 
 import useHumanizeDate from "@/hooks/useHumanizeDate";
 
-function ProductionRow({ shift }: { shift: Shift }) {
+function ProductionRow({ shift }: { shift: Production }) {
   const shortDate = useHumanizeDate({ date: shift.startDate, typeFormat: "short" });
 
-  const calculateEarnings = useCallback((shift: Shift) => {
-    return ShiftService.calculateProductionEarnings({
+  const calculateEarnings = useCallback((shift: Production) => {
+    return ProductionService.earnings({
       itemValue: shift.itemValue,
       itemQuantity: shift.itemQuantity,
       holidayPayRate: shift.holidayPayRate,

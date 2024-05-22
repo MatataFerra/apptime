@@ -1,4 +1,4 @@
-import { Shift } from "@prisma/client";
+import { Hourly, Production, Shift } from "@prisma/client";
 
 import type { EarnsMonthData } from "@/types";
 
@@ -18,8 +18,8 @@ import ShiftService from "../Shift";
  */
 
 class Chart {
-  shifts: Shift[];
-  constructor(shifts: Shift[]) {
+  shifts: Production[] | Hourly[];
+  constructor(shifts: Production[] | Hourly[]) {
     this.shifts = shifts;
   }
 
@@ -36,8 +36,7 @@ class Chart {
       ?.filter((shift) => shift.isClosed)
       .map((shift) => ({
         date: new DateHumanizer("short").humanizeDate(new Date(shift.startDate)),
-        earnings: ShiftService.calculateEarnings({ shift }),
-        type: shift.typeShift,
+        earnings: new ShiftService(shift).calculateEarnings(),
       }));
 
     return data;
@@ -48,7 +47,7 @@ class Chart {
       const earnings =
         this.groupByMonths &&
         this.groupByMonths[month]?.reduce((acc, shift) => {
-          return acc + ShiftService.calculateEarnings({ shift });
+          return acc + new ShiftService(shift).calculateEarnings();
         }, 0);
 
       if (!earnings) return null;

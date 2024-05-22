@@ -2,6 +2,7 @@ import * as tailwindColors from "tailwindcss/colors";
 
 export type TAILWIND_COLOR =
   | `${keyof typeof TAILWIND_TYPE_COLOR}-${keyof typeof TAILWIND_COLORS}-${keyof typeof TAILWIND_NUMBER_COLORS}`
+  | `${keyof typeof TAILWIND_TYPE_COLOR}-${keyof typeof TAILWIND_COLORS}-${keyof typeof TAILWIND_NUMBER_COLORS}/${string}`
   | `${keyof typeof TAILWIND_TYPE_COLOR}-${EXTENDED_COLORS}`
   | `${keyof typeof TAILWIND_TYPE_COLOR}-${BASE_COLORS}`;
 

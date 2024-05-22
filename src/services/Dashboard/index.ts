@@ -3,7 +3,7 @@ import { isNaN as isLodashNan } from "lodash";
 
 import ShiftService from "@/services/Shift";
 
-import { type DashboardInterface, type DashboardUserType, DAYS } from "@/types/services";
+import { type DashboardInterface, DAYS, type UserType } from "@/types/services";
 
 /**
   @description
@@ -21,20 +21,32 @@ import { type DashboardInterface, type DashboardUserType, DAYS } from "@/types/s
 */
 
 class Dashboard implements DashboardInterface {
-  user: DashboardUserType;
-  constructor(user: DashboardUserType) {
+  user: UserType;
+  constructor(user: UserType) {
     this.user = user;
   }
 
   get shiftsLen() {
-    return this.user.shifts.length;
+    if (!this.user.shifts) return 0;
+    const production = this.user.shifts.production.length;
+    const hourly = this.user.shifts.hourly.length;
+    return production + hourly;
   }
 
   get hoursWorked() {
-    const total = this.user.shifts.reduce((acc, shift) => {
+    if (!this.user.shifts) return 0;
+
+    const production = this.user.shifts.production.reduce((acc, shift) => {
       const amount = shift?.amount ?? 0;
       return acc + amount;
     }, 0);
+
+    const hourly = this.user.shifts.hourly.reduce((acc, shift) => {
+      const amount = shift?.amount ?? 0;
+      return acc + amount;
+    }, 0);
+
+    const total = production + hourly;
 
     return total;
   }
@@ -47,24 +59,34 @@ class Dashboard implements DashboardInterface {
     return total;
   }
 
-  // get hourValue() {
-  //   return this.user.shifts?.hourlyRate ?? 0;
-  // }
-
-  // get minuteValue() {
-  //   return this.hourValue / 60;
-  // }
-
-  get lastDayRegistered() {
-    if (this.user.shifts.length === 0) return "There is no data";
-    return max(this.user.shifts.map((shift) => new Date(shift.startDate))).toString();
+  get lastProductionShift() {
+    if (!this.user?.shifts) return null;
+    return max(this.user.shifts.production.map((shift) => new Date(shift.startDate)));
   }
 
-  // We can refactor this function using the Pay Service, also we can migrate this
-  // functionality to Pay Service and create a better abastraction
+  get lastHourlyShift() {
+    if (!this.user?.shifts) return null;
+    return max(this.user?.shifts?.hourly.map((shift) => new Date(shift.startDate)));
+  }
+
+  get lastDayRegistered() {
+    if (!this.user?.shifts) return "There is no data";
+    if (!this.lastProductionShift && !this.lastHourlyShift) return "There is no data";
+    if (!this.lastProductionShift && this.lastHourlyShift)
+      return new Date(this.lastHourlyShift).toString();
+    if (this.lastProductionShift && !this.lastHourlyShift)
+      return new Date(this.lastProductionShift).toString();
+    return max([
+      new Date(this.lastProductionShift ?? ""),
+      new Date(this.lastHourlyShift ?? ""),
+    ]).toString();
+  }
+
   estimatedWeeklyEarnings({ weekStartsOn = "monday" }: { weekStartsOn?: keyof typeof DAYS } = {}) {
-    return this.user.shifts.reduce((acc, shift) => {
-      const earnings = ShiftService.calculateEarnings({ shift });
+    if (!this.user.shifts) return 0;
+
+    const production = this.user.shifts?.production.reduce((acc, shift) => {
+      const earnings = new ShiftService(shift).calculateEarnings();
 
       if (
         isThisWeek(new Date(shift.startDate), {
@@ -76,6 +98,22 @@ class Dashboard implements DashboardInterface {
 
       return acc;
     }, 0);
+
+    const hourly = this.user.shifts?.hourly?.reduce((acc, shift) => {
+      const earnings = new ShiftService(shift).calculateEarnings();
+
+      if (
+        isThisWeek(new Date(shift.startDate), {
+          weekStartsOn: DAYS[weekStartsOn as keyof typeof DAYS],
+        })
+      ) {
+        acc += earnings;
+      }
+
+      return acc;
+    }, 0);
+
+    return production + hourly;
   }
 
   dashboardData() {

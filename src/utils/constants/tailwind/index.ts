@@ -2,6 +2,9 @@ export const TEXT_VARIANTS = {
   default: "text-gray-800 dark:text-gray-100",
   title: "text-4xl font-bold text-gray-800 dark:text-gray-100",
   subtitle: "text-xl font-bold text-gray-800 dark:text-gray-100",
+  body: "text-base text-gray-800 dark:text-gray-100",
+  small: "text-sm text-gray-800 dark:text-gray-100",
+  label: "text-sm font-bold text-gray-800 dark:text-gray-100",
   error: "text-red-600 dark:text-red-400",
   success: "text-green-600 dark:text-green-400",
 };
@@ -49,8 +52,7 @@ export const INPUT_VARIANTS = {
   info: "bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent",
   plane: "h-full w-full rounded-md bg-white text-base",
   radio: "",
-  underline:
-    "bg-transparent border-b-2 pl-0 border-gray-400 rounded-none focus:border-blue-600 focus:outline-none",
+  underline: "bg-transparent pl-0 rounded-none focus:outline-none",
 };
 
 export const HEADER_POSITION = {

@@ -16,8 +16,15 @@ import { TAX_CODES } from "@/utils/constants";
 
 import { useShiftData } from "@/store/useShiftData";
 
-function ShiftStartTaxCodeDropdown() {
+/**
+ *
+ * @deprecated This component is deprecated and will be removed in the future.
+ * The reason is the tax code will be included in Tax model.
+ *
+ */
+function TaxCodeDropdown() {
   const { setData, setErrors, data } = useShiftData((state) => state);
+  // @ts-ignore
   const [taxCode, setTaxCode] = useState(data.taxCode?.toString() ?? TAX_CODES.NONE.toString());
   const taxCodeSelected = useMemo(
     () =>
@@ -35,6 +42,7 @@ function ShiftStartTaxCodeDropdown() {
 
   function onChangeTaxCode(value: string) {
     setTaxCode(value);
+    // @ts-ignore
     setData({ taxCode: value ? (Number(value) as TaxCodes) : 2 });
   }
 
@@ -54,4 +62,4 @@ function ShiftStartTaxCodeDropdown() {
   );
 }
 
-export default ShiftStartTaxCodeDropdown;
+export default TaxCodeDropdown;

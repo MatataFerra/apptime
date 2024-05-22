@@ -4,8 +4,6 @@ import { useRouter } from "next/navigation";
 import api from "@/services/Api/Shift";
 import Toast from "@/services/Toast";
 
-import { TypeShift } from "@/types";
-
 import Button from "@/components/ui/Button";
 import Loader from "@/components/ui/Loader";
 
@@ -32,7 +30,7 @@ function FinishButton({ buttonStatus }: Props) {
   } = useShiftStateContext((state) => state);
 
   const mutate = useMutation({
-    mutationFn: api.updateShift.bind(api),
+    mutationFn: api.updateHourly.bind(api),
     onSuccess: (_) => {
       updateShiftsInfo();
       updateShiftUnclosed();
@@ -77,8 +75,7 @@ function FinishButton({ buttonStatus }: Props) {
         notes: updateShift?.notes,
         publicHolidayWorked: updateShift?.publicHolidayWorked,
         startDate: updateShift?.startDate,
-        userId: updateShift?.userId,
-        typeShift: (updateShift?.typeShift as TypeShift) ?? "TRACK",
+        unpaidBreaks: updateShift?.unpaidBreaks,
       },
       id: updateShift?.id,
     });

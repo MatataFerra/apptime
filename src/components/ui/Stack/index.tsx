@@ -63,8 +63,8 @@ function Stack<E extends React.ElementType = typeof StackDefaultAsType>({
       <Component
         className={cn(
           grid ? "grid" : STACK_ORIENTATION[orientation],
-          !grid && STACK_JUSTIFY[justifyContent],
-          !grid && STACK_ALIGN[alignItems],
+          STACK_JUSTIFY[justifyContent],
+          STACK_ALIGN[alignItems],
           wrap && "flex-wrap",
           classes
         )}

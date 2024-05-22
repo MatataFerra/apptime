@@ -1,8 +1,6 @@
 import ShiftService from "@/services/Shift";
 import Toast from "@/services/Toast";
 
-import { type TypeShift } from "@/types";
-
 import Button from "@/components/ui/Button";
 import Stack from "@/components/ui/Stack";
 
@@ -23,8 +21,7 @@ function Buttons() {
     await new ShiftService({
       ...shift,
       notes,
-      typeShift: (shift.typeShift as TypeShift) ?? "TRACK",
-    }).update({ shiftId: shift.id });
+    }).update(shift?.id);
 
     updateShift({ notes, id: shift.id });
 

@@ -1,4 +1,4 @@
-import { Shift } from "@prisma/client";
+import { Hourly } from "@prisma/client";
 import dynamic from "next/dynamic";
 
 import { UserType } from "@/types";
@@ -46,15 +46,19 @@ const NotesFab = dynamic(() => import("@/components/structures/Notes/Fab"), {
 
 type Props = {
   user: UserType;
-  shiftUnclosed: Shift | null;
+  shiftUnclosed: Hourly | null;
 };
 
 function Track({ user, shiftUnclosed }: Props) {
   return (
     <ShiftStatusProvider user={user} shiftOpen={shiftUnclosed}>
-      <State />
-      <MonitorScreen />
-      <Buttons />
+      <Stack orientation="vertical" justifyContent="between" classes="h-full w-full" spacing={8}>
+        <Stack orientation="vertical" classes="w-full">
+          <State />
+          <MonitorScreen />
+        </Stack>
+        <Buttons />
+      </Stack>
       <NotesFab />
       <NotesPortal />
     </ShiftStatusProvider>

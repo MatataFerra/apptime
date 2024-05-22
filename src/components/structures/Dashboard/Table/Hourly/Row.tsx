@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 
-import { Shift } from "@prisma/client";
+import { Hourly } from "@prisma/client";
 import dynamic from "next/dynamic";
 
 import ShiftService from "@/services/Shift";
@@ -32,11 +32,11 @@ const TableDialogContent = dynamic(
   }
 );
 
-function HourlyRow({ shift }: { shift: Shift }) {
+function HourlyRow({ shift }: { shift: Hourly }) {
   const shortDate = useHumanizeDate({ date: shift.startDate, typeFormat: "short" });
 
-  const calculateEarnings = useCallback((shift: Shift) => {
-    return ShiftService.calculateEarnings({ shift });
+  const calculateEarnings = useCallback((shift: Hourly) => {
+    return new ShiftService(shift).calculateEarnings();
   }, []);
 
   function getHours(minutes: number) {

@@ -2,7 +2,7 @@ import { User } from "@prisma/client";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
-import ShiftService from "@/services/Shift";
+import HourlyService from "@/services/Shift/Hourly";
 
 import { FormErrors, FormStore, FormStoreData } from "@/types/store";
 
@@ -56,7 +56,7 @@ export const useFormStore = create(
 
       detectInputType: (value: string) => {
         if (value.includes(":")) {
-          return ShiftService.convertHourInFloat(value);
+          return HourlyService.convertHourInFloat(value);
         }
 
         return Number(value);
