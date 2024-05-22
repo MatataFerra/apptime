@@ -22,10 +22,7 @@ import Password from "@/services/Auth/password";
 ===================================================================
 */
 
-const ProductionShiftSchema = z.object({
-  id: z.number({
-    required_error: "Id must be provided correctly",
-  }),
+const BaseShiftSchema = z.object({
   startDate: z.string(),
   endDate: z.string().nullable(),
   amount: z.number().nullable(),
@@ -33,37 +30,37 @@ const ProductionShiftSchema = z.object({
   isPublicHoliday: z.boolean(),
   publicHolidayWorked: z.boolean(),
   notes: z.string().nullable(),
-  itemValue: z.number().nullable(),
-  itemQuantity: z.number().nullable(),
   holidayPay: z.boolean(),
   holidayPayRate: z.number().nullable(),
   unpaidBreaks: z.number().nullable(),
-  taxCode: z.number().nullable(),
+  shiftId: z.number().nullable(),
 });
 
-const HourlyShiftSchema = z.object({
-  id: z.number({
-    required_error: "Id must be provided correctly",
-  }),
-  startDate: z.string(),
-  endDate: z.string().nullable(),
-  amount: z.number().nullable(),
-  isClosed: z.boolean(),
-  isPublicHoliday: z.boolean(),
-  publicHolidayWorked: z.boolean(),
-  notes: z.string().nullable(),
-  hourValue: z.number().nullable(),
-  holidayPay: z.number().nullable(),
-  unpaidBreaks: z.number().nullable(),
-  taxCode: z.number().nullable(),
-});
+const ProductionShiftSchema = BaseShiftSchema.merge(
+  z.object({
+    id: z.number({
+      required_error: "Id must be provided correctly",
+    }),
+    itemValue: z.number().nullable(),
+    itemQuantity: z.number().nullable(),
+  })
+);
+
+const HourlyShiftSchema = BaseShiftSchema.merge(
+  z.object({
+    id: z.number({
+      required_error: "Id must be provided correctly",
+    }),
+    hourValue: z.number().nullable(),
+  })
+);
 
 const ShiftModelSchema = z.object({
   id: z.number({
     required_error: "Id must be provided correctly",
   }),
-  hourId: z.string().nullable(),
-  productionId: z.string().nullable(),
+  hourly: z.array(HourlyShiftSchema).nullable(),
+  production: z.array(ProductionShiftSchema).nullable(),
   userId: z.string().nullable(),
 });
 
@@ -291,12 +288,17 @@ const HandleErrorTypeSchema = z.enum([
 ]);
 
 export {
+  BaseShiftSchema,
   FastChargeFormSchema,
   HandleErrorTypeSchema,
+  HourlyCreateSchema,
   HourlyShiftSchema,
+  HourlyUpdateSchema,
   PasswordSchema,
+  ProductionCreateSchema,
   ProductionJobFormSchema,
   ProductionShiftSchema,
+  ProductionUpdateSchema,
   ProfileCreateSchema,
   ProfileSchema,
   ProfileUpdateSchema,
