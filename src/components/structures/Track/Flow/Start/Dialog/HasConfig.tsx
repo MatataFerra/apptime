@@ -16,13 +16,7 @@ import { useShiftData } from "@/store/useShiftData";
 
 function ShiftStartHasConfigStep() {
   const { setStep, data } = useShiftData((state) => state);
-  const taxCode = useMemo(
-    () =>
-      Object.keys(TAX_CODES).find(
-        (key) => TAX_CODES[key as keyof typeof TAX_CODES] === Number(data.taxCode)
-      ),
-    [data.taxCode]
-  );
+
   return (
     <>
       <DialogHeader className="text-left">
@@ -76,24 +70,6 @@ function ShiftStartHasConfigStep() {
               />
             </svg>
             <span>Holiday pay: {data.holidayPayRate}%</span>
-          </li>
-          <li className="flex items-center space-x-1">
-            <svg
-              className="h-3.5 w-3.5 flex-shrink-0 text-green-500 dark:text-green-400"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 16 12"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M1 5.917 5.724 10.5 15 1.5"
-              />
-            </svg>
-            <span>Tax code: {taxCode}</span>
           </li>
           <li className="flex items-center space-x-1">
             <svg

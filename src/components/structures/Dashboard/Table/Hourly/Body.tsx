@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 
+import { Hourly } from "@prisma/client";
 import isEmpty from "lodash/isEmpty";
 
 import ShiftService from "@/services/Shift";
@@ -14,7 +15,7 @@ import { useDashboardContext } from "@/store/useDashboardStore";
 function HourlyBody() {
   const { user } = useDashboardContext((state) => state);
   const hourlyWorkedShift = useMemo(() => {
-    return user?.shifts?.filter((shift) => shift.typeShift !== "PRODUCTION");
+    return user?.shifts?.hourly;
   }, [user?.shifts]);
 
   return (
@@ -28,7 +29,7 @@ function HourlyBody() {
       ) : (
         ShiftService.shiftsSorted(hourlyWorkedShift, { desc: false })
           ?.filter((shift) => shift.isClosed)
-          .map((shift) => <Row key={shift.id} shift={shift} />)
+          .map((shift) => <Row key={shift.id} shift={shift as Hourly} />)
       )}
     </TableBody>
   );

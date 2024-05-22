@@ -1,12 +1,10 @@
 "use client";
 
-import { Shift } from "@prisma/client";
+import { Hourly } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 
 import api from "@/services/Api/Shift";
 import Toast from "@/services/Toast";
-
-import { type TaxCodes } from "@/types";
 
 import Button from "@/components/ui/Button";
 import { DialogClose } from "@/components/ui/Dialog";
@@ -17,7 +15,7 @@ import { useShiftStateContext } from "@/store/useShiftStatusStore";
 type SuccessShiftResponse = {
   message: string;
   response: boolean;
-  shift: Shift;
+  shift: Hourly;
 };
 
 type Props = {
@@ -33,8 +31,9 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
   const { user, updateShiftsInfo, updateShiftStatus, createShift, updateShiftUnclosed } =
     useShiftStateContext((state) => state);
   const mutate = useMutation({
-    mutationFn: api.createShift.bind(api),
+    mutationFn: api.createHourly.bind(api),
     onMutate: () => {
+      updateShiftStatus(true);
       Toast({
         message: "Shift is being created",
         type: "info",
@@ -42,9 +41,18 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
     },
     onSuccess: (data) => {
       if (checkData(data)) {
+        if (!data.response) {
+          Toast({
+            message: "Error creating shift, please try again",
+            type: "error",
+          });
+          updateShiftStatus(false);
+          return;
+        }
+
+        // success response
         createShift({
           ...data.shift,
-          id: data?.shift.id,
         });
         updateShiftsInfo();
         updateShiftUnclosed();
@@ -55,21 +63,11 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
         });
       }
     },
-
-    onError: () => {
-      Toast({
-        message: "Error creating shift, please try again",
-        type: "error",
-      });
-
-      updateShiftStatus(false);
-    },
   });
 
   function onStartShift() {
     mutate.mutate({
       body: {
-        userId: user?.id as string,
         startDate: new Date().toString(),
         isClosed: false,
         amount: 0,
@@ -80,15 +78,10 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
         hourValue: Number(data.hourValue),
         holidayPay: data.holidayPay ?? false,
         holidayPayRate: Number(data.holidayPayRate),
-        taxCode: data.taxCode ? (data.taxCode as TaxCodes) : 2,
         unpaidBreaks: Number(data.unpaidBreaks),
-        itemQuantity: null,
-        itemValue: null,
-        typeShift: "TRACK",
+        shiftId: user?.shifts?.id as number | null,
       },
     });
-
-    updateShiftStatus(true);
   }
 
   return (

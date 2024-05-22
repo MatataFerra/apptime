@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import PublicHolidayDropdown from "@/components/structures/Track/Flow/Start/Dialog/Dropdown";
-import TaxCodeDropdown from "@/components/structures/Track/Flow/Start/TaxCodeDropdown";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 
@@ -94,7 +93,7 @@ function ShiftStartInputs() {
         />
       </Stack>
       <Stack orientation="vertical" classes="h-20">
-        <TaxCodeDropdown />
+        {/* <TaxCodeDropdown /> */}
         <PublicHolidayDropdown />
       </Stack>
     </>
