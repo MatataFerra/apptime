@@ -2,22 +2,24 @@ import { z } from "zod";
 
 import ApiBaseService from "@/services/Api/base";
 
-import { ShiftCreateSchema } from "@/types";
+import { HourlyCreateSchema, ProductionCreateSchema } from "@/types";
 
 import { API_ENDPOINTS } from "@/utils/constants/endpoints";
 
-type ShiftSchema = z.infer<typeof ShiftCreateSchema>;
+type ProductionSchema = z.infer<typeof ProductionCreateSchema>;
+type HourlySchema = z.infer<typeof HourlyCreateSchema>;
+type ShiftTypes = ProductionSchema | HourlySchema;
 
 class ApiShiftService extends ApiBaseService {
   constructor() {
     super();
   }
 
-  static async updateShift({
+  static async updateHourly({
     body,
     id,
   }: {
-    body: Partial<ShiftSchema>;
+    body: Partial<HourlySchema>;
     id: number | null | undefined;
   }) {
     const response = await this.put({
@@ -28,7 +30,40 @@ class ApiShiftService extends ApiBaseService {
     return response;
   }
 
-  static async createShift({ body }: { body: ShiftSchema }) {
+  static async updateShift({
+    body,
+    id,
+  }: {
+    body: Partial<ShiftTypes>;
+    id: number | null | undefined;
+  }) {
+    const response = await this.put({
+      endpoint: `${API_ENDPOINTS.SHIFT}/${id}`,
+      body,
+      hasEnvUrl: false,
+    });
+    return response;
+  }
+
+  static async createHourly({ body }: { body: HourlySchema }) {
+    const response = await this.post({
+      endpoint: `${API_ENDPOINTS.SHIFT}/hourly`,
+      body,
+      hasEnvUrl: false,
+    });
+    return response;
+  }
+
+  static async createProduction({ body }: { body: ProductionSchema }) {
+    const response = await this.post({
+      endpoint: `${API_ENDPOINTS.SHIFT}`,
+      body,
+      hasEnvUrl: false,
+    });
+    return response;
+  }
+
+  static async createShift({ body }: { body: ShiftTypes }) {
     const response = await this.post({
       endpoint: `${API_ENDPOINTS.SHIFT}`,
       body,

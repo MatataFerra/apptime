@@ -18,8 +18,8 @@ import prisma from "../../../prisma/client";
  */
 
 class ProductionService {
-  shift: Production;
-  constructor(shift: Production) {
+  shift: Omit<Production, "shiftId" | "id">;
+  constructor(shift: Omit<Production, "shiftId" | "id">) {
     this.shift = shift;
   }
 
@@ -81,6 +81,11 @@ class ProductionService {
     };
   }
 
+  static findUnClosedShift(shifts: Production[] | undefined) {
+    if (!shifts) return null;
+    return shifts.find((shift) => !shift.isClosed);
+  }
+
   static getLastConfigShift(shifts: Production[] | undefined) {
     const lastShift = shifts?.at(-1);
 
@@ -115,6 +120,28 @@ class ProductionService {
       },
       {} as Record<string, Production[]>
     );
+  }
+
+  static earnings({
+    itemValue,
+    itemQuantity,
+    holidayPayRate,
+    publicHolidayWorked,
+  }: {
+    itemValue: number | null;
+    itemQuantity: number | null;
+    holidayPayRate: number | null;
+    publicHolidayWorked: boolean | null;
+  }) {
+    let publicHolidayRate = 1;
+    let holidayPayRateValue = !!holidayPayRate ? holidayPayRate / 100 + 1 : 1;
+    if (!itemValue || !itemQuantity) return 0;
+
+    if (publicHolidayWorked) {
+      publicHolidayRate = 1.5;
+    }
+
+    return itemValue * itemQuantity * publicHolidayRate * holidayPayRateValue;
   }
 }
 

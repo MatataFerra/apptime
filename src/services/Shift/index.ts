@@ -1,12 +1,14 @@
 import { Hourly, Production } from "@prisma/client";
-import { differenceInMinutes } from "date-fns";
+import { differenceInMinutes, isAfter } from "date-fns";
 import cloneDeep from "lodash/cloneDeep";
+
+import { Shifts } from "@/types";
 
 import HourlyService from "./Hourly";
 import ProductionService from "./Production";
 
 interface ShiftServiceInterface {
-  shift: TypeShift;
+  shift: TypeShift | Partial<TypeShift>;
   create: (id: number) => Promise<TypeShift | undefined>;
   differenceInMinsBetweenStartAndEnd: () => this;
   closeShift: () => this;
@@ -14,7 +16,10 @@ interface ShiftServiceInterface {
   build: () => void;
 }
 
-type TypeShift = Production | Hourly;
+type ProdcutionType = Production | Omit<Production, "shiftId" | "id">;
+type HourlyType = Hourly | Omit<Hourly, "shiftId" | "id">;
+
+type TypeShift = ProdcutionType | HourlyType;
 
 /**
  * @class ShiftService
@@ -34,8 +39,8 @@ type TypeShift = Production | Hourly;
  * @method build - Returns the shift
  */
 class ShiftService implements ShiftServiceInterface {
-  shift: TypeShift;
-  constructor(shift: TypeShift) {
+  shift: TypeShift | Partial<TypeShift>;
+  constructor(shift: TypeShift | Partial<TypeShift>) {
     this.shift = cloneDeep(shift);
   }
 
@@ -57,11 +62,11 @@ class ShiftService implements ShiftServiceInterface {
     if (this.isProductionShift) {
       return await this.createProductionShift();
     }
-
     return await this.createHourlyShift();
   }
 
-  async update(id: number): Promise<TypeShift | undefined> {
+  async update(id?: number): Promise<TypeShift | undefined> {
+    if (!id) return undefined;
     if (this.isProductionShift) {
       return await this.updateProductionShift(id);
     }
@@ -112,6 +117,11 @@ class ShiftService implements ShiftServiceInterface {
     };
   }
 
+  /**
+   *
+   * @deprecated Use `getLatestUnclosedShift` instead if you want to get the latest unclosed shift between all
+   * or `findUnClosedShift` in Hourly or Production services
+   */
   static findUnClosedShift(shifts: Production[] | Hourly[] | undefined) {
     if (!shifts) return null;
     return shifts.find((shift) => !shift.isClosed);
@@ -177,6 +187,48 @@ class ShiftService implements ShiftServiceInterface {
     }
 
     return new HourlyService(lastShift).getConfig();
+  }
+
+  static getLatestShift(shifts: Partial<Shifts> | undefined | null) {
+    if (!shifts) return null;
+
+    const hourly = ShiftService.shiftsSorted(shifts.hourly);
+    const production = ShiftService.shiftsSorted(shifts.production);
+
+    if (!hourly && !production) return null;
+
+    const lastHourly = hourly?.find((shift) => shift.endDate !== null);
+    const lastProduction = production?.find((shift) => shift.endDate !== null);
+
+    if (!lastHourly && !lastProduction) return null;
+
+    if (!lastHourly) return lastProduction;
+    if (!lastProduction) return lastHourly;
+
+    return isAfter(new Date(lastHourly.startDate), new Date(lastProduction.startDate))
+      ? lastHourly
+      : lastProduction;
+  }
+
+  static getLatestUnclosedShift(shifts: Partial<Shifts> | undefined) {
+    if (!shifts) return null;
+
+    const hourly = ShiftService.shiftsSorted(shifts.hourly);
+    const production = ShiftService.shiftsSorted(shifts.production);
+
+    if (!hourly && !production) return null;
+
+    const lastHourly = hourly?.find((shift) => !shift.isClosed);
+    const lastProduction = production?.find((shift) => !shift.isClosed);
+
+    if (!lastHourly && !lastProduction) return null;
+
+    if (!lastHourly) return lastProduction;
+    if (!lastProduction) return lastHourly;
+
+    return isAfter(new Date(lastHourly.startDate), new Date(lastProduction.startDate))
+      ? lastHourly
+      : lastProduction;
   }
 
   static calculateEarnings({

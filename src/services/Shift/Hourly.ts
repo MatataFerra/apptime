@@ -22,8 +22,8 @@ import prisma from "../../../prisma/client";
  */
 
 class HourlyService {
-  shift: Hourly;
-  constructor(shift: Hourly) {
+  shift: Omit<Hourly, "shiftId" | "id">;
+  constructor(shift: Omit<Hourly, "shiftId" | "id">) {
     this.shift = shift;
   }
 
@@ -108,6 +108,11 @@ class HourlyService {
       holidayPayRate: this.shift.holidayPayRate,
       unpaidBreaks: this.shift.unpaidBreaks,
     };
+  }
+
+  static findUnClosedShift(shifts: Hourly[] | undefined) {
+    if (!shifts) return null;
+    return shifts.find((shift) => !shift.isClosed);
   }
 
   static getLastConfigShift(shifts: Hourly[] | undefined) {

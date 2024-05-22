@@ -40,7 +40,12 @@ class UserService {
         name: true,
         type_account: true,
         role: true,
-        shifts: options.shifts,
+        shifts: {
+          include: {
+            hourly: options.shifts,
+            production: options.shifts,
+          },
+        },
         profile: options.profile,
         emailVerified: true,
         formCompleted: true,
