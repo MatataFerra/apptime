@@ -8,6 +8,8 @@ import ErrorFactory from "@/services/Error/factory";
 
 import { UserCreateSchema } from "@/types";
 
+import prisma from "#/prisma/client";
+
 export async function POST(req: NextRequest) {
   const body: User = await req.json();
   try {
