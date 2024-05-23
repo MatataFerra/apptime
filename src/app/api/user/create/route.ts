@@ -25,18 +25,6 @@ export async function POST(req: NextRequest) {
       ...parsedBody.data,
     }).register();
 
-    if (!isEmpty(newUser)) {
-      await prisma?.shift.create({
-        data: {
-          user: {
-            connect: {
-              id: newUser.id,
-            },
-          },
-        },
-      });
-    }
-
     return NextResponse.json(
       {
         message: "success",

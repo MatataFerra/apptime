@@ -118,6 +118,12 @@ class UserService {
         password: this.user.password,
         name: this.user.name,
         type_account: this.user.type_account,
+        shifts: {
+          create: {
+            hourly: {},
+            production: {},
+          },
+        },
       },
     });
   }
