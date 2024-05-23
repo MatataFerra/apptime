@@ -1,8 +1,6 @@
 import { User } from "@prisma/client";
 import { getServerSession } from "next-auth";
 
-import TokenService from "@/services/Token";
-
 import { UserType } from "@/types";
 
 import { USER_ROLES } from "@/utils/constants";
@@ -42,7 +40,12 @@ class UserService {
         name: true,
         type_account: true,
         role: true,
-        shifts: options.shifts,
+        shifts: {
+          include: {
+            hourly: options.shifts,
+            production: options.shifts,
+          },
+        },
         profile: options.profile,
         emailVerified: true,
         formCompleted: true,
@@ -94,16 +97,6 @@ class UserService {
 
       return acc;
     }, {});
-  }
-
-  static async authenticatedUser() {
-    const token = await new TokenService("next-auth.session-token").decodedCookieData();
-
-    if (!token) return null;
-
-    const user = await UserService.findUniqueUser({ email: token.email });
-
-    return user;
   }
 
   static async getSessionUser() {

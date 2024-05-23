@@ -1,7 +1,7 @@
-import { forwardRef, Ref } from "react";
+import { forwardRef, PropsWithChildren, Ref } from "react";
 
 type Props = {
-  children: React.ReactNode;
+  classes: string;
 };
 
 /**
@@ -11,8 +11,12 @@ type Props = {
  * @param ref forwardRef
  * @returns JSX.Element
  */
-function Box(props: Props, ref: Ref<HTMLElement>) {
-  return <section ref={ref}>{props.children}</section>;
+function Box({ classes, children, ...props }: PropsWithChildren<Props>, ref: Ref<HTMLElement>) {
+  return (
+    <section className={classes} ref={ref} {...props}>
+      {children}
+    </section>
+  );
 }
 
 export default forwardRef(Box);

@@ -1,4 +1,3 @@
-import { User } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { getToken, JWT } from "next-auth/jwt";
 
@@ -11,20 +10,13 @@ import { QUERY_PARAMS } from "@/utils/constants";
 
 import prisma from "#/prisma/client";
 
-function checkIsAdmin(user: User) {
-  return user.role === "ADMIN";
-}
-
 function parseEmailFromParams(token: JWT | null, email: string | null) {
   if (token?.role !== "ADMIN") return token?.email;
   return email;
 }
 
 export async function GET(req: NextRequest) {
-  const checkToken = await getToken({
-    req,
-    cookieName: "next-auth.session-token",
-  });
+  const checkToken = await getToken({ req });
 
   if (!checkToken) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -64,7 +56,12 @@ export async function GET(req: NextRequest) {
         email: parsedSearchParams?.data?.email ?? "",
       },
       include: {
-        shifts: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
+        shifts: {
+          include: {
+            hourly: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
+            production: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
+          },
+        },
         profile: JSON.parse(parsedSearchParams.data.profile ?? "false"),
       },
     });

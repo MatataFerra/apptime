@@ -1,5 +1,6 @@
 "use server";
 
+import { Hourly } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 import ShiftService from "@/services/Shift";
@@ -14,23 +15,31 @@ export default async function onSubmitFastCharge(data: FastChargeInputsParsed) {
     return null;
   }
 
+  if (currentUser.shifts?.id === null) {
+    return null;
+  }
+
   const shift = new ShiftService({
     startDate: data.startDate,
     endDate: data.endDate,
     isPublicHoliday: data.isPublicHoliday,
     publicHolidayWorked: data.isWorked,
+    hourValue: data.hourValue,
+    holidayPay: data.holidayPay,
     amount: 0,
     isClosed: true,
     notes: "",
-    userId: currentUser.id,
+    holidayPayRate: data.holidayPayRate,
+    unpaidBreaks: data.unpaidBreaks,
+    shiftId: currentUser.shifts?.id,
   })
     .closeShift()
     .checkPublicHoliday()
     .differenceInMinsBetweenStartAndEnd()
-    .build();
+    .build<Hourly>();
 
   try {
-    const createShift = await new ShiftService(shift).create({ userId: currentUser.id });
+    const createShift = await new ShiftService(shift).create();
 
     revalidatePath("/[locale]/(home)/history-shifts", "page");
 

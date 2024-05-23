@@ -18,32 +18,41 @@ function useUser() {
   ]);
   const [user, setUser] = useState<UserType | undefined>(data?.user);
   const fetchUser = useCallback(async () => {
-    {
-      if (!data && session.data?.user?.email) {
-        await queryClient
-          .fetchQuery({
-            queryKey: ["user", session.data?.user?.email],
-            queryFn: () =>
-              api.getUserByEmail.bind(api)({
-                email: session.data?.user?.email,
-                hasEnvUrl: false,
-                profile: true,
-                shifts: true,
-              }) as unknown as SuccessApiResponse<UserType>,
-          })
-          .then((res) => {
-            setUser(res?.user);
-          });
-      }
-
-      queryClient.invalidateQueries({
-        queryKey: ["user", session.data?.user?.email],
-      });
+    if (!data && session.data?.user?.email) {
+      await queryClient
+        .fetchQuery({
+          queryKey: ["user", session.data?.user?.email],
+          queryFn: () =>
+            api.getUserByEmail.bind(api)({
+              email: session.data?.user?.email,
+              hasEnvUrl: false,
+              profile: true,
+              shifts: true,
+            }) as unknown as SuccessApiResponse<UserType>,
+        })
+        .then((res) => {
+          setUser(res?.user);
+        });
     }
-  }, [data, queryClient, session.data?.user?.email]);
+
+    queryClient.invalidateQueries({
+      queryKey: ["user", session.data?.user?.email],
+    });
+
+    return user;
+  }, [data, queryClient, session.data?.user?.email, user]);
 
   useEffect(() => {
-    fetchUser().then(() => setIsloading(false));
+    fetchUser()
+      .then((user) => {
+        if (user) {
+          return setIsloading(false);
+        }
+        setIsloading(true);
+      })
+      .catch((err) => {
+        setIsloading(false);
+      });
   }, [fetchUser]);
 
   return { data: user, isLoading };

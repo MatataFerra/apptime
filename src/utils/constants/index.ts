@@ -78,3 +78,27 @@ export const FULL_MONTHS_NAMES = [
   "November",
   "December",
 ] as const;
+
+export const WEEK_DAYS = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thrusday",
+  "friday",
+  "saturday",
+  "sunday",
+] as const;
+
+export const NEXT_AUTH_SESSION_TOKEN = "__Secure-next-auth.session-token";
+
+export const TAX_CODES = {
+  M: 0,
+  CAE: 1,
+  NONE: 2,
+} as const;
+
+export const TYPE_SHIFT = {
+  PRODUCTION: "Production",
+  TRACK: "Hourly",
+  FAST: "Hourly",
+} as const;

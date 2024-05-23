@@ -2,7 +2,7 @@ import { Fragment } from "react";
 
 import { FormStep } from "@/types/forms";
 
-import NumberRoundBadge from "@/components/NumberRoundBadge";
+import RoundBadge from "@/components/structures/share/RoundBadge";
 import Line from "@/components/ui/Line";
 import Stack from "@/components/ui/Stack";
 
@@ -26,9 +26,10 @@ type Props = {
     id: FormStep;
     title: string;
   }[];
+  currentStep: FormStep;
 };
 
-function Stepper({ steps = ARRAY }: Props) {
+function Stepper({ steps = ARRAY, currentStep }: Props) {
   return (
     <>
       <nav className="flex w-full flex-row items-center justify-between gap-4">
@@ -39,9 +40,11 @@ function Stepper({ steps = ARRAY }: Props) {
               justifyContent="center"
               classes="flex w-full flex-row gap-2 text-xs"
             >
-              <NumberRoundBadge index={index} id={id} title={title} />
+              <RoundBadge index={index} id={id} title={title} />
             </Stack>
-            {index !== steps.length - 1 && <Line id={id} />}
+            {index !== steps.length - 1 && (
+              <Line color={`${id === currentStep ? "bg-black" : "bg-stone-200"}`} />
+            )}
           </Fragment>
         ))}
       </nav>

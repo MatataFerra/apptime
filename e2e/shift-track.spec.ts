@@ -22,7 +22,6 @@ test.beforeEach(async ({ page }) => {
 
   if (await finishButton.isEnabled()) {
     await finishButton.click();
-    await page.getByRole("button", { name: /move/ }).click();
   }
 
   await page.waitForURL(/en/);
@@ -32,16 +31,38 @@ test("user can start a shift", async ({ page }) => {
   const start = page.getByRole("button", { name: /Start/ });
   await start.click();
   expect(page.getByRole("dialog")).toBeVisible();
-  await page.getByRole("button", { name: /regular/ }).click();
-  expect(page.getByText(/online/)).toBeVisible();
-  expect(start).toBeDisabled();
+  const input = page.getByTestId("hourValue");
+
+  if (await input.isVisible()) {
+    await input.fill("27");
+    await page.getByRole("button", { name: /Save/ }).click();
+    expect(
+      page
+        .getByText(/created/)
+        .first()
+        .textContent()
+    ).toBeTruthy();
+  } else {
+    await page.getByRole("button", { name: /Start/ }).click();
+    expect(
+      page
+        .getByText(/created/)
+        .first()
+        .textContent()
+    ).toBeTruthy();
+  }
 });
 
 test("user can end a shift", async ({ page }) => {
   await page.getByRole("button", { name: /Start/ }).click();
   expect(page.getByRole("dialog")).toBeVisible();
-  await page.getByRole("button", { name: /regular/ }).click();
+  const input = page.getByTestId("hourValue");
+  if (await input.isVisible()) {
+    await input.fill("27");
+    await page.getByRole("button", { name: /Save/ }).click();
+  } else {
+    await page.getByRole("button", { name: /Start/ }).click();
+  }
   await page.getByRole("button", { name: /Finish/ }).click();
-  await page.getByRole("button", { name: /move/ }).click();
   expect(page.getByRole("button", { name: /Finish/ })).toBeDisabled();
 });

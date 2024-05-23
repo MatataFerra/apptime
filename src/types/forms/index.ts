@@ -2,9 +2,10 @@ import { HTMLInputTypeAttribute } from "react";
 
 import { z } from "zod";
 
-import { CSSClassNames, FastChargeFormSchema } from "@/types";
+import { CSSClassNames, FastChargeFormSchema, ProductionJobFormSchema } from "@/types";
 
 import { INPUT_VARIANTS } from "@/utils/constants/tailwind";
+
 export enum FormStep {
   PERSONAL_INFO,
   PAY_INFO,
@@ -26,6 +27,7 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
   labelClasses?: CSSClassNames;
   variant?: Variants;
   type?: HTMLInputTypeAttribute;
+  basis?: `basis-${string}`;
   spacing?: number;
   isError?: boolean;
   isRequired?: boolean;
@@ -44,7 +46,23 @@ export interface InputMeasureProps extends InputProps {
 export type FastChargeInputs = z.infer<typeof FastChargeFormSchema>;
 export type FastChargeInputsParsed = {
   startDate: string;
+  hourValue: number;
   endDate: string;
   isPublicHoliday: boolean;
   isWorked: boolean;
+  holidayPay: boolean;
+  holidayPayRate: number;
+  unpaidBreaks: number;
+};
+
+// Production Form
+export type ProductionInputs = z.infer<typeof ProductionJobFormSchema>;
+export type ProductionInputsParsed = {
+  startDate: string;
+  endDate: string;
+  itemValue: number;
+  itemQuantity: number;
+  holidayPayRate: number;
+  isPublicHoliday: boolean;
+  publicHolidayWorked: boolean;
 };

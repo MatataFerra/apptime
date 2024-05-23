@@ -164,3 +164,12 @@ div[data-radio-state="false"] .animate_fade_out {
   background: linear-gradient(#fff, #fff) padding-box,
   linear-gradient(90deg, var(--gradient-1) 0%, var(--gradient-2) 50%, var(--gradient-3) 100%) border-box;
 }
+
+.input-flex{
+  @apply flex-grow-[2] flex-shrink-[1] basis-[120px]
+}
+
+.drawer-option {
+  @apply relative w-full px-4 py-1 text-sm text-left active:after:absolute active:after:inset-0 active:after:-z-10 active:after:bg-slate-100 hover:after:bg-slate-100 hover:after:absolute hover:after:inset-0 hover:after:-z-10;
+}
+

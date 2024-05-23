@@ -1,47 +1,45 @@
 "use client";
 
-import { ReactElement } from "react";
+import { HTMLAttributes, ReactNode, useRef } from "react";
+
+import { useOnClickOutside } from "usehooks-ts";
 
 import { CSSClassNames } from "@/types";
 
-import Portal from "@/components/ui/Portal";
-import Stack from "@/components/ui/Stack";
+import Box from "@/components/ui/Box";
 
 import { cn } from "@/utils/helpers/styleMerger";
 import useDelayed from "@/hooks/useDelayed";
 
-interface Props extends React.HTMLAttributes<HTMLElement> {
+interface Props extends HTMLAttributes<HTMLElement> {
   isOpen: boolean;
-  classes?: CSSClassNames;
-  children: ReactElement | ReactElement[];
+  classes?: string;
+  children: ReactNode;
   handleOutsideClick?: () => void;
 }
 
-function Drawer({ children, isOpen, ...rest }: Props) {
+function Drawer({ children, isOpen, handleOutsideClick, classes, ...rest }: Props) {
   //delay the animation of the drawer
-  const isOpenDelayed = useDelayed(isOpen, 500);
+  const delayOpen = useDelayed(isOpen, 100);
+  const ref = useRef<HTMLDivElement>(null);
+  useOnClickOutside([ref], () => {
+    isOpen && handleOutsideClick && handleOutsideClick();
+  });
 
   return (
     <>
-      <Portal
-        isOn={isOpenDelayed}
-        classes={`w-1/2 transition-all ${isOpen ? "[&>section]:animate-show-left" : "[&>section]:animate-show-right"}`}
-        {...rest}
-      >
-        {isOpen && (
-          <Stack
-            as="div"
-            classes={`absolute top-0 h-svh w-full animate-backdrop-blurry bg-[#80808033] transition-all`}
-            onClick={rest.handleOutsideClick}
-          />
-        )}
-        <Stack
-          orientation="vertical"
-          classes={cn(`absolute inset-0 w-3/4 bg-white p-4`, rest.classes)}
+      {delayOpen && (
+        <Box
+          ref={ref}
+          role="dialog"
+          classes={cn(
+            `absolute flex flex-col transition-all duration-300 ${isOpen ? "animate-fade-in" : "animate-fade-out"} ${classes}`
+          )}
+          {...rest}
         >
           {children}
-        </Stack>
-      </Portal>
+        </Box>
+      )}
     </>
   );
 }

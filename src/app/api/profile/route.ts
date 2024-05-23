@@ -2,6 +2,7 @@ import { Prisma, Profile } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 import ErrorFactory from "@/services/Error/factory";
+import ProfileService from "@/services/Profile";
 
 import { ProfileCreateSchema } from "@/types";
 
@@ -15,7 +16,7 @@ export async function GET(req: NextRequest) {
   if (!userId) {
     return NextResponse.json(
       {
-        ...ErrorFactory.createError("QueryNotProvided"),
+        error: ErrorFactory.createError("QueryNotProvided"),
         response: false,
       },
       { status: 400 }
@@ -32,7 +33,7 @@ export async function GET(req: NextRequest) {
     if (!profile) {
       return NextResponse.json(
         {
-          ...ErrorFactory.createError("ProfileNotFound"),
+          error: ErrorFactory.createError("ProfileNotFound"),
           response: false,
         },
         { status: 404 }
@@ -50,7 +51,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       {
-        ...ErrorFactory.createError("InternalServer"),
+        error: ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }
@@ -114,22 +115,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const profile = await prisma.profile.create({
-      data: {
-        User: {
-          connect: {
-            id: user.id,
-          },
-        },
+    const {
+      data: { firstName, address, city, country, lastName },
+    } = parsedBody;
 
-        endHour: parsedBody.data?.endHour,
-        startHour: parsedBody.data?.startHour,
-        holidayPay: parsedBody.data?.holidayPay,
-        hourlyRate: parsedBody.data?.hourlyRate,
-        nightShift: parsedBody.data?.nightShift,
-        extraNightShiftPay: parsedBody.data?.extraNightShiftPay,
-        holidayPayRate: parsedBody.data?.holidayPayRate,
-        unpaidBreaks: parsedBody.data?.unpaidBreaks,
+    const profile = await ProfileService.createProfile({
+      userId: user.id,
+      profile: {
+        firstName,
+        lastName,
+        address,
+        city,
+        country,
       },
     });
 

@@ -1,4 +1,4 @@
-import { Profile, Shift } from "@prisma/client";
+import { Hourly, Production, Shift } from "@prisma/client";
 
 import type { EarnsMonthData } from "@/types";
 
@@ -18,8 +18,8 @@ import ShiftService from "../Shift";
  */
 
 class Chart {
-  shifts: Shift[];
-  constructor(shifts: Shift[]) {
+  shifts: Production[] | Hourly[];
+  constructor(shifts: Production[] | Hourly[]) {
     this.shifts = shifts;
   }
 
@@ -31,26 +31,23 @@ class Chart {
     return ShiftService.groupShiftsByMonths(this.shifts);
   }
 
-  earnsPerDay(profile: Profile) {
+  earnsPerDay() {
     const data = this.sortShifts
       ?.filter((shift) => shift.isClosed)
       .map((shift) => ({
         date: new DateHumanizer("short").humanizeDate(new Date(shift.startDate)),
-        earnings: ShiftService.calculateEarnings({
-          shift,
-          profile,
-        }),
+        earnings: new ShiftService(shift).calculateEarnings(),
       }));
 
     return data;
   }
 
-  earnsPerMonth(profile: Profile) {
+  earnsPerMonth() {
     const data = Object.keys(this.groupByMonths ?? {}).map((month: string) => {
       const earnings =
         this.groupByMonths &&
         this.groupByMonths[month]?.reduce((acc, shift) => {
-          return acc + ShiftService.calculateEarnings({ shift, profile });
+          return acc + new ShiftService(shift).calculateEarnings();
         }, 0);
 
       if (!earnings) return null;

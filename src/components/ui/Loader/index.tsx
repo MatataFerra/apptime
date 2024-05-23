@@ -2,7 +2,9 @@ import { CSSClassNames } from "@/types";
 
 import Text from "@/components/ui/Text";
 
-import { cm } from "@/utils/helpers/styleMerger";
+import { cn } from "@/utils/helpers/styleMerger";
+
+import styles from "./loader.module.css";
 
 interface Loader {
   children?: React.ReactElement | React.ReactElement[];
@@ -48,7 +50,7 @@ Loader.spinner = ({
     <div className={containerClasses} role="status">
       <svg
         aria-hidden="true"
-        className={cm(
+        className={cn(
           "mr-2 inline h-4 w-4 animate-spin dark:text-gray-600",
           bg,
           spinColor,
@@ -69,6 +71,10 @@ Loader.spinner = ({
       </svg>
     </div>
   );
+};
+
+Loader.progress = function () {
+  return <div className={styles.loader} />;
 };
 
 export default Loader;

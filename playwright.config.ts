@@ -4,12 +4,11 @@ import path from "path";
 // ignore test
 const IGNORE_TEST_DESKTOP = [
   /.*login.spec.ts/,
+  /.*home.spec.ts/,
   /.*register.spec.ts/,
-  /.*home-form.spec.ts/,
   /.*shift-track.spec.ts/,
   /.*fast-charge.spec.ts/,
-  /.*history-shift.spec.ts/,
-  /.*env.spec.ts/,
+  /.*dashboard.spec.ts/,
   /.*drawer.spec.ts/,
 ];
 const IGNORE_TEST_MOBILE = [/.*no-mobile.spec.ts/];

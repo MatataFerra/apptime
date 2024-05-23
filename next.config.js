@@ -1,8 +1,15 @@
 const withNextIntl = require('next-intl/plugin')();
+const withBundleAnalyzer = require('@next/bundle-analyzer')()
+
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
   images: {
     remotePatterns: [{
       protocol: 'https',
@@ -18,4 +25,7 @@ const nextConfig = {
   }
 };
 
-module.exports = withNextIntl(nextConfig);
+module.exports = 
+  process.env.ANALYZE === 'true' 
+    ? withBundleAnalyzer(withNextIntl(nextConfig)) 
+    : withNextIntl(nextConfig);

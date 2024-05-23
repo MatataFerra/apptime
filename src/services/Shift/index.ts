@@ -1,21 +1,25 @@
-import { Shift } from "@prisma/client";
-import { differenceInMinutes } from "date-fns";
-import { cloneDeep } from "lodash";
+import { Hourly, Production } from "@prisma/client";
+import { differenceInMinutes, isAfter } from "date-fns";
+import cloneDeep from "lodash/cloneDeep";
 
-import { UserType } from "@/types";
+import { Shifts } from "@/types";
 
-import prisma from "../../../prisma/client";
-
-type ShiftWithoutId = Omit<Shift, "id">;
+import HourlyService from "./Hourly";
+import ProductionService from "./Production";
 
 interface ShiftServiceInterface {
-  shift: ShiftWithoutId;
-  create: ({ userId }: { userId: string }) => Promise<Shift>;
-  differenceInMinsBetweenStartAndEnd: () => void;
-  closeShift: () => void;
-  checkPublicHoliday: () => void;
-  build: () => Omit<Shift, "id">;
+  shift: TypeShift | Partial<TypeShift>;
+  create: (id: number) => Promise<TypeShift | undefined>;
+  differenceInMinsBetweenStartAndEnd: () => this;
+  closeShift: () => this;
+  checkPublicHoliday: () => this;
+  build: () => void;
 }
+
+type ProdcutionType = Production | Omit<Production, "shiftId" | "id">;
+type HourlyType = Hourly | Omit<Hourly, "shiftId" | "id">;
+
+type TypeShift = ProdcutionType | HourlyType;
 
 /**
  * @class ShiftService
@@ -35,80 +39,60 @@ interface ShiftServiceInterface {
  * @method build - Returns the shift
  */
 class ShiftService implements ShiftServiceInterface {
-  shift: ShiftWithoutId;
-  constructor(shift: ShiftWithoutId) {
+  shift: TypeShift | Partial<TypeShift>;
+  constructor(shift: TypeShift | Partial<TypeShift>) {
     this.shift = cloneDeep(shift);
   }
 
-  async delete({ id }: { id: number }) {
-    const deleteShift = await prisma.shift.delete({
-      where: {
-        id,
-      },
-    });
+  /*  
+    ============================================================
+    CRUD methods
+    ============================================================
+  */
 
-    return deleteShift;
-  }
-
-  async create({ userId }: { userId: string }) {
-    const createShift = await prisma.shift.create({
-      data: {
-        User: {
-          connect: {
-            id: userId,
-          },
-        },
-        startDate: this.shift.startDate,
-        endDate: this.shift.endDate,
-        amount: this.shift.amount,
-        isClosed: this.shift.isClosed,
-        isPublicHoliday: this.shift.isPublicHoliday,
-        notes: this.shift.notes,
-        publicHolidayWorked: this.shift.publicHolidayWorked,
-      },
-    });
-
-    return createShift;
-  }
-
-  static calculateEarnings({
-    shift,
-    profile,
-    startDate,
-    endDate,
-    isPublicHoliday,
-  }: {
-    shift?: Omit<Shift, "id">;
-    profile: UserType["profile"];
-    startDate?: string;
-    endDate?: string;
-    isPublicHoliday?: boolean;
-  }) {
-    let amount = 0;
-    let holidayRate = 1;
-    let minuteRate = profile?.hourlyRate ? profile?.hourlyRate / 60 : 1;
-
-    if (startDate && endDate) {
-      const start = new Date(startDate ?? "");
-      const end = new Date(endDate ?? "");
-
-      amount = differenceInMinutes(end, start);
-    } else {
-      const start = new Date(shift?.startDate ?? "");
-      const end = new Date(shift?.endDate ?? "");
-      amount = differenceInMinutes(end, start);
+  async delete(id: number): Promise<TypeShift | undefined> {
+    if (this.isProductionShift) {
+      return await this.deleteProductionShift(id);
     }
 
-    if (amount <= 0) amount = 0;
+    return await this.deleteHourlyShift(id);
+  }
 
-    if (shift?.isPublicHoliday || isPublicHoliday) {
-      holidayRate = 1.5;
+  async create(): Promise<TypeShift | undefined> {
+    if (this.isProductionShift) {
+      return await this.createProductionShift();
+    }
+    return await this.createHourlyShift();
+  }
+
+  async update(id?: number): Promise<TypeShift | undefined> {
+    if (!id) return undefined;
+    if (this.isProductionShift) {
+      return await this.updateProductionShift(id);
     }
 
-    const earnings = amount * minuteRate * holidayRate;
-
-    return Math.round(earnings * 100) / 100;
+    return await this.updateHourlyShift(id);
   }
+
+  /*  
+    ============================================================
+    Public methods
+    ============================================================
+  */
+
+  calculateEarnings() {
+    if (this.isProductionShift) {
+      return new ProductionService(this.shift as Production).calculateEarnings();
+    }
+
+    return new HourlyService(this.shift as Hourly).calculateEarnings();
+  }
+
+  /*  
+    ============================================================
+    Static methods
+    ============================================================
+  */
 
   static differenceInHHmm(start: string | number | Date, end?: string | number | Date) {
     let startDate: Date;
@@ -133,12 +117,20 @@ class ShiftService implements ShiftServiceInterface {
     };
   }
 
-  static findUnClosedShift(shifts: Shift[] | undefined) {
+  /**
+   *
+   * @deprecated Use `getLatestUnclosedShift` instead if you want to get the latest unclosed shift between all
+   * or `findUnClosedShift` in Hourly or Production services
+   */
+  static findUnClosedShift(shifts: Production[] | Hourly[] | undefined) {
     if (!shifts) return null;
     return shifts.find((shift) => !shift.isClosed);
   }
 
-  static shiftsSorted(shifts: Shift[] | undefined, { desc = true }: { desc?: boolean } = {}) {
+  static shiftsSorted(
+    shifts: Production[] | Hourly[] | undefined,
+    { desc = true }: { desc?: boolean } = {}
+  ) {
     if (!shifts) return null;
     if (desc) {
       return shifts
@@ -153,27 +145,150 @@ class ShiftService implements ShiftServiceInterface {
     });
   }
 
-  static convertAmountInDecimal(amount: ShiftWithoutId["amount"]): number {
+  static convertAmountInDecimal(amount: number): number {
     const validAmount = amount ?? 0;
     return Math.round((validAmount / 60) * 100) / 100;
   }
 
-  static groupShiftsByMonths(shifts: Shift[] | undefined) {
+  static isProductionShift(shift: TypeShift): shift is Production {
+    return (shift as Production).itemValue !== undefined;
+  }
+
+  static groupShiftsByMonths(shifts: Production[] | Hourly[] | undefined) {
     if (!shifts) return null;
+
     return shifts.reduce(
       (acc, shift) => {
         const date = new Date(shift.startDate);
         const month = date.toLocaleString("en-US", { month: "short" });
         const key = `${month}`;
+
+        if (!acc[key]) {
+          acc[key] = [];
+        }
+
         if (!acc[key]) {
           acc[key] = [];
         }
         acc[key].push(shift);
         return acc;
       },
-      {} as Record<string, Shift[]>
+      {} as Record<string, TypeShift[]>
     );
   }
+
+  static getLastConfigShift(shifts: Production[] | Hourly[] | undefined) {
+    const lastShift = shifts?.at(-1);
+
+    if (!lastShift) return null;
+
+    if (ShiftService.isProductionShift(lastShift)) {
+      return new ProductionService(lastShift).getConfig();
+    }
+
+    return new HourlyService(lastShift).getConfig();
+  }
+
+  static getLatestShift(shifts: Partial<Shifts> | undefined | null) {
+    if (!shifts) return null;
+
+    const hourly = ShiftService.shiftsSorted(shifts.hourly);
+    const production = ShiftService.shiftsSorted(shifts.production);
+
+    if (!hourly && !production) return null;
+
+    const lastHourly = hourly?.find((shift) => shift.endDate !== null);
+    const lastProduction = production?.find((shift) => shift.endDate !== null);
+
+    if (!lastHourly && !lastProduction) return null;
+
+    if (!lastHourly) return lastProduction;
+    if (!lastProduction) return lastHourly;
+
+    return isAfter(new Date(lastHourly.startDate), new Date(lastProduction.startDate))
+      ? lastHourly
+      : lastProduction;
+  }
+
+  static getLatestUnclosedShift(shifts: Partial<Shifts> | undefined) {
+    if (!shifts) return null;
+
+    const hourly = ShiftService.shiftsSorted(shifts.hourly);
+    const production = ShiftService.shiftsSorted(shifts.production);
+
+    if (!hourly && !production) return null;
+
+    const lastHourly = hourly?.find((shift) => !shift.isClosed);
+    const lastProduction = production?.find((shift) => !shift.isClosed);
+
+    if (!lastHourly && !lastProduction) return null;
+
+    if (!lastHourly) return lastProduction;
+    if (!lastProduction) return lastHourly;
+
+    return isAfter(new Date(lastHourly.startDate), new Date(lastProduction.startDate))
+      ? lastHourly
+      : lastProduction;
+  }
+
+  static calculateEarnings({
+    holidayPayRate,
+    hourValue,
+    hoursWorked,
+    startDate,
+    endDate,
+    unpaidBreaks,
+    isPublicHoliday,
+  }: {
+    holidayPayRate?: number;
+    hourValue: number;
+    hoursWorked?: number;
+    startDate?: string;
+    endDate?: string;
+    unpaidBreaks?: number;
+    isPublicHoliday?: boolean;
+  }) {
+    const MIN_MINUTES_WORKED = 8 * 60;
+    let amount = 0;
+    let totalTime = 0;
+    let publicHolidayRate = 1;
+    const holidayPayRateValue = holidayPayRate ? holidayPayRate / 100 + 1 : 1;
+    const hourJobValue = hourValue;
+    const unpaidBreaksValue = unpaidBreaks;
+    const minutesUnpaids = (unpaidBreaksValue ?? 0) * 30;
+
+    let minuteRate = hourJobValue ? hourJobValue / 60 : 0;
+
+    if (startDate && endDate) {
+      const start = new Date(startDate ?? "");
+      const end = new Date(endDate ?? "");
+      amount = differenceInMinutes(end, start);
+    } else if (hoursWorked) {
+      amount = hoursWorked * 60;
+    }
+
+    if (amount <= 0) amount = 0;
+
+    if (isPublicHoliday) {
+      publicHolidayRate = 1.5;
+    }
+
+    if (amount < MIN_MINUTES_WORKED) {
+      totalTime = amount;
+    } else {
+      totalTime = amount - minutesUnpaids;
+    }
+
+    const earnings = totalTime * minuteRate * publicHolidayRate * holidayPayRateValue;
+
+    return Math.round(earnings * 100) / 100;
+  }
+
+  /*  
+    ============================================================
+    Build methods
+    ============================================================
+  */
 
   closeShift() {
     this.updateEndDate().updateStatus();
@@ -207,9 +322,23 @@ class ShiftService implements ShiftServiceInterface {
     return this;
   }
 
-  build() {
-    return this.shift;
+  buildProduction() {
+    return new ProductionService(this.shift as Production).build();
   }
+
+  buildHourly() {
+    return new HourlyService(this.shift as Hourly).build();
+  }
+
+  build<T extends TypeShift>(): T {
+    return this.shift as T;
+  }
+
+  /*  
+    ============================================================
+    Private methods
+    ============================================================
+  */
 
   private updateEndDate() {
     if (this.shift.isClosed) {
@@ -239,6 +368,59 @@ class ShiftService implements ShiftServiceInterface {
     if (isNaN(getDecimals)) return 0;
 
     return getDecimals;
+  }
+
+  /*  
+    ============================================================
+    CRUD private methods
+    ============================================================
+  */
+
+  /*
+    ===========================
+    -----------Update----------
+    ===========================
+  */
+  private async updateHourlyShift(id: number) {
+    return await new HourlyService(this.shift as Hourly).update(id);
+  }
+
+  private async updateProductionShift(id: number) {
+    return await new ProductionService(this.shift as Production).update(id);
+  }
+
+  /*
+    ===========================
+    -----------Create----------
+    ===========================
+  */
+
+  private async createHourlyShift() {
+    return await new HourlyService(this.shift as Hourly).create();
+  }
+
+  private async createProductionShift() {
+    return await new ProductionService(this.shift as Production).create();
+  }
+
+  /*
+    ===========================
+    -----------delete----------
+    ===========================
+  */
+
+  private async deleteHourlyShift(id: number) {
+    return await new HourlyService(this.shift as Hourly).delete(id);
+  }
+
+  private async deleteProductionShift(id: number) {
+    return await new ProductionService(this.shift as Production).delete(id);
+  }
+
+  private get isProductionShift(): boolean {
+    const shift = this.shift as Production;
+
+    return !!shift.itemValue;
   }
 }
 

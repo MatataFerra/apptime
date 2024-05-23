@@ -1,26 +1,13 @@
 /* eslint-disable no-console */
 
-import { Shift, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import { hashSync } from "bcryptjs";
 import { addDays, addMinutes, differenceInMinutes, isToday as isTheDateToday } from "date-fns";
 
 import prisma from "./client";
 
-const now = new Date(Date.now());
 const today = new Date();
 const myToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0);
-
-const datesMock = [
-  now, // today
-  addDays(now, -1), // yesterday
-  addDays(now, -2), // one day before yesterday
-  addDays(now, 1), // tomorrow
-  addDays(now, 2), // one day after tomorrow
-  addDays(now, 8), // one day after one week after
-  addDays(now, 7), // one week after
-  addDays(now, -7), // one week before
-  addDays(now, -8), // one day before one week before
-];
 
 const newDatesMock = [
   myToday, // today at 12:00
@@ -30,21 +17,36 @@ const newDatesMock = [
   addDays(myToday, -4), // three days before yesterday
 ];
 
-function addShiftsForSeed(user: User, dates: Array<Date>): Omit<Shift, "id">[] {
-  const datesMocked = dates.map((date, i) => {
-    return {
-      userId: user?.id,
-      startDate: date.toString(),
-      endDate: isTheDateToday(date) ? null : addMinutes(date, 125 + i).toString(),
-      amount: isTheDateToday(date) ? 0 : differenceInMinutes(addMinutes(date, 125 + i), date),
-      isClosed: isTheDateToday(date) ? false : true,
-      isPublicHoliday: false,
-      publicHolidayWorked: false,
-      notes: `mocked shift number ${i} from user ${user?.name}`,
-    };
-  });
+function addProductionShiftsForSeed(dates: Array<Date>) {
+  return dates.map((date, i) => ({
+    startDate: date.toString(),
+    endDate: isTheDateToday(date) ? null : addMinutes(date, 125 + i).toString(),
+    amount: isTheDateToday(date) ? 0 : differenceInMinutes(addMinutes(date, 125 + i), date),
+    isClosed: isTheDateToday(date) ? false : true,
+    itemValue: i === 2 ? 0.023 : null,
+    itemQuantity: i === 2 ? 520 : null,
+    holidayPay: true,
+    holidayPayRate: 0,
+    isPublicHoliday: false,
+    notes: `This is a note for the shift ${i + 1}`,
+    publicHolidayWorked: false,
+  }));
+}
 
-  return datesMocked;
+function addHourlyShiftsForSeed(dates: Array<Date>) {
+  return dates.map((date, i) => ({
+    startDate: date.toString(),
+    endDate: isTheDateToday(date) ? null : addMinutes(date, 125 + i).toString(),
+    amount: isTheDateToday(date) ? 0 : differenceInMinutes(addMinutes(date, 125 + i), date),
+    isClosed: isTheDateToday(date) ? false : true,
+    hourValue: 27,
+    holidayPay: true,
+    holidayPayRate: 0,
+    isPublicHoliday: false,
+    notes: "",
+    publicHolidayWorked: false,
+    unpaidBreaks: 0,
+  }));
 }
 
 function addUsersMocked(): Omit<User, "id">[] {
@@ -54,7 +56,7 @@ function addUsersMocked(): Omit<User, "id">[] {
       name: `User Testing ${i}`,
       emailVerified: null,
       formCompleted: false,
-      image: "/assets/user-profile.webp",
+      image: "/assets/avatar.svg",
       online: false,
       password: hashSync(`Secreto${i}!`, 10),
       type_account: "CREDENTIALS",
@@ -68,7 +70,7 @@ async function main() {
   await clearDatabase();
 
   for (const userData of addUsersMocked()) {
-    await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         email: userData.email,
         name: userData.name,
@@ -82,11 +84,24 @@ async function main() {
         isActive: userData.isActive,
       },
     });
+
+    await prisma.shift.create({
+      data: {
+        user: {
+          connect: {
+            id: user.id,
+          },
+        },
+      },
+    });
   }
 
   const firstUser = await prisma.user.findUnique({
     where: {
       email: [...addUsersMocked()][1].email,
+    },
+    include: {
+      shifts: true,
     },
   });
 
@@ -101,54 +116,59 @@ async function main() {
     return;
   }
 
-  for (const shiftData of addShiftsForSeed(firstUser, newDatesMock)) {
-    await prisma.shift.create({
+  for (const prodShift of addProductionShiftsForSeed(newDatesMock)) {
+    await prisma.production.create({
       data: {
-        userId: shiftData.userId,
-        startDate: shiftData.startDate,
-        endDate: shiftData.endDate,
-        amount: shiftData.amount,
-        isClosed: shiftData.isClosed,
-        isPublicHoliday: shiftData.isPublicHoliday,
-        publicHolidayWorked: shiftData.publicHolidayWorked,
-        notes: shiftData.notes,
+        shift: {
+          connect: {
+            id: firstUser.shifts?.id,
+          },
+        },
+        ...prodShift,
+      },
+    });
+  }
+
+  for (const hourlyShift of addHourlyShiftsForSeed(newDatesMock)) {
+    await prisma.hourly.create({
+      data: {
+        shift: {
+          connect: {
+            id: firstUser.shifts?.id,
+          },
+        },
+        ...hourlyShift,
       },
     });
   }
 
   await prisma.profile.create({
     data: {
-      User: {
+      user: {
         connect: {
           id: firstUser.id,
         },
       },
-      endHour: 17,
-      extraNightShiftPay: 0,
-      holidayPay: true,
-      holidayPayRate: 1.5,
-      hourlyRate: 10.5,
-      nightShift: false,
-      startHour: 8,
-      unpaidBreaks: 0,
+      firstName: "Testing",
+      lastName: "Surname",
+      address: "House mock",
+      city: "City mock",
+      country: "Argentina",
     },
   });
 
   await prisma.profile.create({
     data: {
-      User: {
+      user: {
         connect: {
           id: secondUser.id,
         },
       },
-      endHour: 19,
-      extraNightShiftPay: 0,
-      holidayPay: true,
-      holidayPayRate: 2,
-      hourlyRate: 22,
-      nightShift: true,
-      startHour: 10,
-      unpaidBreaks: 30,
+      firstName: "User",
+      lastName: "Lastname",
+      address: "Adress mock",
+      city: "City mock",
+      country: "Argentina",
     },
   });
 
@@ -178,6 +198,8 @@ async function main() {
 async function clearDatabase() {
   const transaction = await prisma.$transaction([
     prisma.shift.deleteMany(),
+    prisma.production.deleteMany(),
+    prisma.hourly.deleteMany(),
     prisma.user.deleteMany(),
     prisma.profile.deleteMany(),
   ]);

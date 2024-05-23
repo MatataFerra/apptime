@@ -1,10 +1,7 @@
-import { Prisma, Shift } from "@prisma/client";
+import { Shift } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 import ErrorFactory from "@/services/Error/factory";
-import ShiftService from "@/services/Shift";
-
-import { ShiftCreateSchema } from "@/types";
 
 import { QUERY_PARAMS } from "@/utils/constants";
 
@@ -16,7 +13,7 @@ export async function GET(req: NextRequest) {
   if (!userId) {
     return NextResponse.json(
       {
-        ...ErrorFactory.createError("QueryNotProvided"),
+        error: ErrorFactory.createError("QueryNotProvided"),
         response: false,
       },
       { status: 400 }
@@ -28,12 +25,17 @@ export async function GET(req: NextRequest) {
       where: {
         userId: userId,
       },
+
+      select: {
+        hourly: true,
+        production: true,
+      },
     });
 
     if (shift.length === 0) {
       return NextResponse.json(
         {
-          ...ErrorFactory.createError("ShiftNotFound"),
+          error: ErrorFactory.createError("ShiftNotFound"),
           response: false,
         },
         { status: 400 }
@@ -51,7 +53,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       {
-        ...ErrorFactory.createError("InternalServer"),
+        error: ErrorFactory.createError("InternalServer"),
         response: false,
       },
       { status: 500 }
@@ -61,21 +63,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const body: Shift = await req.json();
-  const parsedBody = ShiftCreateSchema.safeParse(body);
 
-  if (!parsedBody.success) {
-    return NextResponse.json(
-      {
-        error: ErrorFactory.createError("DataProvidedIsNotValid", {
-          error: parsedBody.error,
-        }),
-        response: false,
-      },
-      { status: 400 }
-    );
-  }
-
-  if (!parsedBody.data.userId) {
+  if (!body?.userId) {
     return NextResponse.json(
       {
         error: ErrorFactory.createError("BodyNotProvided"),
@@ -84,11 +73,16 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-  const shiftTransform = new ShiftService(parsedBody.data).checkPublicHoliday().build();
 
   try {
-    const shift = await new ShiftService(shiftTransform).create({
-      userId: parsedBody.data.userId,
+    const shift = await prisma.shift.create({
+      data: {
+        user: {
+          connect: {
+            id: body?.userId,
+          },
+        },
+      },
     });
 
     return NextResponse.json(
@@ -100,16 +94,6 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientValidationError) {
-      return NextResponse.json(
-        {
-          error: ErrorFactory.createError("PrismaClientFields"),
-          response: false,
-        },
-        { status: 400 }
-      );
-    }
-
     return NextResponse.json(
       {
         error: ErrorFactory.createError("InternalServer"),

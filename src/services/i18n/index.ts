@@ -3,7 +3,7 @@ import Negotiator from "negotiator";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 
-import { Locale, PathNames } from "@/types";
+import { Locale } from "@/types";
 
 import { SUPPORTED_LOCALES } from "@/utils/constants";
 
@@ -67,33 +67,6 @@ class i18n {
     const locale = matchLocale(languages, [...SUPPORTED_LOCALES], defaultLocale);
 
     return locale;
-  }
-
-  static isMissingLocale(pathname: string): boolean {
-    return SUPPORTED_LOCALES.every(
-      (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
-    );
-  }
-
-  static parsePathname(pathname: string, locale: Locale) {
-    const regex = new RegExp(`^/(${locale})`);
-    const endpoint = pathname.replace(regex, "");
-    return `/${locale}${endpoint}`;
-  }
-
-  static parseRoutes(routes: PathNames[], locale: Locale) {
-    // TODO checkear que itere portodos los locale
-    for (const route of routes) {
-      return i18n.parsePathname(route, locale);
-    }
-  }
-
-  static isRouteSupported(route: string, pathname: string) {
-    // first remove the locale from the pathname
-    const pathnameWithoutLocale = pathname.replace(/^\/(en|es)/, "");
-    const path = pathnameWithoutLocale === "" ? "/" : pathnameWithoutLocale;
-
-    return route === path;
   }
 }
 

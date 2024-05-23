@@ -2,6 +2,7 @@ import * as tailwindColors from "tailwindcss/colors";
 
 export type TAILWIND_COLOR =
   | `${keyof typeof TAILWIND_TYPE_COLOR}-${keyof typeof TAILWIND_COLORS}-${keyof typeof TAILWIND_NUMBER_COLORS}`
+  | `${keyof typeof TAILWIND_TYPE_COLOR}-${keyof typeof TAILWIND_COLORS}-${keyof typeof TAILWIND_NUMBER_COLORS}/${string}`
   | `${keyof typeof TAILWIND_TYPE_COLOR}-${EXTENDED_COLORS}`
   | `${keyof typeof TAILWIND_TYPE_COLOR}-${BASE_COLORS}`;
 
@@ -33,7 +34,8 @@ type EXTENDED_COLORS =
   | "light-gold"
   | "hard-pink"
   | "light-blue"
-  | "post-it-button";
+  | "post-it-button"
+  | "ocean";
 
 type BASE_COLORS = "black" | "white";
 
@@ -76,4 +78,6 @@ const TAILWIND_COLORS = {
   rose: "rose",
   gray: "gray",
   stone: "stone",
+  sky: "sky",
+  slate: "slate",
 } as const;

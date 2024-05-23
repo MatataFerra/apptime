@@ -1,8 +1,18 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// TAX CODES
+// 0 - M
+// 1 - CAE
+// 2 - NONE
+
+// TYPE SHIFTS
+// TRACK
+// FAST
+// PRODUCTION
+
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
 }
 
@@ -12,16 +22,11 @@ datasource db {
 }
 
 model Shift {
-  id                  Int     @id @default(autoincrement())
-  startDate           String
-  endDate             String?
-  amount              Float?
-  isPublicHoliday     Boolean @default(false)
-  publicHolidayWorked Boolean @default(false)
-  isClosed            Boolean @default(false)
-  notes               String?
-  User                User?   @relation(fields: [userId], references: [id])
-  userId              String?
+  id         Int          @id @default(autoincrement())
+  userId     String?      @unique
+  production Production[]
+  hourly     Hourly[]
+  user       User?        @relation(fields: [userId], references: [id])
 }
 
 model User {
@@ -31,28 +36,93 @@ model User {
   image           String?
   name            String
   password        String?
-  type_account    String             @default("CREDENTIALS")
-  role            String             @default("USER")
+  type_account    String           @default("CREDENTIALS")
+  role            String           @default("USER")
   online          Boolean          @default(false)
   formCompleted   Boolean          @default(false)
   isActive        Boolean          @default(true)
-  shifts          Shift[]
+  shifts          Shift?
   profile         Profile?
+  config          Config?
   passwordAttemps PasswordAttemps?
 }
 
 model Profile {
-  id                 Int     @id @default(autoincrement())
-  hourlyRate         Float
-  startHour          Float
-  endHour            Float
-  nightShift         Boolean
-  extraNightShiftPay Float?
-  holidayPay         Boolean
-  holidayPayRate     Float?
-  unpaidBreaks       Float?
-  User               User?   @relation(fields: [userId], references: [id])
-  userId             String? @unique
+  id        Int     @id @default(autoincrement())
+  firstName String
+  lastName  String?
+  address   String?
+  city      String?
+  country   String?
+  user      User?   @relation(fields: [userId], references: [id])
+  userId    String? @unique
+}
+
+model Production {
+  id                  Int            @id @default(autoincrement())
+  startDate           String
+  endDate             String?
+  amount              Float?
+  isPublicHoliday     Boolean        @default(false)
+  publicHolidayWorked Boolean        @default(false)
+  isClosed            Boolean        @default(false)
+  notes               String?
+  itemValue           Float?
+  itemQuantity        Float?
+  holidayPay          Boolean
+  holidayPayRate      Float?
+  shiftId             Int?
+  taxes               Tax[]
+  contributions       Contribution[]
+  shift               Shift?         @relation(fields: [shiftId], references: [id])
+}
+
+model Hourly {
+  id                  Int            @id @default(autoincrement())
+  startDate           String
+  endDate             String?
+  amount              Float?
+  isPublicHoliday     Boolean        @default(false)
+  publicHolidayWorked Boolean        @default(false)
+  isClosed            Boolean        @default(false)
+  notes               String?
+  hourValue           Float
+  holidayPay          Boolean
+  holidayPayRate      Float?
+  unpaidBreaks        Float?
+  shiftId             Int?
+  taxes               Tax[]
+  contributions       Contribution[]
+  shift               Shift?         @relation(fields: [shiftId], references: [id])
+}
+
+model Tax {
+  id           Int         @id @default(autoincrement())
+  name         String
+  value        Float
+  description  String?
+  hourlyId     Int?
+  productionId Int?
+  production   Production? @relation(fields: [productionId], references: [id])
+  jourly       Hourly?     @relation(fields: [hourlyId], references: [id])
+}
+
+model Contribution {
+  id           Int         @id @default(autoincrement())
+  name         String
+  value        Float
+  description  String?
+  hourlyId     Int?
+  productionId Int?
+  production   Production? @relation(fields: [productionId], references: [id])
+  hourly       Hourly?     @relation(fields: [hourlyId], references: [id])
+}
+
+model Config {
+  id           Int     @id @default(autoincrement())
+  weekStartsOn String  @default("MONDAY")
+  user         User?   @relation(fields: [userId], references: [id])
+  userId       String? @unique
 }
 
 model PasswordAttemps {
@@ -64,18 +134,7 @@ model PasswordAttemps {
 }
 
 model WaitingListDesktop {
-  id        Int     @id @default(autoincrement())
-  email     String  @unique
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
   createdAt DateTime @default(now())
 }
-
-// enum Type {
-//   OAUTH
-//   CREDENTIALS
-// }
-
-// enum Role {
-//   USER
-//   ADMIN
-//   SUPER_USER
-// }

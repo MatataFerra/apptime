@@ -1,17 +1,14 @@
-import FastChargeForm from "@/components/FastChargeForm";
+import Form from "@/components/modules/FastCharge/Form";
+import ModuleTitle from "@/components/structures/share/ModuleTitle";
 import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
+
+export const dynamic = "force-dynamic";
 
 export default async function FastCharge() {
   return (
     <Stack orientation="vertical" spacing={6}>
-      <Stack orientation="vertical">
-        <Text gradient="title" classes={`text-2xl font-bold`}>
-          Fast charge
-        </Text>
-        <Text>charge a shift quickly</Text>
-      </Stack>
-      <FastChargeForm />
+      <ModuleTitle title="Fast Charge" subtitle="charge your shift" />
+      <Form />
     </Stack>
   );
 }

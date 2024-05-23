@@ -1,16 +1,43 @@
-import { forwardRef, ReactElement, Ref } from "react";
+import { forwardRef, Ref } from "react";
 
 import { InputProps } from "@/types/forms";
 
-import InputBase from "@/components/ui/Input/InputBase";
-import Stack from "@/components/ui/Stack";
-
+import { INPUT_VARIANTS } from "@/utils/constants/tailwind";
 import { cn } from "@/utils/helpers/styleMerger";
 
-function Input(props: InputProps, ref: Ref<HTMLInputElement>): ReactElement<InputProps> {
-  const { label, labelClasses, isRequired, containerClasses, spacing, ...rest } = props;
+/**
+ *
+ * @param variant
+ * @param type
+ * @param isError
+ * @param isRequired
+ * @param classes
+ * @param name
+ * @param description
+ * @param measure
+ * @param measurePlace
+ * @param ref
+ * @returns
+ */
 
-  if (label && !rest.name && process.env.NODE_ENV === "development") {
+const input = forwardRef(function Input(
+  {
+    variant = "default",
+    type,
+    isError,
+    isRequired,
+    classes,
+    description,
+    measure,
+    measurePlace,
+    label,
+    labelClasses,
+    basis,
+    ...props
+  }: InputProps,
+  ref: Ref<HTMLInputElement>
+) {
+  if (label && !props.name && process.env.NODE_ENV === "development") {
     // eslint-disable-next-line no-console
     console.log(
       "\x1b[31m%s\x1b[0m",
@@ -18,59 +45,69 @@ function Input(props: InputProps, ref: Ref<HTMLInputElement>): ReactElement<Inpu
     );
   }
 
+  const flexBasis = basis ? `${basis}` : "input-flex";
+
   return (
-    <>
-      {label ? (
-        <Stack
-          as="section"
-          spacing={spacing ? spacing : undefined}
-          orientation="vertical"
-          classes={`${containerClasses ? containerClasses : ""}`}
+    <section className={`${flexBasis} w-full`}>
+      {label && (
+        <label
+          htmlFor={props.name}
+          className={cn("text-sm text-slate-600 dark:text-gray-100", labelClasses)}
         >
-          <label
-            htmlFor={rest.type === "radio" ? `${rest.name}-${label}` : rest.name}
-            className={cn("text-sm", labelClasses ? labelClasses : "")}
-          >
-            <span className="flex gap-1">
-              {label} {isRequired && <span className="font-bold text-red-500">*</span>}
-            </span>
-          </label>
-          <InputBase {...rest} ref={ref} />
-        </Stack>
-      ) : (
-        <>
-          <InputBase {...rest} ref={ref} />
-        </>
+          {label}
+        </label>
       )}
-    </>
+
+      <div
+        className={cn(
+          "flex w-full items-center justify-between rounded-lg bg-transparent px-2 py-2",
+          type === "radio" || type === "checkbox"
+            ? INPUT_VARIANTS["radio"]
+            : INPUT_VARIANTS[variant],
+          variant === "underline" ? "border-none" : "border border-gray-200",
+          isError ? "border-2 border-red-600 focus:ring-red-600" : "",
+          "h-fit min-h-12",
+          "gap-2",
+          classes
+        )}
+      >
+        <input
+          id={props.name}
+          ref={ref}
+          type={type}
+          autoComplete="off"
+          className={cn(
+            variant === "underline"
+              ? "border-b-2 border-b-slate-200 transition-colors hover:border-b-slate-400/60 focus:border-b-blue-600"
+              : "border-none",
+            "h-full w-full outline-none",
+            measurePlace === "left" ? "order-2" : "order-1"
+          )}
+          {...props}
+        />
+        {measure && (
+          <span
+            className={cn(
+              "text-sm text-slate-600 dark:text-gray-100",
+              measurePlace === "left" ? "order-1" : "order-2"
+            )}
+          >
+            {measure}
+          </span>
+        )}
+      </div>
+      {description && (
+        <small
+          className={cn(
+            "mt-0 block text-[.5rem]",
+            isError ? "font-semibold text-red-500" : "font-normal text-slate-600"
+          )}
+        >
+          {description}
+        </small>
+      )}
+    </section>
   );
-}
+});
 
-/**
- * Input component
- * @prop {String} classes - Tailwind classes
- * @prop {String} containerClasses - Tailwind classes
- * @prop {String} labelClasses - Tailwind classes
- * @prop {String} variant - Tailwind classes
- * @prop {String} type - Input type
- * @prop {Number} spacing - Spacing between label and input
- * @prop {Boolean} isError - Input error
- * @prop {Boolean} isRequired - Input required
- * @prop {String} label - Input label
- * @prop {String} description - Input description
- * @prop {String} measure - Input measure unit (e.g. $, €, %)
- * @prop {String} measurePlace - Input measure place (left or right)
- * @prop {Ref<HTMLInputElement>} ref
- * @returns {ReactElement<InputProps>}
- * @example
- * ```tsx
- * <Input
- *  type="time"
- *  name="hours"
- *  label="Hours"
- *  description="e.g.: 10.30 - with dot, NOT colon"
- * />
- * ```
- */
-
-export default forwardRef(Input);
+export default input;

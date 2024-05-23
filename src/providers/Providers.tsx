@@ -1,15 +1,15 @@
 "use client";
-import React from "react";
+import { ReactNode, useEffect } from "react";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { SessionProvider } from "next-auth/react";
-import { NextIntlClientProvider } from "next-intl";
+import { NextIntlClientProvider, useLocale } from "next-intl";
 
 import ut from "@/services/Utilities/client";
 
 type Props = {
-  children?: React.ReactNode;
+  children?: ReactNode;
   i18n: {
     messages: Record<string, string>;
     locale: string;
@@ -19,19 +19,23 @@ type Props = {
 const queryClient = new QueryClient();
 
 function Providers({ children, i18n }: Props) {
+  const locale = useLocale();
+  useEffect(() => {
+    if (locale) {
+      document.documentElement.setAttribute("lang", locale);
+    }
+  }, [locale]);
   return (
-    <>
-      <QueryClientProvider client={queryClient}>
-        {ut.toBool(process.env.NEXT_PUBLIC_SHOW_DEVTOOLS) && (
-          <ReactQueryDevtools initialIsOpen={false} />
-        )}
-        <SessionProvider>
-          <NextIntlClientProvider {...i18n} timeZone="UTC">
-            {children}
-          </NextIntlClientProvider>
-        </SessionProvider>
-      </QueryClientProvider>
-    </>
+    <QueryClientProvider client={queryClient}>
+      {ut.toBool(process.env.NEXT_PUBLIC_SHOW_DEVTOOLS) && (
+        <ReactQueryDevtools initialIsOpen={false} />
+      )}
+      <SessionProvider>
+        <NextIntlClientProvider {...i18n} timeZone="UTC">
+          {children}
+        </NextIntlClientProvider>
+      </SessionProvider>
+    </QueryClientProvider>
   );
 }
 

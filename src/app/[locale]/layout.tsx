@@ -1,20 +1,27 @@
-import React from "react";
+import { ReactNode } from "react";
 
-import ut from "@/services/Utilities/client";
+import dynamic from "next/dynamic";
+import { redirect } from "next/navigation";
 
 import { LocaleParams } from "@/types";
 
-import { Toaster } from "@/components/ui/Toast/toaster";
+import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-import Providers from "@/providers/Providers";
+import "../globals.css";
 
-import "@/app/globals.css";
+const Providers = dynamic(() => import("@/providers/Providers"), {
+  ssr: false,
+});
+
+const Toaster = dynamic(() => import("@/components/ui/Toast/toaster"), {
+  ssr: false,
+});
 
 export default async function RootLayout({
   children,
   params,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   params: LocaleParams;
 }) {
   let messages;
@@ -22,7 +29,7 @@ export default async function RootLayout({
   try {
     messages = (await import(`#/messages/${params.locale}.json`)).default;
   } catch (error) {
-    ut.redirectTo(`/`);
+    redirect(PATH_NAMES.HOME);
   }
 
   return (

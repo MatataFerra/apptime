@@ -1,0 +1,14 @@
+/* HTML: <div class="loader"></div> */
+.loader {
+  height: 10px;
+  width: 250px;
+  --c:no-repeat linear-gradient(#FF2B91 0 0);
+  background: var(--c),var(--c),#fcb8fc;
+  background-size: 60% 100%;
+  animation: l16 3s infinite;
+}
+@keyframes l16 {
+  0%   {background-position:-150% 0,-150% 0}
+  66%  {background-position: 250% 0,-150% 0}
+  100% {background-position: 250% 0, 250% 0}
+}

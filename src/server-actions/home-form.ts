@@ -31,14 +31,11 @@ export default async function onSubmitServerAction(data: FormStoreData): Promise
   const response = await ProfileService.createProfile({
     userId: currentUser.id,
     profile: {
-      endHour: profile.endHour,
-      hourlyRate: profile.hourlyRate,
-      startHour: profile.startHour,
-      holidayPay: profile.holidayPay,
-      nightShift: profile.nightShift,
-      extraNightShiftPay: profile.extraNightShiftPay,
-      holidayPayRate: profile.holidayPayRate,
-      unpaidBreaks: profile.unpaidBreaks,
+      address: profile.address,
+      city: profile.city,
+      country: profile.country,
+      firstName: userData.name,
+      lastName: userData.surname,
     },
   });
 

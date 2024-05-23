@@ -8,6 +8,14 @@
       "isHoliday": false,
       "notes": "Nota por defecto",
       "startDate": "2023-04-25T08:00:00.000Z",
+      "hourValue": 10.5,
+      "holidayPay": true,
+      "holidayPayRate": 8,
+      "unpaidBreaks": 1,
+      "taxCode": 0,
+      "itemValue": null,
+      "itemQuantity": null,
+      "typeShift": "TRACK",
       "userId": "1"
     },
     {
@@ -18,6 +26,14 @@
       "isHoliday": false,
       "notes": "",
       "startDate": "2023-04-26T08:00:00.000Z",
+      "hourValue": 10.5,
+      "holidayPay": true,
+      "holidayPayRate": 8,
+      "unpaidBreaks": 1,
+      "taxCode": 0,
+      "itemValue": null,
+      "itemQuantity": null,
+      "typeShift": "TRACK",
       "userId": "1"
     }
   ],
@@ -28,6 +44,14 @@
     "isPublicHoliday": false,
     "publicHolidayWorked": false,
     "notes": "",
+    "hourValue": 10,
+    "holidayPay": true,
+    "holidayPayRate": 0,
+    "unpaidBreaks": 0,
+    "taxCode": 0,
+    "itemValue": null,
+    "itemQuantity": null,
+    "typeShift": "TRACK",
     "userId": "2"
   }
 }

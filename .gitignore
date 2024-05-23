@@ -52,3 +52,5 @@ yarn.lock
 .go-tetris.log
 local.db
 /prisma/apptime.db
+
+.VSCodeCounter/

@@ -515,3 +515,57 @@ export class ProfileAlreadyExists extends Error implements ExceptionsInterface {
     return this.exception;
   }
 }
+
+/**
+ * @class SettingsNotUpdated
+ * @description This class is responsible for the logic related to the SettingsNotUpdated error
+ * When you try to update the settings and it fails this error is thrown
+ * @default Error
+ * message: "Settings could not be updated"
+ * cause: "An error occurred while updating the settings"
+ * type_error: "SettingsNotUpdated"
+ * @returns {Exception} - The exception object
+ * @example
+ * import { ErrorFactory } from "@/services";
+ * try {
+ *  const updateSettings = await prisma?.$transaction([
+ *   prisma.user.update({
+ *    where: { id: user.id },
+ *    data: {
+ *      email: checkData.data.email,
+ *      name: checkData.data.name,
+ *    },
+ *  }),
+ *  prisma.config.update({
+ *    where: { userId: user.id },
+ *    data: {
+ *      weekStartsOn: checkData.data.weekStartsOn,
+ *    },
+ *  }),
+ * ]);
+ *
+ * if(!updateSettings) {
+ *  return ErrorFactory.createError("SettingsNotUpdated");
+ * }
+ *
+ * } catch (error) {
+ * ...
+ * }
+ *
+ *
+ */
+export class SettingsNotUpdated extends Error implements ExceptionsInterface {
+  constructor() {
+    super("Settings could not be updated");
+  }
+
+  exception: Exception = {
+    message: "Settings could not be updated",
+    cause: "An error occurred while updating the settings",
+    type_error: "SettingsNotUpdated",
+  };
+
+  handleError() {
+    return this.exception;
+  }
+}

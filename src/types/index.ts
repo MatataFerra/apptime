@@ -2,13 +2,21 @@ import { HTMLAttributes } from "react";
 
 import { z } from "zod";
 
-import { SUPPORTED_LOCALES } from "@/utils/constants";
-import { PATH_NAMES } from "@/utils/constants/pathnames";
+import { ShiftCreateSchema, ShiftModelSchema, SuscribeSchema } from "@/types";
 
-import { SuscribeSchema } from ".";
+import { SUPPORTED_LOCALES, TAX_CODES } from "@/utils/constants";
+import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 export * from "@/types/services";
 export * from "@/types/zod";
+
+/*
+  Shift
+*/
+
+export type ShiftCreate = z.infer<typeof ShiftCreateSchema>;
+export type ShiftSchema = z.infer<typeof ShiftModelSchema>;
+export type TypeShift = "PRODUCTION" | "FAST" | "TRACK";
 
 /* 
   Routes types
@@ -49,3 +57,5 @@ export type LoginInputs = {
   email: string;
   password: string;
 };
+
+export type TaxCodes = (typeof TAX_CODES)[keyof typeof TAX_CODES];

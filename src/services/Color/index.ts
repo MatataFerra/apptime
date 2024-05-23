@@ -4,7 +4,7 @@ import { Color, ColorWithGradientAndHex, Gradient, PlainColor } from "@/types";
 import { twColors } from "@/types/tailwind";
 
 class ColorService {
-  isGradient(color: PlainColor | Gradient): color is Gradient {
+  isGradient(color: PlainColor | Gradient | `#${string}`): color is Gradient {
     return (color as Gradient).from !== undefined;
   }
 

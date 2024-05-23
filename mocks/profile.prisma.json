@@ -1,14 +1,11 @@
 {
   "profile": {
     "id": 1,
-    "endHour": 17,
-    "extraNightShiftPay": 0,
-    "holidayPay": true,
-    "holidayPayRate": 1.5,
-    "hourlyRate": 10.5,
-    "nightShift": false,
-    "startHour": 8,
-    "unpaidBreaks": 0,
+    "firstName": "user name",
+    "lastName": "Lastname",
+    "address": "Adress mock",
+    "city": "City mock",
+    "country": "Argentina",
     "userId": "1"
   }
 }
