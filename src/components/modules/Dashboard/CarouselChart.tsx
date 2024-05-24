@@ -2,48 +2,25 @@
 
 import { useState } from "react";
 
-import { Shift } from "@prisma/client";
 import dynamic from "next/dynamic";
 
 import Button from "@/components/ui/Button";
 import { type CarouselApi } from "@/components/ui/Carousel";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
 
 import { cn } from "@/utils/helpers/styleMerger";
 import { useDot } from "@/hooks/useDot";
-
-import { useDashboardContext } from "@/store/useDashboardStore";
-
-const EarnsPerDay = dynamic(() => import("@/components/structures/Dashboard/Chart/EarnsPerDay"), {
-  ssr: false,
-  loading: () => <Skeleton classes="h-40 w-full" />,
-});
-
-const ChartEmpty = dynamic(() => import("@/components/structures/Dashboard/Chart/Empty"), {
-  ssr: false,
-  loading: () => <Skeleton classes="h-40 w-full" />,
-});
 
 const Carousel = dynamic(() => import("@/components/ui/Carousel").then((mod) => mod.Carousel), {
   ssr: false,
   loading: () => <Skeleton classes="mx-auto mt-8 h-full w-full max-w-xl" />,
 });
 
-const CarouselContent = dynamic(
-  () => import("@/components/ui/Carousel").then((mod) => mod.CarouselContent),
-  {
-    ssr: false,
-  }
-);
-
-const CarouselItem = dynamic(
-  () => import("@/components/ui/Carousel").then((mod) => mod.CarouselItem),
-  {
-    ssr: false,
-  }
-);
+const Content = dynamic(() => import("@/components/structures/Dashboard/Chart/Content"), {
+  ssr: false,
+  loading: () => <Skeleton classes="mx-auto mt-8 h-full w-full max-w-xl" />,
+});
 
 const CarouselNext = dynamic(
   () => import("@/components/ui/Carousel").then((mod) => mod.CarouselNext),
@@ -62,7 +39,6 @@ const CarouselPrevious = dynamic(
 );
 
 function CarouselChart() {
-  const { user } = useDashboardContext((state) => state);
   const [api, setApi] = useState<CarouselApi>();
   const { scrollSnaps, selectedIndex } = useDot(api);
   return (
@@ -77,16 +53,7 @@ function CarouselChart() {
         }}
         className="mx-auto mt-8 h-full w-full max-w-xl"
       >
-        <CarouselContent>
-          <ChartEmpty data={user?.shifts as unknown as Shift[]}>
-            <CarouselItem>
-              <Text gradient="secondary" classes="mb-2 text-lg">
-                Earnings per day
-              </Text>
-              <EarnsPerDay user={user} />
-            </CarouselItem>
-          </ChartEmpty>
-        </CarouselContent>
+        <Content />
         <Stack
           as="footer"
           orientation="horizontal"

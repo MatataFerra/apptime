@@ -1,4 +1,4 @@
-import { isThisWeek, max } from "date-fns";
+import { isThisWeek, isValid, max } from "date-fns";
 import { isNaN as isLodashNan } from "lodash";
 
 import ShiftService from "@/services/Shift";
@@ -66,20 +66,20 @@ class Dashboard implements DashboardInterface {
 
   get lastHourlyShift() {
     if (!this.user?.shifts) return null;
+
     return max(this.user?.shifts?.hourly.map((shift) => new Date(shift.startDate)));
   }
 
   get lastDayRegistered() {
     if (!this.user?.shifts) return "There is no data";
     if (!this.lastProductionShift && !this.lastHourlyShift) return "There is no data";
-    if (!this.lastProductionShift && this.lastHourlyShift)
-      return new Date(this.lastHourlyShift).toString();
-    if (this.lastProductionShift && !this.lastHourlyShift)
-      return new Date(this.lastProductionShift).toString();
-    return max([
-      new Date(this.lastProductionShift ?? ""),
-      new Date(this.lastHourlyShift ?? ""),
-    ]).toString();
+    if (!isValid(this.lastProductionShift) && isValid(this.lastHourlyShift))
+      return this.lastHourlyShift!.toString();
+
+    if (isValid(this.lastProductionShift) && !isValid(this.lastHourlyShift))
+      return this.lastProductionShift!.toString();
+
+    return max([this.lastProductionShift ?? "", this.lastHourlyShift ?? ""]).toString();
   }
 
   estimatedWeeklyEarnings({ weekStartsOn = "monday" }: { weekStartsOn?: keyof typeof DAYS } = {}) {

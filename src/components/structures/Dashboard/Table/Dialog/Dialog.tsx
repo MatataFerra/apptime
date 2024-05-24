@@ -32,17 +32,18 @@ type Props = PropsWithChildren<{
   title: string;
   shift: Hourly | Production;
   content: ReactNode;
+  type: "hourly" | "production";
 }>;
 
-function TableDialog({ title, content, shift, children }: Props) {
+function TableDialog({ title, content, shift, type, children }: Props) {
   const { setStep, step } = useTableStore((state) => state);
   const { user, update, deleteShift } = useDashboardContext((state) => state);
   const queryClient = useQueryClient();
   const router = useRouter();
   const { mutate } = useMutation({
-    mutationFn: api.deleteShift.bind(api) as unknown as ({
-      id,
-    }: {
+    mutationFn: (type === "hourly"
+      ? api.deleteHourly.bind(api)
+      : api.deleteProduction.bind(api)) as unknown as (data: {
       id: number;
     }) => Promise<SuccessApiResponse<UserType>>,
 
