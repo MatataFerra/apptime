@@ -26,7 +26,12 @@ function ProductionRow({ shift }: { shift: Production }) {
   }, []);
 
   return (
-    <Dialog title="Info about this shift" shift={shift} content={<Content shift={shift} />}>
+    <Dialog
+      title="Info about this shift"
+      shift={shift}
+      type="production"
+      content={<Content shift={shift} />}
+    >
       <TableElement as="tr" type="tr">
         <TableElement>{shortDate}</TableElement>
         <TableElement>{shift?.itemQuantity ? shift.itemQuantity : "..."}</TableElement>

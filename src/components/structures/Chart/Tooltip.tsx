@@ -34,7 +34,6 @@ function CustomChartTooltip({ active, payload, label, legend, customLegend, show
         ) : (
           <div>
             <p className="text-md w-full py-1 text-gray-900">{`${legend}: $${sumValue.toFixed(2)} `}</p>
-            <p className="text-md w-full py-1 text-gray-900">{`Type of shift: ${TYPE_SHIFT[type as keyof typeof TYPE_SHIFT]} `}</p>
             <p className="w-full text-sm text-gray-800">{`${findMonthName !== -1 ? `Number of shifts worked: ${shiftsWorked}` : ""}`}</p>
             {showDates && (
               <ul className="w-full list-inside list-disc text-sm text-violet-600">

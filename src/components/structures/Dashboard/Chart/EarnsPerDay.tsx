@@ -4,7 +4,7 @@ import ChartService from "@/services/Chart";
 
 import { UserType } from "@/types";
 
-import Chart from "@/components/ui/Chart";
+import Bar from "@/components/ui/Chart/Bar";
 
 // Override console.error
 // This is a hack to suppress the warning about missing defaultProps in recharts library as of version 2.12
@@ -22,9 +22,9 @@ type Props = {
 };
 
 function EarnsPerDay({ user }: Props) {
-  const earnsPerDay = new ChartService(user?.shifts?.hourly ?? []).earnsPerDay();
+  const earnsPerDay = new ChartService(user?.shifts).earnsPerDay();
 
-  return <Chart data={earnsPerDay} legend="Shift payment per Day" color={"bg-sky-500"} />;
+  return <Bar data={earnsPerDay} legend="Shift payment per Day" color={"bg-sky-500"} />;
 }
 
 export default EarnsPerDay;

@@ -47,6 +47,7 @@ function HourlyRow({ shift }: { shift: Hourly }) {
     <TableDialog
       title="Info about this shift"
       shift={shift}
+      type="hourly"
       content={<TableDialogContent shift={shift} />}
     >
       <TableElement as="tr" type="tr">

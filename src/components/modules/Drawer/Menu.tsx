@@ -22,7 +22,7 @@ function DrawerMenu({ children }: Props) {
       <Drawer
         handleOutsideClick={() => toggle()}
         isOpen={isOpen}
-        classes="top-3/4 isolate z-50 h-[80dvh] w-fit rounded-lg border border-slate-100/70 bg-gradient-to-b from-white via-stone-100/95 to-slate-300/35 shadow-2xl backdrop-blur-md"
+        classes="top-3/4 isolate z-50 h-[80dvh] w-[60dvw] rounded-lg border border-slate-100/70 bg-gradient-to-b from-white via-stone-100/95 to-slate-300/35 shadow-2xl backdrop-blur-md"
       >
         <Stack justifyContent="between" classes="z-10 w-full">
           {children}

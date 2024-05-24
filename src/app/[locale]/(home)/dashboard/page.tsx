@@ -9,9 +9,9 @@ const CarouselCards = dynamic(() => import("@/components/modules/Dashboard/Carou
   ssr: false,
   loading: () => (
     <Stack classes="h-full w-full max-w-[90svw] overflow-hidden">
-      <Skeleton classes="h-[300px] basis-1/2 sm:basis-1/3 md:basis-1/5" />
-      <Skeleton classes="h-[300px] basis-1/2 sm:basis-1/3 md:basis-1/5" />
-      <Skeleton classes="h-[300px] basis-1/2 sm:basis-1/3 md:basis-1/5" />
+      <Skeleton classes="basis-1/2 sm:basis-1/3 md:basis-1/5" />
+      <Skeleton classes="basis-1/2 sm:basis-1/3 md:basis-1/5" />
+      <Skeleton classes="basis-1/2 sm:basis-1/3 md:basis-1/5" />
     </Stack>
   ),
 });
