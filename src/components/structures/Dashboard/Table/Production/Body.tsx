@@ -6,7 +6,6 @@ import { Production } from "@prisma/client";
 import isEmpty from "lodash/isEmpty";
 
 import ShiftService from "@/services/Shift";
-import ProductionService from "@/services/Shift/Production";
 
 import Row from "@/components/structures/Dashboard/Table/Production/Row";
 import TableBody from "@/components/ui/TableBody";

@@ -145,6 +145,25 @@ class ShiftService implements ShiftServiceInterface {
     });
   }
 
+  static sortAllShifts(
+    shifts: (Production | Hourly)[] | undefined,
+    { desc = true }: { desc?: boolean } = {}
+  ) {
+    if (!shifts) return null;
+
+    if (desc) {
+      return shifts
+        .filter((shift) => shift.isClosed)
+        .toSorted((a, b) => {
+          return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+        });
+    }
+
+    return shifts.toSorted((a, b) => {
+      return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
+    });
+  }
+
   static convertAmountInDecimal(amount: number): number {
     const validAmount = amount ?? 0;
     return Math.round((validAmount / 60) * 100) / 100;
