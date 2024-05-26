@@ -6,6 +6,8 @@ import dynamic from "next/dynamic";
 import Skeleton from "@/components/ui/Skeleton";
 import Text from "@/components/ui/Text";
 
+import useDashboard from "@/hooks/useDashboard";
+
 import { useDashboardContext } from "@/store/useDashboardStore";
 
 const EarnsPerDay = dynamic(() => import("@/components/structures/Dashboard/Chart/EarnsPerDay"), {
@@ -41,7 +43,7 @@ const CarouselItem = dynamic(
 );
 
 function Content() {
-  const { user } = useDashboardContext((state) => state);
+  const { user } = useDashboard();
 
   return (
     <CarouselContent>

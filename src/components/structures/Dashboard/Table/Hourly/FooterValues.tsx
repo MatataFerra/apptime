@@ -6,10 +6,12 @@ import ShiftService from "@/services/Shift";
 
 import TableElement from "@/components/ui/TableElement";
 
+import useDashboard from "@/hooks/useDashboard";
+
 import { useDashboardContext } from "@/store/useDashboardStore";
 
 function FooterValues() {
-  const { user } = useDashboardContext((state) => state);
+  const { user } = useDashboard();
   function calculateEarnings(shift: Hourly) {
     return new ShiftService(shift).calculateEarnings();
   }
