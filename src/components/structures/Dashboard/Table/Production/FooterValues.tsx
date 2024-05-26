@@ -6,10 +6,12 @@ import ProductionService from "@/services/Shift/Production";
 
 import TableElement from "@/components/ui/TableElement";
 
+import useDashboard from "@/hooks/useDashboard";
+
 import { useDashboardContext } from "@/store/useDashboardStore";
 
 function FooterValues() {
-  const { user } = useDashboardContext((state) => state);
+  const { user } = useDashboard();
   function calculateEarnings(shift: Production) {
     return ProductionService.earnings({
       holidayPayRate: shift?.holidayPayRate ?? 0,

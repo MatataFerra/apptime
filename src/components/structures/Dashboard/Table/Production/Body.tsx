@@ -10,10 +10,12 @@ import ShiftService from "@/services/Shift";
 import Row from "@/components/structures/Dashboard/Table/Production/Row";
 import TableBody from "@/components/ui/TableBody";
 
+import useDashboard from "@/hooks/useDashboard";
+
 import { useDashboardContext } from "@/store/useDashboardStore";
 
 function ProductionBody() {
-  const { user } = useDashboardContext((state) => state);
+  const { user } = useDashboard();
   const productionShifts = useMemo(() => {
     return user?.shifts?.production;
   }, [user?.shifts?.production]);

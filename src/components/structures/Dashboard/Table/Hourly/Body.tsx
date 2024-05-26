@@ -10,10 +10,10 @@ import ShiftService from "@/services/Shift";
 import Row from "@/components/structures/Dashboard/Table/Hourly/Row";
 import TableBody from "@/components/ui/TableBody";
 
-import { useDashboardContext } from "@/store/useDashboardStore";
+import useDashboard from "@/hooks/useDashboard";
 
 function HourlyBody() {
-  const { user } = useDashboardContext((state) => state);
+  const { user } = useDashboard();
   const hourlyWorkedShift = useMemo(() => {
     return user?.shifts?.hourly;
   }, [user?.shifts]);
