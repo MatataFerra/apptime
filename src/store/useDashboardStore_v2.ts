@@ -92,7 +92,6 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   },
   filterByDate: (date) => {
     const initial = get().initialShifts;
-    console.log("🚀 ~ useDashboardStore ~ initial:", initial);
     const production = initial?.production?.filter((shift) => {
       if (!date?.from) return false;
       if (!date?.to) return false;
