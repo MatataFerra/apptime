@@ -14,7 +14,7 @@ const SettingsSchema = z.object({
   email: z.string().email(),
   country: z.string(),
   city: z.string(),
-  weekStartsOn: z.enum(WEEK_DAYS),
+  weekStartsOn: z.enum(WEEK_DAYS).default("monday"),
 });
 
 export default async function onUpdateSettings(values: typeof SETTINGS_FIELDS) {
@@ -66,7 +66,7 @@ export default async function onUpdateSettings(values: typeof SETTINGS_FIELDS) {
         userId: user.id,
         country: checkData.data.country,
         city: checkData.data.city,
-        firstName: checkData.data.name,
+        firstName: "",
       },
       update: {
         country: checkData.data.country,
