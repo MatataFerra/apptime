@@ -179,6 +179,7 @@ const UserCreateSchema = UserModelSchema.omit({
 const SearchParamsSchema = z.object({
   shifts: z.string().nullable(),
   profile: z.string().nullable(),
+  config: z.string().nullable(),
   email: z.string().nullable(),
   only: z.string().nullable(),
 });

@@ -6,6 +6,7 @@ export const QUERY_PARAMS = {
   USER_ID: "userId",
   PROFILE: "profile",
   SHIFTS: "shifts",
+  CONFIG: "config",
   EMAIL: "email",
   ONLY: "only",
 };

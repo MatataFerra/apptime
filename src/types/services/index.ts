@@ -1,4 +1,4 @@
-import { Hourly, Production, Profile, Shift, User } from "@prisma/client";
+import { Config, Hourly, Production, Profile, Shift, User } from "@prisma/client";
 import { JWT } from "next-auth/jwt";
 import { z } from "zod";
 
@@ -7,6 +7,7 @@ import { HandleErrorTypeSchema } from "@/types/zod";
 
 // Types
 export type UserType = User & {
+  config: Config | null;
   shifts: Shifts | null;
   profile: Profile | null;
 };

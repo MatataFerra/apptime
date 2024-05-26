@@ -33,6 +33,7 @@ const input = forwardRef(function Input(
     label,
     labelClasses,
     basis,
+    containerClasses,
     ...props
   }: InputProps,
   ref: Ref<HTMLInputElement>
@@ -48,7 +49,7 @@ const input = forwardRef(function Input(
   const flexBasis = basis ? `${basis}` : "input-flex";
 
   return (
-    <section className={`${flexBasis} w-full`}>
+    <section className={cn(flexBasis, containerClasses, "w-full")}>
       {label && (
         <label
           htmlFor={props.name}
