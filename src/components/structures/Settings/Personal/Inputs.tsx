@@ -1,34 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
-
-import InputForm from "@/components/structures/Settings/InputForm";
+import AccordionItemSettings from "@/components/structures/Settings/AccordionItem";
+import Input from "@/components/structures/Settings/Input";
 import Dropdown from "@/components/structures/Settings/Personal/Dropdown";
-import Skeleton from "@/components/ui/Skeleton";
-import Stack from "@/components/ui/Stack";
 
 import { SETTINGS_FIELDS } from "@/utils/constants/settings";
 import getCountryData from "@/utils/helpers/getCountryData";
-import useUser from "@/hooks/useUser";
-
-import { useSettingsStore } from "@/store/useSettingsStore";
+import useSettings from "@/hooks/useSettings";
 
 function Inputs() {
-  const { data: user, isLoading } = useUser();
-
-  const { setValue, values } = useSettingsStore((state) => state);
-
-  useEffect(() => {
-    setValue({
-      personal: {
-        city: user?.profile?.city ?? "",
-        country: user?.profile?.country ?? "",
-        firstname: user?.profile?.firstName ?? "",
-        lastname: user?.profile?.lastName ?? "",
-      },
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { setValue, values, isLoading } = useSettings();
 
   function onChangeInputs(e: React.ChangeEvent<HTMLInputElement>) {
     const { value, id } = e.target;
@@ -42,39 +23,34 @@ function Inputs() {
   }
 
   return (
-    <Stack as="div" orientation="vertical" classes="w-full" spacing={0}>
-      <InputForm
-        id="country"
-        label="Country"
-        loading={isLoading}
-        fallback={<Skeleton classes="h-5 w-20"></Skeleton>}
-        fallbackData={
-          values.personal.country &&
-          `${getCountryData(values.personal.country).flag} ${values.personal.country}`
-        }
-      >
-        <Dropdown
-          staleTitle="Select country"
-          searchingTitle="Found your country"
-          setSelected={(value) =>
-            setValue({
-              personal: {
-                ...values.personal,
-                country: value,
-              },
-            })
-          }
-        />
-      </InputForm>
-      <InputForm
-        id="city"
-        loading={isLoading}
-        fallback={<Skeleton classes="h-5 w-20"></Skeleton>}
+    <AccordionItemSettings value="personal" trigger="Personal Details">
+      <Input
+        name={SETTINGS_FIELDS.personal.city.toLowerCase()}
+        id={SETTINGS_FIELDS.personal.city.toLowerCase()}
         label={SETTINGS_FIELDS.personal.city}
-        data={values.personal.city}
-        onHandleChange={onChangeInputs}
+        description="Your city"
+        variant="plane"
+        value={values.personal.city}
+        isLoading={isLoading}
+        onChange={onChangeInputs}
       />
-    </Stack>
+      <Dropdown
+        staleTitle={
+          values.personal.country
+            ? `${getCountryData(values.personal.country).flag} ${values.personal.country}`
+            : "Select your country"
+        }
+        searchingTitle="Found your country"
+        setSelected={(value) =>
+          setValue({
+            personal: {
+              ...values.personal,
+              country: value,
+            },
+          })
+        }
+      />
+    </AccordionItemSettings>
   );
 }
 
