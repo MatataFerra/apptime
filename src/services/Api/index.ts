@@ -37,6 +37,7 @@ class ApiService extends ApiBaseService {
     filters,
     shifts = false,
     profile = false,
+    config = false,
     hasEnvUrl = true,
     options,
   }: {
@@ -44,13 +45,22 @@ class ApiService extends ApiBaseService {
     filters?: keyof User | (keyof User)[];
     shifts?: boolean;
     profile?: boolean;
+    config?: boolean;
     hasEnvUrl?: boolean;
     options?: NextFetchRequestConfig;
   }) {
     const parseFilters = Array.isArray(filters) ? filters.join(",") : "";
 
+    const buildEndpoint = ApiService.prettyfyEndpoint(API_ENDPOINTS.USER, [
+      { name: "email", value: email ?? "" },
+      { name: "only", value: parseFilters },
+      { name: "shifts", value: String(shifts) },
+      { name: "profile", value: String(profile) },
+      { name: "config", value: String(config) },
+    ]);
+
     const response: SuccessUserApiResponse = await this.get({
-      endpoint: `${API_ENDPOINTS.USER}?email=${email}&only=${parseFilters}&shifts=${shifts}&profile=${profile}`,
+      endpoint: buildEndpoint,
       hasEnvUrl,
       options,
     });
@@ -94,6 +104,17 @@ class ApiService extends ApiBaseService {
     // eslint-disable-next-line no-console
     const response = console.log("delayed", ms);
     return new Promise((resolve) => setTimeout(() => resolve(response), ms));
+  }
+
+  private static prettyfyEndpoint(
+    endpoint: (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS],
+    params: Array<{ name: string; value: string }>
+  ) {
+    const parse = params.map(({ name, value }) => {
+      return `${name}=${value}`;
+    });
+
+    return `${endpoint}?${parse.join("&")}`;
   }
 }
 
