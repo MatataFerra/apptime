@@ -25,11 +25,13 @@ export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const shifts = searchParams.get(QUERY_PARAMS.SHIFTS);
   const profile = searchParams.get(QUERY_PARAMS.PROFILE);
+  const config = searchParams.get(QUERY_PARAMS.CONFIG);
   const email = parseEmailFromParams(checkToken, searchParams.get(QUERY_PARAMS.EMAIL));
   const only = searchParams.get(QUERY_PARAMS.ONLY);
 
   const parsedSearchParams = SearchParamsSchema.safeParse({
     shifts,
+    config,
     profile,
     email,
     only,
@@ -63,6 +65,7 @@ export async function GET(req: NextRequest) {
           },
         },
         profile: JSON.parse(parsedSearchParams.data.profile ?? "false"),
+        config: JSON.parse(parsedSearchParams.data.config ?? "false"),
       },
     });
 

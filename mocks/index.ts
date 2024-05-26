@@ -109,4 +109,9 @@ export const userMocked: UserType = {
     ...userShiftsMocked,
   },
   profile: profileParsed,
+  config: {
+    id: 1,
+    userId: userMockedParsed.id,
+    weekStartsOn: "Sunday",
+  },
 };

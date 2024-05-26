@@ -34,6 +34,7 @@ export async function GET(req: NextRequest) {
           },
         },
         profile: true,
+        config: true,
       },
     });
 
