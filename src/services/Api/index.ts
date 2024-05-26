@@ -51,7 +51,7 @@ class ApiService extends ApiBaseService {
   }) {
     const parseFilters = Array.isArray(filters) ? filters.join(",") : "";
 
-    const buildEndpoint = ApiService.prettyfyEndpoint(API_ENDPOINTS.USER, [
+    const buildEndpoint = ApiService.addSearchParamsToEndpoint(API_ENDPOINTS.USER, [
       { name: "email", value: email ?? "" },
       { name: "only", value: parseFilters },
       { name: "shifts", value: String(shifts) },
@@ -106,13 +106,16 @@ class ApiService extends ApiBaseService {
     return new Promise((resolve) => setTimeout(() => resolve(response), ms));
   }
 
-  private static prettyfyEndpoint(
+  private static addSearchParamsToEndpoint(
     endpoint: (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS],
     params: Array<{ name: string; value: string }>
   ) {
-    const parse = params.map(({ name, value }) => {
-      return `${name}=${value}`;
-    });
+    const parse = params
+      .map(({ name, value }) => {
+        if (!value) return "";
+        return `${name}=${value}`;
+      })
+      .filter((param) => param !== "");
 
     return `${endpoint}?${parse.join("&")}`;
   }
