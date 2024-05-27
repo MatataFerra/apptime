@@ -15,6 +15,13 @@ type Props = {
   user: UserType | null;
 };
 
+/**
+ * @deprecated Use `useDashboardStore` (named as `useDashboardStore_v2`) instead and combine it with useUser hook to get the user data
+ * or use directly useDashboard custom hook
+ * ```tsx
+ *    const { user } = useDashboard();
+ * ```
+ */
 function DashboardProvider({ children, user }: Props) {
   const store = useRef(createDashboardStore({ user })).current;
   const query = useQuery({

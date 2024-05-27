@@ -46,6 +46,9 @@ const DashboardProvider = dynamic(() => import("@/providers/DashboardProvider"),
   ),
 });
 
+/**
+ * @deprecated This component was replaced by the new parallel routing of Dashboard
+ */
 async function Dashboard() {
   const user = await UserService.getSessionUser();
   return (
