@@ -1,31 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
-
-import InputForm from "@/components/structures/Settings/InputForm";
-import Skeleton from "@/components/ui/Skeleton";
-import Stack from "@/components/ui/Stack";
+import AccordionItemSettings from "@/components/structures/Settings/AccordionItem";
+import Input from "@/components/structures/Settings/Input";
 
 import { SETTINGS_FIELDS } from "@/utils/constants/settings";
-import useUser from "@/hooks/useUser";
-
-import { useSettingsStore } from "@/store/useSettingsStore";
+import useSettings from "@/hooks/useSettings";
 
 function Inputs() {
-  const { data: user, isLoading } = useUser();
-  const { setValue, values } = useSettingsStore((state) => state);
-
-  useEffect(() => {
-    if (isLoading) return;
-    if (!user?.email || !user.name) return;
-    setValue({
-      account: {
-        name: user.name,
-        email: user.email,
-      },
-    });
-  }, [setValue, user?.email, user?.name, isLoading]);
-
+  const { setValue, values, isLoading } = useSettings();
   function onChangeInputs(e: React.ChangeEvent<HTMLInputElement>) {
     const { value, id } = e.target;
 
@@ -38,16 +20,18 @@ function Inputs() {
   }
 
   return (
-    <Stack as="div" orientation="vertical" classes="w-full" spacing={0}>
-      <InputForm
-        id="name"
-        loading={isLoading}
-        fallback={<Skeleton classes="h-5 w-20"></Skeleton>}
+    <AccordionItemSettings value="account" trigger="Account Details">
+      <Input
+        name={SETTINGS_FIELDS.account.name.toLowerCase()}
+        id={SETTINGS_FIELDS.account.name.toLowerCase()}
         label={SETTINGS_FIELDS.account.name}
-        data={values.account.name}
-        onHandleChange={onChangeInputs}
+        description="Your full name"
+        variant="plane"
+        value={values.account.name}
+        isLoading={isLoading}
+        onChange={onChangeInputs}
       />
-    </Stack>
+    </AccordionItemSettings>
   );
 }
 

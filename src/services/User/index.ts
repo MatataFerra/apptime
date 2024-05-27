@@ -12,6 +12,7 @@ type FindUniqueUserType = {
   email?: string;
   profile?: boolean;
   shifts?: boolean;
+  config?: boolean;
 };
 
 /**
@@ -47,6 +48,7 @@ class UserService {
           },
         },
         profile: options.profile,
+        config: options.config,
         emailVerified: true,
         formCompleted: true,
         image: true,

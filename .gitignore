@@ -54,3 +54,4 @@ local.db
 /prisma/apptime.db
 
 .VSCodeCounter/
+compare_builds.txt

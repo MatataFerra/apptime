@@ -6,4 +6,4 @@ export const API_ENDPOINTS = {
   USER: `/api/user`,
   PROFILE: `/api/profile`,
   SHIFT: `/api/shift`,
-};
+} as const;

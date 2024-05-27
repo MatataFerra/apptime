@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
+import isEmpty from "lodash/isEmpty";
 import { useSession } from "next-auth/react";
 
 import api from "@/services/Api";
@@ -28,32 +29,32 @@ function useUser() {
               hasEnvUrl: false,
               profile: true,
               shifts: true,
+              config: true,
             }) as unknown as SuccessApiResponse<UserType>,
         })
-        .then((res) => {
-          setUser(res?.user);
+        .then((res: any) => {
+          if (isEmpty(res?.user)) return;
+          if (JSON.stringify(user) !== JSON.stringify(res?.user)) return setUser(res?.user);
         });
     }
-
-    queryClient.invalidateQueries({
-      queryKey: ["user", session.data?.user?.email],
-    });
 
     return user;
   }, [data, queryClient, session.data?.user?.email, user]);
 
   useEffect(() => {
+    if (!isLoading) return;
+
     fetchUser()
       .then((user) => {
-        if (user) {
-          return setIsloading(false);
+        if (isEmpty(user)) {
+          return setIsloading(true);
         }
-        setIsloading(true);
+        setIsloading(false);
       })
       .catch((err) => {
         setIsloading(false);
       });
-  }, [fetchUser]);
+  }, [fetchUser, isLoading]);
 
   return { data: user, isLoading };
 }

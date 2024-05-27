@@ -20,6 +20,13 @@ interface DashboardState extends DashboardStateProps {
 
 type DashboardStateStore = ReturnType<typeof createDashboardStore>;
 
+/**
+ * @deprecated Use `useDashboardStore` (named as `useDashboardStore_v2`) instead and combine it with useUser hook to get the user data
+ * or use directly useDashboard custom hook
+ * ```tsx
+ *    const { user } = useDashboard();
+ * ```
+ */
 export function createDashboardStore(initProps?: Partial<DashboardStateProps>) {
   const DEFAULT_PROPS: DashboardStateProps = {
     user: initProps?.user || null,

@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/Dialog";
 import Stack from "@/components/ui/Stack";
 
+import useDashboard from "@/hooks/useDashboard";
+
 import { useDashboardContext } from "@/store/useDashboardStore";
 import { useTableStore } from "@/store/useTableStore";
 
@@ -37,7 +39,7 @@ type Props = PropsWithChildren<{
 
 function TableDialog({ title, content, shift, type, children }: Props) {
   const { setStep, step } = useTableStore((state) => state);
-  const { user, update, deleteShift } = useDashboardContext((state) => state);
+  const { user, update, deleteShift } = useDashboard();
   const queryClient = useQueryClient();
   const router = useRouter();
   const { mutate } = useMutation({

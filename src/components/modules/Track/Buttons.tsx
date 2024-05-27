@@ -23,7 +23,7 @@ function ShiftButtons() {
   }, [shiftUnclosed, updateShiftStatus]);
 
   return (
-    <Stack classes="h-full w-full" spacing={10} alignItems="center" justifyContent="between">
+    <Stack classes="h-fit w-full" spacing={10} alignItems="center" justifyContent="between">
       <StartDialog triggerStatus={buttonStatus?.startButton} />
       <FinishButton buttonStatus={buttonStatus.finishButton} />
     </Stack>
