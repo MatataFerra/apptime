@@ -1,6 +1,5 @@
 "use client";
 
-import { Hourly, Production, Shift } from "@prisma/client";
 import dynamic from "next/dynamic";
 
 import Skeleton from "@/components/ui/Skeleton";
@@ -8,24 +7,22 @@ import Text from "@/components/ui/Text";
 
 import useDashboard from "@/hooks/useDashboard";
 
-import { useDashboardContext } from "@/store/useDashboardStore";
-
 const EarnsPerDay = dynamic(() => import("@/components/structures/Dashboard/Chart/EarnsPerDay"), {
   ssr: false,
-  loading: () => <Skeleton classes="h-40 w-full" />,
+  loading: () => <Skeleton classes="h-[500px] w-full" />,
 });
 
 const CompareShifts = dynamic(
   () => import("@/components/structures/Dashboard/Chart/CompareShifts"),
   {
     ssr: false,
-    loading: () => <Skeleton classes="h-40 w-full" />,
+    loading: () => <Skeleton classes="h-[500px] w-full" />,
   }
 );
 
 const ChartEmpty = dynamic(() => import("@/components/structures/Dashboard/Chart/Empty"), {
   ssr: false,
-  loading: () => <Skeleton classes="h-40 w-full" />,
+  loading: () => <Skeleton classes="h-[500px] w-full" />,
 });
 
 const CarouselContent = dynamic(

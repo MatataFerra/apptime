@@ -38,7 +38,7 @@ interface Props {
 export default async function HomeLayout({ children, params }: Props) {
   return (
     <>
-      <main className="grid h-[100dvh] grid-rows-[auto,1fr] gap-8 p-4" data-testid="drawer-close">
+      <main className="grid h-full grid-rows-[auto,1fr] gap-8 p-4" data-testid="drawer-close">
         <Header position="between" classes="relative">
           <Ham />
           <Drawer>

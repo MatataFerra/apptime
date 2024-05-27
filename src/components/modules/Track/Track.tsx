@@ -52,8 +52,8 @@ type Props = {
 function Track({ user, shiftUnclosed }: Props) {
   return (
     <ShiftStatusProvider user={user} shiftOpen={shiftUnclosed}>
-      <Stack orientation="vertical" justifyContent="between" classes="h-full w-full" spacing={8}>
-        <Stack orientation="vertical" classes="w-full">
+      <Stack orientation="vertical" justifyContent="between" classes="h-[70dvh] w-full" spacing={8}>
+        <Stack orientation="vertical" classes="h-full w-full">
           <State />
           <MonitorScreen />
         </Stack>

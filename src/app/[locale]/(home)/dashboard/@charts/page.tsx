@@ -6,7 +6,7 @@ import Stack from "@/components/ui/Stack";
 const CarouselChart = dynamic(() => import("@/components/modules/Dashboard/CarouselChart"), {
   ssr: false,
   loading: () => (
-    <Stack classes="h-full w-full overflow-hidden">
+    <Stack classes="h-[500px] w-full overflow-hidden">
       <Skeleton classes="mx-auto mt-8 h-full w-full max-w-xl" />
     </Stack>
   ),

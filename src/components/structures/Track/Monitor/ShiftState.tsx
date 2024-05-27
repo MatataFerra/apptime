@@ -34,13 +34,13 @@ function ShiftState() {
   return (
     <>
       {shiftUnclosed.isLoading ? (
-        <Text classes="block text-lg">loading...</Text>
+        <Text classes="block text-2xl">loading...</Text>
       ) : !isEmpty(shiftUnclosed.shift) ? (
         <>
-          <Text classes="text-lg">shift opened {` (${shiftTime})`}</Text>
+          <Text classes="text-2xl">shift opened {` (${shiftTime})`}</Text>
         </>
       ) : (
-        <Text classes="block text-lg underline">No shift is being tracked</Text>
+        <Text classes="block text-2xl underline">No shift is being tracked</Text>
       )}
     </>
   );
