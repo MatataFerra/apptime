@@ -1,4 +1,29 @@
-class Tax {
+import type { Tax } from "@prisma/client";
+import { z } from "zod";
+
+import { TaxCreateSchema } from "@/types";
+
+import prisma from "#/prisma/client";
+
+class TaxService {
+  taxes: Omit<Tax, "id">[];
+  constructor(taxes: Omit<Tax, "id">[]) {
+    this.taxes = taxes;
+  }
+
+  async create() {
+    const checkData = z.array(TaxCreateSchema).safeParse(this.taxes);
+
+    if (!checkData.success) {
+      throw new Error("Invalid data");
+    }
+    const createMany = await prisma.tax.createManyAndReturn({
+      data: this.taxes,
+    });
+
+    return createMany;
+  }
+
   static calcularTasaImpuestoEfectiva(ingresoAnual: number): number {
     const tramos = [
       [14000, 0.105],
@@ -29,3 +54,5 @@ class Tax {
     return tasaImpuestoEfectiva;
   }
 }
+
+export default TaxService;
