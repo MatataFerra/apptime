@@ -1,12 +1,15 @@
 "use server";
 
-import { Hourly } from "@prisma/client";
+import type { Hourly } from "@prisma/client";
+import isEmpty from "lodash/isEmpty";
 import { revalidatePath } from "next/cache";
 
 import ShiftService from "@/services/Shift";
+import TaxService from "@/services/Tax";
+import TaxHourlyService from "@/services/Tax/Hourly";
 import UserService from "@/services/User";
 
-import { type FastChargeInputsParsed } from "@/types/forms";
+import type { FastChargeInputsParsed } from "@/types/forms";
 
 export default async function onSubmitFastCharge(data: FastChargeInputsParsed) {
   const currentUser = await UserService.getSessionUser();
@@ -39,7 +42,21 @@ export default async function onSubmitFastCharge(data: FastChargeInputsParsed) {
     .build<Hourly>();
 
   try {
-    const createShift = await new ShiftService(shift).create();
+    const createShift = await new ShiftService(shift).create<Hourly>();
+
+    if (!isEmpty(data.taxes) && createShift) {
+      const taxesWithId = data.taxes
+        .filter((tax) => tax.name && tax.value)
+        .map((tax) => ({
+          ...tax,
+          productionId: createShift.id,
+        }));
+      await new TaxService(taxesWithId).create();
+
+      if (data.saveTaxes) {
+        await new TaxHourlyService(taxesWithId).save(currentUser.config!.id);
+      }
+    }
 
     revalidatePath("/[locale]/(home)/history-shifts", "page");
 
