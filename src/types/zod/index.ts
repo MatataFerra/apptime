@@ -8,6 +8,7 @@ import Password from "@/services/Auth/password";
   - Shift
   - Profile
   - User
+  - Tax
   - SearchParams
   - Suscribe
   - Validate password
@@ -168,6 +169,34 @@ const UserCreateSchema = UserModelSchema.omit({
 });
 
 /*
+===================================================================
+-------------------------Tax---------------------------------------
+===================================================================
+*/
+
+const TaxSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  value: z.number(),
+  description: z.string().nullable(),
+  internalId: z.string(),
+  hourlyId: z.number().nullable(),
+  productionId: z.number().nullable(),
+});
+
+const TaxCreateSchema = TaxSchema.omit({
+  id: true,
+  internalId: true,
+}).refine((values) => Object.keys(values).length > 0, {
+  message: "One of the fields must be defined",
+});
+
+const TaxUpdateSchema = TaxSchema.omit({
+  id: true,
+  internalId: true,
+});
+
+/*
 ============================================================================
 ============================================================================
 */
@@ -308,6 +337,9 @@ export {
   ShiftModelSchema,
   ShiftUpdateSchema,
   SuscribeSchema,
+  TaxCreateSchema,
+  TaxSchema,
+  TaxUpdateSchema,
   UserCreateSchema,
   UserModelSchema,
   UserUpdateSchema,
