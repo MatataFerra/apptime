@@ -7,8 +7,9 @@ import { isBefore } from "date-fns";
 import Toast from "@/services/Toast";
 
 import { ProductionJobFormSchema } from "@/types";
-import { type ProductionInputs } from "@/types/forms";
+import type { ProductionInputs } from "@/types/forms";
 
+import AccordionTaxes from "@/components/structures/Taxes/AccordionTaxes";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
@@ -17,9 +18,14 @@ import useUser from "@/hooks/useUser";
 
 import onSubmitProductionJob from "@/server-actions/production-job";
 import { useProductionForm } from "@/store/useProductionForm";
+import { useProductionTaxesStore } from "@/store/useProductionTaxesStore";
 
 function Inputs() {
   const { setValues, reset: resetValues } = useProductionForm((state) => state);
+  const { taxes, saveTaxes, clearTaxes, setSaveTaxes, addTax, removeTax } = useProductionTaxesStore(
+    (state) => state
+  );
+
   const queryClient = useQueryClient();
   const { data: user } = useUser();
   const {
@@ -46,6 +52,8 @@ function Inputs() {
       itemQuantity: parseFloat(formData["item-quantity"]),
       isPublicHoliday: formData["is-public-holiday"],
       publicHolidayWorked: formData["is-worked"],
+      taxes: taxes,
+      saveTaxes,
     };
 
     if (isBefore(new Date(finishDateWatch), new Date(startDateWatch))) {
@@ -65,7 +73,7 @@ function Inputs() {
       duration: 1000,
     });
 
-    onSubmitProductionJob(parseData).then((response: any) => {
+    onSubmitProductionJob(parseData).then((response) => {
       if (response) {
         queryClient.invalidateQueries({
           queryKey: ["user", user?.email],
@@ -78,6 +86,7 @@ function Inputs() {
         });
 
         resetValues();
+        clearTaxes();
 
         return reset();
       }
@@ -154,6 +163,16 @@ function Inputs() {
             },
           })}
         />
+        <Stack classes="my-8 w-full">
+          <AccordionTaxes
+            addTax={addTax}
+            taxes={taxes}
+            clearTaxes={clearTaxes}
+            emptyTableText="Not taxes yet"
+            setSaveTaxes={setSaveTaxes}
+            removeTax={removeTax}
+          />
+        </Stack>
         <Stack orientation="horizontal" wrap>
           <Stack alignItems="center">
             <input

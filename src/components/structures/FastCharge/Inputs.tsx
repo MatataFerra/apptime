@@ -8,8 +8,9 @@ import { format, isBefore, isEqual, isValid } from "date-fns";
 import Toast from "@/services/Toast";
 
 import { FastChargeFormSchema } from "@/types";
-import { type FastChargeInputs, FastChargeInputsParsed } from "@/types/forms";
+import type { FastChargeInputs } from "@/types/forms";
 
+import AccordionTaxes from "@/components/structures/Taxes/AccordionTaxes";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
@@ -19,10 +20,14 @@ import useUser from "@/hooks/useUser";
 
 import onSubmitFastCharge from "@/server-actions/fast-charge";
 import { useFastChargeStore } from "@/store/useFastChargeStore";
+import { useHourlyTaxesStore } from "@/store/useProductionTaxesStore";
 
 function Inputs() {
   const queryClient = useQueryClient();
   const { data: user } = useUser();
+  const { addTax, clearTaxes, removeTax, setSaveTaxes, taxes, saveTaxes } = useHourlyTaxesStore(
+    (state) => state
+  );
 
   const {
     setValues,
@@ -100,7 +105,7 @@ function Inputs() {
       return;
     }
 
-    const parseData: FastChargeInputsParsed = {
+    const parseData = {
       startDate: formatStart,
       endDate: formatEnd,
       isPublicHoliday: formData["fast-holiday"] ?? false,
@@ -113,6 +118,8 @@ function Inputs() {
       unpaidBreaks: isNaN(Number(formData["unpaid-breaks"]))
         ? 0
         : Number(formData["unpaid-breaks"]),
+      taxes,
+      saveTaxes,
     };
 
     onSubmitFastCharge(parseData).then((res) => {
@@ -233,6 +240,16 @@ function Inputs() {
             },
           })}
         />
+        <Stack classes="my-8 w-full">
+          <AccordionTaxes
+            addTax={addTax}
+            taxes={taxes}
+            clearTaxes={clearTaxes}
+            emptyTableText="Not taxes yet"
+            setSaveTaxes={setSaveTaxes}
+            removeTax={removeTax}
+          />
+        </Stack>
         <Stack orientation="horizontal" wrap>
           <Stack alignItems="center">
             <input
