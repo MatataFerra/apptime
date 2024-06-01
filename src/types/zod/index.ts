@@ -267,12 +267,14 @@ const FastChargeFormSchema = z.object({
   "hour-value": z.string().refine((value) => !!value, {
     message: "Hour value must be greater than 0",
   }),
-  "unpaid-breaks": z.string().refine((value) => !!value, {
-    message: "Unpaid breaks must be greater than 0",
-  }),
-  "holiday-pay-rate": z.string().refine((value) => !!value, {
-    message: "Holiday pay rate must be greater than 0",
-  }),
+  "unpaid-breaks": z.string().nullable(),
+  "holiday-pay-rate": z.string().nullable(),
+});
+
+const FastChargeFormCheckDataSchema = z.object({
+  startDate: z.string().min(1),
+  finishDate: z.string().min(1),
+  hourValue: z.string().min(1),
 });
 
 /* 
@@ -293,6 +295,13 @@ const ProductionJobFormSchema = z.object({
   }),
   "is-public-holiday": z.boolean(),
   "is-worked": z.boolean(),
+});
+
+const ProductionJobFormCheckDataSchema = z.object({
+  startDate: z.string().min(1),
+  finishDate: z.string().min(1),
+  itemValue: z.string().min(1),
+  itemQuantity: z.string().min(1),
 });
 
 /**
@@ -319,6 +328,7 @@ const HandleErrorTypeSchema = z.enum([
 
 export {
   BaseShiftSchema,
+  FastChargeFormCheckDataSchema,
   FastChargeFormSchema,
   HandleErrorTypeSchema,
   HourlyCreateSchema,
@@ -326,6 +336,7 @@ export {
   HourlyUpdateSchema,
   PasswordSchema,
   ProductionCreateSchema,
+  ProductionJobFormCheckDataSchema,
   ProductionJobFormSchema,
   ProductionShiftSchema,
   ProductionUpdateSchema,
