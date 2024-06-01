@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,7 +7,7 @@ import { isBefore } from "date-fns";
 
 import Toast from "@/services/Toast";
 
-import { ProductionJobFormSchema } from "@/types";
+import { ProductionJobFormCheckDataSchema, ProductionJobFormSchema } from "@/types";
 import type { ProductionInputs } from "@/types/forms";
 
 import AccordionTaxes from "@/components/structures/Taxes/AccordionTaxes";
@@ -18,10 +19,15 @@ import useUser from "@/hooks/useUser";
 
 import onSubmitProductionJob from "@/server-actions/production-job";
 import { useProductionForm } from "@/store/useProductionForm";
-import { useProductionTaxesStore } from "@/store/useProductionTaxesStore";
+import { useProductionTaxesStore } from "@/store/useTaxStore";
 
 function Inputs() {
-  const { setValues, reset: resetValues } = useProductionForm((state) => state);
+  const {
+    setValues,
+    reset: resetValues,
+    setIsFormReady,
+    setDialogState,
+  } = useProductionForm((state) => state);
   const { taxes, saveTaxes, clearTaxes, setSaveTaxes, addTax, removeTax } = useProductionTaxesStore(
     (state) => state
   );
@@ -42,6 +48,25 @@ function Inputs() {
 
   const startDateWatch = watch("start-date");
   const finishDateWatch = watch("finish-date");
+  const itemValueWatch = watch("item-value");
+  const itemQuantityWatch = watch("item-quantity");
+
+  useEffect(() => {
+    const data = {
+      startDate: startDateWatch,
+      finishDate: finishDateWatch,
+      itemValue: itemValueWatch,
+      itemQuantity: itemQuantityWatch,
+    };
+
+    const checkData = ProductionJobFormCheckDataSchema.safeParse(data);
+
+    if (checkData.success) {
+      setIsFormReady(true);
+    } else {
+      setIsFormReady(false);
+    }
+  }, [finishDateWatch, itemQuantityWatch, itemValueWatch, setIsFormReady, startDateWatch]);
 
   function onSubmit(formData: ProductionInputs) {
     const parseData = {
@@ -57,6 +82,7 @@ function Inputs() {
     };
 
     if (isBefore(new Date(finishDateWatch), new Date(startDateWatch))) {
+      setDialogState(false);
       setError("finish-date", {
         message: "Finish date must be after start date",
       });
@@ -87,6 +113,7 @@ function Inputs() {
 
         resetValues();
         clearTaxes();
+        setDialogState(false);
 
         return reset();
       }
@@ -163,17 +190,7 @@ function Inputs() {
             },
           })}
         />
-        <Stack classes="my-8 w-full">
-          <AccordionTaxes
-            addTax={addTax}
-            taxes={taxes}
-            clearTaxes={clearTaxes}
-            emptyTableText="Not taxes yet"
-            setSaveTaxes={setSaveTaxes}
-            removeTax={removeTax}
-          />
-        </Stack>
-        <Stack orientation="horizontal" wrap>
+        <Stack orientation="horizontal" wrap classes="mt-4">
           <Stack alignItems="center">
             <input
               className="size-4"
@@ -204,6 +221,16 @@ function Inputs() {
               did you work it?
             </Text>
           </Stack>
+        </Stack>
+        <Stack classes="my-8 w-full">
+          <AccordionTaxes
+            addTax={addTax}
+            taxes={taxes}
+            clearTaxes={clearTaxes}
+            emptyTableText="Not taxes yet"
+            setSaveTaxes={setSaveTaxes}
+            removeTax={removeTax}
+          />
         </Stack>
       </Stack>
     </>
