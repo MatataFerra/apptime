@@ -37,7 +37,7 @@ const Inputs = dynamic(() => import("@/components/structures/FastCharge/Inputs")
   ),
 });
 
-const Submit = dynamic(() => import("@/components/structures/share/SubmitForm"), {
+const Submit = dynamic(() => import("@/components/structures/FastCharge/Submit"), {
   ssr: false,
   loading: () => (
     <Stack justifyContent="end" classes="w-full">
@@ -50,8 +50,7 @@ function Form() {
   return (
     <>
       <Inputs />
-      <Report />
-      <Submit form="fast-charge" />
+      <Submit />
     </>
   );
 }
