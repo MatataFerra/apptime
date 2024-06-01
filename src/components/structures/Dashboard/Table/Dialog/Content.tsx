@@ -1,4 +1,4 @@
-import { Hourly, Production } from "@prisma/client";
+import type { Hourly, Production } from "@prisma/client";
 
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";

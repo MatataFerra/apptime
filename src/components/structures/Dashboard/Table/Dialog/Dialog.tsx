@@ -1,16 +1,16 @@
 "use client";
 
-import { PropsWithChildren, ReactNode } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 
-import { Hourly, Production, Shift } from "@prisma/client";
+import type { Hourly, Production } from "@prisma/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 import api from "@/services/Api/Shift";
 import Toast from "@/services/Toast";
 
-import { UserType } from "@/types";
-import { SuccessApiResponse } from "@/types/api_response";
+import type { UserType } from "@/types";
+import type { SuccessApiResponse } from "@/types/api_response";
 
 import TableDialogEditShift from "@/components/structures/Dashboard/Table/Dialog/Edit";
 import Button from "@/components/ui/Button";
@@ -27,7 +27,6 @@ import Stack from "@/components/ui/Stack";
 
 import useDashboard from "@/hooks/useDashboard";
 
-import { useDashboardContext } from "@/store/useDashboardStore";
 import { useTableStore } from "@/store/useTableStore";
 
 type Props = PropsWithChildren<{

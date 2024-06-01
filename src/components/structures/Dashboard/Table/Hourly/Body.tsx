@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 
-import { Hourly } from "@prisma/client";
+import type { Hourly } from "@prisma/client";
 import isEmpty from "lodash/isEmpty";
 
 import ShiftService from "@/services/Shift";
