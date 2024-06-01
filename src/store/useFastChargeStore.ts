@@ -33,10 +33,16 @@ interface FastCharge {
     unpaidBreaks: boolean;
   };
 
+  isFormReady: boolean;
+  dialog: boolean;
+
   setValues: (values: Partial<FastCharge["values"]>) => void;
   setError: (error: keyof FastCharge["errors"], value: boolean) => void;
   setFocus: (focus: keyof FastCharge["focus"], value: boolean) => void;
   reset: () => void;
+
+  setIsFormReady: (value: boolean) => void;
+  setDialogState: (value: boolean) => void;
 }
 
 export const useFastChargeStore = create<FastCharge>((set, get) => ({
@@ -72,6 +78,9 @@ export const useFastChargeStore = create<FastCharge>((set, get) => ({
     unpaidBreaks: false,
   },
 
+  isFormReady: false,
+  dialog: false,
+
   setValues: (values) => set({ values: { ...get().values, ...values } }),
   setError: (error, value) => set({ errors: { ...get().errors, [error]: value } }),
   setFocus: (focus, value) => set({ focus: { ...get().focus, [focus]: value } }),
@@ -89,4 +98,7 @@ export const useFastChargeStore = create<FastCharge>((set, get) => ({
         unpaidBreaks: "",
       },
     }),
+
+  setIsFormReady: (value) => set({ isFormReady: value }),
+  setDialogState: (value) => set({ dialog: value }),
 }));
