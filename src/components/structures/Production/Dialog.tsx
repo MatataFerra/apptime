@@ -1,6 +1,6 @@
 "use client";
 
-import { type PropsWithChildren, useMemo } from "react";
+import { type PropsWithChildren, useEffect, useMemo } from "react";
 
 import DateHumanizer from "@/services/Date";
 import ProductionService from "@/services/Shift/Production";
@@ -26,8 +26,12 @@ import { useProductionTaxesStore } from "@/store/useTaxStore";
 type Props = {};
 
 function DialogProduction({ children }: PropsWithChildren<Props>) {
-  const { values, dialog, setDialogState } = useProductionForm((state) => state);
+  const { values, dialog, setDialogState, formError } = useProductionForm((state) => state);
   const { taxes, saveTaxes } = useProductionTaxesStore((state) => state);
+
+  useEffect(() => {
+    if (formError) return setDialogState(false);
+  }, [formError, setDialogState]);
 
   const calculateProductionEarn = useMemo(() => {
     const earnings = ProductionService.earnings({

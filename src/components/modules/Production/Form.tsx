@@ -1,6 +1,11 @@
 "use client";
 
+import { FormProvider, useForm } from "react-hook-form";
+
+import { zodResolver } from "@hookform/resolvers/zod";
 import dynamic from "next/dynamic";
+
+import { ProductionJobFormSchema } from "@/types";
 
 import Submit from "@/components/structures/Production/Submit";
 import Skeleton from "@/components/ui/Skeleton";
@@ -30,10 +35,15 @@ const Inputs = dynamic(() => import("@/components/structures/Production/Inputs")
 });
 
 function Form() {
+  const methods = useForm({
+    resolver: zodResolver(ProductionJobFormSchema),
+  });
   return (
     <>
-      <Inputs />
-      <Submit />
+      <FormProvider {...methods}>
+        <Inputs />
+        <Submit />
+      </FormProvider>
     </>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { type PropsWithChildren, useMemo } from "react";
+import { type PropsWithChildren, useEffect, useMemo } from "react";
 
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
@@ -42,8 +42,13 @@ function DialogHourly({ children }: PropsWithChildren<Props>) {
     },
     dialog,
     setDialogState,
+    formError,
   } = useFastChargeStore((state) => state);
   const { taxes, saveTaxes } = useHourlyTaxesStore((state) => state);
+
+  useEffect(() => {
+    if (formError) return setDialogState(false);
+  }, [formError, setDialogState]);
 
   const formatStart = useFormatAndAddTime({
     date: startDate ?? "",

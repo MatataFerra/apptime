@@ -35,6 +35,7 @@ interface FastCharge {
 
   isFormReady: boolean;
   dialog: boolean;
+  formError: boolean;
 
   setValues: (values: Partial<FastCharge["values"]>) => void;
   setError: (error: keyof FastCharge["errors"], value: boolean) => void;
@@ -43,6 +44,7 @@ interface FastCharge {
 
   setIsFormReady: (value: boolean) => void;
   setDialogState: (value: boolean) => void;
+  setFormError: (value: boolean) => void;
 }
 
 export const useFastChargeStore = create<FastCharge>((set, get) => ({
@@ -80,6 +82,7 @@ export const useFastChargeStore = create<FastCharge>((set, get) => ({
 
   isFormReady: false,
   dialog: false,
+  formError: false,
 
   setValues: (values) => set({ values: { ...get().values, ...values } }),
   setError: (error, value) => set({ errors: { ...get().errors, [error]: value } }),
@@ -101,4 +104,5 @@ export const useFastChargeStore = create<FastCharge>((set, get) => ({
 
   setIsFormReady: (value) => set({ isFormReady: value }),
   setDialogState: (value) => set({ dialog: value }),
+  setFormError: (value) => set({ formError: value }),
 }));

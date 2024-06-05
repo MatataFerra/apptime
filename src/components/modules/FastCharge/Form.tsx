@@ -1,18 +1,14 @@
 "use client";
 
+import { FormProvider, useForm } from "react-hook-form";
+
+import { zodResolver } from "@hookform/resolvers/zod";
 import dynamic from "next/dynamic";
+
+import { FastChargeFormSchema } from "@/types";
 
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
-
-const Report = dynamic(() => import("@/components/structures/FastCharge/Report"), {
-  ssr: false,
-  loading: () => (
-    <Stack orientation="vertical" classes="h-full w-full">
-      <Skeleton classes="h-28 w-1/2" />
-    </Stack>
-  ),
-});
 
 const Inputs = dynamic(() => import("@/components/structures/FastCharge/Inputs"), {
   ssr: false,
@@ -47,10 +43,15 @@ const Submit = dynamic(() => import("@/components/structures/FastCharge/Submit")
 });
 
 function Form() {
+  const methods = useForm({
+    resolver: zodResolver(FastChargeFormSchema),
+  });
   return (
     <>
-      <Inputs />
-      <Submit />
+      <FormProvider {...methods}>
+        <Inputs />
+        <Submit />
+      </FormProvider>
     </>
   );
 }

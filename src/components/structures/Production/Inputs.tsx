@@ -1,13 +1,11 @@
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { isBefore } from "date-fns";
 
 import Toast from "@/services/Toast";
 
-import { ProductionJobFormCheckDataSchema, ProductionJobFormSchema } from "@/types";
+import { ProductionJobFormCheckDataSchema } from "@/types";
 import type { ProductionInputs } from "@/types/forms";
 
 import AccordionTaxes from "@/components/structures/Taxes/AccordionTaxes";
@@ -39,12 +37,8 @@ function Inputs() {
     register,
     watch,
     reset,
-    setError,
-    setFocus,
     formState: { errors },
-  } = useForm<ProductionInputs>({
-    resolver: zodResolver(ProductionJobFormSchema),
-  });
+  } = useFormContext<ProductionInputs>();
 
   const startDateWatch = watch("start-date");
   const finishDateWatch = watch("finish-date");
@@ -80,17 +74,6 @@ function Inputs() {
       taxes: taxes,
       saveTaxes,
     };
-
-    if (isBefore(new Date(finishDateWatch), new Date(startDateWatch))) {
-      setDialogState(false);
-      setError("finish-date", {
-        message: "Finish date must be after start date",
-      });
-
-      setFocus("finish-date");
-
-      return;
-    }
 
     Toast({
       type: "info",

@@ -1,13 +1,12 @@
 import { type ChangeEvent, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { format, isBefore, isEqual, isValid } from "date-fns";
+import { format } from "date-fns";
 
 import Toast from "@/services/Toast";
 
-import { FastChargeFormCheckDataSchema, FastChargeFormSchema } from "@/types";
+import { FastChargeFormCheckDataSchema } from "@/types";
 import type { FastChargeInputs } from "@/types/forms";
 
 import AccordionTaxes from "@/components/structures/Taxes/AccordionTaxes";
@@ -42,13 +41,9 @@ function Inputs() {
     watch,
     register,
     setValue,
-    setFocus,
-    setError,
     handleSubmit,
     formState: { touchedFields, errors },
-  } = useForm<FastChargeInputs>({
-    resolver: zodResolver(FastChargeFormSchema),
-  });
+  } = useFormContext<FastChargeInputs>();
 
   const formatStart = useFormatAndAddTime({
     date: startDate ?? "",
@@ -92,81 +87,6 @@ function Inputs() {
       description: "Please wait a moment...",
       duration: 1000,
     });
-
-    if (isBefore(new Date(finishDate ?? ""), new Date(startDate ?? ""))) {
-      setError("finish-date", {
-        message: "Finish date must be after start date",
-      });
-      setFocus("finish-date");
-
-      setDialogState(false);
-
-      Toast({
-        type: "error",
-        message: "Error",
-        description: "An error occurred while creating the shift",
-        duration: 1500,
-      });
-
-      return;
-    }
-
-    if (isEqual(new Date(formatEnd), new Date(formatStart))) {
-      setError("finish-time", {
-        message: "Finish time must be after start time",
-      });
-      setFocus("finish-time");
-
-      setDialogState(false);
-
-      Toast({
-        type: "error",
-        message: "Error",
-        description: "An error occurred while creating the shift",
-        duration: 1500,
-      });
-
-      return;
-    }
-
-    if (isBefore(new Date(formatEnd ?? ""), new Date(formatStart ?? ""))) {
-      setError("finish-time", {
-        message: "Finish date must be after start date",
-      });
-      setFocus("finish-time");
-
-      Toast({
-        type: "error",
-        message: "Error",
-        description: "An error occurred while creating the shift",
-        duration: 1500,
-      });
-
-      setDialogState(false);
-
-      return;
-    }
-
-    if (!isValid(new Date(formatEnd))) {
-      setError("finish-date", {
-        message: "Finish date is invalid",
-      });
-
-      setError("finish-time", {
-        message: "Invalid time",
-      });
-
-      setDialogState(false);
-
-      Toast({
-        type: "error",
-        message: "Error",
-        description: "An error occurred while creating the shift",
-        duration: 1500,
-      });
-
-      return;
-    }
 
     const parseData = {
       startDate: formatStart,
