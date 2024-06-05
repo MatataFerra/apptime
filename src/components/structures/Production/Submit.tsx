@@ -37,7 +37,7 @@ function Submit() {
 
   return (
     <Dialog>
-      <Box classes="flex w-full justify-end">
+      <Box classes="ml-auto w-fit">
         <Button
           type="button"
           variant="gradient_secondary"
