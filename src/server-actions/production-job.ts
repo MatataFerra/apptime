@@ -58,7 +58,7 @@ export default async function onSubmitFastCharge(data: ProductionInputsParsed) {
       }
     }
 
-    revalidatePath("/[locale]/(home)/history-shifts", "page");
+    revalidatePath("/dashboard", "page");
 
     return createShift;
   } catch (error) {
