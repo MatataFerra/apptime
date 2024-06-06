@@ -17,6 +17,7 @@ function useUser() {
     "user",
     session.data?.user?.email,
   ]);
+
   const [user, setUser] = useState<UserType | undefined>(data?.user);
   const fetchUser = useCallback(async () => {
     if (!data && session.data?.user?.email) {
@@ -34,7 +35,7 @@ function useUser() {
         })
         .then((res: any) => {
           if (isEmpty(res?.user)) return;
-          if (JSON.stringify(user) !== JSON.stringify(res?.user)) return setUser(res?.user);
+          return setUser(res?.user);
         });
     }
 
