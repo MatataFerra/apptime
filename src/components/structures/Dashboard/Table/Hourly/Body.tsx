@@ -14,6 +14,7 @@ import useDashboard from "@/hooks/useDashboard";
 
 function HourlyBody() {
   const { user } = useDashboard();
+
   const hourlyWorkedShift = useMemo(() => {
     return user?.shifts?.hourly;
   }, [user?.shifts]);
