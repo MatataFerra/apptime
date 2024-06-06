@@ -290,9 +290,7 @@ const ProductionJobFormSchema = z.object({
   "item-quantity": z.string().refine((value) => !!value, {
     message: "Hour value must be greater than 0",
   }),
-  "holiday-pay-rate": z.string().refine((value) => !!value, {
-    message: "Holiday pay rate must be greater than 0",
-  }),
+  "holiday-pay-rate": z.string().nullable(),
   "is-public-holiday": z.boolean(),
   "is-worked": z.boolean(),
 });
