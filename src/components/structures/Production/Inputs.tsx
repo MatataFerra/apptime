@@ -5,7 +5,8 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import Toast from "@/services/Toast";
 
-import { ProductionJobFormCheckDataSchema } from "@/types";
+import { ProductionJobFormCheckDataSchema, type UserType } from "@/types";
+import type { SuccessApiResponse } from "@/types/api_response";
 import type { ProductionInputs } from "@/types/forms";
 
 import AccordionTaxes from "@/components/structures/Taxes/AccordionTaxes";
@@ -67,7 +68,7 @@ function Inputs() {
       startDate: new Date(formData["start-date"]).toString(),
       endDate: new Date(formData["finish-date"]).toString(),
       itemValue: parseFloat(formData["item-value"]),
-      holidayPayRate: parseFloat(formData["holiday-pay-rate"]),
+      holidayPayRate: parseFloat(formData["holiday-pay-rate"] ?? "0"),
       itemQuantity: parseFloat(formData["item-quantity"]),
       isPublicHoliday: formData["is-public-holiday"],
       publicHolidayWorked: formData["is-worked"],
@@ -84,9 +85,38 @@ function Inputs() {
 
     onSubmitProductionJob(parseData).then((response) => {
       if (response) {
+        //* Optimistic update
+        queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+          const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
+            "user",
+            user?.email,
+          ]);
+
+          const newProduction = [
+            ...(previousUserData?.user?.shifts?.production ?? []),
+            {
+              ...response,
+            },
+          ];
+
+          queryClient.setQueryData(["user", user?.email], {
+            ...previousUserData,
+            user: {
+              ...previousUserData?.user,
+              shifts: {
+                ...previousUserData?.user.shifts,
+                production: newProduction,
+              },
+            },
+          });
+
+          return { previousUserData };
+        });
+
         queryClient.invalidateQueries({
           queryKey: ["user", user?.email],
         });
+
         Toast({
           type: "success",
           message: "Success",

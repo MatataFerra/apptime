@@ -6,7 +6,8 @@ import { format } from "date-fns";
 
 import Toast from "@/services/Toast";
 
-import { FastChargeFormCheckDataSchema } from "@/types";
+import { FastChargeFormCheckDataSchema, UserType } from "@/types";
+import { SuccessApiResponse } from "@/types/api_response";
 import type { FastChargeInputs } from "@/types/forms";
 
 import AccordionTaxes from "@/components/structures/Taxes/AccordionTaxes";
@@ -105,8 +106,8 @@ function Inputs() {
       saveTaxes,
     };
 
-    onSubmitFastCharge(parseData).then((res) => {
-      if (res) {
+    onSubmitFastCharge(parseData).then((response) => {
+      if (response) {
         Toast({
           type: "success",
           duration: 1500,
@@ -116,6 +117,34 @@ function Inputs() {
         resetValues();
         setDialogState(false);
         clearTaxes();
+
+        //* Optimistic update
+        queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+          const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
+            "user",
+            user?.email,
+          ]);
+
+          const newHourly = [
+            ...(previousUserData?.user?.shifts?.hourly ?? []),
+            {
+              ...response,
+            },
+          ];
+
+          queryClient.setQueryData(["user", user?.email], {
+            ...previousUserData,
+            user: {
+              ...previousUserData?.user,
+              shifts: {
+                ...previousUserData?.user.shifts,
+                hourly: newHourly,
+              },
+            },
+          });
+
+          return { previousUserData };
+        });
 
         queryClient.invalidateQueries({
           queryKey: ["user", user?.email],
