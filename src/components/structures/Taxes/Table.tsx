@@ -9,20 +9,20 @@ import TableHead from "@/components/ui/TableHead";
 import dataIsEmpty from "@/hoc/dataIsEmpty";
 
 type Props = {
-  taxes: Omit<Tax, "id">[];
+  data: Omit<Tax, "id">[];
   removeTax: (tax: string) => void;
 };
 
-function TableTax({ taxes, removeTax }: Props) {
+function TableTax({ data, removeTax }: Props) {
   return (
     <Table classes="w-full table-auto animate-fade-in px-2 shadow-lg">
       <TableHead
         classes="bg-stone-500/20  text-xs text-gray-800 dark:text-gray-100"
         columnTitle={["Name", "Value", "Description", "Action"]}
         elementClasses="py-2"
-      ></TableHead>
+      />
       <TableBody>
-        {taxes.map((tax) => (
+        {data?.map((tax) => (
           <TableElement as="tr" key={tax.name}>
             <TableElement classes="p-2 text-center text-sm group-hover:cursor-default">
               {tax.name}

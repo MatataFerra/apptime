@@ -4,12 +4,8 @@ import Text from "@/components/ui/Text";
 function dataIsEmpty<P extends object>(
   WrappedComponent: React.ComponentType<P>
 ): React.FC<P & { data: unknown[]; emptyContent: string }> {
-  function WithData({
-    data,
-    emptyContent,
-    ...props
-  }: { data: unknown[]; emptyContent: string } & P) {
-    if (data.length === 0) {
+  function WithData({ emptyContent, ...props }: { data: unknown[]; emptyContent: string } & P) {
+    if (props.data.length === 0) {
       return (
         <Stack
           classes="min-h-20 w-full border border-dashed p-4"
