@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 
 import { useQueryClient } from "@tanstack/react-query";
@@ -40,6 +40,12 @@ function Inputs() {
     reset,
     formState: { errors },
   } = useFormContext<ProductionInputs>();
+
+  const savedTaxesFromDb = useMemo(() => {
+    if (!user?.config?.taxSaved?.productionTaxes) return [];
+
+    return user?.config?.taxSaved?.productionTaxes;
+  }, [user?.config?.taxSaved?.productionTaxes]);
 
   const startDateWatch = watch("start-date");
   const finishDateWatch = watch("finish-date");
@@ -243,6 +249,7 @@ function Inputs() {
             emptyTableText="Not taxes yet"
             setSaveTaxes={setSaveTaxes}
             removeTax={removeTax}
+            taxesFromDB={savedTaxesFromDb}
           />
         </Stack>
       </Stack>

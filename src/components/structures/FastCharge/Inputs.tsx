@@ -1,4 +1,4 @@
-import { type ChangeEvent, useEffect } from "react";
+import { type ChangeEvent, useEffect, useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 
 import { useQueryClient } from "@tanstack/react-query";
@@ -28,6 +28,12 @@ function Inputs() {
   const { addTax, clearTaxes, removeTax, setSaveTaxes, taxes, saveTaxes } = useHourlyTaxesStore(
     (state) => state
   );
+
+  const savedTaxesFromDB = useMemo(() => {
+    if (!user?.config?.taxSaved?.hourlyTaxes) return [];
+
+    return user?.config?.taxSaved?.hourlyTaxes;
+  }, [user?.config?.taxSaved?.hourlyTaxes]);
 
   const {
     setValues,
@@ -298,6 +304,7 @@ function Inputs() {
             emptyTableText="Not taxes yet"
             setSaveTaxes={setSaveTaxes}
             removeTax={removeTax}
+            taxesFromDB={savedTaxesFromDB}
           />
         </Stack>
       </Stack>
