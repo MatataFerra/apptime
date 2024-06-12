@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getToken, JWT } from "next-auth/jwt";
+import { getToken, type JWT } from "next-auth/jwt";
 
 import ErrorFactory from "@/services/Error/factory";
 import UserService from "@/services/User";

@@ -31,6 +31,7 @@ function ShiftStatusProvider({ children, user, shiftOpen }: Props) {
         email: user?.email,
         shifts: true,
         profile: true,
+        config: true,
         hasEnvUrl: false,
       }),
   });
