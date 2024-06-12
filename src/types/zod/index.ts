@@ -8,6 +8,7 @@ import Password from "@/services/Auth/password";
   - Shift
   - Profile
   - User
+  - Tax
   - SearchParams
   - Suscribe
   - Validate password
@@ -168,6 +169,34 @@ const UserCreateSchema = UserModelSchema.omit({
 });
 
 /*
+===================================================================
+-------------------------Tax---------------------------------------
+===================================================================
+*/
+
+const TaxSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  value: z.number(),
+  description: z.string().nullable(),
+  internalId: z.string(),
+  hourlyId: z.number().nullable(),
+  productionId: z.number().nullable(),
+});
+
+const TaxCreateSchema = TaxSchema.omit({
+  id: true,
+  internalId: true,
+}).refine((values) => Object.keys(values).length > 0, {
+  message: "One of the fields must be defined",
+});
+
+const TaxUpdateSchema = TaxSchema.omit({
+  id: true,
+  internalId: true,
+});
+
+/*
 ============================================================================
 ============================================================================
 */
@@ -238,12 +267,14 @@ const FastChargeFormSchema = z.object({
   "hour-value": z.string().refine((value) => !!value, {
     message: "Hour value must be greater than 0",
   }),
-  "unpaid-breaks": z.string().refine((value) => !!value, {
-    message: "Unpaid breaks must be greater than 0",
-  }),
-  "holiday-pay-rate": z.string().refine((value) => !!value, {
-    message: "Holiday pay rate must be greater than 0",
-  }),
+  "unpaid-breaks": z.string().nullable(),
+  "holiday-pay-rate": z.string().nullable(),
+});
+
+const FastChargeFormCheckDataSchema = z.object({
+  startDate: z.string().min(1),
+  finishDate: z.string().min(1),
+  hourValue: z.string().min(1),
 });
 
 /* 
@@ -259,11 +290,16 @@ const ProductionJobFormSchema = z.object({
   "item-quantity": z.string().refine((value) => !!value, {
     message: "Hour value must be greater than 0",
   }),
-  "holiday-pay-rate": z.string().refine((value) => !!value, {
-    message: "Holiday pay rate must be greater than 0",
-  }),
+  "holiday-pay-rate": z.string().nullable(),
   "is-public-holiday": z.boolean(),
   "is-worked": z.boolean(),
+});
+
+const ProductionJobFormCheckDataSchema = z.object({
+  startDate: z.string().min(1),
+  finishDate: z.string().min(1),
+  itemValue: z.string().min(1),
+  itemQuantity: z.string().min(1),
 });
 
 /**
@@ -290,6 +326,7 @@ const HandleErrorTypeSchema = z.enum([
 
 export {
   BaseShiftSchema,
+  FastChargeFormCheckDataSchema,
   FastChargeFormSchema,
   HandleErrorTypeSchema,
   HourlyCreateSchema,
@@ -297,6 +334,7 @@ export {
   HourlyUpdateSchema,
   PasswordSchema,
   ProductionCreateSchema,
+  ProductionJobFormCheckDataSchema,
   ProductionJobFormSchema,
   ProductionShiftSchema,
   ProductionUpdateSchema,
@@ -308,6 +346,9 @@ export {
   ShiftModelSchema,
   ShiftUpdateSchema,
   SuscribeSchema,
+  TaxCreateSchema,
+  TaxSchema,
+  TaxUpdateSchema,
   UserCreateSchema,
   UserModelSchema,
   UserUpdateSchema,

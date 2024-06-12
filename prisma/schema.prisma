@@ -104,7 +104,7 @@ model Tax {
   hourlyId     Int?
   productionId Int?
   production   Production? @relation(fields: [productionId], references: [id])
-  jourly       Hourly?     @relation(fields: [hourlyId], references: [id])
+  hourly       Hourly?     @relation(fields: [hourlyId], references: [id])
 }
 
 model Contribution {
@@ -119,10 +119,40 @@ model Contribution {
 }
 
 model Config {
-  id           Int     @id @default(autoincrement())
-  weekStartsOn String  @default("MONDAY")
-  user         User?   @relation(fields: [userId], references: [id])
-  userId       String? @unique
+  id           Int       @id @default(autoincrement())
+  weekStartsOn String    @default("monday")
+  userId       String?   @unique
+  user         User?     @relation(fields: [userId], references: [id])
+  taxSaved     TaxSaved?
+}
+
+model TaxSaved {
+  id              Int                  @id @default(autoincrement())
+  productionTaxes TaxProductionSaved[]
+  hourlyTaxes     TaxHourlySaved[]
+  configId        Int?                 @unique
+
+  config Config? @relation(fields: [configId], references: [id])
+}
+
+model TaxProductionSaved {
+  id          Int     @id @default(autoincrement())
+  name        String
+  value       Float
+  description String?
+  taxSavedId  Int?
+
+  taxSaved TaxSaved? @relation(fields: [taxSavedId], references: [id])
+}
+
+model TaxHourlySaved {
+  id          Int     @id @default(autoincrement())
+  name        String
+  value       Float
+  description String?
+  taxSavedId  Int?
+
+  taxSaved TaxSaved? @relation(fields: [taxSavedId], references: [id])
 }
 
 model PasswordAttemps {

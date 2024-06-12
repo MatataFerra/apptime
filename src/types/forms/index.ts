@@ -1,8 +1,9 @@
-import { HTMLInputTypeAttribute } from "react";
+import type { HTMLInputTypeAttribute } from "react";
 
+import type { Tax } from "@prisma/client";
 import { z } from "zod";
 
-import { CSSClassNames, FastChargeFormSchema, ProductionJobFormSchema } from "@/types";
+import { type CSSClassNames, FastChargeFormSchema, ProductionJobFormSchema } from "@/types";
 
 import { INPUT_VARIANTS } from "@/utils/constants/tailwind";
 
@@ -53,6 +54,8 @@ export type FastChargeInputsParsed = {
   holidayPay: boolean;
   holidayPayRate: number;
   unpaidBreaks: number;
+  saveTaxes: boolean;
+  taxes: Omit<Tax, "id">[] | [];
 };
 
 // Production Form
@@ -65,4 +68,6 @@ export type ProductionInputsParsed = {
   holidayPayRate: number;
   isPublicHoliday: boolean;
   publicHolidayWorked: boolean;
+  taxes: Omit<Tax, "id">[] | [];
+  saveTaxes: boolean;
 };

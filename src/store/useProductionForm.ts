@@ -34,10 +34,18 @@ interface Production {
     unpaidBreaks: boolean;
   };
 
+  isFormReady: boolean;
+  dialog: boolean;
+  formError: boolean;
+
   setValues: (values: Partial<Production["values"]>) => void;
   setError: (error: keyof Production["errors"], value: boolean) => void;
   setFocus: (focus: keyof Production["focus"], value: boolean) => void;
   reset: () => void;
+
+  setIsFormReady: (value: boolean) => void;
+  setDialogState: (value: boolean) => void;
+  setFormError: (value: boolean) => void;
 }
 
 export const useProductionForm = create<Production>((set, get) => ({
@@ -76,6 +84,10 @@ export const useProductionForm = create<Production>((set, get) => ({
     unpaidBreaks: false,
   },
 
+  isFormReady: false,
+  dialog: false,
+  formError: false,
+
   setValues: (values) => set({ values: { ...get().values, ...values } }),
   setError: (error, value) => set({ errors: { ...get().errors, [error]: value } }),
   setFocus: (focus, value) => set({ focus: { ...get().focus, [focus]: value } }),
@@ -91,5 +103,10 @@ export const useProductionForm = create<Production>((set, get) => ({
         startDate: "",
         unpaidBreaks: "",
       },
+      isFormReady: false,
     }),
+
+  setIsFormReady: (value) => set({ isFormReady: value }),
+  setDialogState: (value) => set({ dialog: value }),
+  setFormError: (value) => set({ formError: value }),
 }));

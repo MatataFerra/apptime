@@ -5,7 +5,7 @@ export default function LoadingHome() {
   return (
     <>
       <Stack
-        classes="h-full w-full"
+        classes="h-[90dvh] w-full"
         justifyContent="center"
         alignItems="center"
         orientation="vertical"

@@ -1,11 +1,17 @@
 import { User } from "@prisma/client";
 import { getServerSession } from "next-auth";
 
-import { UserType } from "@/types";
+import type { UserType } from "@/types";
 
 import { USER_ROLES } from "@/utils/constants";
 
 import prisma from "#/prisma/client";
+
+type Options = {
+  profile?: boolean;
+  shifts?: boolean;
+  config?: boolean;
+};
 
 type FindUniqueUserType = {
   id?: string;
@@ -41,6 +47,13 @@ class UserService {
         name: true,
         type_account: true,
         role: true,
+        emailVerified: true,
+        formCompleted: true,
+        image: true,
+        isActive: true,
+        online: true,
+        passwordAttemps: true,
+        password: true,
         shifts: {
           include: {
             hourly: options.shifts,
@@ -49,13 +62,6 @@ class UserService {
         },
         profile: options.profile,
         config: options.config,
-        emailVerified: true,
-        formCompleted: true,
-        image: true,
-        isActive: true,
-        online: true,
-        passwordAttemps: true,
-        password: true,
       },
     });
 
@@ -101,12 +107,13 @@ class UserService {
     }, {});
   }
 
-  static async getSessionUser() {
+  static async getSessionUser({ shifts = true, profile = true, config = true } = {} as Options) {
     const session = await getServerSession();
     const user = await UserService.findUniqueUser({
       email: session?.user?.email ?? "",
-      shifts: true,
-      profile: true,
+      shifts,
+      profile,
+      config,
     });
 
     return user;
@@ -124,6 +131,12 @@ class UserService {
           create: {
             hourly: {},
             production: {},
+          },
+        },
+        config: {
+          create: {
+            weekStartsOn: "monday",
+            taxSaved: {},
           },
         },
       },

@@ -1,14 +1,15 @@
-import { useForm } from "react-hook-form";
+import { useEffect, useMemo } from "react";
+import { useFormContext } from "react-hook-form";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { isBefore } from "date-fns";
 
 import Toast from "@/services/Toast";
 
-import { ProductionJobFormSchema } from "@/types";
-import { type ProductionInputs } from "@/types/forms";
+import { ProductionJobFormCheckDataSchema, type UserType } from "@/types";
+import type { SuccessApiResponse } from "@/types/api_response";
+import type { ProductionInputs } from "@/types/forms";
 
+import AccordionTaxes from "@/components/structures/Taxes/AccordionTaxes";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
@@ -17,9 +18,19 @@ import useUser from "@/hooks/useUser";
 
 import onSubmitProductionJob from "@/server-actions/production-job";
 import { useProductionForm } from "@/store/useProductionForm";
+import { useProductionTaxesStore } from "@/store/useTaxStore";
 
 function Inputs() {
-  const { setValues, reset: resetValues } = useProductionForm((state) => state);
+  const {
+    setValues,
+    reset: resetValues,
+    setIsFormReady,
+    setDialogState,
+  } = useProductionForm((state) => state);
+  const { taxes, saveTaxes, clearTaxes, setSaveTaxes, addTax, removeTax } = useProductionTaxesStore(
+    (state) => state
+  );
+
   const queryClient = useQueryClient();
   const { data: user } = useUser();
   const {
@@ -27,36 +38,49 @@ function Inputs() {
     register,
     watch,
     reset,
-    setError,
-    setFocus,
     formState: { errors },
-  } = useForm<ProductionInputs>({
-    resolver: zodResolver(ProductionJobFormSchema),
-  });
+  } = useFormContext<ProductionInputs>();
+
+  const savedTaxesFromDB = useMemo(() => {
+    if (!user?.config?.taxSaved?.productionTaxes) return [];
+
+    return user?.config?.taxSaved?.productionTaxes;
+  }, [user?.config?.taxSaved?.productionTaxes]);
 
   const startDateWatch = watch("start-date");
   const finishDateWatch = watch("finish-date");
+  const itemValueWatch = watch("item-value");
+  const itemQuantityWatch = watch("item-quantity");
+
+  useEffect(() => {
+    const data = {
+      startDate: startDateWatch,
+      finishDate: finishDateWatch,
+      itemValue: itemValueWatch,
+      itemQuantity: itemQuantityWatch,
+    };
+
+    const checkData = ProductionJobFormCheckDataSchema.safeParse(data);
+
+    if (checkData.success) {
+      setIsFormReady(true);
+    } else {
+      setIsFormReady(false);
+    }
+  }, [finishDateWatch, itemQuantityWatch, itemValueWatch, setIsFormReady, startDateWatch]);
 
   function onSubmit(formData: ProductionInputs) {
     const parseData = {
       startDate: new Date(formData["start-date"]).toString(),
       endDate: new Date(formData["finish-date"]).toString(),
       itemValue: parseFloat(formData["item-value"]),
-      holidayPayRate: parseFloat(formData["holiday-pay-rate"]),
+      holidayPayRate: parseFloat(formData["holiday-pay-rate"] ?? "0"),
       itemQuantity: parseFloat(formData["item-quantity"]),
       isPublicHoliday: formData["is-public-holiday"],
       publicHolidayWorked: formData["is-worked"],
+      taxes: taxes,
+      saveTaxes,
     };
-
-    if (isBefore(new Date(finishDateWatch), new Date(startDateWatch))) {
-      setError("finish-date", {
-        message: "Finish date must be after start date",
-      });
-
-      setFocus("finish-date");
-
-      return;
-    }
 
     Toast({
       type: "info",
@@ -65,11 +89,48 @@ function Inputs() {
       duration: 1000,
     });
 
-    onSubmitProductionJob(parseData).then((response: any) => {
+    onSubmitProductionJob(parseData).then((response) => {
+      const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
+        "user",
+        user?.email,
+      ]);
+      //* Optimistic update
+      queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+        const newProduction = [
+          ...(previousUserData?.user?.shifts?.production ?? []),
+          {
+            ...response?.createShift,
+          },
+        ];
+
+        queryClient.setQueryData(["user", user?.email], {
+          ...previousUserData,
+          user: {
+            ...previousUserData?.user,
+            shifts: {
+              ...previousUserData?.user.shifts,
+              production: newProduction,
+            },
+
+            config: {
+              ...previousUserData?.user.config,
+              taxSaved: {
+                ...previousUserData?.user.config?.taxSaved,
+                productionTaxes: saveTaxes
+                  ? [...savedTaxesFromDB, ...response!.taxesCreated]
+                  : savedTaxesFromDB,
+              },
+            },
+          },
+        });
+
+        return { previousUserData };
+      });
       if (response) {
         queryClient.invalidateQueries({
           queryKey: ["user", user?.email],
         });
+
         Toast({
           type: "success",
           message: "Success",
@@ -78,9 +139,32 @@ function Inputs() {
         });
 
         resetValues();
+        clearTaxes();
+        setDialogState(false);
+        setSaveTaxes(false);
 
         return reset();
       }
+
+      queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+        queryClient.setQueryData(["user", user?.email], {
+          ...previousUserData,
+          user: {
+            ...previousUserData?.user,
+            profile: {
+              ...previousUserData?.user.profile,
+            },
+            shifts: {
+              ...previousUserData?.user.shifts,
+              production: previousUserData?.user.shifts?.production,
+            },
+          },
+        });
+
+        return { previousUserData };
+      });
+
+      setSaveTaxes(false);
 
       Toast({
         type: "error",
@@ -154,7 +238,7 @@ function Inputs() {
             },
           })}
         />
-        <Stack orientation="horizontal" wrap>
+        <Stack orientation="horizontal" wrap classes="mt-4">
           <Stack alignItems="center">
             <input
               className="size-4"
@@ -185,6 +269,18 @@ function Inputs() {
               did you work it?
             </Text>
           </Stack>
+        </Stack>
+        <Stack classes="my-8 w-full">
+          <AccordionTaxes
+            type="production"
+            addTax={addTax}
+            taxes={taxes}
+            clearTaxes={clearTaxes}
+            emptyTableText="Not taxes yet"
+            setSaveTaxes={setSaveTaxes}
+            removeTax={removeTax}
+            taxesFromDB={savedTaxesFromDB}
+          />
         </Stack>
       </Stack>
     </>
