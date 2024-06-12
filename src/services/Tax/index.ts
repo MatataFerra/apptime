@@ -11,7 +11,7 @@ class TaxService {
     this.taxes = taxes;
   }
 
-  async create() {
+  async create(): Promise<Tax[]> {
     const checkData = z.array(TaxCreateSchema).safeParse(this.taxes);
 
     if (!checkData.success) {

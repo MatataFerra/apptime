@@ -8,7 +8,7 @@ class TaxHourlyService {
     this.taxes = taxes;
   }
 
-  async save(configId: number) {
+  async save(configId: number): Promise<TaxHourlySaved[]> {
     const savedTaxesConfig = await prisma.taxSaved.findFirst({
       where: {
         configId,
@@ -33,12 +33,9 @@ class TaxHourlyService {
       return create;
     }
 
-    const transaction = await prisma.$transaction([
-      prisma.taxHourlySaved.deleteMany(),
-      prisma.taxHourlySaved.createManyAndReturn({
-        data: this.parseTax(savedTaxesConfig.id),
-      }),
-    ]);
+    const transaction = await prisma.taxHourlySaved.createManyAndReturn({
+      data: this.parseTax(savedTaxesConfig.id),
+    });
 
     return transaction;
   }
