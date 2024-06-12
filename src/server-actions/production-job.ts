@@ -1,6 +1,6 @@
 "use server";
 
-import type { Production } from "@prisma/client";
+import type { Production, TaxProductionSaved } from "@prisma/client";
 import isEmpty from "lodash/isEmpty";
 import { revalidatePath } from "next/cache";
 
@@ -44,23 +44,46 @@ export default async function onSubmitFastCharge(data: ProductionInputsParsed) {
   try {
     const createShift = await new ShiftService(shift).create<Production>();
 
-    if (!isEmpty(data.taxes) && createShift) {
-      const taxesWithId = data.taxes
-        .filter((tax) => tax.name && tax.value)
-        .map((tax) => ({
-          ...tax,
-          productionId: createShift.id,
-        }));
-      await new TaxService(taxesWithId).create();
+    if (!createShift) return null;
 
+    let taxesCreated: TaxProductionSaved[] = [];
+    const productionTaxes = await prisma?.taxProductionSaved.findMany();
+    const taxesFromDB = productionTaxes?.map((tax) => ({
+      name: tax.name,
+      value: tax.value,
+      description: tax.description,
+      productionId: createShift.id,
+      hourlyId: null,
+    }));
+    const taxesFromLocal = data.taxes
+      .filter((tax) => tax.name && tax.value)
+      .map((tax) => ({
+        ...tax,
+        productionId: createShift.id,
+      }));
+
+    if (isEmpty(taxesFromLocal) && !isEmpty(taxesFromDB)) {
+      await new TaxService(taxesFromDB!).create();
+    }
+
+    if (!isEmpty(taxesFromLocal) && isEmpty(taxesFromDB)) {
+      await new TaxService(taxesFromLocal).create();
       if (data.saveTaxes) {
-        await new TaxProductionService(taxesWithId).save(currentUser.config!.id);
+        taxesCreated = await new TaxProductionService(taxesFromLocal).save(currentUser.config!.id);
+      }
+    }
+
+    if (!isEmpty(taxesFromLocal) && !isEmpty(taxesFromDB)) {
+      const allTaxes = [...taxesFromDB!, ...taxesFromLocal];
+      await new TaxService(allTaxes).create();
+      if (data.saveTaxes) {
+        taxesCreated = await new TaxProductionService(taxesFromLocal).save(currentUser.config!.id);
       }
     }
 
     revalidatePath("/dashboard", "page");
 
-    return createShift;
+    return { createShift, taxesCreated };
   } catch (error) {
     return null;
   }
