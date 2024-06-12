@@ -41,7 +41,7 @@ function Inputs() {
     formState: { errors },
   } = useFormContext<ProductionInputs>();
 
-  const savedTaxesFromDb = useMemo(() => {
+  const savedTaxesFromDB = useMemo(() => {
     if (!user?.config?.taxSaved?.productionTaxes) return [];
 
     return user?.config?.taxSaved?.productionTaxes;
@@ -90,35 +90,43 @@ function Inputs() {
     });
 
     onSubmitProductionJob(parseData).then((response) => {
-      if (response) {
-        //* Optimistic update
-        queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
-          const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
-            "user",
-            user?.email,
-          ]);
+      const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
+        "user",
+        user?.email,
+      ]);
+      //* Optimistic update
+      queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+        const newProduction = [
+          ...(previousUserData?.user?.shifts?.production ?? []),
+          {
+            ...response?.createShift,
+          },
+        ];
 
-          const newProduction = [
-            ...(previousUserData?.user?.shifts?.production ?? []),
-            {
-              ...response,
+        queryClient.setQueryData(["user", user?.email], {
+          ...previousUserData,
+          user: {
+            ...previousUserData?.user,
+            shifts: {
+              ...previousUserData?.user.shifts,
+              production: newProduction,
             },
-          ];
 
-          queryClient.setQueryData(["user", user?.email], {
-            ...previousUserData,
-            user: {
-              ...previousUserData?.user,
-              shifts: {
-                ...previousUserData?.user.shifts,
-                production: newProduction,
+            config: {
+              ...previousUserData?.user.config,
+              taxSaved: {
+                ...previousUserData?.user.config?.taxSaved,
+                productionTaxes: saveTaxes
+                  ? [...savedTaxesFromDB, ...response!.taxesCreated]
+                  : savedTaxesFromDB,
               },
             },
-          });
-
-          return { previousUserData };
+          },
         });
 
+        return { previousUserData };
+      });
+      if (response) {
         queryClient.invalidateQueries({
           queryKey: ["user", user?.email],
         });
@@ -133,9 +141,30 @@ function Inputs() {
         resetValues();
         clearTaxes();
         setDialogState(false);
+        setSaveTaxes(false);
 
         return reset();
       }
+
+      queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+        queryClient.setQueryData(["user", user?.email], {
+          ...previousUserData,
+          user: {
+            ...previousUserData?.user,
+            profile: {
+              ...previousUserData?.user.profile,
+            },
+            shifts: {
+              ...previousUserData?.user.shifts,
+              production: previousUserData?.user.shifts?.production,
+            },
+          },
+        });
+
+        return { previousUserData };
+      });
+
+      setSaveTaxes(false);
 
       Toast({
         type: "error",
@@ -243,13 +272,14 @@ function Inputs() {
         </Stack>
         <Stack classes="my-8 w-full">
           <AccordionTaxes
+            type="production"
             addTax={addTax}
             taxes={taxes}
             clearTaxes={clearTaxes}
             emptyTableText="Not taxes yet"
             setSaveTaxes={setSaveTaxes}
             removeTax={removeTax}
-            taxesFromDB={savedTaxesFromDb}
+            taxesFromDB={savedTaxesFromDB}
           />
         </Stack>
       </Stack>

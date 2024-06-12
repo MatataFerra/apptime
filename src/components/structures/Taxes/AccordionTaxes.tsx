@@ -2,7 +2,12 @@
 
 import { type ChangeEvent, useState } from "react";
 
-import type { Tax, TaxProductionSaved } from "@prisma/client";
+import type { Tax, TaxHourlySaved, TaxProductionSaved } from "@prisma/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+
+import { UserType } from "@/types";
+import { SuccessApiResponse } from "@/types/api_response";
 
 import AccordionFaq from "@/components/structures/Taxes/AccordionFaq";
 import InputTax from "@/components/structures/Taxes/InputTax";
@@ -22,11 +27,14 @@ import TableElement from "@/components/ui/TableElement";
 import TableHead from "@/components/ui/TableHead";
 import Text from "@/components/ui/Text";
 
+import useUser from "@/hooks/useUser";
+
 import remove from "@/server-actions/remove-tax";
 
 type Props = {
   taxes: Omit<Tax, "id">[];
-  taxesFromDB: TaxProductionSaved[];
+  type?: "production" | "hourly";
+  taxesFromDB: TaxProductionSaved[] | TaxHourlySaved[];
   emptyTableText: string;
   addTax: (tax: Omit<Tax, "id">) => void;
   setSaveTaxes: (value: boolean) => void;
@@ -36,6 +44,7 @@ type Props = {
 
 function AccordionTaxes({
   taxes,
+  type = "production",
   taxesFromDB,
   emptyTableText,
   setSaveTaxes,
@@ -44,9 +53,72 @@ function AccordionTaxes({
   removeTax,
 }: Props) {
   const [addMoreTaxes, setAddMoreTaxes] = useState(false);
+  const queryClient = useQueryClient();
+  const { data: user } = useUser();
 
-  function removeSaveTax(tax: any) {
-    remove("production", tax);
+  function removeSaveTax(taxItem: any) {
+    const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
+      "user",
+      user?.email,
+    ]);
+    //* Optimistic update
+    queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+      queryClient.setQueryData(["user", user?.email], {
+        ...previousUserData,
+        user: {
+          ...previousUserData?.user,
+
+          config: {
+            ...previousUserData?.user.config,
+            taxSaved: {
+              ...previousUserData?.user.config?.taxSaved,
+              hourlyTaxes:
+                type === "hourly"
+                  ? previousUserData?.user.config?.taxSaved?.hourlyTaxes?.filter(
+                      (tax) => tax.id !== taxItem?.id
+                    )
+                  : previousUserData?.user.config?.taxSaved?.hourlyTaxes,
+              productionTaxes:
+                type === "production"
+                  ? previousUserData?.user.config?.taxSaved?.productionTaxes?.filter(
+                      (tax) => tax.id !== taxItem?.id
+                    )
+                  : previousUserData?.user.config?.taxSaved?.productionTaxes,
+            },
+          },
+        },
+      });
+
+      return { previousUserData };
+    });
+    remove(type, taxItem).then((response) => {
+      queryClient.invalidateQueries({
+        queryKey: ["user", user?.email],
+      });
+
+      if (!response) {
+        // reset state if the shift was not created
+        queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+          queryClient.setQueryData(["user", user?.email], {
+            ...previousUserData,
+            user: {
+              ...previousUserData?.user,
+              profile: {
+                ...previousUserData?.user.profile,
+              },
+              shifts: {
+                ...previousUserData?.user.shifts,
+                hourly: previousUserData?.user.shifts?.hourly,
+              },
+            },
+          });
+
+          return { previousUserData };
+        });
+
+        return;
+      }
+    });
   }
 
   return (
@@ -96,11 +168,11 @@ function AccordionTaxes({
             </>
           ) : (
             <Stack
-              classes="h-40 w-full animate-pulse bg-slate-300"
+              classes="h-20 w-full bg-slate-100/60"
               justifyContent="center"
               alignItems="center"
             >
-              Loading taxes...
+              No taxes saved
             </Stack>
           )}
 

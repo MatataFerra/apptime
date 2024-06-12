@@ -113,7 +113,46 @@ function Inputs() {
     };
 
     onSubmitFastCharge(parseData).then((response) => {
-      if (response) {
+      const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
+        "user",
+        user?.email,
+      ]);
+      //* Optimistic update
+      queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+        const newHourly = [
+          ...(previousUserData?.user?.shifts?.hourly ?? []),
+          {
+            ...response?.createShift,
+          },
+        ];
+
+        queryClient.setQueryData(["user", user?.email], {
+          ...previousUserData,
+          user: {
+            ...previousUserData?.user,
+            profile: {
+              ...previousUserData?.user.profile,
+            },
+            shifts: {
+              ...previousUserData?.user.shifts,
+              hourly: newHourly,
+            },
+
+            config: {
+              ...previousUserData?.user.config,
+              taxSaved: {
+                ...previousUserData?.user.config?.taxSaved,
+                hourlyTaxes: saveTaxes
+                  ? [...savedTaxesFromDB, ...response!.taxesCreated]
+                  : savedTaxesFromDB,
+              },
+            },
+          },
+        });
+
+        return { previousUserData };
+      });
+      if (response?.createShift) {
         Toast({
           type: "success",
           duration: 1500,
@@ -122,35 +161,8 @@ function Inputs() {
 
         resetValues();
         setDialogState(false);
+        setSaveTaxes(false);
         clearTaxes();
-
-        //* Optimistic update
-        queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
-          const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
-            "user",
-            user?.email,
-          ]);
-
-          const newHourly = [
-            ...(previousUserData?.user?.shifts?.hourly ?? []),
-            {
-              ...response,
-            },
-          ];
-
-          queryClient.setQueryData(["user", user?.email], {
-            ...previousUserData,
-            user: {
-              ...previousUserData?.user,
-              shifts: {
-                ...previousUserData?.user.shifts,
-                hourly: newHourly,
-              },
-            },
-          });
-
-          return { previousUserData };
-        });
 
         queryClient.invalidateQueries({
           queryKey: ["user", user?.email],
@@ -158,6 +170,27 @@ function Inputs() {
 
         return reset();
       }
+
+      // reset state if the shift was not created
+      queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+        queryClient.setQueryData(["user", user?.email], {
+          ...previousUserData,
+          user: {
+            ...previousUserData?.user,
+            profile: {
+              ...previousUserData?.user.profile,
+            },
+            shifts: {
+              ...previousUserData?.user.shifts,
+              hourly: previousUserData?.user.shifts?.hourly,
+            },
+          },
+        });
+
+        return { previousUserData };
+      });
+
+      setSaveTaxes(false);
 
       Toast({
         type: "error",
@@ -298,6 +331,7 @@ function Inputs() {
         </Stack>
         <Stack classes="my-8 w-full">
           <AccordionTaxes
+            type="hourly"
             addTax={addTax}
             taxes={taxes}
             clearTaxes={clearTaxes}
