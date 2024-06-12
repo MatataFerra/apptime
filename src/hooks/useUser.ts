@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 import isEmpty from "lodash/isEmpty";
+import isEqual from "lodash/isEqual";
 import { useSession } from "next-auth/react";
 
 import api from "@/services/Api";
@@ -10,7 +11,7 @@ import { UserType } from "@/types";
 import { SuccessApiResponse } from "@/types/api_response";
 
 function useUser() {
-  const [isLoading, setIsloading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const session = useSession();
   const queryClient = useQueryClient();
   const data = queryClient.getQueryData<SuccessApiResponse<UserType>>([
@@ -43,19 +44,37 @@ function useUser() {
   }, [data, queryClient, session.data?.user?.email, user]);
 
   useEffect(() => {
+    if (!data?.user) return;
+    if (isEqual(user, data.user)) return;
+
+    setUser(data.user);
+  }, [data?.user, user]);
+
+  useEffect(() => {
     if (!isLoading) return;
 
     fetchUser()
       .then((user) => {
         if (isEmpty(user)) {
-          return setIsloading(true);
+          setIsLoading(true);
+        } else {
+          setIsLoading(false);
         }
-        setIsloading(false);
       })
       .catch((err) => {
-        setIsloading(false);
+        setIsLoading(false);
       });
   }, [fetchUser, isLoading]);
+
+  useEffect(() => {
+    const unsubscribe = queryClient.getQueryCache().subscribe((events) => {
+      setUser(events.query.state.data?.user);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [queryClient, fetchUser]);
 
   return { data: user, isLoading };
 }
