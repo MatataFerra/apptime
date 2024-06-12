@@ -112,6 +112,7 @@ export const userMocked: UserType = {
   config: {
     id: 1,
     userId: userMockedParsed.id,
-    weekStartsOn: "Sunday",
+    weekStartsOn: "sunday",
+    taxSaved: null,
   },
 };

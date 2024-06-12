@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 
+import { isEqual } from "lodash";
+
 import useUser from "@/hooks/useUser";
 
 import { useDashboardStore } from "@/store/useDashboardStore_v2";
@@ -20,6 +22,14 @@ function useDashboard() {
   } = useDashboardStore((state) => state);
 
   useEffect(() => {
+    if (!data) return;
+
+    if (isEqual(user, data)) return;
+
+    setUser(data);
+  }, [data, setUser, user]);
+
+  useEffect(() => {
     if (!isLoading) return;
     if (!data) return;
     if (isUserLoaded) return;
@@ -27,8 +37,7 @@ function useDashboard() {
     setInitialShifts(data?.shifts);
 
     setIsUserLoaded(true);
-    setUser(data);
-  }, [isLoading, data, setUser, isUserLoaded, setIsUserLoaded, setInitialShifts]);
+  }, [isLoading, data, isUserLoaded, setIsUserLoaded, setInitialShifts]);
 
   return { deleteShift, filterByDate, initialShifts, resetShifts, update, user };
 }

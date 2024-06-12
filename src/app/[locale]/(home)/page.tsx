@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 
 import i18n from "@/services/i18n";
-import UserService from "@/services/User";
 
 import { type LocaleParams } from "@/types";
 
@@ -19,7 +18,5 @@ export default async function Home({ params }: { params: LocaleParams }) {
     return redirect(PATH_NAMES.HOME);
   }
 
-  const user = await UserService.getSessionUser();
-
-  return <Content user={user} params={params} />;
+  return <Content params={params} />;
 }

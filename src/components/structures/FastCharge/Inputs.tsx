@@ -1,15 +1,16 @@
-import { type ChangeEvent, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { type ChangeEvent, useEffect, useMemo } from "react";
+import { useFormContext } from "react-hook-form";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { format, isBefore, isEqual, isValid } from "date-fns";
+import { format } from "date-fns";
 
 import Toast from "@/services/Toast";
 
-import { FastChargeFormSchema } from "@/types";
-import { type FastChargeInputs, FastChargeInputsParsed } from "@/types/forms";
+import { FastChargeFormCheckDataSchema, UserType } from "@/types";
+import { SuccessApiResponse } from "@/types/api_response";
+import type { FastChargeInputs } from "@/types/forms";
 
+import AccordionTaxes from "@/components/structures/Taxes/AccordionTaxes";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
@@ -19,29 +20,38 @@ import useUser from "@/hooks/useUser";
 
 import onSubmitFastCharge from "@/server-actions/fast-charge";
 import { useFastChargeStore } from "@/store/useFastChargeStore";
+import { useHourlyTaxesStore } from "@/store/useTaxStore";
 
 function Inputs() {
   const queryClient = useQueryClient();
   const { data: user } = useUser();
+  const { addTax, clearTaxes, removeTax, setSaveTaxes, taxes, saveTaxes } = useHourlyTaxesStore(
+    (state) => state
+  );
+
+  const savedTaxesFromDB = useMemo(() => {
+    if (!user?.config?.taxSaved?.hourlyTaxes) return [];
+
+    return user?.config?.taxSaved?.hourlyTaxes;
+  }, [user?.config?.taxSaved?.hourlyTaxes]);
 
   const {
     setValues,
     reset: resetValues,
     values: { startDate, finishDate, finishTime, startTime },
+    setIsFormReady,
+    setDialogState,
   } = useFastChargeStore((state) => state);
 
   const {
+    reset,
+    watch,
     register,
     setValue,
-    formState: { touchedFields, errors },
-    setFocus,
-    setError,
     handleSubmit,
-    reset,
-    clearErrors,
-  } = useForm<FastChargeInputs>({
-    resolver: zodResolver(FastChargeFormSchema),
-  });
+    formState: { touchedFields, errors },
+  } = useFormContext<FastChargeInputs>();
+
   const formatStart = useFormatAndAddTime({
     date: startDate ?? "",
     time: startTime ?? "",
@@ -52,14 +62,30 @@ function Inputs() {
     time: finishTime ?? "",
   });
 
+  const hourValueWatch = watch("hour-value");
+
+  useEffect(() => {
+    const data = {
+      startDate: formatStart,
+      finishDate: formatEnd,
+      hourValue: hourValueWatch,
+    };
+
+    const checkData = FastChargeFormCheckDataSchema.safeParse(data);
+
+    if (checkData.success) {
+      setIsFormReady(true);
+    } else {
+      setIsFormReady(false);
+    }
+  }, [formatEnd, formatStart, hourValueWatch, setIsFormReady]);
+
   useEffect(() => {
     if (startDate && !touchedFields["finish-date"]) {
       setValue("finish-date", startDate);
       setValues({ finishDate: startDate });
-
-      if (errors["finish-date"]) clearErrors("finish-date");
     }
-  }, [startDate, setValue, touchedFields, setValues, errors, clearErrors]);
+  }, [startDate, setValue, touchedFields, setValues]);
 
   function onSubmit(formData: FastChargeInputs) {
     Toast({
@@ -69,38 +95,7 @@ function Inputs() {
       duration: 1000,
     });
 
-    if (isBefore(new Date(finishDate ?? ""), new Date(startDate ?? ""))) {
-      setError("finish-date", {
-        type: "manual",
-        message: "Finish date must be after start date",
-      });
-      setFocus("finish-date");
-      return;
-    }
-
-    if (isEqual(new Date(formatEnd), new Date(formatStart))) {
-      setError("finish-time", {
-        type: "manual",
-        message: "Finish time must be after start time",
-      });
-      setFocus("finish-time");
-      return;
-    }
-
-    if (!isValid(new Date(formatEnd))) {
-      setError("finish-date", {
-        type: "manual",
-        message: "Finish date is invalid",
-      });
-
-      setError("finish-time", {
-        type: "manual",
-        message: "Invalid time",
-      });
-      return;
-    }
-
-    const parseData: FastChargeInputsParsed = {
+    const parseData = {
       startDate: formatStart,
       endDate: formatEnd,
       isPublicHoliday: formData["fast-holiday"] ?? false,
@@ -113,17 +108,61 @@ function Inputs() {
       unpaidBreaks: isNaN(Number(formData["unpaid-breaks"]))
         ? 0
         : Number(formData["unpaid-breaks"]),
+      taxes,
+      saveTaxes,
     };
 
-    onSubmitFastCharge(parseData).then((res) => {
-      if (res) {
+    onSubmitFastCharge(parseData).then((response) => {
+      const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
+        "user",
+        user?.email,
+      ]);
+      //* Optimistic update
+      queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+        const newHourly = [
+          ...(previousUserData?.user?.shifts?.hourly ?? []),
+          {
+            ...response?.createShift,
+          },
+        ];
+
+        queryClient.setQueryData(["user", user?.email], {
+          ...previousUserData,
+          user: {
+            ...previousUserData?.user,
+            profile: {
+              ...previousUserData?.user.profile,
+            },
+            shifts: {
+              ...previousUserData?.user.shifts,
+              hourly: newHourly,
+            },
+
+            config: {
+              ...previousUserData?.user.config,
+              taxSaved: {
+                ...previousUserData?.user.config?.taxSaved,
+                hourlyTaxes: saveTaxes
+                  ? [...savedTaxesFromDB, ...response!.taxesCreated]
+                  : savedTaxesFromDB,
+              },
+            },
+          },
+        });
+
+        return { previousUserData };
+      });
+      if (response?.createShift) {
         Toast({
           type: "success",
-          duration: 2000,
+          duration: 1500,
           message: "Shift created successfully",
         });
 
         resetValues();
+        setDialogState(false);
+        setSaveTaxes(false);
+        clearTaxes();
 
         queryClient.invalidateQueries({
           queryKey: ["user", user?.email],
@@ -131,6 +170,27 @@ function Inputs() {
 
         return reset();
       }
+
+      // reset state if the shift was not created
+      queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+        queryClient.setQueryData(["user", user?.email], {
+          ...previousUserData,
+          user: {
+            ...previousUserData?.user,
+            profile: {
+              ...previousUserData?.user.profile,
+            },
+            shifts: {
+              ...previousUserData?.user.shifts,
+              hourly: previousUserData?.user.shifts?.hourly,
+            },
+          },
+        });
+
+        return { previousUserData };
+      });
+
+      setSaveTaxes(false);
 
       Toast({
         type: "error",
@@ -233,7 +293,7 @@ function Inputs() {
             },
           })}
         />
-        <Stack orientation="horizontal" wrap>
+        <Stack orientation="horizontal" wrap classes="mt-4">
           <Stack alignItems="center">
             <input
               className="size-4"
@@ -268,6 +328,18 @@ function Inputs() {
               did you work it?
             </Text>
           </Stack>
+        </Stack>
+        <Stack classes="my-8 w-full">
+          <AccordionTaxes
+            type="hourly"
+            addTax={addTax}
+            taxes={taxes}
+            clearTaxes={clearTaxes}
+            emptyTableText="Not taxes yet"
+            setSaveTaxes={setSaveTaxes}
+            removeTax={removeTax}
+            taxesFromDB={savedTaxesFromDB}
+          />
         </Stack>
       </Stack>
     </>

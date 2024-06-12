@@ -1,16 +1,35 @@
-import { Config, Hourly, Production, Profile, Shift, User } from "@prisma/client";
-import { JWT } from "next-auth/jwt";
+import type {
+  Config,
+  Hourly,
+  Production,
+  Profile,
+  Shift,
+  TaxHourlySaved,
+  TaxProductionSaved,
+  TaxSaved,
+  User,
+} from "@prisma/client";
+import type { JWT } from "next-auth/jwt";
 import { z } from "zod";
 
 import type { BG_TAILWIND_COLOR, FROM_TO_TAILWIND_COLOR } from "@/types/tailwind";
 import { HandleErrorTypeSchema } from "@/types/zod";
 
 // Types
-export type UserType = User & {
-  config: Config | null;
+export interface UserType extends User {
+  config: ConfigType | null;
   shifts: Shifts | null;
   profile: Profile | null;
+}
+
+export type ConfigType = Config & {
+  taxSaved?: TaxSavedType | null;
 };
+
+interface TaxSavedType extends TaxSaved {
+  hourlyTaxes: TaxHourlySaved[] | null;
+  productionTaxes: TaxProductionSaved[] | null;
+}
 
 export type Shifts = Shift & {
   production: Production[];

@@ -1,11 +1,11 @@
-import { Hourly, Production } from "@prisma/client";
+import type { Hourly, Production } from "@prisma/client";
 import { differenceInMinutes, isAfter } from "date-fns";
 import cloneDeep from "lodash/cloneDeep";
 
-import { Shifts } from "@/types";
+import HourlyService from "@/services/Shift/Hourly";
+import ProductionService from "@/services/Shift/Production";
 
-import HourlyService from "./Hourly";
-import ProductionService from "./Production";
+import type { Shifts } from "@/types";
 
 interface ShiftServiceInterface {
   shift: TypeShift | Partial<TypeShift>;
@@ -58,11 +58,11 @@ class ShiftService implements ShiftServiceInterface {
     return await this.deleteHourlyShift(id);
   }
 
-  async create(): Promise<TypeShift | undefined> {
+  async create<T extends TypeShift>(): Promise<T | undefined> {
     if (this.isProductionShift) {
-      return await this.createProductionShift();
+      return (await this.createProductionShift()) as T;
     }
-    return await this.createHourlyShift();
+    return (await this.createHourlyShift()) as T;
   }
 
   async update(id?: number): Promise<TypeShift | undefined> {

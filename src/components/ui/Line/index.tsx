@@ -6,10 +6,11 @@ import { cn } from "@/utils/helpers/styleMerger";
 
 type Props = {
   color?: TAILWIND_COLOR;
+  classes?: string;
 };
 
-function Line({ color = "bg-stone-500" }: Props) {
-  return <div className={cn("flex h-[1px] w-full", `${color}`)} />;
+function Line({ color = "bg-stone-500", classes }: Props) {
+  return <div className={cn("flex h-[1px] w-full", `${color}`, classes)} />;
 }
 
 export default Line;

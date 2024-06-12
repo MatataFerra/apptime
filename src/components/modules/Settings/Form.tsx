@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 
 import { useQueryClient } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
 import Toast from "@/services/Toast";
@@ -20,7 +19,6 @@ import Skeleton from "@/components/ui/Skeleton";
 import useSettings from "@/hooks/useSettings";
 
 import onUpdateSettings from "@/server-actions/update-settings";
-import { useSettingsStore } from "@/store/useSettingsStore";
 
 const Account = dynamic(() => import("@/components/modules/Settings/Account"), {
   ssr: false,
