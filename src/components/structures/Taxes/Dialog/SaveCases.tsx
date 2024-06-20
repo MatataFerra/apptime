@@ -29,12 +29,14 @@ type Props = {
 function SaveCases({ taxes, savedTaxesFromDB, saveTaxes }: Props) {
   const cases = useMemo(
     () => ({
-      bothEmpty: isEmpty(savedTaxesFromDB) && !saveTaxes,
-      bothNotEmpty: !isEmpty(savedTaxesFromDB) && saveTaxes,
-      fromDBEmptyAndSavingTaxes: isEmpty(savedTaxesFromDB) && saveTaxes,
-      fromDBNotEmptyAndNotSaving: !isEmpty(savedTaxesFromDB) && !saveTaxes,
+      bothEmpty: isEmpty(savedTaxesFromDB) && isEmpty(taxes),
+      bothNotEmpty: !isEmpty(savedTaxesFromDB) && !isEmpty(taxes),
+      fromDBEmptyAndSavingTaxes: isEmpty(savedTaxesFromDB) && !isEmpty(taxes) && saveTaxes,
+      fromDBNotEmptyAndNotSavingTaxes: !isEmpty(savedTaxesFromDB) && !isEmpty(taxes) && !saveTaxes,
+      fromDBEmptyAndNotSavingTaxes: isEmpty(savedTaxesFromDB) && !isEmpty(taxes) && !saveTaxes,
+      justFromDB: !isEmpty(savedTaxesFromDB) && isEmpty(taxes),
     }),
-    [saveTaxes, savedTaxesFromDB]
+    [saveTaxes, savedTaxesFromDB, taxes]
   );
 
   return (
@@ -51,7 +53,7 @@ function SaveCases({ taxes, savedTaxesFromDB, saveTaxes }: Props) {
       ))}
       {cases.bothEmpty && (
         <Text classes="rounded-md bg-gradient-to-tl from-stone-400/60 via-slate-400 to-stone-500/60  px-2 py-1 text-sm font-bold">
-          {"Taxes won't be saved."}
+          {"No taxes added or saved."}
         </Text>
       )}
       {cases.fromDBEmptyAndSavingTaxes && (
@@ -60,7 +62,7 @@ function SaveCases({ taxes, savedTaxesFromDB, saveTaxes }: Props) {
         </Text>
       )}
 
-      {cases.fromDBNotEmptyAndNotSaving && (
+      {cases.fromDBNotEmptyAndNotSavingTaxes && (
         <Text classes="rounded-md bg-gradient-to-tl from-sky-400/60 via-blue-400 to-teal-500/60 px-2 py-1 text-sm font-bold">
           {"Using tax configuration. Not saving new taxes."}
         </Text>
@@ -68,6 +70,17 @@ function SaveCases({ taxes, savedTaxesFromDB, saveTaxes }: Props) {
       {cases.bothNotEmpty && (
         <Text classes="rounded-md bg-gradient-to-tl from-red-400/60 via-pink-400 to-orange-500/60 px-2 py-1 text-sm font-bold">
           {"You will overwrite the saved taxes with this new configuration."}
+        </Text>
+      )}
+
+      {cases.fromDBEmptyAndNotSavingTaxes && (
+        <Text classes="rounded-md bg-gradient-to-tl from-violet-400/60 via-purple-300 to-fuchsia-500/60 px-2 py-1 text-sm font-bold">
+          {"The taxes will not be saved for future use."}
+        </Text>
+      )}
+      {cases.justFromDB && (
+        <Text classes="rounded-md bg-gradient-to-tl from-orange-400/60 via-amber-300 to-yellow-500/60 px-2 py-1 text-sm font-bold">
+          {"Using tax configuration. Not saving new taxes."}
         </Text>
       )}
     </>

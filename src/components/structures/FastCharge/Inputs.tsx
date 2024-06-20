@@ -10,7 +10,6 @@ import { FastChargeFormCheckDataSchema, UserType } from "@/types";
 import { SuccessApiResponse } from "@/types/api_response";
 import type { FastChargeInputs } from "@/types/forms";
 
-import AccordionTaxes from "@/components/structures/Taxes/AccordionTaxes";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
@@ -25,9 +24,7 @@ import { useHourlyTaxesStore } from "@/store/useTaxStore";
 function Inputs() {
   const queryClient = useQueryClient();
   const { data: user } = useUser();
-  const { addTax, clearTaxes, removeTax, setSaveTaxes, taxes, saveTaxes } = useHourlyTaxesStore(
-    (state) => state
-  );
+  const { clearTaxes, setSaveTaxes, taxes, saveTaxes } = useHourlyTaxesStore((state) => state);
 
   const savedTaxesFromDB = useMemo(() => {
     if (!user?.config?.taxSaved?.hourlyTaxes) return [];
@@ -88,13 +85,6 @@ function Inputs() {
   }, [startDate, setValue, touchedFields, setValues]);
 
   function onSubmit(formData: FastChargeInputs) {
-    Toast({
-      type: "info",
-      message: "Your request is being processed",
-      description: "Please wait a moment...",
-      duration: 1000,
-    });
-
     const parseData = {
       startDate: formatStart,
       endDate: formatEnd,
@@ -112,46 +102,69 @@ function Inputs() {
       saveTaxes,
     };
 
-    onSubmitFastCharge(parseData).then((response) => {
-      const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
-        "user",
-        user?.email,
-      ]);
-      //* Optimistic update
-      queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
-        const newHourly = [
-          ...(previousUserData?.user?.shifts?.hourly ?? []),
-          {
-            ...response?.createShift,
+    Toast({
+      type: "info",
+      message: "Your request is being processed",
+      description: "Please wait a moment...",
+      duration: 1000,
+    });
+
+    const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
+      "user",
+      user?.email,
+    ]);
+
+    //* Optimistic update
+    queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+      const newHourly = [
+        ...(previousUserData?.user?.shifts?.hourly ?? []),
+        {
+          startDate: parseData.startDate,
+          endDate: parseData.endDate,
+          holidayPayRate: parseData.holidayPayRate,
+          hourValue: parseData.hourValue,
+          isPublicHoliday: parseData.isPublicHoliday,
+          publicHolidayWorked: parseData.isWorked,
+          holidayPay: parseData.holidayPayRate > 0,
+          unpaidBreaks: parseData.unpaidBreaks,
+          amount: 0,
+          isClosed: true,
+          notes: "",
+          shiftId: user?.shifts?.id,
+        },
+      ];
+
+      queryClient.setQueryData(["user", user?.email], {
+        ...previousUserData,
+        user: {
+          ...previousUserData?.user,
+          profile: {
+            ...previousUserData?.user.profile,
           },
-        ];
+          shifts: {
+            ...previousUserData?.user.shifts,
+            hourly: newHourly,
+          },
 
-        queryClient.setQueryData(["user", user?.email], {
-          ...previousUserData,
-          user: {
-            ...previousUserData?.user,
-            profile: {
-              ...previousUserData?.user.profile,
-            },
-            shifts: {
-              ...previousUserData?.user.shifts,
-              hourly: newHourly,
-            },
-
-            config: {
-              ...previousUserData?.user.config,
-              taxSaved: {
-                ...previousUserData?.user.config?.taxSaved,
-                hourlyTaxes: saveTaxes
-                  ? [...savedTaxesFromDB, ...response!.taxesCreated]
-                  : savedTaxesFromDB,
-              },
+          config: {
+            ...previousUserData?.user.config,
+            taxSaved: {
+              ...previousUserData?.user.config?.taxSaved,
+              hourlyTaxes: saveTaxes ? [...savedTaxesFromDB, ...taxes] : savedTaxesFromDB,
             },
           },
-        });
-
-        return { previousUserData };
+        },
       });
+
+      return { previousUserData };
+    });
+
+    resetValues();
+    setDialogState(false);
+    setSaveTaxes(false);
+    clearTaxes();
+
+    onSubmitFastCharge(parseData).then((response) => {
       if (response?.createShift) {
         Toast({
           type: "success",
@@ -159,14 +172,12 @@ function Inputs() {
           message: "Shift created successfully",
         });
 
-        resetValues();
-        setDialogState(false);
-        setSaveTaxes(false);
-        clearTaxes();
-
         queryClient.invalidateQueries({
           queryKey: ["user", user?.email],
         });
+
+        resetValues();
+        clearTaxes();
 
         return reset();
       }
@@ -191,6 +202,7 @@ function Inputs() {
       });
 
       setSaveTaxes(false);
+      setDialogState(false);
 
       Toast({
         type: "error",
@@ -328,18 +340,6 @@ function Inputs() {
               did you work it?
             </Text>
           </Stack>
-        </Stack>
-        <Stack classes="my-8 w-full">
-          <AccordionTaxes
-            type="hourly"
-            addTax={addTax}
-            taxes={taxes}
-            clearTaxes={clearTaxes}
-            emptyTableText="Not taxes yet"
-            setSaveTaxes={setSaveTaxes}
-            removeTax={removeTax}
-            taxesFromDB={savedTaxesFromDB}
-          />
         </Stack>
       </Stack>
     </>

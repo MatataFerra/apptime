@@ -9,7 +9,6 @@ import { ProductionJobFormCheckDataSchema, type UserType } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 import type { ProductionInputs } from "@/types/forms";
 
-import AccordionTaxes from "@/components/structures/Taxes/AccordionTaxes";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
@@ -27,9 +26,7 @@ function Inputs() {
     setIsFormReady,
     setDialogState,
   } = useProductionForm((state) => state);
-  const { taxes, saveTaxes, clearTaxes, setSaveTaxes, addTax, removeTax } = useProductionTaxesStore(
-    (state) => state
-  );
+  const { taxes, saveTaxes, clearTaxes, setSaveTaxes } = useProductionTaxesStore((state) => state);
 
   const queryClient = useQueryClient();
   const { data: user } = useUser();
@@ -89,44 +86,57 @@ function Inputs() {
       duration: 1000,
     });
 
-    onSubmitProductionJob(parseData).then((response) => {
-      const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
-        "user",
-        user?.email,
-      ]);
-      //* Optimistic update
-      queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
-        const newProduction = [
-          ...(previousUserData?.user?.shifts?.production ?? []),
-          {
-            ...response?.createShift,
+    const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
+      "user",
+      user?.email,
+    ]);
+    //* Optimistic update
+    queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+      const newProduction = [
+        ...(previousUserData?.user?.shifts?.production ?? []),
+        {
+          startDate: parseData.startDate,
+          endDate: parseData.endDate,
+          holidayPayRate: parseData.holidayPayRate,
+          itemValue: parseData.itemValue,
+          itemQuantity: parseData.itemQuantity,
+          isPublicHoliday: parseData.isPublicHoliday,
+          publicHolidayWorked: parseData.publicHolidayWorked,
+          holidayPay: parseData.holidayPayRate > 0,
+          amount: 0,
+          isClosed: true,
+          notes: "",
+          shiftId: user?.shifts?.id,
+        },
+      ];
+
+      queryClient.setQueryData(["user", user?.email], {
+        ...previousUserData,
+        user: {
+          ...previousUserData?.user,
+          shifts: {
+            ...previousUserData?.user.shifts,
+            production: newProduction,
           },
-        ];
 
-        queryClient.setQueryData(["user", user?.email], {
-          ...previousUserData,
-          user: {
-            ...previousUserData?.user,
-            shifts: {
-              ...previousUserData?.user.shifts,
-              production: newProduction,
-            },
-
-            config: {
-              ...previousUserData?.user.config,
-              taxSaved: {
-                ...previousUserData?.user.config?.taxSaved,
-                productionTaxes: saveTaxes
-                  ? [...savedTaxesFromDB, ...response!.taxesCreated]
-                  : savedTaxesFromDB,
-              },
+          config: {
+            ...previousUserData?.user.config,
+            taxSaved: {
+              ...previousUserData?.user.config?.taxSaved,
+              productionTaxes: saveTaxes ? [...savedTaxesFromDB, ...taxes] : savedTaxesFromDB,
             },
           },
-        });
-
-        return { previousUserData };
+        },
       });
-      if (response) {
+
+      return { previousUserData };
+    });
+
+    setDialogState(false);
+    setSaveTaxes(false);
+
+    onSubmitProductionJob(parseData).then((response) => {
+      if (response?.createShift) {
         queryClient.invalidateQueries({
           queryKey: ["user", user?.email],
         });
@@ -140,8 +150,6 @@ function Inputs() {
 
         resetValues();
         clearTaxes();
-        setDialogState(false);
-        setSaveTaxes(false);
 
         return reset();
       }
@@ -165,6 +173,7 @@ function Inputs() {
       });
 
       setSaveTaxes(false);
+      setDialogState(false);
 
       Toast({
         type: "error",
@@ -269,18 +278,6 @@ function Inputs() {
               did you work it?
             </Text>
           </Stack>
-        </Stack>
-        <Stack classes="my-8 w-full">
-          <AccordionTaxes
-            type="production"
-            addTax={addTax}
-            taxes={taxes}
-            clearTaxes={clearTaxes}
-            emptyTableText="Not taxes yet"
-            setSaveTaxes={setSaveTaxes}
-            removeTax={removeTax}
-            taxesFromDB={savedTaxesFromDB}
-          />
         </Stack>
       </Stack>
     </>
