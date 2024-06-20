@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,6 +10,19 @@ import { FastChargeFormSchema } from "@/types";
 
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
+
+import useUser from "@/hooks/useUser";
+
+import { useHourlyTaxesStore } from "@/store/useTaxStore";
+
+const AccordionTaxes = dynamic(() => import("@/components/structures/Taxes/AccordionTaxes"), {
+  ssr: false,
+  loading: () => (
+    <Stack classes="w-full">
+      <Skeleton classes="h-24 w-full" />
+    </Stack>
+  ),
+});
 
 const Inputs = dynamic(() => import("@/components/structures/FastCharge/Inputs"), {
   ssr: false,
@@ -43,13 +57,36 @@ const Submit = dynamic(() => import("@/components/structures/FastCharge/Submit")
 });
 
 function Form() {
+  const { data: user, isLoading } = useUser();
+  const { addTax, clearTaxes, removeTax, setSaveTaxes, taxes } = useHourlyTaxesStore(
+    (state) => state
+  );
+
   const methods = useForm({
     resolver: zodResolver(FastChargeFormSchema),
   });
+  const savedTaxesFromDB = useMemo(() => {
+    if (!user?.config?.taxSaved?.hourlyTaxes) return [];
+
+    return user?.config?.taxSaved?.hourlyTaxes;
+  }, [user?.config?.taxSaved?.hourlyTaxes]);
   return (
     <>
       <FormProvider {...methods}>
         <Inputs />
+        <Stack classes="my-8 w-full">
+          <AccordionTaxes
+            isLoadingTaxes={isLoading}
+            type="hourly"
+            addTax={addTax}
+            taxes={taxes}
+            clearTaxes={clearTaxes}
+            emptyTableText="Not taxes yet"
+            setSaveTaxes={setSaveTaxes}
+            removeTax={removeTax}
+            taxesFromDB={savedTaxesFromDB}
+          />
+        </Stack>
         <Submit />
       </FormProvider>
     </>

@@ -1,9 +1,8 @@
 "use client";
 
-import { type ChangeEvent, useMemo, useState } from "react";
+import { type ChangeEvent, useState } from "react";
 
 import type { Tax, TaxHourlySaved, TaxProductionSaved } from "@prisma/client";
-import { useQuery } from "@tanstack/react-query";
 import isEmpty from "lodash/isEmpty";
 
 import AccordionFaq from "@/components/structures/Taxes/AccordionFaq";
@@ -21,13 +20,12 @@ import Line from "@/components/ui/Line";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
-import useUser from "@/hooks/useUser";
-
 type Props = {
   taxes: Omit<Tax, "id">[];
   type?: "production" | "hourly";
   taxesFromDB: TaxProductionSaved[] | TaxHourlySaved[];
   emptyTableText: string;
+  isLoadingTaxes: boolean;
   addTax: (tax: Omit<Tax, "id">) => void;
   setSaveTaxes: (value: boolean) => void;
   clearTaxes: () => void;
@@ -39,16 +37,18 @@ function AccordionTaxes({
   type = "production",
   taxesFromDB,
   emptyTableText,
+  isLoadingTaxes,
   setSaveTaxes,
   clearTaxes,
   addTax,
   removeTax,
 }: Props) {
   const [addMoreTaxes, setAddMoreTaxes] = useState(false);
-  const { data: taxesData } = useQuery({
-    queryKey: ["tax"],
-    queryFn: async () => fetch("/api/tax").then((res) => res.json()),
-  });
+  // const { data: taxesData } = useQuery({
+  //   queryKey: ["tax"],
+  //   queryFn: async () => fetch("/api/tax").then((res) => res.json()),
+  //   refetchOnWindowFocus: false,
+  // });
 
   return (
     <Accordion
@@ -62,7 +62,20 @@ function AccordionTaxes({
           <Stack as="div">Taxes</Stack>
         </AccordionTrigger>
         <AccordionContent>
-          {taxesFromDB.length > 0 ? (
+          {isLoadingTaxes ? (
+            <>
+              <Stack orientation="vertical">
+                <Stack classes="h-8 w-full animate-pulse rounded-md bg-slate-100/60" />
+                <Stack
+                  classes="h-24 w-full animate-pulse bg-slate-100/60"
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  Loading taxes...
+                </Stack>
+              </Stack>
+            </>
+          ) : !isEmpty(taxesFromDB) ? (
             <TaxesFromDB type={type} taxesFromDB={taxesFromDB} />
           ) : (
             <Stack

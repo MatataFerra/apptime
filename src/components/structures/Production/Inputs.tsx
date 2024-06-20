@@ -9,7 +9,6 @@ import { ProductionJobFormCheckDataSchema, type UserType } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 import type { ProductionInputs } from "@/types/forms";
 
-import AccordionTaxes from "@/components/structures/Taxes/AccordionTaxes";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
@@ -27,9 +26,7 @@ function Inputs() {
     setIsFormReady,
     setDialogState,
   } = useProductionForm((state) => state);
-  const { taxes, saveTaxes, clearTaxes, setSaveTaxes, addTax, removeTax } = useProductionTaxesStore(
-    (state) => state
-  );
+  const { taxes, saveTaxes, clearTaxes, setSaveTaxes } = useProductionTaxesStore((state) => state);
 
   const queryClient = useQueryClient();
   const { data: user } = useUser();
@@ -139,7 +136,7 @@ function Inputs() {
     setSaveTaxes(false);
 
     onSubmitProductionJob(parseData).then((response) => {
-      if (response) {
+      if (response?.createShift) {
         queryClient.invalidateQueries({
           queryKey: ["user", user?.email],
         });
@@ -177,7 +174,6 @@ function Inputs() {
 
       setSaveTaxes(false);
       setDialogState(false);
-      setSaveTaxes(false);
 
       Toast({
         type: "error",
@@ -282,18 +278,6 @@ function Inputs() {
               did you work it?
             </Text>
           </Stack>
-        </Stack>
-        <Stack classes="my-8 w-full">
-          <AccordionTaxes
-            type="production"
-            addTax={addTax}
-            taxes={taxes}
-            clearTaxes={clearTaxes}
-            emptyTableText="Not taxes yet"
-            setSaveTaxes={setSaveTaxes}
-            removeTax={removeTax}
-            taxesFromDB={savedTaxesFromDB}
-          />
         </Stack>
       </Stack>
     </>
