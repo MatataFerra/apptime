@@ -89,43 +89,56 @@ function Inputs() {
       duration: 1000,
     });
 
-    onSubmitProductionJob(parseData).then((response) => {
-      const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
-        "user",
-        user?.email,
-      ]);
-      //* Optimistic update
-      queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
-        const newProduction = [
-          ...(previousUserData?.user?.shifts?.production ?? []),
-          {
-            ...response?.createShift,
+    const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
+      "user",
+      user?.email,
+    ]);
+    //* Optimistic update
+    queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+      const newProduction = [
+        ...(previousUserData?.user?.shifts?.production ?? []),
+        {
+          startDate: parseData.startDate,
+          endDate: parseData.endDate,
+          holidayPayRate: parseData.holidayPayRate,
+          itemValue: parseData.itemValue,
+          itemQuantity: parseData.itemQuantity,
+          isPublicHoliday: parseData.isPublicHoliday,
+          publicHolidayWorked: parseData.publicHolidayWorked,
+          holidayPay: parseData.holidayPayRate > 0,
+          amount: 0,
+          isClosed: true,
+          notes: "",
+          shiftId: user?.shifts?.id,
+        },
+      ];
+
+      queryClient.setQueryData(["user", user?.email], {
+        ...previousUserData,
+        user: {
+          ...previousUserData?.user,
+          shifts: {
+            ...previousUserData?.user.shifts,
+            production: newProduction,
           },
-        ];
 
-        queryClient.setQueryData(["user", user?.email], {
-          ...previousUserData,
-          user: {
-            ...previousUserData?.user,
-            shifts: {
-              ...previousUserData?.user.shifts,
-              production: newProduction,
-            },
-
-            config: {
-              ...previousUserData?.user.config,
-              taxSaved: {
-                ...previousUserData?.user.config?.taxSaved,
-                productionTaxes: saveTaxes
-                  ? [...savedTaxesFromDB, ...response!.taxesCreated]
-                  : savedTaxesFromDB,
-              },
+          config: {
+            ...previousUserData?.user.config,
+            taxSaved: {
+              ...previousUserData?.user.config?.taxSaved,
+              productionTaxes: saveTaxes ? [...savedTaxesFromDB, ...taxes] : savedTaxesFromDB,
             },
           },
-        });
-
-        return { previousUserData };
+        },
       });
+
+      return { previousUserData };
+    });
+
+    setDialogState(false);
+    setSaveTaxes(false);
+
+    onSubmitProductionJob(parseData).then((response) => {
       if (response) {
         queryClient.invalidateQueries({
           queryKey: ["user", user?.email],
@@ -140,8 +153,6 @@ function Inputs() {
 
         resetValues();
         clearTaxes();
-        setDialogState(false);
-        setSaveTaxes(false);
 
         return reset();
       }
@@ -164,6 +175,8 @@ function Inputs() {
         return { previousUserData };
       });
 
+      setSaveTaxes(false);
+      setDialogState(false);
       setSaveTaxes(false);
 
       Toast({

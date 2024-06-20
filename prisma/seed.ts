@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 
-import { User } from "@prisma/client";
+import { PrismaClient, type User } from "@prisma/client";
 import { hashSync } from "bcryptjs";
 import { addDays, addMinutes, differenceInMinutes, isToday as isTheDateToday } from "date-fns";
 
-import prisma from "./client";
+const prisma = new PrismaClient();
 
 const today = new Date();
 const myToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0);
@@ -82,6 +82,12 @@ async function main() {
         type_account: userData.type_account,
         role: userData.role,
         isActive: userData.isActive,
+        config: {
+          create: {
+            weekStartsOn: "monday",
+            taxSaved: {},
+          },
+        },
       },
     });
 
@@ -202,6 +208,10 @@ async function clearDatabase() {
     prisma.hourly.deleteMany(),
     prisma.user.deleteMany(),
     prisma.profile.deleteMany(),
+    prisma.tax.deleteMany(),
+    prisma.config.deleteMany(),
+    prisma.taxHourlySaved.deleteMany(),
+    prisma.taxProductionSaved.deleteMany(),
   ]);
 
   return transaction;
