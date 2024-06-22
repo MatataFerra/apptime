@@ -30,6 +30,7 @@ function Inputs() {
 
   const queryClient = useQueryClient();
   const { data: user } = useUser();
+
   const {
     handleSubmit,
     register,
@@ -92,6 +93,10 @@ function Inputs() {
     ]);
     //* Optimistic update
     queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+      const formatTaxes = taxes.map((tax) => ({
+        ...tax,
+        id: crypto.randomUUID(),
+      }));
       const newProduction = [
         ...(previousUserData?.user?.shifts?.production ?? []),
         {
@@ -123,7 +128,7 @@ function Inputs() {
             ...previousUserData?.user.config,
             taxSaved: {
               ...previousUserData?.user.config?.taxSaved,
-              productionTaxes: saveTaxes ? [...savedTaxesFromDB, ...taxes] : savedTaxesFromDB,
+              productionTaxes: saveTaxes ? [...savedTaxesFromDB, ...formatTaxes] : savedTaxesFromDB,
             },
           },
         },

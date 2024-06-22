@@ -116,6 +116,10 @@ function Inputs() {
 
     //* Optimistic update
     queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+      const formatTaxes = taxes.map((tax) => ({
+        ...tax,
+        id: crypto.randomUUID(),
+      }));
       const newHourly = [
         ...(previousUserData?.user?.shifts?.hourly ?? []),
         {
@@ -150,7 +154,7 @@ function Inputs() {
             ...previousUserData?.user.config,
             taxSaved: {
               ...previousUserData?.user.config?.taxSaved,
-              hourlyTaxes: saveTaxes ? [...savedTaxesFromDB, ...taxes] : savedTaxesFromDB,
+              hourlyTaxes: saveTaxes ? [...savedTaxesFromDB, ...formatTaxes] : savedTaxesFromDB,
             },
           },
         },

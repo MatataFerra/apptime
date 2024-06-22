@@ -55,8 +55,6 @@ function InputTax({ addTax }: Props) {
       name: watch("name"),
       value: Number(watch("value")),
       description: watch("description"),
-      hourlyId: null,
-      productionId: null,
     });
 
     onRemovingTax();

@@ -44,11 +44,6 @@ function AccordionTaxes({
   removeTax,
 }: Props) {
   const [addMoreTaxes, setAddMoreTaxes] = useState(false);
-  // const { data: taxesData } = useQuery({
-  //   queryKey: ["tax"],
-  //   queryFn: async () => fetch("/api/tax").then((res) => res.json()),
-  //   refetchOnWindowFocus: false,
-  // });
 
   return (
     <Accordion
@@ -136,10 +131,10 @@ function AccordionTaxes({
               type="button"
               variant="outlined"
               size="sm"
-              classes="mx-auto my-4 flex h-20 w-full animate-fade-in items-center justify-center border border-dashed border-gray-300"
+              classes="mx-auto my-4 flex h-20 w-full animate-fade-in items-center justify-center border border-dashed border-gray-300 bg-gradient-to-bl from-slate-200 via-stone-300/60 to-gray-400"
               onClick={() => setAddMoreTaxes(true)}
             >
-              Add more taxes
+              Click to add more taxes
             </Button>
           )}
         </AccordionContent>
