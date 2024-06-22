@@ -62,7 +62,6 @@ class ApiService extends ApiBase {
       hasEnvUrl,
       options,
     });
-    // console.log("🚀 ~ ApiService ~ response:API_SERVICE", response);
 
     return response;
   }
