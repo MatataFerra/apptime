@@ -1,11 +1,10 @@
 "use server";
 
 import type { Production, TaxProductionSaved } from "@prisma/client";
-import isEmpty from "lodash/isEmpty";
 import { revalidatePath } from "next/cache";
 
 import ShiftService from "@/services/Shift";
-import TaxService from "@/services/Tax";
+import ProductionService from "@/services/Shift/Production";
 import TaxProductionService from "@/services/Tax/Production";
 import UserService from "@/services/User";
 
@@ -39,46 +38,34 @@ export default async function onSubmitFastCharge(data: ProductionInputsParsed) {
     .closeShift()
     .checkPublicHoliday()
     .differenceInMinsBetweenStartAndEnd()
-    .build();
+    .build<Production>();
 
   try {
-    const createShift = await new ShiftService(shift).create<Production>();
-
-    if (!createShift) return null;
-
     let taxesCreated: TaxProductionSaved[] = [];
-    const productionTaxes = await prisma?.taxProductionSaved.findMany();
-    const taxesFromDB = productionTaxes?.map((tax) => ({
-      name: tax.name,
-      value: tax.value,
-      description: tax.description,
-      productionId: createShift.id,
-      hourlyId: null,
-    }));
+    let createShift: Production | null = null;
+
     const taxesFromLocal = data.taxes
       .filter((tax) => tax.name && tax.value)
       .map((tax) => ({
         ...tax,
-        productionId: createShift.id,
       }));
 
-    if (isEmpty(taxesFromLocal) && !isEmpty(taxesFromDB)) {
-      await new TaxService(taxesFromDB!).create();
-    }
-
-    if (!isEmpty(taxesFromLocal) && isEmpty(taxesFromDB)) {
-      await new TaxService(taxesFromLocal).create();
-      if (data.saveTaxes) {
-        taxesCreated = await new TaxProductionService(taxesFromLocal).save(currentUser.config!.id);
-      }
-    }
-
-    if (!isEmpty(taxesFromLocal) && !isEmpty(taxesFromDB)) {
-      const allTaxes = [...taxesFromDB!, ...taxesFromLocal];
-      await new TaxService(allTaxes).create();
-      if (data.saveTaxes) {
-        taxesCreated = await new TaxProductionService(taxesFromLocal).save(currentUser.config!.id);
-      }
+    new ProductionService(shift)
+      .addtaxes(taxesFromLocal)
+      .then((service) => {
+        return service.create();
+      })
+      .then((createdProduction) => {
+        createShift = createdProduction;
+      })
+      .catch((error) => {
+        return {
+          response: false,
+          message: error.message,
+        };
+      });
+    if (data.saveTaxes) {
+      taxesCreated = await new TaxProductionService(taxesFromLocal).save(currentUser.config!.id);
     }
 
     revalidatePath("/dashboard", "page");
