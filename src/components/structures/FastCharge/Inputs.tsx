@@ -23,12 +23,14 @@ import { useFastChargeStore } from "@/store/useFastChargeStore";
 import { useHourlyTaxesStore } from "@/store/useTaxStore";
 
 function Inputs() {
-  const queryClient = useQueryClient();
-  const { data: user } = useUser();
+  /*
+    Custom hook to get the taxes from the store
+  */
   const { clearTaxes, setSaveTaxes, taxes, saveTaxes } = useHourlyTaxesStore((state) => state);
 
-  const savedTaxesFromDB = useSavedTax(user, "hourly");
-
+  /*
+    Custom hook to get the values from the form
+  */
   const {
     setValues,
     reset: resetValues,
@@ -37,6 +39,9 @@ function Inputs() {
     setDialogState,
   } = useFastChargeStore((state) => state);
 
+  /*
+    Use data and methods from the useForm hook
+  */
   const {
     reset,
     watch,
@@ -45,6 +50,23 @@ function Inputs() {
     handleSubmit,
     formState: { touchedFields, errors },
   } = useFormContext<FastChargeInputs>();
+
+  const queryClient = useQueryClient();
+  const { data: user } = useUser();
+
+  /*
+    Custom hook to get the saved taxes. 
+  */
+  const savedTaxesFromDB = useSavedTax(user, "hourly");
+
+  /*
+    ================================================================================
+    ================================================================================
+  */
+
+  /*
+    Custom hook to format the date and time
+  */
 
   const formatStart = useFormatAndAddTime({
     date: startDate ?? "",
@@ -56,6 +78,10 @@ function Inputs() {
     time: finishTime ?? "",
   });
 
+  /*
+    Watch the values of the form fields
+  */
+
   const hourValueWatch = watch("hour-value");
 
   useEffect(() => {
@@ -65,8 +91,10 @@ function Inputs() {
       hourValue: hourValueWatch,
     };
 
+    // Check if the data from form is valid
     const checkData = FastChargeFormCheckDataSchema.safeParse(data);
 
+    // If the data is valid, set the form as ready and release the button to submit
     if (checkData.success) {
       setIsFormReady(true);
     } else {
@@ -74,12 +102,25 @@ function Inputs() {
     }
   }, [formatEnd, formatStart, hourValueWatch, setIsFormReady]);
 
+  /*
+    ================================================================================
+    ================================================================================
+  */
+
+  /*
+    Set the finish date with the start date if the finish date is not set
+  */
   useEffect(() => {
     if (startDate && !touchedFields["finish-date"]) {
       setValue("finish-date", startDate);
       setValues({ finishDate: startDate });
     }
   }, [startDate, setValue, touchedFields, setValues]);
+
+  /*
+    ================================================================================
+    ================================================================================
+  */
 
   function onSubmit(formData: FastChargeInputs) {
     const parseData = {

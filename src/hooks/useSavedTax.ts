@@ -6,6 +6,12 @@ import { type UserType } from "@/types";
 
 type TaxSaved = TaxHourlySaved | TaxProductionSaved;
 
+/**
+ * @description Custom hook to get the saved taxes. It maps the user and the type of shift and returns the saved taxes
+ * @param {UserType} user
+ * @param {"production" | "hourly"} type
+ * @returns {TaxSaved[]}
+ */
 function useSavedTax(user: UserType | undefined, type: "production" | "hourly") {
   const [savedTaxesFromDB, setSavedTaxesFromDB] = useState<TaxSaved[]>([]);
 

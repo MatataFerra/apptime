@@ -21,17 +21,24 @@ import { useProductionForm } from "@/store/useProductionForm";
 import { useProductionTaxesStore } from "@/store/useTaxStore";
 
 function Inputs() {
+  /*
+    Custom hook to get the values from the form
+  */
   const {
     setValues,
     reset: resetValues,
     setIsFormReady,
     setDialogState,
   } = useProductionForm((state) => state);
+
+  /*
+    Custom hook to get the taxes from the store
+  */
   const { taxes, saveTaxes, clearTaxes, setSaveTaxes } = useProductionTaxesStore((state) => state);
 
-  const queryClient = useQueryClient();
-  const { data: user } = useUser();
-
+  /*
+    Use data and methods from the useForm hook
+  */
   const {
     handleSubmit,
     register,
@@ -40,7 +47,22 @@ function Inputs() {
     formState: { errors },
   } = useFormContext<ProductionInputs>();
 
+  const queryClient = useQueryClient();
+  const { data: user } = useUser();
+
+  /*
+    Custom hook to get the saved taxes.
+  */
   const savedTaxesFromDB = useSavedTax(user, "production");
+
+  /*
+    ================================================================================
+    ================================================================================
+  */
+
+  /*
+    Watch the values of the form fields
+  */
 
   const startDateWatch = watch("start-date");
   const finishDateWatch = watch("finish-date");
@@ -55,14 +77,21 @@ function Inputs() {
       itemQuantity: itemQuantityWatch,
     };
 
+    // Check if the data from form is valid
     const checkData = ProductionJobFormCheckDataSchema.safeParse(data);
 
+    // If the data is valid, set the form as ready and release the button to submit
     if (checkData.success) {
       setIsFormReady(true);
     } else {
       setIsFormReady(false);
     }
   }, [finishDateWatch, itemQuantityWatch, itemValueWatch, setIsFormReady, startDateWatch]);
+
+  /*
+    ================================================================================
+    ================================================================================
+  */
 
   function onSubmit(formData: ProductionInputs) {
     const parseData = {
