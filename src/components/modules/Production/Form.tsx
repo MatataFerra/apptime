@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +11,7 @@ import Submit from "@/components/structures/Production/Submit";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
+import useSavedTax from "@/hooks/useSavedTax";
 import useUser from "@/hooks/useUser";
 
 import { useProductionTaxesStore } from "@/store/useTaxStore";
@@ -54,11 +54,7 @@ function Form() {
     (state) => state
   );
 
-  const savedTaxesFromDB = useMemo(() => {
-    if (!user?.config?.taxSaved?.productionTaxes) return [];
-
-    return user?.config?.taxSaved?.productionTaxes;
-  }, [user?.config?.taxSaved?.productionTaxes]);
+  const savedTaxesFromDB = useSavedTax(user, "production");
 
   const methods = useForm({
     resolver: zodResolver(ProductionJobFormSchema),

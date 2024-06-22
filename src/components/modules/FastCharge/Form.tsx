@@ -11,6 +11,7 @@ import { FastChargeFormSchema } from "@/types";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
+import useSavedTax from "@/hooks/useSavedTax";
 import useUser from "@/hooks/useUser";
 
 import { useHourlyTaxesStore } from "@/store/useTaxStore";
@@ -61,15 +62,12 @@ function Form() {
   const { addTax, clearTaxes, removeTax, setSaveTaxes, taxes } = useHourlyTaxesStore(
     (state) => state
   );
+  const savedTaxesFromDB = useSavedTax(user, "hourly");
 
   const methods = useForm({
     resolver: zodResolver(FastChargeFormSchema),
   });
-  const savedTaxesFromDB = useMemo(() => {
-    if (!user?.config?.taxSaved?.hourlyTaxes) return [];
 
-    return user?.config?.taxSaved?.hourlyTaxes;
-  }, [user?.config?.taxSaved?.hourlyTaxes]);
   return (
     <>
       <FormProvider {...methods}>

@@ -13,6 +13,7 @@ import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
+import useSavedTax from "@/hooks/useSavedTax";
 import useUser from "@/hooks/useUser";
 
 import onSubmitProductionJob from "@/server-actions/production-job";
@@ -39,11 +40,7 @@ function Inputs() {
     formState: { errors },
   } = useFormContext<ProductionInputs>();
 
-  const savedTaxesFromDB = useMemo(() => {
-    if (!user?.config?.taxSaved?.productionTaxes) return [];
-
-    return user?.config?.taxSaved?.productionTaxes;
-  }, [user?.config?.taxSaved?.productionTaxes]);
+  const savedTaxesFromDB = useSavedTax(user, "production");
 
   const startDateWatch = watch("start-date");
   const finishDateWatch = watch("finish-date");

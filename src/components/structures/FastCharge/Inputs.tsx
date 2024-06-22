@@ -15,6 +15,7 @@ import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
 import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
+import useSavedTax from "@/hooks/useSavedTax";
 import useUser from "@/hooks/useUser";
 
 import onSubmitFastCharge from "@/server-actions/fast-charge";
@@ -26,11 +27,7 @@ function Inputs() {
   const { data: user } = useUser();
   const { clearTaxes, setSaveTaxes, taxes, saveTaxes } = useHourlyTaxesStore((state) => state);
 
-  const savedTaxesFromDB = useMemo(() => {
-    if (!user?.config?.taxSaved?.hourlyTaxes) return [];
-
-    return user?.config?.taxSaved?.hourlyTaxes;
-  }, [user?.config?.taxSaved?.hourlyTaxes]);
+  const savedTaxesFromDB = useSavedTax(user, "hourly");
 
   const {
     setValues,
