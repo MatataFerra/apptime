@@ -4,6 +4,7 @@ import type {
   Production,
   Profile,
   Shift,
+  Tax,
   TaxHourlySaved,
   TaxProductionSaved,
   TaxSaved,
@@ -34,6 +35,11 @@ interface TaxSavedType extends TaxSaved {
 export type Shifts = Shift & {
   production: Production[];
   hourly: Hourly[];
+};
+
+export type Taxes = Tax & {
+  hourly: Hourly[];
+  production: Production[];
 };
 
 export type HandleErrorType = z.infer<typeof HandleErrorTypeSchema>;
