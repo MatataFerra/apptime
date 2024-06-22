@@ -5,8 +5,8 @@ import { useSession } from "next-auth/react";
 
 import api from "@/services/Api";
 
-import { UserType } from "@/types";
-import { SuccessApiResponse } from "@/types/api_response";
+import type { UserType } from "@/types";
+import type { SuccessApiResponse } from "@/types/api_response";
 
 function useUser() {
   const session = useSession();
