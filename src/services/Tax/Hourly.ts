@@ -50,6 +50,19 @@ class TaxHourlyService {
       };
     });
   }
+
+  static async create(tax: Omit<Tax, "id">, shiftId: number): Promise<Tax> {
+    return await prisma.tax.create({
+      data: {
+        ...tax,
+        hourly: {
+          connect: {
+            id: shiftId,
+          },
+        },
+      },
+    });
+  }
 }
 
 export default TaxHourlyService;

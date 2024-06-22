@@ -1,4 +1,4 @@
-import type { Hourly, Production } from "@prisma/client";
+import type { Hourly, Production, Tax } from "@prisma/client";
 import { differenceInMinutes, isAfter } from "date-fns";
 import cloneDeep from "lodash/cloneDeep";
 
@@ -9,7 +9,7 @@ import type { Shifts } from "@/types";
 
 interface ShiftServiceInterface {
   shift: TypeShift | Partial<TypeShift>;
-  create: (id: number) => Promise<TypeShift | undefined>;
+  create: (taxes?: Omit<Tax, "id">[]) => Promise<TypeShift | undefined>;
   differenceInMinsBetweenStartAndEnd: () => this;
   closeShift: () => this;
   checkPublicHoliday: () => this;
@@ -50,6 +50,12 @@ class ShiftService implements ShiftServiceInterface {
     ============================================================
   */
 
+  /*
+    ===========================
+    -----------Delete----------
+    ===========================
+  */
+
   async delete(id: number): Promise<TypeShift | undefined> {
     if (this.isProductionShift) {
       return await this.deleteProductionShift(id);
@@ -58,12 +64,31 @@ class ShiftService implements ShiftServiceInterface {
     return await this.deleteHourlyShift(id);
   }
 
+  private async deleteHourlyShift(id: number) {
+    return await new HourlyService(this.shift as Hourly).delete(id);
+  }
+
+  private async deleteProductionShift(id: number) {
+    return await new ProductionService(this.shift as Production).delete(id);
+  }
+
+  /*
+    ===========================
+    -----------Create----------
+    ===========================
+  */
   async create<T extends TypeShift>(): Promise<T | undefined> {
     if (this.isProductionShift) {
-      return (await this.createProductionShift()) as T;
+      return (await new ProductionService(this.shift as Production).create()) as T;
     }
-    return (await this.createHourlyShift()) as T;
+    return (await new HourlyService(this.shift as Hourly).create()) as T;
   }
+
+  /*
+    ===========================
+    -----------Update----------
+    ===========================
+  */
 
   async update(id?: number): Promise<TypeShift | undefined> {
     if (!id) return undefined;
@@ -72,6 +97,14 @@ class ShiftService implements ShiftServiceInterface {
     }
 
     return await this.updateHourlyShift(id);
+  }
+
+  private async updateHourlyShift(id: number) {
+    return await new HourlyService(this.shift as Hourly).update(id);
+  }
+
+  private async updateProductionShift(id: number) {
+    return await new ProductionService(this.shift as Production).update(id);
   }
 
   /*  
@@ -400,41 +433,12 @@ class ShiftService implements ShiftServiceInterface {
     -----------Update----------
     ===========================
   */
-  private async updateHourlyShift(id: number) {
-    return await new HourlyService(this.shift as Hourly).update(id);
-  }
-
-  private async updateProductionShift(id: number) {
-    return await new ProductionService(this.shift as Production).update(id);
-  }
-
-  /*
-    ===========================
-    -----------Create----------
-    ===========================
-  */
-
-  private async createHourlyShift() {
-    return await new HourlyService(this.shift as Hourly).create();
-  }
-
-  private async createProductionShift() {
-    return await new ProductionService(this.shift as Production).create();
-  }
 
   /*
     ===========================
     -----------delete----------
     ===========================
   */
-
-  private async deleteHourlyShift(id: number) {
-    return await new HourlyService(this.shift as Hourly).delete(id);
-  }
-
-  private async deleteProductionShift(id: number) {
-    return await new ProductionService(this.shift as Production).delete(id);
-  }
 
   private get isProductionShift(): boolean {
     const shift = this.shift as Production;
