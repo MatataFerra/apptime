@@ -101,10 +101,8 @@ model Tax {
   name         String
   value        Float
   description  String?
-  hourlyId     Int?
-  productionId Int?
-  production   Production? @relation(fields: [productionId], references: [id])
-  hourly       Hourly?     @relation(fields: [hourlyId], references: [id])
+  production   Production[] 
+  hourly       Hourly[]     
 }
 
 model Contribution {
@@ -112,10 +110,8 @@ model Contribution {
   name         String
   value        Float
   description  String?
-  hourlyId     Int?
-  productionId Int?
-  production   Production? @relation(fields: [productionId], references: [id])
-  hourly       Hourly?     @relation(fields: [hourlyId], references: [id])
+  production   Production[]
+  hourly       Hourly[]  
 }
 
 model Config {

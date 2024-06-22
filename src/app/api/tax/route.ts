@@ -17,5 +17,5 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  return NextResponse.json({ tax, response: true });
+  return NextResponse.json({ tax, response: true, message: "success" });
 }
