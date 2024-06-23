@@ -15,25 +15,25 @@ type Props = {
 
 function TableTax({ data, removeTax }: Props) {
   return (
-    <Table classes="w-full table-auto animate-fade-in px-2 shadow-lg">
+    <Table classes="w-full table-fixed animate-fade-in rounded-md border border-slate-300/20 px-2 shadow-sm">
       <TableHead
-        classes="bg-stone-500/20  text-xs text-gray-800 dark:text-gray-100"
+        classes="bg-stone-200/20  text-xs text-gray-600 dark:text-gray-100"
         columnTitle={["Name", "Value", "Description", "Action"]}
         elementClasses="py-2"
       />
       <TableBody>
         {data?.map((tax) => (
-          <TableElement as="tr" key={tax.name}>
-            <TableElement classes="p-2 text-center text-sm group-hover:cursor-default">
+          <TableElement as="tr" classes="rounded-md" key={tax.name}>
+            <TableElement classes="p-1 text-center text-sm group-hover:cursor-default">
               {tax.name}
             </TableElement>
-            <TableElement classes="p-2 text-center text-sm group-hover:cursor-default">
+            <TableElement classes="p-1 text-center text-sm group-hover:cursor-default">
               {tax.value}%
             </TableElement>
-            <TableElement classes="p-2 text-center text-sm group-hover:cursor-default">
+            <TableElement classes="overflow-hidden text-ellipsis text-nowrap p-1 text-center text-sm group-hover:cursor-default">
               {tax.description}
             </TableElement>
-            <TableElement classes="p-2">
+            <TableElement classes="table-cell p-1 text-center">
               <Button
                 type="button"
                 variant="danger"

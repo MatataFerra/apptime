@@ -67,7 +67,7 @@ function InputTax({ addTax }: Props) {
   }
 
   return (
-    <Stack as="div" orientation="horizontal" classes="h-14 w-full" alignItems="baseline">
+    <Stack as="div" orientation="horizontal" grid cols={1} classes="w-full">
       <Input
         placeholder="Name of tax"
         classes="min-h-8 w-full text-sm"
@@ -103,13 +103,8 @@ function InputTax({ addTax }: Props) {
           // value: taxes.find((tax) => tax.internalId === internalId)?.description ?? "",
         })}
       />
-      <Button
-        type="button"
-        variant="info"
-        classes="flex size-4 items-center justify-center rounded-full"
-        onClick={() => onAddingTax()}
-      >
-        +
+      <Button type="button" variant="info" size="md" classes="w-full" onClick={() => onAddingTax()}>
+        add tax
       </Button>
     </Stack>
   );
