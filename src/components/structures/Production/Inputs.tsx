@@ -98,7 +98,7 @@ function Inputs() {
       startDate: new Date(formData["start-date"]).toString(),
       endDate: new Date(formData["finish-date"]).toString(),
       itemValue: parseFloat(formData["item-value"]),
-      holidayPayRate: parseFloat(formData["holiday-pay-rate"] ?? "0"),
+      holidayPayRate: parseFloat(formData["holiday-pay-rate"] || "0"),
       itemQuantity: parseFloat(formData["item-quantity"]),
       isPublicHoliday: formData["is-public-holiday"],
       publicHolidayWorked: formData["is-worked"],
@@ -119,13 +119,11 @@ function Inputs() {
     ]);
     //* Optimistic update
     queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
-      const formatTaxes = taxes.map((tax) => ({
-        ...tax,
-        id: crypto.randomUUID(),
-      }));
+      const lastId = previousUserData?.user?.shifts?.production?.at(-1)?.id ?? Math.random();
       const newProduction = [
         ...(previousUserData?.user?.shifts?.production ?? []),
         {
+          id: lastId + 1,
           startDate: parseData.startDate,
           endDate: parseData.endDate,
           holidayPayRate: parseData.holidayPayRate,
@@ -149,14 +147,6 @@ function Inputs() {
             ...previousUserData?.user.shifts,
             production: newProduction,
           },
-
-          config: {
-            ...previousUserData?.user.config,
-            taxSaved: {
-              ...previousUserData?.user.config?.taxSaved,
-              productionTaxes: saveTaxes ? [...savedTaxesFromDB, ...formatTaxes] : savedTaxesFromDB,
-            },
-          },
         },
       });
 
@@ -167,11 +157,7 @@ function Inputs() {
     setSaveTaxes(false);
 
     onSubmitProductionJob(parseData).then((response) => {
-      if (response?.createShift) {
-        queryClient.invalidateQueries({
-          queryKey: ["user", user?.email],
-        });
-
+      if (response?.response) {
         Toast({
           type: "success",
           message: "Success",
@@ -184,6 +170,10 @@ function Inputs() {
 
         return reset();
       }
+
+      queryClient.invalidateQueries({
+        queryKey: ["user", user?.email],
+      });
 
       queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
         queryClient.setQueryData(["user", user?.email], {
@@ -247,10 +237,12 @@ function Inputs() {
           })}
         />
         <Input
-          label="Item value"
+          label="Value of each item"
+          min={0}
           type="number"
           step={"any"}
           measure="$"
+          description="If you produce boxes, each box costs $0.023"
           measurePlace="left"
           {...register("item-value", {
             onChange(e) {
@@ -260,6 +252,7 @@ function Inputs() {
         />
         <Input
           label="Quantity"
+          min={0}
           type="number"
           {...register("item-quantity", {
             onChange(e) {

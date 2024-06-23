@@ -11,9 +11,6 @@ import Submit from "@/components/structures/Production/Submit";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
-import useSavedTax from "@/hooks/useSavedTax";
-import useUser from "@/hooks/useUser";
-
 import { useProductionTaxesStore } from "@/store/useTaxStore";
 
 const AccordionTaxes = dynamic(() => import("@/components/structures/Taxes/AccordionTaxes"), {
@@ -49,12 +46,9 @@ const Inputs = dynamic(() => import("@/components/structures/Production/Inputs")
 });
 
 function Form() {
-  const { data: user, isLoading } = useUser();
   const { taxes, clearTaxes, setSaveTaxes, addTax, removeTax } = useProductionTaxesStore(
     (state) => state
   );
-
-  const savedTaxesFromDB = useSavedTax(user, "production");
 
   const methods = useForm({
     resolver: zodResolver(ProductionJobFormSchema),
@@ -65,15 +59,12 @@ function Form() {
         <Inputs />
         <Stack classes="my-8 w-full">
           <AccordionTaxes
-            isLoadingTaxes={isLoading}
-            type="production"
             addTax={addTax}
             taxes={taxes}
             clearTaxes={clearTaxes}
             emptyTableText="Not taxes yet"
             setSaveTaxes={setSaveTaxes}
             removeTax={removeTax}
-            taxesFromDB={savedTaxesFromDB}
           />
         </Stack>
         <Submit />

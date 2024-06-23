@@ -10,9 +10,6 @@ import { FastChargeFormSchema } from "@/types";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
-import useSavedTax from "@/hooks/useSavedTax";
-import useUser from "@/hooks/useUser";
-
 import { useHourlyTaxesStore } from "@/store/useTaxStore";
 
 const AccordionTaxes = dynamic(() => import("@/components/structures/Taxes/AccordionTaxes"), {
@@ -57,11 +54,9 @@ const Submit = dynamic(() => import("@/components/structures/FastCharge/Submit")
 });
 
 function Form() {
-  const { data: user, isLoading } = useUser();
   const { addTax, clearTaxes, removeTax, setSaveTaxes, taxes } = useHourlyTaxesStore(
     (state) => state
   );
-  const savedTaxesFromDB = useSavedTax(user, "hourly");
 
   const methods = useForm({
     resolver: zodResolver(FastChargeFormSchema),
@@ -73,15 +68,12 @@ function Form() {
         <Inputs />
         <Stack classes="my-8 w-full">
           <AccordionTaxes
-            isLoadingTaxes={isLoading}
-            type="hourly"
             addTax={addTax}
             taxes={taxes}
             clearTaxes={clearTaxes}
             emptyTableText="Not taxes yet"
             setSaveTaxes={setSaveTaxes}
             removeTax={removeTax}
-            taxesFromDB={savedTaxesFromDB}
           />
         </Stack>
         <Submit />
