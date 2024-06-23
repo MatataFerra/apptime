@@ -41,36 +41,26 @@ export default async function onSubmitFastCharge(data: ProductionInputsParsed) {
     .build<Production>();
 
   try {
-    let taxesCreated: TaxProductionSaved[] = [];
-    let createShift: Production | null = null;
-
     const taxesFromLocal = data.taxes
       .filter((tax) => tax.name && tax.value)
       .map((tax) => ({
         ...tax,
       }));
 
-    new ProductionService(shift)
+    const response = await new ProductionService(shift)
       .addtaxes(taxesFromLocal)
       .then((service) => {
         return service.create();
       })
-      .then((createdProduction) => {
-        createShift = createdProduction;
-      })
-      .catch((error) => {
-        return {
-          response: false,
-          message: error.message,
-        };
-      });
-    if (data.saveTaxes) {
-      taxesCreated = await new TaxProductionService(taxesFromLocal).save(currentUser.config!.id);
-    }
+      .then((createdProduction) => createdProduction)
+      .catch((error) => JSON.stringify(error.message));
 
     revalidatePath("/dashboard", "page");
 
-    return { createShift, taxesCreated };
+    return {
+      response: typeof response !== "string",
+      createShift: response,
+    };
   } catch (error) {
     return null;
   }
