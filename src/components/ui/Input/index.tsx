@@ -49,7 +49,7 @@ const input = forwardRef(function Input(
   const flexBasis = basis ? `${basis}` : "input-flex";
 
   return (
-    <section className={cn(flexBasis, containerClasses, "w-full")}>
+    <div className={cn(flexBasis, containerClasses, "w-full")}>
       {label && (
         <label
           htmlFor={props.name}
@@ -107,7 +107,7 @@ const input = forwardRef(function Input(
           {description}
         </small>
       )}
-    </section>
+    </div>
   );
 });
 
