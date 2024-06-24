@@ -1,14 +1,12 @@
 "use client";
 
-import { Production } from "@prisma/client";
+import type { Production } from "@prisma/client";
 
 import ProductionService from "@/services/Shift/Production";
 
 import TableElement from "@/components/ui/TableElement";
 
 import useDashboard from "@/hooks/useDashboard";
-
-import { useDashboardContext } from "@/store/useDashboardStore";
 
 function FooterValues() {
   const { user } = useDashboard();
@@ -22,11 +20,11 @@ function FooterValues() {
   }
 
   function totalEarnings() {
-    return user?.shifts?.production.reduce((acc, shift) => acc + calculateEarnings(shift), 0);
+    return user?.shifts?.production?.reduce((acc, shift) => acc + calculateEarnings(shift), 0);
   }
 
   function sumProduction() {
-    return user?.shifts?.production.reduce((acc, shift) => {
+    return user?.shifts?.production?.reduce((acc, shift) => {
       return acc + (shift?.itemQuantity ? shift.itemQuantity : 0);
     }, 0);
   }
