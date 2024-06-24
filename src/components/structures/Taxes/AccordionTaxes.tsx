@@ -66,7 +66,11 @@ function AccordionTaxes({
           )}
           {addMoreTaxes || !isEmpty(taxes) ? (
             <>
-              <Stack as="article" orientation="vertical" classes="w-full">
+              <Stack
+                as="article"
+                orientation="vertical"
+                classes="w-full animate-fade-in transition-all repeat-1"
+              >
                 <Text as="h2" classes="text-xl font-medium">
                   Add new taxes
                 </Text>
