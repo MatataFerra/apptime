@@ -1,21 +1,23 @@
 import { type ChangeEvent, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 
+import { Tax } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 
 import Toast from "@/services/Toast";
 
-import { FastChargeFormCheckDataSchema, UserType } from "@/types";
-import { SuccessApiResponse } from "@/types/api_response";
+import { FastChargeFormCheckDataSchema, type UserType } from "@/types";
+import type { SuccessApiResponse } from "@/types/api_response";
 import type { FastChargeInputs } from "@/types/forms";
 
+import { observer } from "@/components/structures/Taxes/observer";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
 import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
-import useSavedTax from "@/hooks/useSavedTax";
+import useGetUniqueTaxes from "@/hooks/useGetUniqueTaxes";
 import useUser from "@/hooks/useUser";
 
 import onSubmitFastCharge from "@/server-actions/fast-charge";
@@ -54,10 +56,12 @@ function Inputs() {
   const queryClient = useQueryClient();
   const { data: user } = useUser();
 
+  const getUniqueTaxes = useGetUniqueTaxes({ localTaxes: taxes });
+
   /*
-    Custom hook to get the saved taxes. 
+    observe when the submit is done
   */
-  const savedTaxesFromDB = useSavedTax(user, "hourly");
+  const { setDone } = observer();
 
   /*
     ================================================================================
@@ -152,15 +156,41 @@ function Inputs() {
       user?.email,
     ]);
 
+    const previousTaxData = queryClient.getQueryData<SuccessApiResponse<Tax[]>>(["tax"]);
+
+    //* Optimistic update
+    queryClient.cancelQueries({ queryKey: ["tax"] }).then(() => {
+      const prev = previousTaxData?.tax.map((tax) => {
+        return {
+          ...tax,
+        };
+      });
+
+      const lastId = prev?.at(-1)?.id ?? Math.random();
+
+      const unique = getUniqueTaxes?.map((tax) => ({
+        ...tax,
+        id: lastId + 1,
+      }));
+
+      const all = prev?.concat(unique ?? []);
+
+      queryClient.setQueryData(["tax"], {
+        ...previousTaxData,
+        tax: all,
+      });
+
+      return { previousTaxData };
+    });
+
     //* Optimistic update
     queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
-      const formatTaxes = taxes.map((tax) => ({
-        ...tax,
-        id: crypto.randomUUID(),
-      }));
+      const lastId = previousUserData?.user?.shifts?.hourly?.at(-1)?.id ?? Math.random();
+
       const newHourly = [
         ...(previousUserData?.user?.shifts?.hourly ?? []),
         {
+          id: lastId + 1,
           startDate: parseData.startDate,
           endDate: parseData.endDate,
           holidayPayRate: parseData.holidayPayRate,
@@ -187,14 +217,6 @@ function Inputs() {
             ...previousUserData?.user.shifts,
             hourly: newHourly,
           },
-
-          config: {
-            ...previousUserData?.user.config,
-            taxSaved: {
-              ...previousUserData?.user.config?.taxSaved,
-              hourlyTaxes: saveTaxes ? [...savedTaxesFromDB, ...formatTaxes] : savedTaxesFromDB,
-            },
-          },
         },
       });
 
@@ -207,15 +229,12 @@ function Inputs() {
     clearTaxes();
 
     onSubmitFastCharge(parseData).then((response) => {
-      if (response?.createShift) {
+      setDone(true);
+      if (response?.response) {
         Toast({
           type: "success",
           duration: 1500,
           message: "Shift created successfully",
-        });
-
-        queryClient.invalidateQueries({
-          queryKey: ["user", user?.email],
         });
 
         resetValues();
@@ -223,6 +242,14 @@ function Inputs() {
 
         return reset();
       }
+
+      queryClient.invalidateQueries({
+        queryKey: ["user", user?.email],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["tax"],
+      });
 
       // reset state if the shift was not created
       queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
@@ -241,6 +268,15 @@ function Inputs() {
         });
 
         return { previousUserData };
+      });
+
+      queryClient.cancelQueries({ queryKey: ["tax"] }).then(() => {
+        queryClient.setQueryData(["tax"], {
+          ...previousTaxData,
+          tax: previousTaxData?.tax,
+        });
+
+        return { previousTaxData };
       });
 
       setSaveTaxes(false);
