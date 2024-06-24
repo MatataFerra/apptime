@@ -1,15 +1,15 @@
 import type { Production, Tax } from "@prisma/client";
 import isEmpty from "lodash/isEmpty";
 
-import TaxProductionService from "@/services/Tax/Production";
+import TaxService from "@/services/Tax";
 
 import prisma from "../../../prisma/client";
 
-interface ProductionService {
+interface ProductionInterface {
   update(id: number): Promise<Production>;
   create(): Promise<Production>;
   delete(id: number): Promise<Production>;
-  addtaxes(taxes: Tax[]): Promise<ProductionService>;
+  addtaxes(taxes: Tax[] | Omit<Tax, "id">[]): Promise<ProductionService>;
   build(): Omit<Production, "shiftId" | "id">;
   calculateEarnings(): number;
   getConfig(): Pick<Production, "itemValue" | "itemQuantity" | "holidayPay" | "holidayPayRate">;
@@ -30,7 +30,7 @@ interface ProductionService {
  *
  */
 
-class ProductionService implements ProductionService {
+class ProductionService implements ProductionInterface {
   taxes: Pick<Tax, "id">[];
   shift: Omit<Production, "shiftId" | "id">;
   constructor(shift: Omit<Production, "shiftId" | "id">) {
@@ -108,8 +108,14 @@ class ProductionService implements ProductionService {
     return deleteShift;
   }
 
+  /*  
+    ============================================================
+    Helper methods
+    ============================================================
+  */
+
   async addtaxes(taxes: Tax[] | Omit<Tax, "id">[]) {
-    const createTaxes = await new TaxProductionService(taxes).create();
+    const createTaxes = await new TaxService(taxes).create();
     this.taxes = createTaxes;
     return this;
   }
@@ -138,6 +144,12 @@ class ProductionService implements ProductionService {
       holidayPayRate: this.shift.holidayPayRate,
     };
   }
+
+  /*  
+    ============================================================
+    Static methods
+    ============================================================
+  */
 
   static findUnClosedShift(shifts: Production[] | undefined) {
     if (!shifts) return null;
