@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import type { Tax } from "@prisma/client";
 
+import { observer } from "@/components/structures/Taxes/observer";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
@@ -26,6 +28,20 @@ function InputTax({ addTax }: Props) {
     resetField,
     formState: { errors },
   } = useForm<TaxField>();
+
+  /*
+    Observes the submit of both forms and when they are done the callback is called
+  */
+  const { done, setDone } = observer();
+  useEffect(() => {
+    if (done) {
+      clearErrors();
+    }
+
+    return () => {
+      setDone(false);
+    };
+  }, [setDone, done, clearErrors]);
 
   function onAddingTax() {
     if (!watch("name")) {
@@ -74,7 +90,6 @@ function InputTax({ addTax }: Props) {
         isError={!!errors["name"]}
         description={errors["name"]?.message}
         {...register("name", {
-          // value: taxes.find((tax) => tax.name === name)?.name,
           onChange: () => {
             clearErrors("name");
           },
@@ -90,7 +105,6 @@ function InputTax({ addTax }: Props) {
         description={errors["value"]?.message}
         {...register("value", {
           valueAsNumber: true,
-          // value: taxes.find((tax) => tax.internalId === internalId)?.value?.toString(),
           onChange: () => {
             clearErrors("value");
           },
@@ -99,9 +113,7 @@ function InputTax({ addTax }: Props) {
       <Input
         placeholder="add useful information..."
         classes="min-h-8 w-full text-sm"
-        {...register("description", {
-          // value: taxes.find((tax) => tax.internalId === internalId)?.description ?? "",
-        })}
+        {...register("description")}
       />
       <Button type="button" variant="info" size="md" classes="w-full" onClick={() => onAddingTax()}>
         add tax
