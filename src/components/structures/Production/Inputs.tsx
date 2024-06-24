@@ -9,11 +9,11 @@ import { ProductionJobFormCheckDataSchema, type UserType } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 import type { ProductionInputs } from "@/types/forms";
 
+import { observer } from "@/components/structures/Taxes/observer";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
-import useSavedTax from "@/hooks/useSavedTax";
 import useUser from "@/hooks/useUser";
 
 import onSubmitProductionJob from "@/server-actions/production-job";
@@ -47,13 +47,13 @@ function Inputs() {
     formState: { errors },
   } = useFormContext<ProductionInputs>();
 
+  /*
+    observe when the submit is done
+  */
+  const { setDone } = observer();
+
   const queryClient = useQueryClient();
   const { data: user } = useUser();
-
-  /*
-    Custom hook to get the saved taxes.
-  */
-  const savedTaxesFromDB = useSavedTax(user, "production");
 
   /*
     ================================================================================
@@ -157,6 +157,7 @@ function Inputs() {
     setSaveTaxes(false);
 
     onSubmitProductionJob(parseData).then((response) => {
+      setDone(true);
       if (response?.response) {
         Toast({
           type: "success",
@@ -173,6 +174,10 @@ function Inputs() {
 
       queryClient.invalidateQueries({
         queryKey: ["user", user?.email],
+      });
+
+      queryClient.refetchQueries({
+        queryKey: ["tax"],
       });
 
       queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
