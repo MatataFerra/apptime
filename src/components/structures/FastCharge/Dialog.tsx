@@ -2,6 +2,8 @@
 
 import { type PropsWithChildren, useEffect, useMemo } from "react";
 
+import isEmpty from "lodash/isEmpty";
+
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
 
@@ -23,6 +25,7 @@ import Text from "@/components/ui/Text";
 import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
 
 import { useFastChargeStore } from "@/store/useFastChargeStore";
+import { useHourlyTaxesStore } from "@/store/useTaxStore";
 
 type Props = {};
 
@@ -43,6 +46,7 @@ function DialogHourly({ children }: PropsWithChildren<Props>) {
     setDialogState,
     formError,
   } = useFastChargeStore((state) => state);
+  const { taxes } = useHourlyTaxesStore((state) => state);
 
   useEffect(() => {
     if (formError) return setDialogState(false);
@@ -58,7 +62,7 @@ function DialogHourly({ children }: PropsWithChildren<Props>) {
     time: finishTime ?? "",
   });
 
-  const calculateProductionEarn = useMemo(() => {
+  const calculateEarn = useMemo(() => {
     const earnings = ShiftService.calculateEarnings({
       startDate: formatStart,
       endDate: formatEnd,
@@ -68,8 +72,17 @@ function DialogHourly({ children }: PropsWithChildren<Props>) {
       unpaidBreaks: Number(unpaidBreaks),
     });
 
-    return isNaN(earnings) ? 0 : earnings;
-  }, [fastWorked, formatEnd, formatStart, holidayPayRate, hourValue, unpaidBreaks]);
+    const getTaxesDiscount = taxes?.reduce((acc, tax) => {
+      const value = Number(tax.value);
+      const prepareTax = (earnings * value) / 100;
+      return (acc -= prepareTax);
+    }, earnings);
+
+    return {
+      sharp: isNaN(earnings) ? 0 : earnings,
+      afterTaxes: isNaN(getTaxesDiscount) ? 0 : getTaxesDiscount,
+    };
+  }, [fastWorked, formatEnd, formatStart, holidayPayRate, hourValue, taxes, unpaidBreaks]);
 
   return (
     <Dialog open={dialog} onOpenChange={setDialogState}>
@@ -99,10 +112,28 @@ function DialogHourly({ children }: PropsWithChildren<Props>) {
             {holidayPayRate && <Text classes="text-sm">Holday pay rate: {holidayPayRate}%</Text>}
             <Text classes="text-sm">Public holiday: {fastHoliday ? "Yes" : "No"}</Text>
             <Text classes="text-sm">Public holiday worked: {fastWorked ? "Yes" : "No"}</Text>
-            <Text classes="rounded-md bg-gradient-to-tl from-lime-400/60 via-green-400 to-teal-500/60 px-2 py-1 text-sm font-bold">
-              You will earn: ${calculateProductionEarn.toFixed(2)}
-            </Text>
+            <Stack>
+              <Text classes="rounded-md bg-gradient-to-tl from-lime-400/60 via-green-400 to-teal-500/60 px-2 py-1 text-sm font-bold">
+                You will earn: ${calculateEarn.sharp.toFixed(2)}
+              </Text>
+              {!isEmpty(taxes) && calculateEarn.afterTaxes > 0 ? (
+                <Text classes="animate-fade-in rounded-md bg-gradient-to-tl from-red-400/60 to-violet-500/60 px-2 py-1 text-sm font-bold repeat-[2]">
+                  After Taxes: ${calculateEarn.afterTaxes.toFixed(2)}
+                </Text>
+              ) : null}
+            </Stack>
           </DialogValue>
+          {!isEmpty(taxes) ? (
+            <DialogValue content="Taxes">
+              <Stack grid cols={3}>
+                {taxes?.map((tax) => (
+                  <Text key={tax.name} classes="text-sm">
+                    {tax.name}: {tax.value}%
+                  </Text>
+                ))}
+              </Stack>
+            </DialogValue>
+          ) : null}
         </Stack>
         <DialogFooter className="flex flex-row justify-end gap-4">
           <DialogClose asChild>
