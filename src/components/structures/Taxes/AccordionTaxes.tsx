@@ -1,8 +1,8 @@
 "use client";
 
-import { type ChangeEvent, useState } from "react";
+import { useState } from "react";
 
-import type { Tax, TaxHourlySaved, TaxProductionSaved } from "@prisma/client";
+import type { Tax } from "@prisma/client";
 import isEmpty from "lodash/isEmpty";
 
 import AccordionFaq from "@/components/structures/Taxes/AccordionFaq";
@@ -16,16 +16,14 @@ import {
   AccordionTrigger,
 } from "@/components/ui/Accordion";
 import Button from "@/components/ui/Button";
-import Line from "@/components/ui/Line";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
+import useTax from "@/hooks/useTax";
+
 type Props = {
   taxes: Omit<Tax, "id">[];
-  type?: "production" | "hourly";
-  taxesFromDB: TaxProductionSaved[] | TaxHourlySaved[];
   emptyTableText: string;
-  isLoadingTaxes: boolean;
   addTax: (tax: Omit<Tax, "id">) => void;
   setSaveTaxes: (value: boolean) => void;
   clearTaxes: () => void;
@@ -34,35 +32,23 @@ type Props = {
 
 function AccordionTaxes({
   taxes,
-  type = "production",
-  taxesFromDB,
   emptyTableText,
-  isLoadingTaxes,
   setSaveTaxes,
   clearTaxes,
   addTax,
   removeTax,
 }: Props) {
   const [addMoreTaxes, setAddMoreTaxes] = useState(false);
-  // const { data: taxesData } = useQuery({
-  //   queryKey: ["tax"],
-  //   queryFn: async () => fetch("/api/tax").then((res) => res.json()),
-  //   refetchOnWindowFocus: false,
-  // });
+  const { isLoading } = useTax();
 
   return (
-    <Accordion
-      type="single"
-      defaultValue="one"
-      collapsible
-      className="w-full rounded-md p-2 shadow-md"
-    >
+    <Accordion type="single" defaultValue="one" collapsible className="w-full rounded-md shadow-md">
       <AccordionItem value="one">
-        <AccordionTrigger className="py-1 text-base font-bold hover:no-underline">
+        <AccordionTrigger className="px-2 py-1 text-base font-bold hover:no-underline">
           <Stack as="div">Taxes</Stack>
         </AccordionTrigger>
-        <AccordionContent>
-          {isLoadingTaxes ? (
+        <AccordionContent className="space-y-8 p-2">
+          {addMoreTaxes && isLoading ? (
             <>
               <Stack orientation="vertical">
                 <Stack classes="h-8 w-full animate-pulse rounded-md bg-slate-100/60" />
@@ -71,75 +57,55 @@ function AccordionTaxes({
                   justifyContent="center"
                   alignItems="center"
                 >
-                  Loading taxes...
+                  Trying to retrieve used taxes
                 </Stack>
               </Stack>
             </>
-          ) : !isEmpty(taxesFromDB) ? (
-            <TaxesFromDB type={type} taxesFromDB={taxesFromDB} />
           ) : (
-            <Stack
-              classes="h-20 w-full bg-slate-100/60"
-              justifyContent="center"
-              alignItems="center"
-            >
-              No taxes saved
-            </Stack>
+            <TaxesFromDB addTax={addTax} />
           )}
-
-          {(addMoreTaxes || !isEmpty(taxes)) && (
+          {addMoreTaxes || !isEmpty(taxes) ? (
             <>
-              <Line classes="my-4" color="bg-stone-600/40" />
-              <Stack orientation="vertical" alignItems="center" classes="px-4 py-2">
+              <Stack
+                as="article"
+                orientation="vertical"
+                classes="w-full animate-fade-in transition-all repeat-1"
+              >
+                <Text as="h2" classes="text-xl font-medium">
+                  Add new taxes
+                </Text>
                 <InputTax addTax={addTax} />
-                <TableTax emptyContent={emptyTableText} removeTax={removeTax} data={taxes} />
               </Stack>
-              {!isEmpty(taxes) && (
-                <Button
-                  type="button"
-                  variant="outlined"
-                  size="sm"
-                  classes="mx-auto my-4 flex w-[95%] animate-fade-in items-center justify-center ring-2 ring-red-500/80"
-                  onClick={() => {
-                    setAddMoreTaxes(false);
-                    setSaveTaxes(false);
-                    clearTaxes();
-                  }}
-                >
-                  Clear all
-                </Button>
-              )}
-              {!isEmpty(taxes) && (
-                <Stack
-                  alignItems="center"
-                  classes="mb-4 mt-8 w-full animate-fade-in transition-all"
-                >
-                  <Text as="label" htmlFor="save-taxes">
-                    save taxes for future use
-                  </Text>
-                  <input
-                    className="size-4"
-                    type="checkbox"
-                    id="save-taxes"
-                    name="save-taxes"
-                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                      setSaveTaxes(Boolean(e.target.checked))
-                    }
-                  />
-                </Stack>
-              )}
+              <Stack orientation="vertical" classes="w-full">
+                <Text as="h3" classes="text-sm font-medium">
+                  Check out your taxes
+                </Text>
+                <TableTax emptyContent={emptyTableText} removeTax={removeTax} data={taxes} />
+                {!isEmpty(taxes) && (
+                  <Button
+                    type="button"
+                    variant="outlined"
+                    size="sm"
+                    classes="flex w-full animate-fade-in items-center justify-center font-semibold ring-2 ring-red-500/80 active:shadow-button-inner"
+                    onClick={() => {
+                      setSaveTaxes(false);
+                      clearTaxes();
+                    }}
+                  >
+                    Clear all added taxes
+                  </Button>
+                )}
+              </Stack>
             </>
-          )}
-
-          {!addMoreTaxes && (
+          ) : (
             <Button
               type="button"
               variant="outlined"
               size="sm"
-              classes="mx-auto my-4 flex h-20 w-full animate-fade-in items-center justify-center border border-dashed border-gray-300"
+              classes="mx-auto my-4 flex h-20 w-full animate-fade-in items-center justify-center border border-dashed border-gray-300 bg-gradient-to-tl from-slate-200 via-slate-200/60 to-slate-300"
               onClick={() => setAddMoreTaxes(true)}
             >
-              Add more taxes
+              Click to add more taxes
             </Button>
           )}
         </AccordionContent>

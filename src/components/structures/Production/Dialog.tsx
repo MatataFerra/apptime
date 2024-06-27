@@ -2,11 +2,12 @@
 
 import { type PropsWithChildren, useEffect, useMemo } from "react";
 
+import isEmpty from "lodash/isEmpty";
+
 import DateHumanizer from "@/services/Date";
 import ProductionService from "@/services/Shift/Production";
 
 import DialogValue from "@/components/structures/share/DialogValue";
-import SaveCases from "@/components/structures/Taxes/Dialog/SaveCases";
 import Button from "@/components/ui/Button";
 import {
   Dialog,
@@ -21,29 +22,20 @@ import Image from "@/components/ui/Image";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
-import useUser from "@/hooks/useUser";
-
 import { useProductionForm } from "@/store/useProductionForm";
 import { useProductionTaxesStore } from "@/store/useTaxStore";
 
 type Props = {};
 
 function DialogProduction({ children }: PropsWithChildren<Props>) {
-  const { data: user } = useUser();
   const { values, dialog, setDialogState, formError } = useProductionForm((state) => state);
-  const { taxes, saveTaxes } = useProductionTaxesStore((state) => state);
-
-  const savedTaxesFromDB = useMemo(() => {
-    if (!user?.config?.taxSaved?.productionTaxes) return [];
-
-    return user?.config?.taxSaved?.productionTaxes;
-  }, [user?.config?.taxSaved?.productionTaxes]);
+  const { taxes } = useProductionTaxesStore((state) => state);
 
   useEffect(() => {
     if (formError) return setDialogState(false);
   }, [formError, setDialogState]);
 
-  const calculateProductionEarn = useMemo(() => {
+  const calculateEarn = useMemo(() => {
     const earnings = ProductionService.earnings({
       itemValue: Number(values.itemValue ?? 0),
       itemQuantity: Number(values.itemQuantity),
@@ -51,8 +43,23 @@ function DialogProduction({ children }: PropsWithChildren<Props>) {
       publicHolidayWorked: !!values.publicHolidayWorked,
     });
 
-    return isNaN(earnings) ? 0 : earnings;
-  }, [values.holidayPayRate, values.itemQuantity, values.itemValue, values.publicHolidayWorked]);
+    const getTaxesDiscount = taxes?.reduce((acc, tax) => {
+      const value = Number(tax.value);
+      const prepareTax = (earnings * value) / 100;
+      return (acc -= prepareTax);
+    }, earnings);
+
+    return {
+      sharp: isNaN(earnings) ? 0 : earnings,
+      afterTaxes: isNaN(getTaxesDiscount) ? 0 : getTaxesDiscount,
+    };
+  }, [
+    taxes,
+    values.holidayPayRate,
+    values.itemQuantity,
+    values.itemValue,
+    values.publicHolidayWorked,
+  ]);
 
   return (
     <Dialog open={dialog} onOpenChange={setDialogState}>
@@ -87,13 +94,29 @@ function DialogProduction({ children }: PropsWithChildren<Props>) {
             <Text classes="text-sm">
               Public holiday worked: {values.publicHolidayWorked ? "Yes" : "No"}
             </Text>
-            <Text classes="rounded-md bg-gradient-to-tl from-lime-400/60 via-green-400 to-teal-500/60 px-2 py-1 text-sm font-bold">
-              You will earn: ${calculateProductionEarn.toFixed(2)}
-            </Text>
+            <Stack>
+              <Text classes="rounded-md bg-gradient-to-tl from-lime-400/60 via-green-400 to-teal-500/60 px-2 py-1 text-sm font-bold">
+                You will earn: ${calculateEarn.sharp.toFixed(2)}
+              </Text>
+              {!isEmpty(taxes) && calculateEarn.afterTaxes > 0 ? (
+                <Text classes="animate-fade-in rounded-md bg-gradient-to-tl from-red-400/60 to-violet-500/60 px-2 py-1 text-sm font-bold repeat-[2]">
+                  After Taxes: ${calculateEarn.afterTaxes.toFixed(2)}
+                </Text>
+              ) : null}
+            </Stack>
           </DialogValue>
-          <DialogValue content="Taxes">
-            <SaveCases taxes={taxes} savedTaxesFromDB={savedTaxesFromDB} saveTaxes={saveTaxes} />
-          </DialogValue>
+
+          {!isEmpty(taxes) ? (
+            <DialogValue content="Taxes">
+              <Stack grid cols={3}>
+                {taxes?.map((tax) => (
+                  <Text key={tax.name} classes="text-sm">
+                    {tax.name}: {tax.value}%
+                  </Text>
+                ))}
+              </Stack>
+            </DialogValue>
+          ) : null}
         </Stack>
         <DialogFooter className="flex flex-row justify-end gap-4">
           <DialogClose asChild>

@@ -39,9 +39,10 @@ function HourlyRow({ shift }: { shift: Hourly }) {
     return new ShiftService(shift).calculateEarnings();
   }, []);
 
-  function getHours(minutes: number) {
-    return ShiftService.convertAmountInDecimal(minutes);
-  }
+  const difference = useCallback((shift: Hourly) => {
+    const diff = new ShiftService(shift).differenceInMinsBetweenStartAndEnd().build().amount ?? 0;
+    return ShiftService.convertAmountInDecimal(diff);
+  }, []);
 
   return (
     <TableDialog
@@ -52,9 +53,7 @@ function HourlyRow({ shift }: { shift: Hourly }) {
     >
       <TableElement as="tr" type="tr">
         <TableElement>{shortDate}</TableElement>
-        <TableElement>
-          {shift?.amount ? `${String(getHours(shift?.amount ?? 0))}h` : "..."}
-        </TableElement>
+        <TableElement>{shift?.amount ? `${String(difference(shift))}h` : "..."}</TableElement>
         <TableElement>${String(calculateEarnings(shift))}</TableElement>
         <TableElement align="center">
           {shift?.isPublicHoliday ? <Icon.star style={{ color: "#00f5d4" }} /> : null}

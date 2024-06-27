@@ -179,21 +179,16 @@ const TaxSchema = z.object({
   name: z.string(),
   value: z.number(),
   description: z.string().nullable(),
-  internalId: z.string(),
-  hourlyId: z.number().nullable(),
-  productionId: z.number().nullable(),
 });
 
 const TaxCreateSchema = TaxSchema.omit({
   id: true,
-  internalId: true,
 }).refine((values) => Object.keys(values).length > 0, {
   message: "One of the fields must be defined",
 });
 
 const TaxUpdateSchema = TaxSchema.omit({
   id: true,
-  internalId: true,
 });
 
 /*

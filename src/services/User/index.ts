@@ -136,7 +136,6 @@ class UserService {
         config: {
           create: {
             weekStartsOn: "monday",
-            taxSaved: {},
           },
         },
       },

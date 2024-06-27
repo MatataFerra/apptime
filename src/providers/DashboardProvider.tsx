@@ -32,7 +32,6 @@ function DashboardProvider({ children, user }: Props) {
         shifts: true,
         profile: true,
         config: true,
-        hasEnvUrl: false,
       }),
   });
 

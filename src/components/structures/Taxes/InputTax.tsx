@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import type { Tax } from "@prisma/client";
 
+import { observer } from "@/components/structures/Taxes/observer";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
@@ -26,6 +28,20 @@ function InputTax({ addTax }: Props) {
     resetField,
     formState: { errors },
   } = useForm<TaxField>();
+
+  /*
+    Observes the submit of both forms and when they are done the callback is called
+  */
+  const { done, setDone } = observer();
+  useEffect(() => {
+    if (done) {
+      clearErrors();
+    }
+
+    return () => {
+      setDone(false);
+    };
+  }, [setDone, done, clearErrors]);
 
   function onAddingTax() {
     if (!watch("name")) {
@@ -55,8 +71,6 @@ function InputTax({ addTax }: Props) {
       name: watch("name"),
       value: Number(watch("value")),
       description: watch("description"),
-      hourlyId: null,
-      productionId: null,
     });
 
     onRemovingTax();
@@ -69,14 +83,13 @@ function InputTax({ addTax }: Props) {
   }
 
   return (
-    <Stack as="div" orientation="horizontal" classes="h-14 w-full" alignItems="baseline">
+    <Stack as="div" orientation="horizontal" grid cols={1} classes="w-full">
       <Input
         placeholder="Name of tax"
         classes="min-h-8 w-full text-sm"
         isError={!!errors["name"]}
         description={errors["name"]?.message}
         {...register("name", {
-          // value: taxes.find((tax) => tax.name === name)?.name,
           onChange: () => {
             clearErrors("name");
           },
@@ -92,7 +105,6 @@ function InputTax({ addTax }: Props) {
         description={errors["value"]?.message}
         {...register("value", {
           valueAsNumber: true,
-          // value: taxes.find((tax) => tax.internalId === internalId)?.value?.toString(),
           onChange: () => {
             clearErrors("value");
           },
@@ -101,17 +113,10 @@ function InputTax({ addTax }: Props) {
       <Input
         placeholder="add useful information..."
         classes="min-h-8 w-full text-sm"
-        {...register("description", {
-          // value: taxes.find((tax) => tax.internalId === internalId)?.description ?? "",
-        })}
+        {...register("description")}
       />
-      <Button
-        type="button"
-        variant="info"
-        classes="flex size-4 items-center justify-center rounded-full"
-        onClick={() => onAddingTax()}
-      >
-        +
+      <Button type="button" variant="info" size="md" classes="w-full" onClick={() => onAddingTax()}>
+        add tax
       </Button>
     </Stack>
   );

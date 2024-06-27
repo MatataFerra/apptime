@@ -2,12 +2,12 @@
 
 import { useEffect, useRef } from "react";
 
-import { Hourly, Shift } from "@prisma/client";
+import type { Hourly } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 
 import api from "@/services/Api";
 
-import { UserType } from "@/types";
+import type { UserType } from "@/types";
 
 import { createShiftStatusStore, ShiftStatusContext } from "@/store/useShiftStatusStore";
 
@@ -32,7 +32,6 @@ function ShiftStatusProvider({ children, user, shiftOpen }: Props) {
         shifts: true,
         profile: true,
         config: true,
-        hasEnvUrl: false,
       }),
   });
 

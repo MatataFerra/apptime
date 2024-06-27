@@ -12,7 +12,7 @@ function AccordionFaq() {
     <Accordion type="multiple">
       <AccordionItem value="FAQ">
         <AccordionTrigger>
-          <Text classes="font-semibold">Brief information about taxes</Text>
+          <Text classes="px-2 font-semibold">Brief information about taxes</Text>
         </AccordionTrigger>
         <AccordionContent>
           <AccordionItem value="two">
