@@ -242,6 +242,7 @@ function Inputs() {
           })}
         />
         <Input
+          labelClasses="text-xs"
           label="Value of each item"
           min={0}
           type="number"

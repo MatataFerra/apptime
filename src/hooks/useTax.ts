@@ -14,6 +14,7 @@ function useTax() {
     queryKey: ["tax"],
     queryFn: apiTax.getAll.bind(apiTax),
     refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   return { data, isLoading };
