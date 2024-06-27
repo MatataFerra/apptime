@@ -65,16 +65,7 @@ export async function GET(req: NextRequest) {
           },
         },
         profile: JSON.parse(parsedSearchParams.data.profile ?? "false"),
-        config: {
-          include: {
-            taxSaved: {
-              include: {
-                hourlyTaxes: JSON.parse(parsedSearchParams.data.config ?? "false"),
-                productionTaxes: JSON.parse(parsedSearchParams.data.config ?? "false"),
-              },
-            },
-          },
-        },
+        config: JSON.parse(parsedSearchParams.data.config ?? "false"),
       },
     });
 

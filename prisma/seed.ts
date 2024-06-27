@@ -85,7 +85,6 @@ async function main() {
         config: {
           create: {
             weekStartsOn: "monday",
-            taxSaved: {},
           },
         },
       },
@@ -210,8 +209,6 @@ async function clearDatabase() {
     prisma.profile.deleteMany(),
     prisma.tax.deleteMany(),
     prisma.config.deleteMany(),
-    prisma.taxHourlySaved.deleteMany(),
-    prisma.taxProductionSaved.deleteMany(),
   ]);
 
   return transaction;

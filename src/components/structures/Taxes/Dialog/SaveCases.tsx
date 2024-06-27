@@ -1,13 +1,13 @@
 import { useMemo } from "react";
 
-import type { Tax, TaxHourlySaved, TaxProductionSaved } from "@prisma/client";
+import type { Tax } from "@prisma/client";
 import isEmpty from "lodash/isEmpty";
 
 import Text from "@/components/ui/Text";
 
 type Props = {
   taxes: Omit<Tax, "id">[];
-  savedTaxesFromDB: (TaxHourlySaved | TaxProductionSaved)[];
+  savedTaxesFromDB: Tax[];
   saveTaxes: boolean;
 };
 
