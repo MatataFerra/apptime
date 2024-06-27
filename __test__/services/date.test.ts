@@ -50,11 +50,14 @@ describe("DateHumanizer", () => {
       expect(() => humanizer.humanizeDate(date, { locale: "en" })).toThrow("Estrategia no válida");
     });
 
+    /* 
+      !Test could fail if the timezone is different from the one in the test
+    */
     test("should format and add time to the date using the 'formatAndAddTime' strategy", () => {
       const humanizer = new DateHumanizer("formatAndAddTime");
       const date = new Date("2022-01-01T00:00:00Z");
       expect(humanizer.humanizeDate(date, { time: "12:00" })).toBe(
-        "Sat Jan 01 2022 12:00:00 GMT+1300 (hora de verano de Nueva Zelanda)"
+        "Sat Jan 01 2022 12:00:00 GMT+1100 (hora de verano de Australia oriental)"
       );
     });
   });
