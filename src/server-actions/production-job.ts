@@ -1,11 +1,10 @@
 "use server";
 
-import type { Production, TaxProductionSaved } from "@prisma/client";
+import type { Production } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 import ShiftService from "@/services/Shift";
 import ProductionService from "@/services/Shift/Production";
-import TaxProductionService from "@/services/Tax/Production";
 import UserService from "@/services/User";
 
 import { ProductionInputsParsed } from "@/types/forms";

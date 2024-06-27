@@ -6,7 +6,6 @@ import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
 
 import DialogValue from "@/components/structures/share/DialogValue";
-import SaveCases from "@/components/structures/Taxes/Dialog/SaveCases";
 import Button from "@/components/ui/Button";
 import {
   Dialog,
@@ -22,10 +21,8 @@ import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
 import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
-import useUser from "@/hooks/useUser";
 
 import { useFastChargeStore } from "@/store/useFastChargeStore";
-import { useHourlyTaxesStore } from "@/store/useTaxStore";
 
 type Props = {};
 
@@ -46,14 +43,6 @@ function DialogHourly({ children }: PropsWithChildren<Props>) {
     setDialogState,
     formError,
   } = useFastChargeStore((state) => state);
-  const { data: user } = useUser();
-  const { taxes, saveTaxes } = useHourlyTaxesStore((state) => state);
-
-  const savedTaxesFromDB = useMemo(() => {
-    if (!user?.config?.taxSaved?.hourlyTaxes) return [];
-
-    return user?.config?.taxSaved?.hourlyTaxes;
-  }, [user?.config?.taxSaved?.hourlyTaxes]);
 
   useEffect(() => {
     if (formError) return setDialogState(false);
@@ -113,9 +102,6 @@ function DialogHourly({ children }: PropsWithChildren<Props>) {
             <Text classes="rounded-md bg-gradient-to-tl from-lime-400/60 via-green-400 to-teal-500/60 px-2 py-1 text-sm font-bold">
               You will earn: ${calculateProductionEarn.toFixed(2)}
             </Text>
-          </DialogValue>
-          <DialogValue content="Taxes">
-            <SaveCases taxes={taxes} savedTaxesFromDB={savedTaxesFromDB} saveTaxes={saveTaxes} />
           </DialogValue>
         </Stack>
         <DialogFooter className="flex flex-row justify-end gap-4">
