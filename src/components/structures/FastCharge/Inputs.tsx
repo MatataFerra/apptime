@@ -20,7 +20,7 @@ import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
 import useGetUniqueTaxes from "@/hooks/useGetUniqueTaxes";
 import useUser from "@/hooks/useUser";
 
-import onSubmitFastCharge from "@/server-actions/fast-charge";
+import onCreateHourlyShift from "@/server-actions/hourly-job";
 import { useFastChargeStore } from "@/store/useFastChargeStore";
 import { useHourlyTaxesStore } from "@/store/useTaxStore";
 
@@ -228,7 +228,7 @@ function Inputs() {
     setSaveTaxes(false);
     clearTaxes();
 
-    onSubmitFastCharge(parseData).then((response) => {
+    onCreateHourlyShift(parseData).then((response) => {
       setDone(true);
       if (response?.response) {
         Toast({

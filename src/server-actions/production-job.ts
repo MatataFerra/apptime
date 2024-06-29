@@ -9,7 +9,7 @@ import UserService from "@/services/User";
 
 import { ProductionInputsParsed } from "@/types/forms";
 
-export default async function onSubmitFastCharge(data: ProductionInputsParsed) {
+export default async function onCreateProductionShift(data: ProductionInputsParsed) {
   const currentUser = await UserService.getSessionUser();
 
   if (!currentUser) {
