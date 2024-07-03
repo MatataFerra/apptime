@@ -90,21 +90,13 @@ class ShiftService implements ShiftServiceInterface {
     ===========================
   */
 
-  async update(id?: number): Promise<TypeShift | undefined> {
+  async update<T extends TypeShift>(id?: number): Promise<T | undefined> {
     if (!id) return undefined;
     if (this.isProductionShift) {
-      return await this.updateProductionShift(id);
+      return (await new ProductionService(this.shift as Production).update(id)) as T;
     }
 
-    return await this.updateHourlyShift(id);
-  }
-
-  private async updateHourlyShift(id: number) {
-    return await new HourlyService(this.shift as Hourly).update(id);
-  }
-
-  private async updateProductionShift(id: number) {
-    return await new ProductionService(this.shift as Production).update(id);
+    return (await new HourlyService(this.shift as Hourly).update(id)) as T;
   }
 
   /*  
@@ -403,13 +395,12 @@ class ShiftService implements ShiftServiceInterface {
   }
 
   private updateStatus() {
-    if (!this.shift.endDate) {
-      this.shift.isClosed = false;
-
+    if (!!this.shift.endDate) {
+      this.shift.isClosed = true;
       return this;
     }
 
-    this.shift.isClosed = true;
+    this.shift.isClosed = false;
 
     return this;
   }
