@@ -3,11 +3,6 @@
 import { type ReactNode, useEffect, useRef } from "react";
 
 import type { Hourly } from "@prisma/client";
-import { useQuery } from "@tanstack/react-query";
-
-import api from "@/services/Api";
-
-import type { UserType } from "@/types";
 
 import useUser from "@/hooks/useUser";
 
