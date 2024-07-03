@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 
+import useTrack from "@/hooks/useTrack";
+
 import useInputValuesStore from "@/store/useInputValuesStore";
-import { useShiftStateContext } from "@/store/useShiftStatusStore";
 
 function useInputValue() {
-  const { inputsDisabled, initialShiftState, clickOnSave } = useShiftStateContext((state) => state);
+  const { inputsDisabled, initialShiftState, clickOnSave } = useTrack();
   const { setInputValues, inputValues } = useInputValuesStore((state) => state);
 
   useEffect(() => {

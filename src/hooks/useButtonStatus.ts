@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
-import { useShiftStateContext } from "@/store/useShiftStatusStore";
+import useTrack from "@/hooks/useTrack";
 
 function useButtonStatus() {
-  const { isShiftActive } = useShiftStateContext((state) => state);
+  const { isShiftActive } = useTrack();
 
   const [btnStatus, setbtnStatus] = useState({
     startButton: {

@@ -1,12 +1,12 @@
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
-import { useShiftStateContext } from "@/store/useShiftStatusStore";
+import useTrack from "@/hooks/useTrack";
 
 function Header() {
   const {
     shiftUnclosed: { shift },
-  } = useShiftStateContext((state) => state);
+  } = useTrack();
   return (
     <Stack classes="m-1 bg-yellow-200 p-2" orientation="vertical">
       <Stack as="header">
