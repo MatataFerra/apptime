@@ -1,6 +1,6 @@
 "use client";
 
-import { Hourly } from "@prisma/client";
+import type { Hourly } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 
 import api from "@/services/Api/Shift";
@@ -9,8 +9,9 @@ import Toast from "@/services/Toast";
 import Button from "@/components/ui/Button";
 import { DialogClose } from "@/components/ui/Dialog";
 
+import useTrack from "@/hooks/useTrack";
+
 import { useShiftData } from "@/store/useShiftData";
-import { useShiftStateContext } from "@/store/useShiftStatusStore";
 
 type SuccessShiftResponse = {
   message: string;
@@ -28,12 +29,15 @@ function checkData(data: unknown): data is SuccessShiftResponse {
 
 function ShiftStartButton({ title = "Save config & start" }: Props) {
   const { data, errors } = useShiftData((state) => state);
-  const { user, updateShiftsInfo, updateShiftStatus, createShift, updateShiftUnclosed } =
-    useShiftStateContext((state) => state);
+  const mock: Hourly = Object.freeze({
+    id: Math.random(),
+    ...data,
+  });
+  const { user, updateShiftsInfo, updateShiftStatus, createShift, updateShiftUnclosed, getShift } =
+    useTrack();
   const mutate = useMutation({
     mutationFn: api.createHourly.bind(api),
     onMutate: () => {
-      updateShiftStatus(true);
       Toast({
         message: "Shift is being created",
         type: "info",
@@ -50,9 +54,15 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
           return;
         }
 
+        const updateShift = getShift(mock.id);
+        const prepareShift = {
+          ...updateShift,
+          ...data.shift,
+        };
+
         // success response
         createShift({
-          ...data.shift,
+          ...prepareShift,
         });
         updateShiftsInfo();
         updateShiftUnclosed();
@@ -66,6 +76,10 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
   });
 
   function onStartShift() {
+    updateShiftStatus(true);
+    createShift({
+      ...mock,
+    });
     mutate.mutate({
       body: {
         startDate: new Date().toString(),
