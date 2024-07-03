@@ -1,15 +1,13 @@
-import { Hourly } from "@prisma/client";
 import dynamic from "next/dynamic";
 
-import { UserType } from "@/types";
+import UserService from "@/services/User";
+import ut from "@/services/Utilities/client";
 
+import HydrateStore from "@/components/structures/Track/HydrateStore";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
-const ShiftStatusProvider = dynamic(() => import("@/providers/ShiftStatusProvider"), {
-  ssr: false,
-  loading: () => <Skeleton classes="h-full w-full" />,
-});
+import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 const State = dynamic(() => import("@/components/structures/Track/State"), {
   ssr: false,
@@ -39,29 +37,36 @@ const NotesPortal = dynamic(() => import("@/components/modules/Notes/Portal"), {
   ssr: false,
 });
 
-const NotesFab = dynamic(() => import("@/components/structures/Notes/Fab"), {
+const FabMenu = dynamic(() => import("@/components/structures/Track/Fab"), {
   ssr: false,
   loading: () => <Skeleton classes="absolute bottom-36 right-2 size-20 rounded-full  p-2" />,
 });
 
-type Props = {
-  user: UserType;
-  shiftUnclosed: Hourly | null;
-};
+async function Track() {
+  const user = await UserService.getSessionUser();
 
-function Track({ user, shiftUnclosed }: Props) {
+  if (!user) {
+    return ut.redirectTo(PATH_NAMES.LOGIN);
+  }
   return (
-    <ShiftStatusProvider user={user} shiftOpen={shiftUnclosed}>
-      <Stack orientation="vertical" justifyContent="between" classes="h-[70dvh] w-full" spacing={8}>
-        <Stack orientation="vertical" classes="h-full w-full">
-          <State />
-          <MonitorScreen />
+    <>
+      <HydrateStore data={{ user }}>
+        <Stack
+          orientation="vertical"
+          justifyContent="between"
+          classes="h-[70dvh] w-full"
+          spacing={8}
+        >
+          <Stack orientation="vertical" classes="h-full w-full">
+            <State />
+            <MonitorScreen />
+          </Stack>
+          <Buttons />
         </Stack>
-        <Buttons />
-      </Stack>
-      <NotesFab />
-      <NotesPortal />
-    </ShiftStatusProvider>
+        <FabMenu />
+        <NotesPortal />
+      </HydrateStore>
+    </>
   );
 }
 
