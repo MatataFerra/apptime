@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { isEqual } from "lodash";
+import isEmpty from "lodash/isEmpty";
 
 import useUser from "@/hooks/useUser";
 
@@ -22,16 +22,16 @@ function useDashboard() {
   } = useDashboardStore((state) => state);
 
   useEffect(() => {
-    if (!data) return;
-
-    if (isEqual(user, data)) return;
+    if (isLoading) return;
+    if (isEmpty(data)) return;
+    if (!isEmpty(user)) return;
 
     setUser(data);
-  }, [data, setUser, user]);
+  }, [data, isLoading, user, setUser]);
 
   useEffect(() => {
-    if (!isLoading) return;
-    if (!data) return;
+    if (isLoading) return;
+    if (isEmpty(data)) return;
     if (isUserLoaded) return;
 
     setInitialShifts(data?.shifts);
