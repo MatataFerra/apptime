@@ -142,6 +142,25 @@ class ShiftService implements ShiftServiceInterface {
     };
   }
 
+  static convertDifferenceInHHmm(difference: number | undefined) {
+    if (!difference)
+      return {
+        text: `...`,
+        hours: 0,
+        minutes: 0,
+        diff: difference,
+      };
+
+    const getHours = difference / 60;
+
+    return {
+      text: `${Math.floor(getHours)}h ${this.decimals(getHours)}m`,
+      hours: getHours,
+      minutes: this.decimals(getHours),
+      diff: difference,
+    };
+  }
+
   /**
    *
    * @deprecated Use `getLatestUnclosedShift` instead if you want to get the latest unclosed shift between all
