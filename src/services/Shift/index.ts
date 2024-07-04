@@ -119,7 +119,7 @@ class ShiftService implements ShiftServiceInterface {
     ============================================================
   */
 
-  static differenceInHHmm(start: string | number | Date, end?: string | number | Date) {
+  static differenceInHHmm(start: string | number | Date, end?: string | number | Date | null) {
     let startDate: Date;
     let endDate: Date;
 
@@ -412,24 +412,6 @@ class ShiftService implements ShiftServiceInterface {
 
     return getDecimals;
   }
-
-  /*  
-    ============================================================
-    CRUD private methods
-    ============================================================
-  */
-
-  /*
-    ===========================
-    -----------Update----------
-    ===========================
-  */
-
-  /*
-    ===========================
-    -----------delete----------
-    ===========================
-  */
 
   private get isProductionShift(): boolean {
     const shift = this.shift as Production;
