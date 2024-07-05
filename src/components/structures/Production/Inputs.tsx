@@ -16,7 +16,7 @@ import Text from "@/components/ui/Text";
 
 import useUser from "@/hooks/useUser";
 
-import onSubmitProductionJob from "@/server-actions/production-job";
+import onCreateProductionShift from "@/server-actions/production-job";
 import { useProductionForm } from "@/store/useProductionForm";
 import { useProductionTaxesStore } from "@/store/useTaxStore";
 
@@ -156,7 +156,7 @@ function Inputs() {
     setDialogState(false);
     setSaveTaxes(false);
 
-    onSubmitProductionJob(parseData).then((response) => {
+    onCreateProductionShift(parseData).then((response) => {
       setDone(true);
       if (response?.response) {
         Toast({

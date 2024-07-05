@@ -1,6 +1,6 @@
-import { ReactElement, ReactNode } from "react";
+import { forwardRef, type ReactElement, type ReactNode, type Ref } from "react";
 
-import { CSSClassNames } from "@/types";
+import type { CSSClassNames } from "@/types";
 
 import { BUTTON_VARIANTS } from "@/utils/constants/tailwind";
 import { cn } from "@/utils/helpers/styleMerger";
@@ -20,7 +20,8 @@ type Props<E extends React.ElementType> = ButtonOwnProps<E> &
   Omit<Omit<React.ComponentProps<E>, "className">, keyof ButtonOwnProps<E>>;
 
 function Button<E extends React.ElementType = typeof ButtonDefaultAsType>(
-  props: Props<E>
+  props: Props<E>,
+  ref: Ref<HTMLButtonElement>
 ): ReactElement {
   const { as, classes, variant = "primary", children, size = "lg", ...rest } = props;
   const Component = as || ButtonDefaultAsType;
@@ -34,6 +35,7 @@ function Button<E extends React.ElementType = typeof ButtonDefaultAsType>(
 
   return (
     <Component
+      ref={ref}
       className={cn(
         "w-40 cursor-pointer rounded-lg text-center",
         props.disabled ? BUTTON_VARIANTS["disabled"] : BUTTON_VARIANTS[variant],
@@ -47,4 +49,8 @@ function Button<E extends React.ElementType = typeof ButtonDefaultAsType>(
   );
 }
 
-export default Button;
+Button.displayName = "Button";
+
+const component = forwardRef<HTMLButtonElement, Props<"button">>(Button);
+
+export default component;

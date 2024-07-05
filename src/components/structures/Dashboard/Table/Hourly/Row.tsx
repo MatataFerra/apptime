@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import { Hourly } from "@prisma/client";
 import dynamic from "next/dynamic";
@@ -39,10 +39,9 @@ function HourlyRow({ shift }: { shift: Hourly }) {
     return new ShiftService(shift).calculateEarnings();
   }, []);
 
-  const difference = useCallback((shift: Hourly) => {
-    const diff = new ShiftService(shift).differenceInMinsBetweenStartAndEnd().build().amount ?? 0;
-    return ShiftService.convertAmountInDecimal(diff);
-  }, []);
+  const getTimeDifference = useMemo(() => {
+    return ShiftService.differenceInHHmm(shift.startDate, shift?.endDate);
+  }, [shift?.endDate, shift.startDate]);
 
   return (
     <TableDialog
@@ -53,7 +52,9 @@ function HourlyRow({ shift }: { shift: Hourly }) {
     >
       <TableElement as="tr" type="tr">
         <TableElement>{shortDate}</TableElement>
-        <TableElement>{shift?.amount ? `${String(difference(shift))}h` : "..."}</TableElement>
+        <TableElement>
+          {getTimeDifference.diff ? `${String(getTimeDifference.text)}` : "..."}
+        </TableElement>
         <TableElement>${String(calculateEarnings(shift))}</TableElement>
         <TableElement align="center">
           {shift?.isPublicHoliday ? <Icon.star style={{ color: "#00f5d4" }} /> : null}

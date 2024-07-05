@@ -90,21 +90,13 @@ class ShiftService implements ShiftServiceInterface {
     ===========================
   */
 
-  async update(id?: number): Promise<TypeShift | undefined> {
+  async update<T extends TypeShift>(id?: number): Promise<T | undefined> {
     if (!id) return undefined;
     if (this.isProductionShift) {
-      return await this.updateProductionShift(id);
+      return (await new ProductionService(this.shift as Production).update(id)) as T;
     }
 
-    return await this.updateHourlyShift(id);
-  }
-
-  private async updateHourlyShift(id: number) {
-    return await new HourlyService(this.shift as Hourly).update(id);
-  }
-
-  private async updateProductionShift(id: number) {
-    return await new ProductionService(this.shift as Production).update(id);
+    return (await new HourlyService(this.shift as Hourly).update(id)) as T;
   }
 
   /*  
@@ -127,7 +119,7 @@ class ShiftService implements ShiftServiceInterface {
     ============================================================
   */
 
-  static differenceInHHmm(start: string | number | Date, end?: string | number | Date) {
+  static differenceInHHmm(start: string | number | Date, end?: string | number | Date | null) {
     let startDate: Date;
     let endDate: Date;
 
@@ -140,6 +132,25 @@ class ShiftService implements ShiftServiceInterface {
     endDate = !!end ? new Date(end) : new Date(Date.now());
 
     const difference = Math.abs(differenceInMinutes(startDate, endDate));
+    const getHours = difference / 60;
+
+    return {
+      text: `${Math.floor(getHours)}h ${this.decimals(getHours)}m`,
+      hours: getHours,
+      minutes: this.decimals(getHours),
+      diff: difference,
+    };
+  }
+
+  static convertDifferenceInHHmm(difference: number | undefined) {
+    if (!difference)
+      return {
+        text: `...`,
+        hours: 0,
+        minutes: 0,
+        diff: difference,
+      };
+
     const getHours = difference / 60;
 
     return {
@@ -403,13 +414,12 @@ class ShiftService implements ShiftServiceInterface {
   }
 
   private updateStatus() {
-    if (!this.shift.endDate) {
-      this.shift.isClosed = false;
-
+    if (!!this.shift.endDate) {
+      this.shift.isClosed = true;
       return this;
     }
 
-    this.shift.isClosed = true;
+    this.shift.isClosed = false;
 
     return this;
   }
@@ -421,24 +431,6 @@ class ShiftService implements ShiftServiceInterface {
 
     return getDecimals;
   }
-
-  /*  
-    ============================================================
-    CRUD private methods
-    ============================================================
-  */
-
-  /*
-    ===========================
-    -----------Update----------
-    ===========================
-  */
-
-  /*
-    ===========================
-    -----------delete----------
-    ===========================
-  */
 
   private get isProductionShift(): boolean {
     const shift = this.shift as Production;

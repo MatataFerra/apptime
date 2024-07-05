@@ -9,10 +9,10 @@ import ShiftService from "@/services/Shift";
 
 import Text from "@/components/ui/Text";
 
-import { useShiftStateContext } from "@/store/useShiftStatusStore";
+import useTrack from "@/hooks/useTrack";
 
 function ShiftState() {
-  const { shiftUnclosed } = useShiftStateContext((state) => state);
+  const { shiftUnclosed } = useTrack();
   const [shiftTime, setShiftTime] = useState("loading...");
 
   useEffect(() => {

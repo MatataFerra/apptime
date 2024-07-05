@@ -9,7 +9,7 @@ import UserService from "@/services/User";
 
 import type { FastChargeInputsParsed } from "@/types/forms";
 
-export default async function onSubmitFastCharge(data: FastChargeInputsParsed) {
+export default async function onCreateHourlyShift(data: FastChargeInputsParsed) {
   const currentUser = await UserService.getSessionUser();
 
   if (!currentUser) {

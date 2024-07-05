@@ -17,7 +17,7 @@ function HourlyBody() {
 
   const hourlyWorkedShift = useMemo(() => {
     return user?.shifts?.hourly;
-  }, [user?.shifts]);
+  }, [user?.shifts?.hourly]);
 
   return (
     <TableBody>

@@ -1,26 +1,15 @@
 import { createContext, useContext } from "react";
 
-import { Hourly, Production, Profile, Shift, User } from "@prisma/client";
+import type { Hourly } from "@prisma/client";
 import { create, useStore } from "zustand";
 
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
 import HourlyService from "@/services/Shift/Hourly";
 
-type UserShiftStateType = Omit<User, "password"> & {
-  shifts: Partial<Shifts> | null;
-  profile: Profile | null;
-};
-
-type Shifts = Shift & {
-  production: Production[];
-  hourly: Hourly[];
-};
-
-type ShiftType = Hourly | Production;
-
+import type { UserType } from "@/types";
 interface ShiftStateProps {
-  user: Partial<UserShiftStateType> | null;
+  user: UserType | Partial<UserType> | null;
   shiftUnclosed: { shift: Partial<Hourly> | null; isLoading: boolean };
 
   isShiftActive: boolean;
@@ -50,10 +39,10 @@ interface ShiftStateProps {
 }
 
 interface ShiftState extends ShiftStateProps {
-  setUser: (user: Partial<UserShiftStateType> | null) => void;
+  setUser: (user: UserType | null | undefined) => void;
   getShift: (id: number | undefined) => Hourly | undefined;
   setButtonClicked: (button: Partial<ShiftStateProps["buttonClicked"]>) => void;
-  updateShift: (shift: Partial<ShiftType>) => void;
+  updateShift: (shift: Partial<Hourly>) => void;
   setClickOnSave: (state: boolean) => void;
   createShift: (shift: Hourly) => void;
   updateShiftsInfo: () => void;
@@ -66,6 +55,10 @@ interface ShiftState extends ShiftStateProps {
 
 type ShiftStateStore = ReturnType<typeof createShiftStatusStore>;
 
+/**
+ * @deprecated use instead `useTrack` hook, it has all the same logic and resources
+ * but much more flexible and easy to use
+ */
 export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
   const DEFAULT_PROPS: ShiftStateProps = {
     user: initProps?.user || null,
@@ -101,7 +94,7 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
   return create<ShiftState>()((set, get) => ({
     ...DEFAULT_PROPS,
     ...initProps,
-    setUser: (user: Partial<UserShiftStateType> | null) => {
+    setUser: (user: UserType | null | undefined) => {
       set((state) => {
         return {
           ...state,
@@ -116,23 +109,23 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
 
       return hourly?.find((h) => h.id === id);
     },
-    updateShift: (shift: Partial<ShiftType>) => {
+    updateShift: (shift: Partial<Hourly>) => {
       set((state) => {
         return {
           ...state,
           user: {
             ...state.user,
+
             shifts: {
+              ...state.user?.shifts,
               id: state.user?.shifts?.id as number,
               userId: state.user?.shifts?.userId as string,
-              hourly: state.user?.shifts?.hourly?.map((h) => {
-                if (h.id === shift.id) return { ...h, ...shift };
-                return h;
-              }),
-              production: state.user?.shifts?.production?.map((p) => {
-                if (p.id === shift.id) return { ...p, ...shift };
-                return p;
-              }),
+              hourly:
+                state.user?.shifts?.hourly?.map((h) => {
+                  if (h.id === shift.id) return { ...h, ...shift };
+                  return h;
+                }) ?? [],
+              production: state?.user?.shifts?.production ?? [],
             },
           },
           shiftsInfo: {
@@ -151,8 +144,8 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
             shifts: {
               id: state.user?.shifts?.id as number,
               userId: state.user?.shifts?.userId as string,
-              hourly: state.user?.shifts?.hourly?.concat(shift),
-              production: state.user?.shifts?.production,
+              hourly: state.user?.shifts?.hourly?.concat(shift) ?? [],
+              production: state.user?.shifts?.production ?? [],
             },
           },
         };

@@ -1,7 +1,8 @@
-import { CSSClassNames } from "@/types";
+import { forwardRef, type Ref } from "react";
+
+import type { CSSClassNames } from "@/types";
 
 import Button from "@/components/ui/Button";
-import Image from "@/components/ui/Image";
 import Text from "@/components/ui/Text";
 
 import { cn } from "@/utils/helpers/styleMerger";
@@ -13,33 +14,32 @@ interface Props extends Omit<React.HTMLAttributes<HTMLButtonElement>, "className
   icon?: JSX.Element;
 }
 
-function FloatingActionButton({ classes, text = "Notes", icon, disabled, ...props }: Props) {
+function FloatingActionButton(
+  { classes, text, icon, disabled, ...props }: Props,
+  ref: Ref<HTMLButtonElement>
+) {
   return (
     <Button
+      ref={ref}
       as="button"
       type="button"
       variant="outlined"
       disabled={disabled}
       classes={cn(
-        "absolute bottom-36 right-2 flex size-20 flex-col items-center justify-center rounded-full border bg-gradient-to-br p-2 shadow-button transition-all",
-        !disabled ? "from-green-400 to-blue-500" : "from-gray-400 to-gray-600",
-        !disabled ? "active:from-green-400 active:to-blue-500 active:shadow-button-inner" : "",
+        "flex size-20 flex-col items-center justify-center rounded-full border p-2 transition-all",
+        disabled ? "cursor-not-allowed" : "cursor-pointer",
         classes ? classes : ""
       )}
       {...props}
     >
-      {icon ? (
-        icon
-      ) : (
-        <Image src="/assets/pencil.svg" alt="Pencil" width={30} height={30} classes="select-none" />
-      )}
-      {text && (
+      {icon ? icon : null}
+      {text ? (
         <Text as="span" classes="text-base">
           {text}
         </Text>
-      )}
+      ) : null}
     </Button>
   );
 }
 
-export default FloatingActionButton;
+export default forwardRef(FloatingActionButton);

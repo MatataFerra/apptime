@@ -20,7 +20,7 @@ interface ProductionInterface {
  * @description Class to handle the production shifts
  * @param {Production} shift - The production shift
  * @method update - Updates a production shift
- * @method create - Creates a new production shift
+ * @method create - Creates a new production shift with or without `taxes`
  * @method delete - Deletes a production shift
  * @method build - Returns the production shift
  * @method calculateEarnings - Calculates the earnings of a production shift

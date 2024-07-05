@@ -1,29 +1,32 @@
-import ShiftService from "@/services/Shift";
+import { useEffect } from "react";
+
 import Toast from "@/services/Toast";
 
 import Button from "@/components/ui/Button";
 import Stack from "@/components/ui/Stack";
 
-import { useNotesStore } from "@/store/useNotesStore";
-import { useShiftStateContext } from "@/store/useShiftStatusStore";
+import useTrack from "@/hooks/useTrack";
+
+import { useNotes } from "@/store/useNotesStore";
 
 function Buttons() {
   const {
     updateShift,
     shiftUnclosed: { shift },
-  } = useShiftStateContext((state) => state);
-  const { notesToggle, notes } = useNotesStore((state) => state);
+  } = useTrack();
+  const { notesToggle, notes, setNotes, localNote, setlocalNote, removelocalNote } = useNotes();
+
+  useEffect(() => {
+    if (!notes.length && localNote) setNotes(localNote);
+    if (!localNote) removelocalNote();
+  }, [localNote, notes, removelocalNote, setNotes]);
 
   async function onSaveNotes() {
     if (notes.length <= 3) return;
     if (!shift) return;
 
-    await new ShiftService({
-      ...shift,
-      notes,
-    }).update(shift?.id);
-
     updateShift({ notes, id: shift.id });
+    setlocalNote(notes);
 
     Toast({
       message: "Note added",

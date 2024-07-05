@@ -7,12 +7,12 @@ import ut from "@/services/Utilities/client";
 import PopoverHome from "@/components/structures/Home/Popover";
 import Text from "@/components/ui/Text";
 
-import { useShiftStateContext } from "@/store/useShiftStatusStore";
+import useTrack from "@/hooks/useTrack";
 
 function ShiftTextState() {
   const {
     shiftUnclosed: { shift },
-  } = useShiftStateContext((state) => state);
+  } = useTrack();
 
   const checkCloseShift = useCallback(() => {
     if (typeof shift?.isClosed === "undefined") {
