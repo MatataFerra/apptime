@@ -9,13 +9,23 @@ class TaxService {
   }
 
   async create() {
-    const taxesFromDB = await prisma.tax.findMany();
+    const taxesFromDB = await TaxService.getAll();
     const filteredTaxes = this.prepareTaxesToCreate(taxesFromDB);
     const taxesToCreate = filteredTaxes.filter((tax) => !tax.exists).map((tax) => tax.tax);
+    let existingTaxes: Tax[] = [];
 
     const newTaxes = await this.createNewTaxes(taxesToCreate);
 
-    return newTaxes;
+    for (const tax of this.taxes) {
+      const findTax = taxesFromDB.find((userTax) => userTax.name === tax.name);
+      if (findTax) existingTaxes.push(findTax);
+    }
+
+    return newTaxes.concat(existingTaxes.map((tax) => ({ id: tax.id })));
+  }
+
+  static async getAll() {
+    return prisma.tax.findMany();
   }
 
   private async createNewTaxes(taxesToCreate: Omit<Tax, "id">[]) {
