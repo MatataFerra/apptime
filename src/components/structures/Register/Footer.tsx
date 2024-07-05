@@ -1,5 +1,7 @@
 "use client";
 
+import NextLink from "next/link";
+
 import { CSSClassNames } from "@/types";
 
 import Button from "@/components/ui/Button";
@@ -28,13 +30,8 @@ function RegisterFooter({ classes, idForm }: Props) {
       >
         Register
       </Button>
-      <Button
-        variant="outlined"
-        classes={cn("w-full text-2xl transition-all hover:bg-gray-200")}
-        as="a"
-        href={PATH_NAMES.LOGIN}
-      >
-        Login
+      <Button variant="outlined" classes={cn("w-full text-2xl transition-all hover:bg-gray-200")}>
+        <NextLink href={PATH_NAMES.LOGIN}>Login</NextLink>
       </Button>
     </Footer>
   );
