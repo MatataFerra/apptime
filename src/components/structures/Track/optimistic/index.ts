@@ -4,7 +4,10 @@ import type { QueryClient } from "@tanstack/react-query";
 import type { UserType } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 
-export function optimisticTrack(
+/*
+  Optimistic updates when user finish track shift
+*/
+export function optimisticFinishTrack(
   newShift: Partial<Hourly>,
   user: UserType | null,
   queryClient: QueryClient
@@ -57,6 +60,45 @@ export function cancelTrackQuery(user: UserType | null, queryClient: QueryClient
         shifts: {
           ...previousUserData?.user.shifts,
           hourly: previousUserData?.user.shifts?.hourly,
+        },
+      },
+    });
+
+    return { previousUserData };
+  });
+}
+
+/*
+  =====================================================================================
+  *************************************************************************************
+  *************************************************************************************
+  =====================================================================================
+*/
+
+/*
+  Optimistic updates when user start track shift
+*/
+
+export function optimisticStartTrack(
+  newShift: Hourly,
+  user: UserType | null,
+  queryClient: QueryClient
+) {
+  const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
+    "user",
+    user?.email,
+  ]);
+
+  if (!previousUserData) return;
+
+  queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+    queryClient.setQueryData(["user", user?.email], {
+      ...previousUserData,
+      user: {
+        ...previousUserData?.user,
+        shifts: {
+          ...previousUserData?.user?.shifts,
+          hourly: [...(previousUserData?.user?.shifts?.hourly ?? []), { ...newShift }],
         },
       },
     });
