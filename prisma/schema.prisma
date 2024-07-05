@@ -101,10 +101,8 @@ model Tax {
   name         String
   value        Float
   description  String?
-  hourlyId     Int?
-  productionId Int?
-  production   Production? @relation(fields: [productionId], references: [id])
-  hourly       Hourly?     @relation(fields: [hourlyId], references: [id])
+  production   Production[] 
+  hourly       Hourly[]     
 }
 
 model Contribution {
@@ -112,10 +110,8 @@ model Contribution {
   name         String
   value        Float
   description  String?
-  hourlyId     Int?
-  productionId Int?
-  production   Production? @relation(fields: [productionId], references: [id])
-  hourly       Hourly?     @relation(fields: [hourlyId], references: [id])
+  production   Production[]
+  hourly       Hourly[]  
 }
 
 model Config {
@@ -123,37 +119,8 @@ model Config {
   weekStartsOn String    @default("monday")
   userId       String?   @unique
   user         User?     @relation(fields: [userId], references: [id])
-  taxSaved     TaxSaved?
 }
 
-model TaxSaved {
-  id              Int                  @id @default(autoincrement())
-  productionTaxes TaxProductionSaved[]
-  hourlyTaxes     TaxHourlySaved[]
-  configId        Int?                 @unique
-
-  config Config? @relation(fields: [configId], references: [id])
-}
-
-model TaxProductionSaved {
-  id          Int     @id @default(autoincrement())
-  name        String
-  value       Float
-  description String?
-  taxSavedId  Int?
-
-  taxSaved TaxSaved? @relation(fields: [taxSavedId], references: [id])
-}
-
-model TaxHourlySaved {
-  id          Int     @id @default(autoincrement())
-  name        String
-  value       Float
-  description String?
-  taxSavedId  Int?
-
-  taxSaved TaxSaved? @relation(fields: [taxSavedId], references: [id])
-}
 
 model PasswordAttemps {
   id           Int       @id @default(autoincrement())

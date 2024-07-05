@@ -1,13 +1,26 @@
-import { Production } from "@prisma/client";
+import type { Production, Tax } from "@prisma/client";
+import isEmpty from "lodash/isEmpty";
+
+import TaxService from "@/services/Tax";
 
 import prisma from "../../../prisma/client";
+
+interface ProductionInterface {
+  update(id: number): Promise<Production>;
+  create(): Promise<Production>;
+  delete(id: number): Promise<Production>;
+  addtaxes(taxes: Tax[] | Omit<Tax, "id">[]): Promise<ProductionService>;
+  build(): Omit<Production, "shiftId" | "id">;
+  calculateEarnings(): number;
+  getConfig(): Pick<Production, "itemValue" | "itemQuantity" | "holidayPay" | "holidayPayRate">;
+}
 
 /**
  * @class ProductionService
  * @description Class to handle the production shifts
  * @param {Production} shift - The production shift
  * @method update - Updates a production shift
- * @method create - Creates a new production shift
+ * @method create - Creates a new production shift with or without `taxes`
  * @method delete - Deletes a production shift
  * @method build - Returns the production shift
  * @method calculateEarnings - Calculates the earnings of a production shift
@@ -17,11 +30,54 @@ import prisma from "../../../prisma/client";
  *
  */
 
-class ProductionService {
+class ProductionService implements ProductionInterface {
+  taxes: Pick<Tax, "id">[];
   shift: Omit<Production, "shiftId" | "id">;
   constructor(shift: Omit<Production, "shiftId" | "id">) {
     this.shift = shift;
+    this.taxes = [];
   }
+
+  /*  
+    ============================================================
+    CRUD methods
+    ============================================================
+  */
+
+  /*
+    ===========================
+    -----------Create----------
+    ===========================
+  */
+
+  async create() {
+    if (isEmpty(this.taxes)) {
+      const productionShiftWithoutTax = await prisma.production.create({
+        data: {
+          ...this.shift,
+        },
+      });
+
+      return productionShiftWithoutTax;
+    }
+
+    const createProductionShift = await prisma.production.create({
+      data: {
+        ...this.shift,
+        taxes: {
+          connect: this.taxes,
+        },
+      },
+    });
+
+    return createProductionShift;
+  }
+
+  /*
+    ===========================
+    -----------Update----------
+    ===========================
+  */
 
   async update(id: number) {
     const updateProductionShift = await prisma.production.update({
@@ -36,15 +92,11 @@ class ProductionService {
     return updateProductionShift;
   }
 
-  async create() {
-    const createProductionShift = await prisma.production.create({
-      data: {
-        ...this.shift,
-      },
-    });
-
-    return createProductionShift;
-  }
+  /*
+    ===========================
+    -----------Delete----------
+    ===========================
+  */
 
   async delete(id: number) {
     const deleteShift = await prisma.production.delete({
@@ -54,6 +106,18 @@ class ProductionService {
     });
 
     return deleteShift;
+  }
+
+  /*  
+    ============================================================
+    Helper methods
+    ============================================================
+  */
+
+  async addtaxes(taxes: Tax[] | Omit<Tax, "id">[]) {
+    const createTaxes = await new TaxService(taxes).create();
+    this.taxes = createTaxes;
+    return this;
   }
 
   build() {
@@ -80,6 +144,12 @@ class ProductionService {
       holidayPayRate: this.shift.holidayPayRate,
     };
   }
+
+  /*  
+    ============================================================
+    Static methods
+    ============================================================
+  */
 
   static findUnClosedShift(shifts: Production[] | undefined) {
     if (!shifts) return null;

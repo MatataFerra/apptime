@@ -113,6 +113,5 @@ export const userMocked: UserType = {
     id: 1,
     userId: userMockedParsed.id,
     weekStartsOn: "sunday",
-    taxSaved: null,
   },
 };

@@ -1,12 +1,12 @@
-import { Profile, User } from "@prisma/client";
+import type { Profile, User } from "@prisma/client";
 
-import ApiBaseService from "@/services/Api/base";
+import ApiBase from "@/services/Api/Base";
 
 import type { ApiResponse, SuccessUserApiResponse } from "@/types/api_response";
 
 import { API_ENDPOINTS } from "@/utils/constants/endpoints";
 
-class ApiService extends ApiBaseService {
+class ApiService extends ApiBase {
   constructor() {
     super();
   }
@@ -14,7 +14,6 @@ class ApiService extends ApiBaseService {
     return this.post({
       endpoint: API_ENDPOINTS.WAITING_LIST,
       body: { email },
-      hasEnvUrl: false,
     });
   }
 
@@ -23,7 +22,6 @@ class ApiService extends ApiBaseService {
       const response: SuccessUserApiResponse = await this.post({
         endpoint: API_ENDPOINTS.REGISTER,
         body: { email, password, emailVerified: null },
-        hasEnvUrl: false,
       });
 
       return response;
@@ -38,7 +36,7 @@ class ApiService extends ApiBaseService {
     shifts = false,
     profile = false,
     config = false,
-    hasEnvUrl = true,
+    hasEnvUrl,
     options,
   }: {
     email?: string | null;
@@ -70,7 +68,7 @@ class ApiService extends ApiBaseService {
 
   static async updateUser({
     user,
-    hasEnvUrl = true,
+    hasEnvUrl,
   }: {
     user: Partial<User>;
     hasEnvUrl?: boolean;
@@ -86,7 +84,7 @@ class ApiService extends ApiBaseService {
 
   static async createProfile({
     profile,
-    hasEnvUrl = true,
+    hasEnvUrl,
   }: {
     profile: Omit<Profile, "id">;
     hasEnvUrl?: boolean;

@@ -56,3 +56,4 @@ local.db
 .VSCodeCounter/
 compare_builds.txt
 *.db-journal
+last-migrations-done.txt

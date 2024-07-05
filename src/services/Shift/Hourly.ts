@@ -1,15 +1,28 @@
-import { Hourly } from "@prisma/client";
+import type { Hourly, Tax } from "@prisma/client";
 import { differenceInMinutes } from "date-fns";
+import isEmpty from "lodash/isEmpty";
+
+import TaxService from "@/services/Tax";
 
 import prisma from "../../../prisma/client";
+
+interface HourlyInterface {
+  update(id: number): Promise<Hourly>;
+  create(): Promise<Hourly>;
+  delete(id: number): Promise<Hourly>;
+  addtaxes(taxes: Tax[] | Omit<Tax, "id">[]): Promise<HourlyService>;
+  build(): Omit<Hourly, "shiftId" | "id">;
+  calculateEarnings(): number;
+  getConfig(): Pick<Hourly, "hourValue" | "holidayPay" | "holidayPayRate" | "unpaidBreaks">;
+}
 
 /**
  * @class HourlyService
  * @description This class is responsible for all the logic related to the Hourly model
  * this class is based on Builder pattern
  * @param {Hourly} shift - The shift
- * @method update - Updates a shift
- * @method create - Creates a new shift
+ * @method update - Updates a shift with or without `taxes`
+ * @method create - Creates a new shift with or without `taxes`
  * @method delete - Deletes a shift
  * @method build - Returns the shift
  * @method calculateEarnings - Calculates the earnings of a shift
@@ -21,34 +34,88 @@ import prisma from "../../../prisma/client";
  * @method convertFloatInHour - Converts the float in hour
  */
 
-class HourlyService {
+class HourlyService implements HourlyInterface {
+  taxes: Pick<Tax, "id">[];
   shift: Omit<Hourly, "shiftId" | "id">;
   constructor(shift: Omit<Hourly, "shiftId" | "id">) {
     this.shift = shift;
+    this.taxes = [];
   }
 
+  /*  
+    ============================================================
+    CRUD methods
+    ============================================================
+  */
+
+  /*
+    ===========================
+    -----------Create----------
+    ===========================
+  */
+
+  async create() {
+    if (isEmpty(this.taxes)) {
+      const hourlyShiftWithoutTax = await prisma.hourly.create({
+        data: {
+          ...this.shift,
+        },
+      });
+
+      return hourlyShiftWithoutTax;
+    }
+
+    const createHourlyShift = await prisma.hourly.create({
+      data: {
+        ...this.shift,
+        taxes: {
+          connect: this.taxes,
+        },
+      },
+    });
+
+    return createHourlyShift;
+  }
+
+  /*
+    ===========================
+    -----------Update----------
+    ===========================
+  */
   async update(id: number) {
+    if (isEmpty(this.taxes)) {
+      const updateHourlyShiftWithoutTax = await prisma.hourly.update({
+        where: {
+          id: id,
+        },
+        data: {
+          ...this.shift,
+        },
+      });
+
+      return updateHourlyShiftWithoutTax;
+    }
+
     const updateHourlyShift = await prisma.hourly.update({
       where: {
         id: id,
       },
       data: {
         ...this.shift,
+        taxes: {
+          connect: this.taxes,
+        },
       },
     });
 
     return updateHourlyShift;
   }
 
-  async create() {
-    const createHourlyShift = await prisma.hourly.create({
-      data: {
-        ...this.shift,
-      },
-    });
-
-    return createHourlyShift;
-  }
+  /*
+    ===========================
+    -----------Delete----------
+    ===========================
+  */
 
   async delete(id: number) {
     const deleteShift = await prisma.hourly.delete({
@@ -58,6 +125,19 @@ class HourlyService {
     });
 
     return deleteShift;
+  }
+
+  /*  
+    ============================================================
+    Helper methods
+    ============================================================
+  */
+
+  async addtaxes(taxes: Tax[] | Omit<Tax, "id">[]) {
+    const taxesCreated = await new TaxService(taxes).create();
+
+    this.taxes = taxesCreated;
+    return this;
   }
 
   build() {
@@ -109,6 +189,12 @@ class HourlyService {
       unpaidBreaks: this.shift.unpaidBreaks,
     };
   }
+
+  /*  
+    ============================================================
+    Static methods
+    ============================================================
+  */
 
   static findUnClosedShift(shifts: Hourly[] | undefined) {
     if (!shifts) return null;

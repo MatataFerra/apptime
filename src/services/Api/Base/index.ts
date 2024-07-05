@@ -14,19 +14,19 @@ interface PUT_PROPS extends POST_PROPS {}
 
 interface DELETE_PROPS extends GET_PROPS {}
 
-class ApiBaseService {
+class ApiBase {
   private static hasUrl(hasEnvUrl: boolean) {
     return hasEnvUrl ? ENV_URL : "";
   }
 
-  static async get({ endpoint, hasEnvUrl = true, options }: GET_PROPS) {
+  static async get({ endpoint, hasEnvUrl = false, options }: GET_PROPS) {
     const response = await fetch(`${this.hasUrl(hasEnvUrl)}${endpoint}`, { next: options });
     const data = await response.json();
 
     return data;
   }
 
-  static async post({ endpoint, body, hasEnvUrl = true, options }: POST_PROPS) {
+  static async post({ endpoint, body, hasEnvUrl = false, options }: POST_PROPS) {
     const response = await fetch(`${this.hasUrl(hasEnvUrl)}${endpoint}`, {
       method: "POST",
       body: JSON.stringify(body),
@@ -41,7 +41,7 @@ class ApiBaseService {
     return data;
   }
 
-  static async put({ endpoint, body, hasEnvUrl = true, options }: PUT_PROPS) {
+  static async put({ endpoint, body, hasEnvUrl = false, options }: PUT_PROPS) {
     const response = await fetch(`${this.hasUrl(hasEnvUrl)}${endpoint}`, {
       method: "PUT",
       body: JSON.stringify(body),
@@ -56,7 +56,7 @@ class ApiBaseService {
     return data;
   }
 
-  static async delete({ endpoint, hasEnvUrl = true, options }: DELETE_PROPS) {
+  static async delete({ endpoint, hasEnvUrl = false, options }: DELETE_PROPS) {
     const response = await fetch(`${this.hasUrl(hasEnvUrl)}${endpoint}`, {
       method: "DELETE",
       next: options,
@@ -68,4 +68,4 @@ class ApiBaseService {
   }
 }
 
-export default ApiBaseService;
+export default ApiBase;

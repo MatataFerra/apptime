@@ -11,8 +11,9 @@ import SetShift from "@/components/structures/Track/Flow/Start/Dialog/SetShift";
 import Trigger from "@/components/structures/Track/Trigger";
 import { Dialog, DialogContent } from "@/components/ui/Dialog";
 
+import useTrack from "@/hooks/useTrack";
+
 import { useShiftData } from "@/store/useShiftData";
-import { useShiftStateContext } from "@/store/useShiftStatusStore";
 
 type Props = {
   triggerStatus:
@@ -25,7 +26,7 @@ type Props = {
 
 function StartDialog({ triggerStatus }: Props) {
   const { step, setData, setStep } = useShiftData((state) => state);
-  const { user } = useShiftStateContext((state) => state);
+  const { user } = useTrack();
   const hasConfig = useMemo(
     () => !isEmpty(ShiftService.getLastConfigShift(user?.shifts?.hourly)),
     [user?.shifts]

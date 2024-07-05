@@ -9,11 +9,10 @@ import FinishButton from "@/components/structures/Track/Flow/Finish/Button";
 import Stack from "@/components/ui/Stack";
 
 import useButtonStatus from "@/hooks/useButtonStatus";
-
-import { useShiftStateContext } from "@/store/useShiftStatusStore";
+import useTrack from "@/hooks/useTrack";
 
 function ShiftButtons() {
-  const { user, updateShiftStatus } = useShiftStateContext((state) => state);
+  const { user, updateShiftStatus } = useTrack();
   const shiftUnclosed = HourlyService.findUnClosedShift(user?.shifts?.hourly);
   const buttonStatus = useButtonStatus();
 

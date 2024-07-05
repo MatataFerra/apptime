@@ -3,7 +3,12 @@ import type { HTMLInputTypeAttribute } from "react";
 import type { Tax } from "@prisma/client";
 import { z } from "zod";
 
-import { type CSSClassNames, FastChargeFormSchema, ProductionJobFormSchema } from "@/types";
+import {
+  type CSSClassNames,
+  FastChargeFormSchema,
+  HourlyShiftSchema,
+  ProductionJobFormSchema,
+} from "@/types";
 
 import { INPUT_VARIANTS } from "@/utils/constants/tailwind";
 
@@ -71,3 +76,6 @@ export type ProductionInputsParsed = {
   taxes: Omit<Tax, "id">[] | [];
   saveTaxes: boolean;
 };
+
+// Track Form
+export type TrackInputs = z.infer<typeof HourlyShiftSchema>;

@@ -1,14 +1,4 @@
-import type {
-  Config,
-  Hourly,
-  Production,
-  Profile,
-  Shift,
-  TaxHourlySaved,
-  TaxProductionSaved,
-  TaxSaved,
-  User,
-} from "@prisma/client";
+import type { Config, Hourly, Production, Profile, Shift, Tax, User } from "@prisma/client";
 import type { JWT } from "next-auth/jwt";
 import { z } from "zod";
 
@@ -17,23 +7,19 @@ import { HandleErrorTypeSchema } from "@/types/zod";
 
 // Types
 export interface UserType extends User {
-  config: ConfigType | null;
+  config: Config | null;
   shifts: Shifts | null;
   profile: Profile | null;
-}
-
-export type ConfigType = Config & {
-  taxSaved?: TaxSavedType | null;
-};
-
-interface TaxSavedType extends TaxSaved {
-  hourlyTaxes: TaxHourlySaved[] | null;
-  productionTaxes: TaxProductionSaved[] | null;
 }
 
 export type Shifts = Shift & {
   production: Production[];
   hourly: Hourly[];
+};
+
+export type Taxes = Tax & {
+  hourly: Hourly[];
+  production: Production[];
 };
 
 export type HandleErrorType = z.infer<typeof HandleErrorTypeSchema>;

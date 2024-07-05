@@ -1,3 +1,4 @@
+import { useLocalStorage } from "usehooks-ts";
 import { devtools } from "zustand/middleware";
 import { shallow } from "zustand/shallow";
 import { createWithEqualityFn } from "zustand/traditional";
@@ -29,3 +30,16 @@ export const useNotesStore = createWithEqualityFn(
   ),
   shallow
 );
+
+export function useNotes() {
+  const { notes, ...rest } = useNotesStore((state) => state);
+  const [localNote, setlocalNote, removelocalNote] = useLocalStorage("notes", notes);
+
+  return {
+    notes,
+    localNote,
+    setlocalNote,
+    removelocalNote,
+    ...rest,
+  };
+}
