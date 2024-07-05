@@ -1,7 +1,5 @@
 import { useEffect } from "react";
 
-import { useLocalStorage } from "usehooks-ts";
-
 import Toast from "@/services/Toast";
 
 import Button from "@/components/ui/Button";
@@ -9,29 +7,26 @@ import Stack from "@/components/ui/Stack";
 
 import useTrack from "@/hooks/useTrack";
 
-import { useNotesStore } from "@/store/useNotesStore";
+import { useNotes } from "@/store/useNotesStore";
 
 function Buttons() {
   const {
     updateShift,
     shiftUnclosed: { shift },
   } = useTrack();
-  const { notesToggle, notes, setNotes } = useNotesStore((state) => state);
-  const [value, setValue, removeValue] = useLocalStorage("notes", notes);
+  const { notesToggle, notes, setNotes, localNote, setlocalNote, removelocalNote } = useNotes();
 
   useEffect(() => {
-    if (window !== undefined) {
-      if (!notes.length && value) setNotes(value);
-      if (!value) removeValue();
-    }
-  }, [notes, removeValue, setNotes, value]);
+    if (!notes.length && localNote) setNotes(localNote);
+    if (!localNote) removelocalNote();
+  }, [localNote, notes, removelocalNote, setNotes]);
 
   async function onSaveNotes() {
     if (notes.length <= 3) return;
     if (!shift) return;
 
     updateShift({ notes, id: shift.id });
-    setValue(notes);
+    setlocalNote(notes);
 
     Toast({
       message: "Note added",
