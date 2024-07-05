@@ -30,9 +30,16 @@ function RegisterFooter({ classes, idForm }: Props) {
       >
         Register
       </Button>
-      <Button variant="outlined" classes={cn("w-full text-2xl transition-all hover:bg-gray-200")}>
-        <NextLink href={PATH_NAMES.LOGIN}>Login</NextLink>
-      </Button>
+      <NextLink
+        href={PATH_NAMES.LOGIN}
+        className={cn(
+          "h-12 w-full cursor-pointer rounded-lg bg-white p-3 text-center text-2xl text-black transition-all hover:bg-gray-200"
+        )}
+        role="button"
+      >
+        {" "}
+        Login
+      </NextLink>
     </Footer>
   );
 }
