@@ -31,7 +31,11 @@ export default async function onUpdateTrackJob(
     id: data?.id,
     isClosed: true,
   };
-  const shift = new ShiftService(prepareShift).closeShift().build<Hourly>();
+  const shift = new ShiftService(prepareShift)
+    .closeShift()
+    .differenceInMinsBetweenStartAndEnd()
+    .checkPublicHoliday()
+    .build<Hourly>();
 
   const taxesFromLocal = taxes
     .filter((tax) => tax.name && tax.value)
