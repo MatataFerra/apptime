@@ -7,13 +7,14 @@ import Toast from "@/services/Toast";
 
 import type { UserType } from "@/types";
 
-import { cancelTrackQuery, optimisticTrack } from "@/components/structures/Track/optimistic";
+import { cancelTrackQuery, optimisticFinishTrack } from "@/components/structures/Track/optimistic";
 import Button from "@/components/ui/Button";
 import Loader from "@/components/ui/Loader";
 
 import useTrack from "@/hooks/useTrack";
 
 import onUpdateTrackJob from "@/server-actions/update-track";
+import { useNotes } from "@/store/useNotesStore";
 import { useTrackTaxesStore } from "@/store/useTaxStore";
 
 type Props = {
@@ -25,6 +26,7 @@ type Props = {
 
 function FinishButton({ buttonStatus }: Props) {
   const queryClient = useQueryClient();
+  const { removelocalNote } = useNotes();
   const { taxes } = useTrackTaxesStore();
   const router = useRouter();
 
@@ -50,7 +52,7 @@ function FinishButton({ buttonStatus }: Props) {
      * Optimistic update
      */
 
-    optimisticTrack(updateTrackedShift as Hourly, user as UserType, queryClient);
+    optimisticFinishTrack(updateTrackedShift as Hourly, user as UserType, queryClient);
     updateShift({ ...updateTrackedShift });
 
     /*
@@ -72,6 +74,7 @@ function FinishButton({ buttonStatus }: Props) {
       if (response) {
         queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
         router.refresh();
+        removelocalNote();
 
         Toast({
           message: "Shift updated",
