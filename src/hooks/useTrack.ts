@@ -46,6 +46,7 @@ export interface ShiftState extends ShiftStateProps {
   updateShift: (shift: Partial<Hourly>) => void;
   setClickOnSave: (state: boolean) => void;
   createShift: (shift: Hourly) => void;
+  deleteShift: (id: number) => void;
   updateShiftsInfo: () => void;
   updateShiftStatus: (state: boolean | undefined) => void;
   updateShiftUnclosed: () => void;
@@ -136,6 +137,26 @@ export const useTrackStore = create<ShiftState>()((set, get) => ({
             hourly: state.user?.shifts?.hourly?.concat(shift) || [],
             production: state.user?.shifts?.production || [],
           },
+        },
+      };
+    });
+  },
+  deleteShift: (id: number) => {
+    set((state) => {
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          shifts: {
+            id: state.user?.shifts?.id as number,
+            userId: state.user?.shifts?.userId as string,
+            hourly: state.user?.shifts?.hourly?.filter((h) => h.id !== id) || [],
+            production: state.user?.shifts?.production || [],
+          },
+        },
+        shiftsInfo: {
+          ...state.shiftsInfo,
+          isEmpty: !state.user?.shifts?.hourly?.length && !state.user?.shifts?.production?.length,
         },
       };
     });
