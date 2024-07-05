@@ -21,8 +21,8 @@ interface HourlyInterface {
  * @description This class is responsible for all the logic related to the Hourly model
  * this class is based on Builder pattern
  * @param {Hourly} shift - The shift
- * @method update - Updates a shift
- * @method create - Creates a new shift
+ * @method update - Updates a shift with or without `taxes`
+ * @method create - Creates a new shift with or without `taxes`
  * @method delete - Deletes a shift
  * @method build - Returns the shift
  * @method calculateEarnings - Calculates the earnings of a shift
@@ -83,12 +83,28 @@ class HourlyService implements HourlyInterface {
     ===========================
   */
   async update(id: number) {
+    if (isEmpty(this.taxes)) {
+      const updateHourlyShiftWithoutTax = await prisma.hourly.update({
+        where: {
+          id: id,
+        },
+        data: {
+          ...this.shift,
+        },
+      });
+
+      return updateHourlyShiftWithoutTax;
+    }
+
     const updateHourlyShift = await prisma.hourly.update({
       where: {
         id: id,
       },
       data: {
         ...this.shift,
+        taxes: {
+          connect: this.taxes,
+        },
       },
     });
 
@@ -118,8 +134,9 @@ class HourlyService implements HourlyInterface {
   */
 
   async addtaxes(taxes: Tax[] | Omit<Tax, "id">[]) {
-    const createTaxes = await new TaxService(taxes).create();
-    this.taxes = createTaxes ?? [];
+    const taxesCreated = await new TaxService(taxes).create();
+
+    this.taxes = taxesCreated;
     return this;
   }
 
