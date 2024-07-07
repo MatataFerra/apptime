@@ -1,10 +1,8 @@
 "use client";
 
-import { HTMLAttributes, ReactNode, useRef } from "react";
+import { type HTMLAttributes, type ReactNode, useRef } from "react";
 
 import { useOnClickOutside } from "usehooks-ts";
-
-import { CSSClassNames } from "@/types";
 
 import Box from "@/components/ui/Box";
 
@@ -18,7 +16,7 @@ interface Props extends HTMLAttributes<HTMLElement> {
   handleOutsideClick?: () => void;
 }
 
-function Drawer({ children, isOpen, handleOutsideClick, classes, ...rest }: Props) {
+function SideMenu({ children, isOpen, handleOutsideClick, classes, ...rest }: Props) {
   //delay the animation of the drawer
   const delayOpen = useDelayed(isOpen, 100);
   const ref = useRef<HTMLDivElement>(null);
@@ -44,4 +42,4 @@ function Drawer({ children, isOpen, handleOutsideClick, classes, ...rest }: Prop
   );
 }
 
-export default Drawer;
+export default SideMenu;
