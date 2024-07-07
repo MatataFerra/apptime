@@ -83,7 +83,7 @@ function InputTax({ addTax }: Props) {
   }
 
   return (
-    <Stack as="div" orientation="horizontal" grid cols={1} classes="w-full">
+    <Stack as="div" orientation="horizontal" grid cols={3} classes="w-full">
       <Input
         placeholder="Name of tax"
         classes="min-h-8 w-full text-sm"
@@ -115,7 +115,13 @@ function InputTax({ addTax }: Props) {
         classes="min-h-8 w-full text-sm"
         {...register("description")}
       />
-      <Button type="button" variant="info" size="md" classes="w-full" onClick={() => onAddingTax()}>
+      <Button
+        type="button"
+        variant="info"
+        size="md"
+        classes="col-span-3 w-full"
+        onClick={() => onAddingTax()}
+      >
         add tax
       </Button>
     </Stack>

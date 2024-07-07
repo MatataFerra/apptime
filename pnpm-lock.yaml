@@ -143,6 +143,9 @@ importers:
       usehooks-ts:
         specifier: ^3.1.0
         version: 3.1.0(react@18.2.0)
+      vaul:
+        specifier: ^0.9.1
+        version: 0.9.1(@types/react-dom@18.2.18)(@types/react@18.3.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       zod:
         specifier: 3.23.5
         version: 3.23.5
@@ -4030,6 +4033,12 @@ packages:
 
   v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
+
+  vaul@0.9.1:
+    resolution: {integrity: sha512-fAhd7i4RNMinx+WEm6pF3nOl78DFkAazcN04ElLPFF9BMCNGbY/kou8UMhIcicm0rJCNePJP0Yyza60gGOD0Jw==}
+    peerDependencies:
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
 
   victory-vendor@36.9.1:
     resolution: {integrity: sha512-+pZIP+U3pEJdDCeFmsXwHzV7vNHQC/eIbHklfe2ZCZqayYRH7lQbHcVgsJ0XOOv27hWs4jH4MONgXxHMObTMSA==}
@@ -8276,6 +8285,15 @@ snapshots:
   uuid@8.3.2: {}
 
   v8-compile-cache-lib@3.0.1: {}
+
+  vaul@0.9.1(@types/react-dom@18.2.18)(@types/react@18.3.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
+    dependencies:
+      '@radix-ui/react-dialog': 1.0.5(@types/react-dom@18.2.18)(@types/react@18.3.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
 
   victory-vendor@36.9.1:
     dependencies:
