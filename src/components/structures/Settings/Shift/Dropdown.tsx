@@ -2,7 +2,7 @@
 
 import { CaretSortIcon } from "@radix-ui/react-icons";
 
-import { Button } from "@/components/ui/button";
+import { ButtonShadCn } from "@/components/ui/buttonShadcn";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,7 +22,7 @@ function Dropdown() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div>
-          <Button
+          <ButtonShadCn
             variant="ghost"
             className="w-full justify-between text-sm capitalize text-stone-600"
           >
@@ -30,7 +30,7 @@ function Dropdown() {
               {!!values.configs.weekStartsOn ? `${values.configs.weekStartsOn}` : "Select day"}
             </Text>
             <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
+          </ButtonShadCn>
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="bottom">

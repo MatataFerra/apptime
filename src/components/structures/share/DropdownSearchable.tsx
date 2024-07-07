@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 
-import { Button } from "@/components/ui/button";
+import { ButtonShadCn } from "@/components/ui/buttonShadcn";
 import {
   Command,
   CommandEmpty,
@@ -45,7 +45,7 @@ function DropdownSearchable({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
+        <ButtonShadCn
           variant="ghost"
           role="combobox"
           aria-expanded={open}
@@ -53,7 +53,7 @@ function DropdownSearchable({
         >
           {search ? data.find((item) => item?.value === search)?.label : `${staleTitle}`}
           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
+        </ButtonShadCn>
       </PopoverTrigger>
       <PopoverContent className="h-40 w-fit p-0" side="bottom">
         <Command>
