@@ -15,15 +15,6 @@ import Stack from "@/components/ui/Stack";
 
 import { useProductionTaxesStore } from "@/store/useTaxStore";
 
-const AccordionTaxes = dynamic(() => import("@/components/structures/Taxes/AccordionTaxes"), {
-  ssr: false,
-  loading: () => (
-    <Stack classes="w-full">
-      <Skeleton classes="h-24 w-full" />
-    </Stack>
-  ),
-});
-
 const Inputs = dynamic(() => import("@/components/structures/Production/Inputs"), {
   ssr: false,
   loading: () => (
@@ -64,11 +55,12 @@ function Form() {
             addTax={addTax}
             taxes={taxes}
             clearTaxes={clearTaxes}
-            emptyTableText="Not taxes yet"
             setSaveTaxes={setSaveTaxes}
             removeTax={removeTax}
           >
-            Advanced options
+            <Button variant="black" classes="w-full">
+              Advanced options
+            </Button>
           </Drawer>
         </Stack>
         <Submit />
