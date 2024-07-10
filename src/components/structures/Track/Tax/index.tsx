@@ -4,7 +4,7 @@ import Toast from "@/services/Toast";
 
 import InputTax from "@/components/structures/Taxes/InputTax";
 import TableTax from "@/components/structures/Taxes/Table";
-import TaxesFromDB from "@/components/structures/Taxes/TaxesFromDB";
+import Legacy_TaxesFromDB from "@/components/structures/Taxes/TaxesFromDB/legacy_TaxesFromDB";
 import Button from "@/components/ui/Button";
 import {
   Dialog,
@@ -33,12 +33,12 @@ function TaxDialog({ children }: PropsWithChildren<Props>) {
           <DialogDescription>Select between your previous taxes or add new ones</DialogDescription>
         </DialogHeader>
         <div className="space-y-8">
-          <TaxesFromDB addTax={addTax} />
+          <legacy_TaxesFromDB addTax={addTax} />
           <div className="space-y-2">
             <p>Add new tax</p>
             <InputTax addTax={addTax} />
           </div>
-          <TableTax data={taxes} emptyContent="No taxes added" removeTax={removeTax} />
+          <TableTax data={taxes} addTax={addTax} removeTax={removeTax} />
         </div>
         <DialogFooter className="my-4 items-end">
           <DialogClose asChild>
