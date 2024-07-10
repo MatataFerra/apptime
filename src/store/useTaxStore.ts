@@ -11,6 +11,17 @@ interface TaxStore {
   setSaveTaxes: (value: boolean) => void;
 }
 
+interface TaxesFromDbStore {
+  open: boolean;
+
+  setOpen: () => void;
+}
+
+export const useTaxesFromDbStore = create<TaxesFromDbStore>((set, get) => ({
+  open: true,
+  setOpen: () => set((state) => ({ open: !state.open })),
+}));
+
 export const useProductionTaxesStore = create(
   devtools<TaxStore>(
     (set, get) => ({
