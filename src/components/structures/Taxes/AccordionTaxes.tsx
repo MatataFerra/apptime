@@ -8,7 +8,7 @@ import isEmpty from "lodash/isEmpty";
 import AccordionFaq from "@/components/structures/Taxes/AccordionFaq";
 import InputTax from "@/components/structures/Taxes/InputTax";
 import TableTax from "@/components/structures/Taxes/Table";
-import TaxesFromDB from "@/components/structures/Taxes/TaxesFromDB";
+import Legacy_TaxesFromDB from "@/components/structures/Taxes/TaxesFromDB/legacy_TaxesFromDB";
 import {
   Accordion,
   AccordionContent,
@@ -30,14 +30,7 @@ type Props = {
   removeTax: (tax: string) => void;
 };
 
-function AccordionTaxes({
-  taxes,
-  emptyTableText,
-  setSaveTaxes,
-  clearTaxes,
-  addTax,
-  removeTax,
-}: Props) {
+function AccordionTaxes({ taxes, setSaveTaxes, clearTaxes, addTax, removeTax }: Props) {
   const [addMoreTaxes, setAddMoreTaxes] = useState(false);
   const { isLoading } = useTax();
 
@@ -62,7 +55,7 @@ function AccordionTaxes({
               </Stack>
             </>
           ) : (
-            <TaxesFromDB addTax={addTax} />
+            <Legacy_TaxesFromDB addTax={addTax} />
           )}
           {addMoreTaxes || !isEmpty(taxes) ? (
             <>
@@ -80,7 +73,7 @@ function AccordionTaxes({
                 <Text as="h3" classes="text-sm font-medium">
                   Check out your taxes
                 </Text>
-                <TableTax emptyContent={emptyTableText} removeTax={removeTax} data={taxes} />
+                <TableTax addTax={addTax} removeTax={removeTax} data={taxes} />
                 {!isEmpty(taxes) && (
                   <Button
                     type="button"
