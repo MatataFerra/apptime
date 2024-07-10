@@ -4,8 +4,6 @@ import Text from "@/components/ui/Text";
 
 import { cn } from "@/utils/helpers/styleMerger";
 
-import styles from "./loader.module.css";
-
 interface Loader {
   children?: React.ReactElement | React.ReactElement[];
   loading?: boolean;
@@ -74,7 +72,13 @@ Loader.spinner = ({
 };
 
 Loader.progress = function () {
-  return <div className={styles.loader} />;
+  return (
+    <div className="w-full">
+      <div className="h-1.5 w-full overflow-hidden bg-pink-100">
+        <div className="h-full w-full origin-left-right animate-progress bg-pink-500"></div>
+      </div>
+    </div>
+  );
 };
 
 export default Loader;

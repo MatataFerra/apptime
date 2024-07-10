@@ -255,9 +255,15 @@ module.exports = {
           "100%": {
             backgroundPosition: "10% 0%",
           },
-        }
+        },
+        progress: {
+          '0%': { transform: ' translateX(0) scaleX(0)' },
+          '40%': { transform: 'translateX(0) scaleX(0.4)' },
+          '100%': { transform: 'translateX(100%) scaleX(0.5)' },
+        },
       },
       animation: {
+        progress: 'progress 1s infinite linear',
         "fade-out-left": "fade-out-left 1s ease-out",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
@@ -276,6 +282,9 @@ module.exports = {
         "fade-out": "fade-out .5s ease-out",
         "bg-gradient": "bg-gradient 5s ease-in-out infinite",
       },
+      transformOrigin: {
+        'left-right': '0% 50%',
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],
