@@ -8,10 +8,11 @@ import isEmpty from "lodash/isEmpty";
 import Buttons from "@/components/structures/Taxes/TaxesFromDB/Buttons";
 import Title from "@/components/structures/Taxes/TaxesFromDB/Title";
 import Button from "@/components/ui/Button";
+import Skeleton from "@/components/ui/Skeleton";
 
 import useTax from "@/hooks/useTax";
 
-const TAXES_PER_PAGE = 3;
+const TAXES_PER_PAGE = 4;
 
 type Props = {
   addTax: (tax: Omit<Tax, "id">) => void;
@@ -27,8 +28,13 @@ function TaxesFromDB({ addTax }: Props) {
     if (page >= taxes.length) return;
     if (page < 1) return;
 
-    const start = (page - 1) * TAXES_PER_PAGE;
-    const end = page * TAXES_PER_PAGE;
+    let start = (page - 1) * TAXES_PER_PAGE;
+    let end = page * TAXES_PER_PAGE;
+
+    if (end >= taxes.length) end = taxes.length;
+    if (start < 0) start = 0;
+
+    if (start >= taxes.length) return;
 
     const taxesPaginated = taxes?.slice(start, end) || [];
 
@@ -40,13 +46,13 @@ function TaxesFromDB({ addTax }: Props) {
       {!isEmpty(dbTaxes?.tax) ? (
         <>
           <Title />
-          <ul className="mt-2 grid grid-cols-3 gap-4">
+          <ul className="mt-2 grid min-h-20 grid-cols-2 gap-4">
             {paginateTaxes()?.map((tax) => {
               const { id, ...rest } = tax;
               return (
                 <li key={tax.name} role="row">
-                  <div className="flex flex-row items-center gap-2">
-                    <p className="line-clamp-1 text-[0.65rem]">
+                  <div className="grid grid-cols-2 items-center gap-1">
+                    <p className="line-clamp-1 text-xs">
                       {tax.name}: {tax.value}%
                     </p>
                     <Button
@@ -78,7 +84,7 @@ function TaxesFromDB({ addTax }: Props) {
             userNotification={
               <>
                 {userHasAddedTax ? (
-                  <div className="absolute left-0 animate-fade-in rounded-md bg-slate-800/70 px-2 py-1 text-center text-white transition-all ">
+                  <div className="absolute left-0 animate-fade-in rounded-md bg-slate-800/70 px-2 py-1 text-center text-white transition-all">
                     Added
                   </div>
                 ) : null}
@@ -86,7 +92,9 @@ function TaxesFromDB({ addTax }: Props) {
             }
           />
         </>
-      ) : null}
+      ) : (
+        <Skeleton classes="min-h-36 w-full" />
+      )}
     </>
   );
 }
