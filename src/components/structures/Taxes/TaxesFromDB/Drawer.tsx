@@ -17,6 +17,7 @@ import {
 
 type Props = {
   addTax: (tax: Omit<Tax, "id">) => void;
+  shouldScaleBackground?: boolean;
 };
 
 interface Observer {
@@ -31,11 +32,11 @@ export const observer = create<Observer>((set) => ({
   close: () => set({ isOpen: false }),
 }));
 
-function DrawerFromDB({ addTax }: Props) {
+function DrawerFromDB({ addTax, shouldScaleBackground = false }: Props) {
   const { openDrawer, close } = observer((state) => state);
   return (
     <Drawer
-      shouldScaleBackground={false}
+      shouldScaleBackground={shouldScaleBackground}
       onOpenChange={(open) => {
         if (open) {
           openDrawer();
