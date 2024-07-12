@@ -33,7 +33,7 @@ function TaxDialog({ children }: PropsWithChildren<Props>) {
           <DialogDescription>Select between your previous taxes or add new ones</DialogDescription>
         </DialogHeader>
         <div className="space-y-8">
-          <legacy_TaxesFromDB addTax={addTax} />
+          <Legacy_TaxesFromDB addTax={addTax} />
           <div className="space-y-2">
             <p>Add new tax</p>
             <InputTax addTax={addTax} />
