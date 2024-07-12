@@ -1,11 +1,4 @@
-import {
-  type Dispatch,
-  PropsWithChildren,
-  ReactNode,
-  type SetStateAction,
-  useEffect,
-  useState,
-} from "react";
+import { type Dispatch, type ReactNode, type SetStateAction, useEffect, useState } from "react";
 
 import Button from "@/components/ui/Button";
 import Stack from "@/components/ui/Stack";
@@ -14,13 +7,14 @@ type Props = {
   page: number;
   maxPages: number;
   userNotification?: ReactNode;
-  setSearch?: (value: string) => void;
+  classes?: string;
   setPage: Dispatch<SetStateAction<number>>;
+  setSearch?: (value: string) => void;
 };
 
 const START_PAGINATION = 1;
 
-function Buttons({ page, maxPages, setSearch, setPage, userNotification }: Props) {
+function Buttons({ page, maxPages, classes, setSearch, setPage, userNotification }: Props) {
   const [disabled, setDisabled] = useState({
     left: false,
     right: false,
@@ -38,7 +32,7 @@ function Buttons({ page, maxPages, setSearch, setPage, userNotification }: Props
   }, [page]);
 
   useEffect(() => {
-    if (page === maxPages) {
+    if (page >= maxPages) {
       setDisabled({
         right: true,
         left: false,
@@ -55,7 +49,7 @@ function Buttons({ page, maxPages, setSearch, setPage, userNotification }: Props
         variant="white"
         size="sm"
         disabled={disabled.left}
-        classes="size-10 border-none p-2 font-medium"
+        classes={`size-10 border-none p-2 font-medium transition-all ${classes}`}
         onClick={() => {
           setSearch && setSearch("");
           if (page === START_PAGINATION) return;
@@ -68,10 +62,10 @@ function Buttons({ page, maxPages, setSearch, setPage, userNotification }: Props
         type="button"
         variant="black"
         size="sm"
-        classes="size-10 p-2 font-medium"
+        classes={`size-10 p-2 font-medium transition-all ${classes}`}
         disabled={disabled.right}
         onClick={() => {
-          if (page === maxPages) return;
+          if (page >= maxPages) return;
           setPage((prev) => prev + 1);
         }}
       >
