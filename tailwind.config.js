@@ -178,6 +178,28 @@ module.exports = {
           },
         },
 
+        'fade-down-out':{
+          '0%': {
+              opacity: '1',
+              transform: 'translateY(0)',
+          },
+          '100%': {
+              opacity: '0',
+              transform: 'translateY(-2rem)',
+          },
+        },
+
+        'fade-up-out':{
+          '0%': {
+              opacity: '1',
+              transform: 'translateY(0)',
+          },
+          '100%': {
+              opacity: '0',
+              transform: 'translateY(2rem)',
+          },
+        },
+
         'fade-up': {
           '0%': {
               opacity: '0',
@@ -270,7 +292,9 @@ module.exports = {
         text: "text 5s ease infinite",
         shake: "shake 1s ease 1",
         "fade-down": "fade-down 0.5s ease-in-out",
+        "fade-down-out": "fade-down-out 0.5s ease-in-out",
         "fade-up": "fade-up 0.5s ease-in-out",
+        "fade-up-out": "fade-up-out 0.5s ease-in-out",
         "hide-left": "show-left 0.5s ease-in-out forwards",
         "show-right": "show-right 0.5s ease-in-out forwards",
         "hide-right": "hide-right 0.5s ease-in-out forwards",
