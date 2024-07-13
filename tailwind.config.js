@@ -283,6 +283,11 @@ module.exports = {
           '40%': { transform: 'translateX(0) scaleX(0.4)' },
           '100%': { transform: 'translateX(100%) scaleX(0.5)' },
         },
+
+        "grow-in": {
+          '0%': {transform: "translateX(100%)", opacity: 0},
+          '100%': {transform: "translateX(0)", opacity: 1}
+        }
       },
       animation: {
         progress: 'progress 1s infinite linear',
@@ -305,6 +310,7 @@ module.exports = {
         "fade-in": "fade-in .5s ease-out",
         "fade-out": "fade-out .5s ease-out",
         "bg-gradient": "bg-gradient 5s ease-in-out infinite",
+        "grow-in": "grow-in 150ms ease-out backwards"
       },
       transformOrigin: {
         'left-right': '0% 50%',
