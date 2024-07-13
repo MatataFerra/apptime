@@ -16,15 +16,15 @@ const START_PAGINATION = 1;
 
 function Buttons({ page, maxPages, classes, setSearch, setPage, userNotification }: Props) {
   const [disabled, setDisabled] = useState({
-    left: false,
-    right: false,
+    back: false,
+    forward: false,
   });
 
   useEffect(() => {
     if (page === START_PAGINATION) {
       setDisabled({
-        right: false,
-        left: true,
+        forward: false,
+        back: true,
       });
 
       return;
@@ -34,8 +34,8 @@ function Buttons({ page, maxPages, classes, setSearch, setPage, userNotification
   useEffect(() => {
     if (page >= maxPages) {
       setDisabled({
-        right: true,
-        left: false,
+        forward: true,
+        back: false,
       });
 
       return;
@@ -48,7 +48,7 @@ function Buttons({ page, maxPages, classes, setSearch, setPage, userNotification
         type="button"
         variant="white"
         size="sm"
-        disabled={disabled.left}
+        disabled={disabled.back}
         classes={`size-10 border-none p-2 font-medium transition-all ${classes}`}
         onClick={() => {
           setSearch && setSearch("");
@@ -63,7 +63,7 @@ function Buttons({ page, maxPages, classes, setSearch, setPage, userNotification
         variant="black"
         size="sm"
         classes={`size-10 p-2 font-medium transition-all ${classes}`}
-        disabled={disabled.right}
+        disabled={disabled.forward}
         onClick={() => {
           if (page >= maxPages) return;
           setPage((prev) => prev + 1);
