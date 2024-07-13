@@ -1,14 +1,16 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { Tax } from "@prisma/client";
 import isEmpty from "lodash/isEmpty";
 
 import Buttons from "@/components/structures/Taxes/TaxesFromDB/Buttons";
+import Searcher, { searchStore } from "@/components/structures/Taxes/TaxesFromDB/Searcher";
 import Title from "@/components/structures/Taxes/TaxesFromDB/Title";
 import Button from "@/components/ui/Button";
 import Skeleton from "@/components/ui/Skeleton";
+import Stack from "@/components/ui/Stack";
 
 import useTax from "@/hooks/useTax";
 
@@ -20,21 +22,30 @@ type Props = {
 
 function TaxesFromDB({ addTax }: Props) {
   const [userHasAddedTax, setUserHasAddedTax] = useState(false);
+  const { search } = searchStore((state) => state);
   const { data: dbTaxes } = useTax();
-  const taxes = useMemo<Tax[]>(() => dbTaxes?.tax || [], [dbTaxes?.tax]);
+  const [taxes, setTaxes] = useState<Tax[]>(dbTaxes?.tax || []);
   const [page, setPage] = useState(1);
 
-  const paginateTaxes = useCallback(() => {
-    if (page >= taxes.length) return;
-    if (page < 1) return;
+  useEffect(() => {
+    if (search === "") {
+      setTaxes(dbTaxes?.tax || []);
+    } else {
+      const filterTaxes =
+        dbTaxes?.tax.filter((tax) => {
+          return tax.name.toLowerCase().includes(search.toLowerCase());
+        }) || [];
+      setTaxes(filterTaxes);
+    }
+  }, [dbTaxes?.tax, search]);
 
+  const paginateTaxes = useCallback(() => {
     let start = (page - 1) * TAXES_PER_PAGE;
     let end = page * TAXES_PER_PAGE;
 
     if (end >= taxes.length) end = taxes.length;
     if (start < 0) start = 0;
-
-    if (start >= taxes.length) return;
+    if (start >= taxes.length) start = 0;
 
     const taxesPaginated = taxes?.slice(start, end) || [];
 
@@ -45,7 +56,10 @@ function TaxesFromDB({ addTax }: Props) {
     <>
       {!isEmpty(dbTaxes?.tax) ? (
         <>
-          <Title />
+          <Stack alignItems="center">
+            <Title />
+            <Searcher />
+          </Stack>
           <ul className="mt-2 grid min-h-20 grid-cols-2 gap-4">
             {paginateTaxes()?.map((tax) => {
               const { id, ...rest } = tax;
@@ -80,7 +94,7 @@ function TaxesFromDB({ addTax }: Props) {
           <Buttons
             page={page}
             setPage={setPage}
-            maxPages={taxes.length / TAXES_PER_PAGE}
+            maxPages={Math.ceil(taxes.length / TAXES_PER_PAGE)}
             userNotification={
               <>
                 {userHasAddedTax ? (
