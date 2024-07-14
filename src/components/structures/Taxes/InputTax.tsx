@@ -3,19 +3,23 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
-import type { Tax } from "@prisma/client";
+import Toast from "@/services/Toast";
 
 import { observer } from "@/components/structures/Taxes/observer";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 
+import useTax from "@/hooks/useTax";
+
+import type { TaxElement } from "@/store/useTaxStore";
+
 type TaxField = {
   [key: string]: string;
 };
 
 type Props = {
-  addTax: (tax: Omit<Tax, "id">) => void;
+  addTax: (tax: TaxElement) => void;
 };
 
 function InputTax({ addTax }: Props) {
@@ -28,6 +32,7 @@ function InputTax({ addTax }: Props) {
     resetField,
     formState: { errors },
   } = useForm<TaxField>();
+  const { data: dbTaxes } = useTax();
 
   /*
     Observes the submit of both forms and when they are done the callback is called
@@ -63,6 +68,16 @@ function InputTax({ addTax }: Props) {
       });
       setFocus("value");
       return;
+    }
+
+    const dbTax = dbTaxes?.tax.some((tax) => tax.name === watch("name"));
+
+    if (dbTax) {
+      return Toast({
+        message: "Not added because the tax was found in Database",
+        type: "warning",
+        duration: 1000,
+      });
     }
 
     clearErrors();
