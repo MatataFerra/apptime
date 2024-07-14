@@ -3,17 +3,17 @@ import clientEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import Button from "../../ui/Button";
-import Drawer from "../../ui/Drawer";
 import Icon from "../../ui/Icons";
+import SideMenu from "../../ui/SideMenu";
 import { useDrawerStore } from "@/store/useDrawerStore";
 
 describe("DrawerMenu", () => {
   const user = clientEvent.setup();
   test("renders DrawerMenu component", () => {
     render(
-      <Drawer data-testid="drawer-menu" isOpen={true} handleOutsideClick={() => {}}>
+      <SideMenu data-testid="drawer-menu" isOpen={true} handleOutsideClick={() => {}}>
         <section>content</section>
-      </Drawer>
+      </SideMenu>
     );
 
     // Assert that the DrawerMenu component is rendered
@@ -27,7 +27,7 @@ describe("DrawerMenu", () => {
     const handleOutsideClickMock = vi.fn().mockImplementation(() => result.current.toggle());
 
     render(
-      <Drawer data-testid="drawer-menu" isOpen={true}>
+      <SideMenu data-testid="drawer-menu" isOpen={true}>
         <section>content</section>
         <Button
           data-testid="button"
@@ -38,7 +38,7 @@ describe("DrawerMenu", () => {
         >
           <Icon.cancel />
         </Button>
-      </Drawer>
+      </SideMenu>
     );
 
     await act(async () => {
@@ -53,7 +53,7 @@ describe("DrawerMenu", () => {
     const handleOutsideClickMock = vi.fn().mockImplementation(() => result.current.toggle());
 
     render(
-      <Drawer
+      <SideMenu
         data-testid="drawer-menu"
         isOpen={result.current.isOpen}
         handleOutsideClick={handleOutsideClickMock}
@@ -68,7 +68,7 @@ describe("DrawerMenu", () => {
         >
           <Icon.cancel />
         </Button>
-      </Drawer>
+      </SideMenu>
     );
 
     fireEvent.click(screen.getByTestId("button"));

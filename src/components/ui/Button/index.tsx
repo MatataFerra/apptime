@@ -49,8 +49,6 @@ function Button<E extends React.ElementType = typeof ButtonDefaultAsType>(
   );
 }
 
-Button.displayName = "Button";
-
 const component = forwardRef<HTMLButtonElement, Props<"button">>(Button);
 
 export default component;

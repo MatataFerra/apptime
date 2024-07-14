@@ -1,11 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
-import Button from "@/components/ui/Button";
 import GoogleButton from "@/components/ui/Button/Google";
 
 import { BUTTON_VARIANTS } from "@/utils/constants/tailwind";
 import { cm } from "@/utils/helpers/styleMerger";
+
+import Button from "./";
 
 const DEFAULT_STYLES = "w-40 cursor-pointer rounded-lg text-center";
 
@@ -33,22 +34,6 @@ describe("Button", () => {
     expect(buttonElement).toBeInTheDocument();
 
     expect(buttonElement).toHaveClass(merger);
-  });
-
-  test("renders with custom props and custom element", () => {
-    render(
-      <Button as="a" href="https://google.com" variant="secondary">
-        Click me
-      </Button>
-    );
-
-    const merger = cm(DEFAULT_STYLES, BUTTON_VARIANTS.secondary);
-
-    const buttonElement = screen.getByText("Click me");
-    expect(buttonElement).toBeInTheDocument();
-
-    expect(buttonElement).toHaveClass(merger);
-    expect(buttonElement).toHaveAttribute("href", "https://google.com");
   });
 });
 

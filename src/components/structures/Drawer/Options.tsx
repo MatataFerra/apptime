@@ -8,7 +8,6 @@ import Login from "@/components/structures/Auth/Login";
 import Logout from "@/components/structures/Auth/Logout";
 import Option from "@/components/structures/Drawer/Option";
 import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 

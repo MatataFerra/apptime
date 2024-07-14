@@ -6,7 +6,7 @@ import { type DateRange } from "react-day-picker";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 
-import { Button } from "@/components/ui/button";
+import { ButtonShadCn } from "@/components/ui/buttonShadcn";
 import { Calendar } from "@/components/ui/Calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
 
@@ -34,7 +34,7 @@ function DateRangePicker({ classes, onDatesSelected }: DateRangePickerProps) {
     <div className={cn("grid gap-2", classes)}>
       <Popover>
         <PopoverTrigger asChild>
-          <Button
+          <ButtonShadCn
             id="date"
             variant={"outline"}
             className={cn(
@@ -54,7 +54,7 @@ function DateRangePicker({ classes, onDatesSelected }: DateRangePickerProps) {
             ) : (
               <span>Pick a date</span>
             )}
-          </Button>
+          </ButtonShadCn>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar

@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
 
 import dynamic from "next/dynamic";
 
@@ -30,15 +30,16 @@ const Ham = dynamic(() => import("@/components/structures/share/Ham"), {
 
 interface Props {
   children: ReactElement;
-  params: {
-    locale: string;
-  };
 }
 
-export default async function HomeLayout({ children, params }: Props) {
+export default async function HomeLayout({ children }: Props) {
   return (
     <>
-      <main className="grid h-full grid-rows-[auto,1fr] gap-8 p-4" data-testid="drawer-close">
+      <main
+        vaul-drawer-wrapper=""
+        className="grid h-full grid-rows-[auto,1fr] gap-8 bg-white p-4"
+        data-testid="drawer-close"
+      >
         <Header position="between" classes="relative">
           <Ham />
           <Drawer>

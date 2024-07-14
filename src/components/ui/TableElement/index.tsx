@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 
-import { CSSClassNames } from "@/types";
+import type { CSSClassNames } from "@/types";
 
 import { cn } from "@/utils/helpers/styleMerger";
 
@@ -42,4 +42,12 @@ function TableElement<E extends ValidTableElement = typeof TableElementDefaultAs
   );
 }
 
+TableElement.displayName = "TableElement";
+
+/**
+ * Forward Ref table element
+ * @param props - TableElement props
+ * @param ref - TableElement ref
+ * @returns TableElement component
+ */
 export default forwardRef(TableElement);
