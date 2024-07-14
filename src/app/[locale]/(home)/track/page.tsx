@@ -11,7 +11,7 @@ import Stack from "@/components/ui/Stack";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-const Status = dynamic(() => import("@/components/modules/Track/Status"), {
+const Track = dynamic(() => import("@/components/modules/Track/Track"), {
   ssr: false,
   loading: () => (
     <>
@@ -32,7 +32,7 @@ const Title = dynamic(() => import("@/components/structures/share/ModuleTitle"),
   loading: () => <Skeleton classes="h-60 w-40" />,
 });
 
-export default async function Track({ params }: { params: LocaleParams }) {
+export default async function TrackPage({ params }: { params: LocaleParams }) {
   const isLocaleSupported = new i18n(params.locale).isLocaleSupported();
 
   if (!isLocaleSupported) {
@@ -49,7 +49,7 @@ export default async function Track({ params }: { params: LocaleParams }) {
     <>
       <Stack orientation="vertical" spacing={8}>
         <Title title="Track" subtitle="Get your exact time while you work" />
-        <Status />
+        <Track />
       </Stack>
     </>
   );
