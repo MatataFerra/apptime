@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { create } from "zustand";
 
@@ -19,8 +19,19 @@ export const searchStore = create<SearchStore>((set) => ({
 }));
 
 function Searcher() {
+  const searchRef = useRef<HTMLInputElement>(null);
   const [iconClick, setIconClick] = useState(false);
   const { search, setSearch } = searchStore((state) => state);
+
+  useEffect(() => {
+    if (!iconClick) {
+      return setSearch("");
+    } else {
+      setTimeout(() => {
+        searchRef.current?.focus();
+      }, 300);
+    }
+  }, [iconClick, setSearch]);
 
   function toggleSearcher() {
     setIconClick(!iconClick);
@@ -30,6 +41,7 @@ function Searcher() {
     <Stack classes="my-2 min-h-9 w-full overflow-hidden" alignItems="center" justifyContent="end">
       {iconClick ? (
         <Input
+          ref={searchRef}
           role="search"
           name="search"
           type="search"
@@ -45,7 +57,7 @@ function Searcher() {
         onClick={() => toggleSearcher()}
       >
         {iconClick ? (
-          <Icon.cancel width={15} height={15} viewBox="0 0 20 18" className="animate-fade-in" />
+          <Icon.cancel width={15} height={15} viewBox="0 0 20 20" className="animate-fade-in" />
         ) : (
           <Icon.magnifier width={15} height={15} className="animate-fade-in" />
         )}
