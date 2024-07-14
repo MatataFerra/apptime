@@ -1,46 +1,47 @@
 import { type Dispatch, type ReactNode, type SetStateAction, useEffect, useState } from "react";
 
+import type { Tax } from "@prisma/client";
+
+import { TAXES_PER_PAGE } from "@/components/structures/Taxes/TaxesFromDB/TaxesFromDB";
 import Button from "@/components/ui/Button";
 import Stack from "@/components/ui/Stack";
 
 type Props = {
   page: number;
   maxPages: number;
-  userNotification?: ReactNode;
   classes?: string;
+  taxes?: Tax[];
+  userNotification?: ReactNode;
   setPage: Dispatch<SetStateAction<number>>;
   setSearch?: (value: string) => void;
 };
 
 const START_PAGINATION = 1;
 
-function Buttons({ page, maxPages, classes, setSearch, setPage, userNotification }: Props) {
+function Buttons({ page, maxPages, classes, taxes, setSearch, setPage, userNotification }: Props) {
   const [disabled, setDisabled] = useState({
     back: false,
     forward: false,
   });
 
   useEffect(() => {
-    if (page === START_PAGINATION) {
+    if ((taxes?.length ?? 0) < TAXES_PER_PAGE) {
       setDisabled({
-        forward: false,
+        forward: true,
         back: true,
       });
-
-      return;
-    }
-  }, [page]);
-
-  useEffect(() => {
-    if (page >= maxPages) {
+    } else if (page >= maxPages) {
       setDisabled({
         forward: true,
         back: false,
       });
-
-      return;
+    } else {
+      setDisabled({
+        forward: false,
+        back: true,
+      });
     }
-  }, [maxPages, page]);
+  }, [maxPages, page, taxes?.length]);
 
   return (
     <Stack classes="relative mt-4 w-full" justifyContent="end">
