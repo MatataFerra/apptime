@@ -1,6 +1,5 @@
 import type { HTMLInputTypeAttribute } from "react";
 
-import type { Tax } from "@prisma/client";
 import { z } from "zod";
 
 import {
@@ -11,6 +10,8 @@ import {
 } from "@/types";
 
 import { INPUT_VARIANTS } from "@/utils/constants/tailwind";
+
+import type { TaxElement } from "@/store/useTaxStore";
 
 export enum FormStep {
   PERSONAL_INFO,
@@ -60,7 +61,7 @@ export type FastChargeInputsParsed = {
   holidayPayRate: number;
   unpaidBreaks: number;
   saveTaxes: boolean;
-  taxes: Omit<Tax, "id">[] | [];
+  taxes: TaxElement[] | [];
 };
 
 // Production Form
@@ -73,7 +74,7 @@ export type ProductionInputsParsed = {
   holidayPayRate: number;
   isPublicHoliday: boolean;
   publicHolidayWorked: boolean;
-  taxes: Omit<Tax, "id">[] | [];
+  taxes: TaxElement[] | [];
   saveTaxes: boolean;
 };
 
