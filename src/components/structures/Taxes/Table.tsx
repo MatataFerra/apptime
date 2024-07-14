@@ -1,54 +1,34 @@
-import type { Tax } from "@prisma/client";
+import isEmpty from "lodash/isEmpty";
 
-import Button from "@/components/ui/Button";
-import Table from "@/components/ui/Table";
-import TableBody from "@/components/ui/TableBody";
-import TableElement from "@/components/ui/TableElement";
-import TableHead from "@/components/ui/TableHead";
+import TaxElement from "@/components/structures/Taxes/Tax";
 
-import dataIsEmpty from "@/hoc/dataIsEmpty";
+import type { TaxElement as TaxElementType } from "@/store/useTaxStore";
 
 type Props = {
-  data: Omit<Tax, "id">[];
+  data: TaxElementType[];
+  addTax: (tax: TaxElementType) => void;
   removeTax: (tax: string) => void;
 };
 
 function TableTax({ data, removeTax }: Props) {
   return (
-    <Table classes="w-full table-fixed animate-fade-in rounded-md border border-slate-300/20 px-2 shadow-sm">
-      <TableHead
-        classes="bg-stone-200/20  text-xs text-gray-600 dark:text-gray-100"
-        columnTitle={["Name", "Value", "Description", "Action"]}
-        elementClasses="py-2"
-      />
-      <TableBody>
-        {data?.map((tax) => (
-          <TableElement as="tr" classes="rounded-md" key={tax.name}>
-            <TableElement classes="p-1 text-center text-sm group-hover:cursor-default">
-              {tax.name}
-            </TableElement>
-            <TableElement classes="p-1 text-center text-sm group-hover:cursor-default">
-              {tax.value}%
-            </TableElement>
-            <TableElement classes="overflow-hidden text-ellipsis text-nowrap p-1 text-center text-sm group-hover:cursor-default">
-              {tax.description}
-            </TableElement>
-            <TableElement classes="table-cell p-1 text-center">
-              <Button
-                type="button"
-                variant="danger"
-                size="xs"
-                classes="mx-auto my-0"
-                onClick={() => removeTax(tax.name ?? "")}
-              >
-                Remove
-              </Button>
-            </TableElement>
-          </TableElement>
-        ))}
-      </TableBody>
-    </Table>
+    <div role="table" className="w-full transition-all">
+      <article>
+        <div className="rounded-md border border-slate-500/20 p-2 shadow-md">
+          <h3 className="mb-2">
+            {!isEmpty(data) ? "Check out your taxes:" : "Waiting for taxes..."}
+          </h3>
+          <ol className="grid h-16 grid-cols-2 overflow-y-scroll marker:text-xs sm:grid-cols-3">
+            {data?.map((tax, index) => (
+              <li key={tax.name} role="row">
+                <TaxElement taxes={data} tax={tax} index={index} removeTax={removeTax} />
+              </li>
+            ))}
+          </ol>
+        </div>
+      </article>
+    </div>
   );
 }
 
-export default dataIsEmpty(TableTax);
+export default TableTax;

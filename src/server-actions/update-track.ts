@@ -1,6 +1,6 @@
 "use server";
 
-import type { Hourly, Tax } from "@prisma/client";
+import type { Hourly } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 import ShiftService from "@/services/Shift";
@@ -9,9 +9,11 @@ import UserService from "@/services/User";
 
 import type { TrackInputs } from "@/types/forms";
 
+import type { TaxElement } from "@/store/useTaxStore";
+
 export default async function onUpdateTrackJob(
   data: Partial<TrackInputs> | null,
-  taxes: Omit<Tax, "id">[],
+  taxes: TaxElement[],
   shiftId: number | undefined
 ) {
   const currentUser = await UserService.getSessionUser();
@@ -39,9 +41,13 @@ export default async function onUpdateTrackJob(
 
   const taxesFromLocal = taxes
     .filter((tax) => tax.name && tax.value)
-    .map((tax) => ({
-      ...tax,
-    }));
+    .map((tax) => {
+      return {
+        name: tax.name,
+        value: tax.value,
+        description: tax.description,
+      };
+    });
 
   try {
     const response = await new HourlyService(shift)

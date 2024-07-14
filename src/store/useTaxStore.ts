@@ -2,14 +2,26 @@ import type { Tax } from "@prisma/client";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
+export type TaxElement = Omit<Tax, "id"> & { fromDb?: boolean };
+
 interface TaxStore {
-  taxes: Omit<Tax, "id">[];
+  taxes: TaxElement[];
   saveTaxes: boolean;
-  addTax: (tax: Omit<Tax, "id">) => void;
+  addTax: (tax: TaxElement) => void;
   removeTax: (internalId: string) => void;
   clearTaxes: () => void;
   setSaveTaxes: (value: boolean) => void;
 }
+
+interface TaxesFromDbStore {
+  open: boolean;
+  setOpen: () => void;
+}
+
+export const useTaxesFromDbStore = create<TaxesFromDbStore>((set, get) => ({
+  open: true,
+  setOpen: () => set((state) => ({ open: !state.open })),
+}));
 
 export const useProductionTaxesStore = create(
   devtools<TaxStore>(

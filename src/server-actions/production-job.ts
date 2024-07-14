@@ -42,9 +42,13 @@ export default async function onCreateProductionShift(data: ProductionInputsPars
   try {
     const taxesFromLocal = data.taxes
       .filter((tax) => tax.name && tax.value)
-      .map((tax) => ({
-        ...tax,
-      }));
+      .map((tax) => {
+        return {
+          name: tax.name,
+          value: tax.value,
+          description: tax.description,
+        };
+      });
 
     const response = await new ProductionService(shift)
       .addtaxes(taxesFromLocal)
