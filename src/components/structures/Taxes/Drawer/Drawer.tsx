@@ -1,7 +1,8 @@
 import { type PropsWithChildren, useState } from "react";
 
-import type { Tax } from "@prisma/client";
 import isEmpty from "lodash/isEmpty";
+
+import Toast from "@/services/Toast";
 
 import InputTax from "@/components/structures/Taxes/InputTax";
 import TableTax from "@/components/structures/Taxes/Table";
@@ -23,9 +24,11 @@ import Text from "@/components/ui/Text";
 
 import { cn } from "@/utils/helpers/styleMerger";
 
+import type { TaxElement } from "@/store/useTaxStore";
+
 type Props = {
-  taxes: Omit<Tax, "id">[];
-  addTax: (tax: Omit<Tax, "id">) => void;
+  taxes: TaxElement[];
+  addTax: (tax: TaxElement) => void;
   setSaveTaxes: (value: boolean) => void;
   clearTaxes: () => void;
   removeTax: (tax: string) => void;
@@ -75,7 +78,20 @@ function Drawer({ taxes, addTax, removeTax, children }: PropsWithChildren<Props>
           )}
           <DrawerFooter>
             <DrawerClose asChild>
-              <Button variant="black" size="md" classes="w-auto text-base">
+              <Button
+                variant="black"
+                size="md"
+                classes="w-auto text-base"
+                onClick={() => {
+                  if (taxes.length > 0) {
+                    Toast({
+                      message: "Save changes...",
+                      type: "plain",
+                      duration: 500,
+                    });
+                  }
+                }}
+              >
                 Save & close
               </Button>
             </DrawerClose>
