@@ -47,12 +47,13 @@ function TaxDialog({ children }: PropsWithChildren<Props>) {
           </div>
           <TableTax data={taxes} addTax={addTax} removeTax={removeTax} />
         </div>
-        <DialogFooter className="my-4 flex flex-row items-end gap-2">
+        <DialogFooter className="my-4 grid grid-cols-[1fr_auto] gap-2">
           <DrawerFromDB addTax={addTax} />
           <DialogClose asChild>
             <Button
               variant={taxes.length === 0 ? "danger" : "gradient_secondary"}
               size="md"
+              classes="w-fit"
               onClick={() => {
                 if (taxes.length === 0) {
                   Toast({
