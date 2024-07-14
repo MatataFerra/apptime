@@ -14,10 +14,12 @@ import Stack from "@/components/ui/Stack";
 
 import useTax from "@/hooks/useTax";
 
-const TAXES_PER_PAGE = 4;
+import type { TaxElement } from "@/store/useTaxStore";
+
+export const TAXES_PER_PAGE = 4;
 
 type Props = {
-  addTax: (tax: Omit<Tax, "id">) => void;
+  addTax: (tax: TaxElement) => void;
 };
 
 function TaxesFromDB({ addTax }: Props) {
@@ -81,7 +83,7 @@ function TaxesFromDB({ addTax }: Props) {
                           setUserHasAddedTax(false);
                         }, 750);
 
-                        addTax({ ...rest });
+                        addTax({ ...rest, fromDb: true });
                       }}
                     >
                       add
@@ -95,6 +97,7 @@ function TaxesFromDB({ addTax }: Props) {
             page={page}
             setPage={setPage}
             maxPages={Math.ceil(taxes.length / TAXES_PER_PAGE)}
+            taxes={taxes}
             userNotification={
               <>
                 {userHasAddedTax ? (
