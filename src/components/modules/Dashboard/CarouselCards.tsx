@@ -12,6 +12,7 @@ import Text from "@/components/ui/Text";
 
 const Card = dynamic(() => import("@/components/ui/Card"), {
   ssr: false,
+  loading: () => <Skeleton classes="h-60 w-full" />,
 });
 
 const Carousel = dynamic(() => import("@/components/ui/Carousel").then((mod) => mod.Carousel), {

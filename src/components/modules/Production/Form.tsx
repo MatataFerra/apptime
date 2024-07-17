@@ -7,13 +7,13 @@ import dynamic from "next/dynamic";
 
 import { ProductionJobFormSchema } from "@/types";
 
-import Submit from "@/components/structures/Production/Submit";
-import Drawer from "@/components/structures/Taxes/Drawer/Drawer";
-import Button from "@/components/ui/Button";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
-import { useProductionTaxesStore } from "@/store/useTaxStore";
+const Drawer = dynamic(() => import("@/components/modules/Production/Drawer"), {
+  ssr: false,
+  loading: () => <Skeleton classes="h-12 w-full" />,
+});
 
 const Inputs = dynamic(() => import("@/components/structures/Production/Inputs"), {
   ssr: false,
@@ -21,28 +21,31 @@ const Inputs = dynamic(() => import("@/components/structures/Production/Inputs")
     <>
       <Stack orientation="vertical" classes="w-full">
         <Stack orientation="horizontal" wrap classes="w-full">
-          <Skeleton classes="input-flex min-h-12 w-full" />
-          <Skeleton classes="input-flex min-h-12 w-full" />
-          <Skeleton classes="input-flex min-h-12 w-full" />
-          <Skeleton classes="input-flex min-h-12 w-full" />
-          <Skeleton classes="input-flex min-h-12 w-full" />
-          <Skeleton classes="input-flex min-h-12 w-full" />
-          <Skeleton classes="input-flex min-h-12 w-full" />
+          <Skeleton classes="min-h-16 w-full" />
+          <Skeleton classes="min-h-16 w-full" />
+          <Skeleton classes="input-flex min-h-16 w-full" />
+          <Skeleton classes="input-flex min-h-16 w-full" />
+          <Skeleton classes="input-flex min-h-16 w-full" />
         </Stack>
         <Stack orientation="horizontal" classes="w-full">
-          <Skeleton classes="h-5 w-full" />
-          <Skeleton classes="h-5 w-full" />
+          <Skeleton classes="h-8 w-full" />
+          <Skeleton classes="h-8 w-full" />
         </Stack>
       </Stack>
     </>
   ),
 });
 
-function Form() {
-  const { taxes, clearTaxes, setSaveTaxes, addTax, removeTax } = useProductionTaxesStore(
-    (state) => state
-  );
+const Submit = dynamic(() => import("@/components/structures/Production/Submit"), {
+  ssr: false,
+  loading: () => (
+    <Stack justifyContent="end" classes="w-full">
+      <Skeleton classes="h-12 w-32" />
+    </Stack>
+  ),
+});
 
+function Form() {
   const methods = useForm({
     resolver: zodResolver(ProductionJobFormSchema),
   });
@@ -50,19 +53,7 @@ function Form() {
     <>
       <FormProvider {...methods}>
         <Inputs />
-        <Stack classes="my-8 w-full">
-          <Drawer
-            addTax={addTax}
-            taxes={taxes}
-            clearTaxes={clearTaxes}
-            setSaveTaxes={setSaveTaxes}
-            removeTax={removeTax}
-          >
-            <Button variant="black" classes="w-full">
-              Advanced options
-            </Button>
-          </Drawer>
-        </Stack>
+        <Drawer />
         <Submit />
       </FormProvider>
     </>

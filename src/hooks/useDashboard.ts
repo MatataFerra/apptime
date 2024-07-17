@@ -39,7 +39,15 @@ function useDashboard() {
     setIsUserLoaded(true);
   }, [isLoading, data, isUserLoaded, setIsUserLoaded, setInitialShifts]);
 
-  return { deleteShift, filterByDate, initialShifts, resetShifts, update, user };
+  return {
+    deleteShift,
+    filterByDate,
+    initialShifts,
+    resetShifts,
+    update,
+    user,
+    isLoadingUserData: isLoading,
+  };
 }
 
 export default useDashboard;

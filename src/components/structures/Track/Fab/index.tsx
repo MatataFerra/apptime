@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import dynamic from "next/dynamic";
 import { useOnClickOutside } from "usehooks-ts";
 
-import TaxDialog from "@/components/structures/Track/Tax";
 import FloatingActionButton from "@/components/ui/Fab";
 import Icon from "@/components/ui/Icons";
 
@@ -12,6 +12,10 @@ import useStatus from "@/hooks/useStatus";
 import useTrack from "@/hooks/useTrack";
 
 import { useNotesStore } from "@/store/useNotesStore";
+
+const TaxDialog = dynamic(() => import("@/components/structures/Track/Tax"), {
+  ssr: false,
+});
 
 const FAB_MS_STAGER = 150;
 

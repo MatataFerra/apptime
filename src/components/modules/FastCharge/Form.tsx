@@ -7,12 +7,13 @@ import dynamic from "next/dynamic";
 
 import { FastChargeFormSchema } from "@/types";
 
-import Drawer from "@/components/structures/Taxes/Drawer/Drawer";
-import Button from "@/components/ui/Button";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
-import { useHourlyTaxesStore } from "@/store/useTaxStore";
+const Drawer = dynamic(() => import("@/components/modules/Production/Drawer"), {
+  ssr: false,
+  loading: () => <Skeleton classes="h-12 w-full" />,
+});
 
 const Inputs = dynamic(() => import("@/components/structures/FastCharge/Inputs"), {
   ssr: false,
@@ -20,17 +21,17 @@ const Inputs = dynamic(() => import("@/components/structures/FastCharge/Inputs")
     <>
       <Stack orientation="vertical" classes="w-full">
         <Stack orientation="horizontal" wrap classes="w-full">
-          <Skeleton classes="input-flex min-h-12 w-full" />
-          <Skeleton classes="input-flex min-h-12 w-full" />
-          <Skeleton classes="input-flex min-h-12 w-full" />
-          <Skeleton classes="input-flex min-h-12 w-full" />
-          <Skeleton classes="input-flex min-h-12 w-full" />
-          <Skeleton classes="input-flex min-h-12 w-full" />
-          <Skeleton classes="input-flex min-h-12 w-full" />
+          <Skeleton classes="input-flex min-h-16 w-full" />
+          <Skeleton classes="input-flex min-h-16 w-full" />
+          <Skeleton classes="input-flex min-h-16 w-full" />
+          <Skeleton classes="input-flex min-h-16 w-full" />
+          <Skeleton classes="input-flex min-h-16 w-full" />
+          <Skeleton classes="input-flex min-h-16 w-full" />
+          <Skeleton classes="input-flex min-h-16 w-full" />
         </Stack>
         <Stack orientation="horizontal" classes="w-full">
-          <Skeleton classes="h-5 w-full" />
-          <Skeleton classes="h-5 w-full" />
+          <Skeleton classes="h-8 w-full" />
+          <Skeleton classes="h-8 w-full" />
         </Stack>
       </Stack>
     </>
@@ -47,10 +48,6 @@ const Submit = dynamic(() => import("@/components/structures/FastCharge/Submit")
 });
 
 function Form() {
-  const { addTax, clearTaxes, removeTax, setSaveTaxes, taxes } = useHourlyTaxesStore(
-    (state) => state
-  );
-
   const methods = useForm({
     resolver: zodResolver(FastChargeFormSchema),
   });
@@ -59,19 +56,7 @@ function Form() {
     <>
       <FormProvider {...methods}>
         <Inputs />
-        <Stack classes="my-8 w-full">
-          <Drawer
-            addTax={addTax}
-            taxes={taxes}
-            clearTaxes={clearTaxes}
-            setSaveTaxes={setSaveTaxes}
-            removeTax={removeTax}
-          >
-            <Button variant="black" classes="w-full">
-              Advanced options
-            </Button>
-          </Drawer>
-        </Stack>
+        <Drawer />
         <Submit />
       </FormProvider>
     </>

@@ -3,20 +3,12 @@ import { useEffect, useState } from "react";
 import type { Tax } from "@prisma/client";
 import isEqual from "lodash/isEqual";
 
-import TaxService from "@/services/Tax";
-
 import useTax from "@/hooks/useTax";
 
 type LocalTax = Omit<Tax, "id">;
 
 type HookProps = {
   localTaxes: LocalTax[];
-};
-
-type UniqueTaxes = {
-  id?: number;
-  exists: boolean;
-  tax: Omit<Tax, "id">;
 };
 
 /**

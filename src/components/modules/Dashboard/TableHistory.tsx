@@ -1,19 +1,38 @@
 import dynamic from "next/dynamic";
 
+import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 import Table from "@/components/ui/Table";
 
-const COLUMNS = ["Day", "Hours", "Earnings", "Public Holiday"] as const;
-const COLUMNS_PER_PRODUCTION = ["Day", "Production", "Earnings", "Public Holiday"] as const;
+export const COLUMNS = ["Day", "Hours", "Earnings", "Public Holiday"] as const;
+export const COLUMNS_PER_PRODUCTION = ["Day", "Production", "Earnings", "Public Holiday"] as const;
 
 const HourlyBody = dynamic(() => import("@/components/structures/Dashboard/Table/Hourly/Body"), {
   ssr: false,
+  loading: () => (
+    <tbody>
+      <tr>
+        <td colSpan={COLUMNS.length}>
+          <Skeleton classes="h-full w-full" />
+        </td>
+      </tr>
+    </tbody>
+  ),
 });
 
 const ProductionBody = dynamic(
   () => import("@/components/structures/Dashboard/Table/Production/Body"),
   {
     ssr: false,
+    loading: () => (
+      <tbody>
+        <tr>
+          <td colSpan={COLUMNS_PER_PRODUCTION.length}>
+            <Skeleton classes="h-full w-full" />
+          </td>
+        </tr>
+      </tbody>
+    ),
   }
 );
 
@@ -37,10 +56,12 @@ const TableHead = dynamic(() => import("@/components/ui/TableHead"), {
 
 const Tabs = dynamic(() => import("@/components/ui/Tabs").then((mod) => mod.Tabs), {
   ssr: false,
+  loading: () => <Skeleton classes="max-h-60 min-h-60 w-full" />,
 });
 
 const TabsContent = dynamic(() => import("@/components/ui/Tabs").then((mod) => mod.TabsContent), {
   ssr: false,
+  loading: () => <Skeleton classes="h-full w-full" />,
 });
 
 const TabsList = dynamic(() => import("@/components/ui/Tabs").then((mod) => mod.TabsList), {
@@ -61,13 +82,12 @@ function TableHistory() {
         </TabsList>
       </Stack>
       <TabsContent className="m-0 rounded-lg shadow-input" value="perHour">
-        <Table classes="h-full w-full table-fixed">
+        <Table classes="h-full min-h-[25dvh] w-full table-fixed">
           <TableHead
             classes="border-b border-b-gray-900 text-left text-xs"
             columnTitle={COLUMNS}
             elementClasses="p-4"
           />
-
           <HourlyBody />
           <HourlyFooter colsNumber={COLUMNS.length} />
         </Table>

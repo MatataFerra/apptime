@@ -4,27 +4,14 @@ import i18n from "@/services/i18n";
 import UserService from "@/services/User";
 import ut from "@/services/Utilities/client";
 
-import { LocaleParams } from "@/types";
+import type { LocaleParams } from "@/types";
 
 import Skeleton from "@/components/ui/Skeleton";
-import Stack from "@/components/ui/Stack";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-const Status = dynamic(() => import("@/components/modules/Track/Status"), {
+const Track = dynamic(() => import("@/components/modules/Track/Track"), {
   ssr: false,
-  loading: () => (
-    <>
-      <Stack orientation="vertical" classes="w-full" spacing={8}>
-        <Skeleton classes="h-8 w-1/3" />
-        <Skeleton classes="h-[25dvh] w-full" />
-      </Stack>
-      <Stack classes="h-full w-full" spacing={10} alignItems="center" justifyContent="between">
-        <Skeleton classes="h-12 w-full" />
-        <Skeleton classes="h-12 w-full" />
-      </Stack>
-    </>
-  ),
 });
 
 const Title = dynamic(() => import("@/components/structures/share/ModuleTitle"), {
@@ -32,7 +19,7 @@ const Title = dynamic(() => import("@/components/structures/share/ModuleTitle"),
   loading: () => <Skeleton classes="h-60 w-40" />,
 });
 
-export default async function Track({ params }: { params: LocaleParams }) {
+export default async function TrackPage({ params }: { params: LocaleParams }) {
   const isLocaleSupported = new i18n(params.locale).isLocaleSupported();
 
   if (!isLocaleSupported) {
@@ -47,10 +34,8 @@ export default async function Track({ params }: { params: LocaleParams }) {
 
   return (
     <>
-      <Stack orientation="vertical" spacing={8}>
-        <Title title="Track" subtitle="Get your exact time while you work" />
-        <Status />
-      </Stack>
+      <Title title="Track" subtitle="Get your exact time while you work" />
+      <Track />
     </>
   );
 }
