@@ -1,7 +1,7 @@
 import { type ChangeEvent, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 
-import { Tax } from "@prisma/client";
+import type { Tax } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 
@@ -26,11 +26,6 @@ import { useHourlyTaxesStore } from "@/store/useTaxStore";
 
 function Inputs() {
   /*
-    Custom hook to get the taxes from the store
-  */
-  const { clearTaxes, setSaveTaxes, taxes, saveTaxes } = useHourlyTaxesStore((state) => state);
-
-  /*
     Custom hook to get the values from the form
   */
   const {
@@ -40,6 +35,11 @@ function Inputs() {
     setIsFormReady,
     setDialogState,
   } = useFastChargeStore((state) => state);
+
+  /*
+    Custom hook to get the taxes from the store
+  */
+  const { clearTaxes, setSaveTaxes, taxes, saveTaxes } = useHourlyTaxesStore((state) => state);
 
   /*
     Use data and methods from the useForm hook

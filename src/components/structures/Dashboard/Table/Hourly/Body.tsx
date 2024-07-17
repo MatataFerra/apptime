@@ -13,7 +13,7 @@ import TableBody from "@/components/ui/TableBody";
 import useDashboard from "@/hooks/useDashboard";
 
 function HourlyBody() {
-  const { user } = useDashboard();
+  const { user, isLoadingUserData } = useDashboard();
 
   const hourlyWorkedShift = useMemo(() => {
     return user?.shifts?.hourly;
@@ -21,7 +21,13 @@ function HourlyBody() {
 
   return (
     <TableBody>
-      {isEmpty(hourlyWorkedShift) ? (
+      {isLoadingUserData ? (
+        <tr>
+          <td colSpan={4} className="p-8 text-center">
+            Waiting for data...
+          </td>
+        </tr>
+      ) : isEmpty(hourlyWorkedShift) ? (
         <tr>
           <td colSpan={4} className="p-8 text-center">
             No shifts found

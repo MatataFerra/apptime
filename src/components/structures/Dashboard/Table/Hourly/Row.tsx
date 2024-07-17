@@ -2,11 +2,12 @@
 
 import { useCallback, useMemo } from "react";
 
-import { Hourly } from "@prisma/client";
+import type { Hourly } from "@prisma/client";
 import dynamic from "next/dynamic";
 
 import ShiftService from "@/services/Shift";
 
+import { COLUMNS } from "@/components/modules/Dashboard/TableHistory";
 import Icon from "@/components/ui/Icons";
 import Skeleton from "@/components/ui/Skeleton";
 import TableElement from "@/components/ui/TableElement";
@@ -17,7 +18,7 @@ const TableDialog = dynamic(() => import("@/components/structures/Dashboard/Tabl
   ssr: false,
   loading: () => (
     <TableElement as="tr">
-      <TableElement>
+      <TableElement colSpan={COLUMNS.length}>
         <Skeleton classes="h-40 w-full" />
       </TableElement>
     </TableElement>
@@ -28,7 +29,7 @@ const TableDialogContent = dynamic(
   () => import("@/components/structures/Dashboard/Table/Dialog/Content"),
   {
     ssr: false,
-    loading: () => <Skeleton classes="h-40 w-full" />,
+    loading: () => <Skeleton classes="h-20 w-full" />,
   }
 );
 

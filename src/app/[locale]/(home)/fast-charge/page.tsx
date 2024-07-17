@@ -4,7 +4,7 @@ import Stack from "@/components/ui/Stack";
 
 export const dynamic = "force-dynamic";
 
-export default async function FastCharge() {
+export default async function FastChargePage() {
   return (
     <Stack orientation="vertical" spacing={6}>
       <ModuleTitle title="Fast Charge" subtitle="charge your shift" />

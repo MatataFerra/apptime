@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 
+import type { Tax } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
 
 import Toast from "@/services/Toast";
@@ -14,6 +15,7 @@ import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
+import useGetUniqueTaxes from "@/hooks/useGetUniqueTaxes";
 import useUser from "@/hooks/useUser";
 
 import onCreateProductionShift from "@/server-actions/production-job";
@@ -54,6 +56,7 @@ function Inputs() {
 
   const queryClient = useQueryClient();
   const { data: user } = useUser();
+  const getUniqueTaxes = useGetUniqueTaxes({ localTaxes: taxes });
 
   /*
     ================================================================================
@@ -117,6 +120,34 @@ function Inputs() {
       "user",
       user?.email,
     ]);
+
+    const previousTaxData = queryClient.getQueryData<SuccessApiResponse<Tax[]>>(["tax"]);
+
+    //* Optimistic update
+    queryClient.cancelQueries({ queryKey: ["tax"] }).then(() => {
+      const prev = previousTaxData?.tax.map((tax) => {
+        return {
+          ...tax,
+        };
+      });
+
+      const lastId = prev?.at(-1)?.id ?? Math.random();
+
+      const unique = getUniqueTaxes?.map((tax) => ({
+        ...tax,
+        id: lastId + 1,
+      }));
+
+      const all = prev?.concat(unique ?? []);
+
+      queryClient.setQueryData(["tax"], {
+        ...previousTaxData,
+        tax: all,
+      });
+
+      return { previousTaxData };
+    });
+
     //* Optimistic update
     queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
       const lastId = previousUserData?.user?.shifts?.production?.at(-1)?.id ?? Math.random();
@@ -196,6 +227,15 @@ function Inputs() {
         });
 
         return { previousUserData };
+      });
+
+      queryClient.cancelQueries({ queryKey: ["tax"] }).then(() => {
+        queryClient.setQueryData(["tax"], {
+          ...previousTaxData,
+          tax: previousTaxData?.tax,
+        });
+
+        return { previousTaxData };
       });
 
       setSaveTaxes(false);

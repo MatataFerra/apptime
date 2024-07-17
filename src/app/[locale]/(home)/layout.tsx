@@ -37,7 +37,7 @@ export default async function HomeLayout({ children }: Props) {
     <>
       <main
         vaul-drawer-wrapper=""
-        className="grid h-full grid-rows-[auto,1fr] gap-8 bg-white p-4"
+        className="grid h-dvh grid-rows-[auto,1fr] gap-8 bg-white p-4"
         data-testid="drawer-close"
       >
         <Header position="between" classes="relative">
