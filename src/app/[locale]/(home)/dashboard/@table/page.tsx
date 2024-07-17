@@ -6,12 +6,7 @@ import Text from "@/components/ui/Text";
 
 const PickupDate = dynamic(() => import("@/components/structures/share/PickupDate"), {
   ssr: false,
-  loading: () => (
-    <Stack as="nav" alignItems="center">
-      <Skeleton classes="h-10 w-60" />
-      <Skeleton classes="h-10 w-32" />
-    </Stack>
-  ),
+  loading: () => <Skeleton classes="h-10 w-2/6" />,
 });
 
 const TableHistory = dynamic(() => import("@/components/modules/Dashboard/TableHistory"), {

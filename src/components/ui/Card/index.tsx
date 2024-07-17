@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
 
 import Stack from "@/components/ui/Stack";
 
@@ -12,7 +12,7 @@ function Card({ children }: Props) {
       grid
       rows={2}
       orientation="vertical"
-      classes="h-40 rounded-lg border border-gray-200 p-2 shadow-input"
+      classes="h-40 min-h-40 rounded-lg border border-gray-200 p-2 shadow-input"
     >
       {children}
     </Stack>

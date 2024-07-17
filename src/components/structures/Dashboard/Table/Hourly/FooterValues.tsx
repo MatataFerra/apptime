@@ -34,7 +34,7 @@ function FooterValues() {
   return (
     <>
       <TableElement>{`${ShiftService.convertDifferenceInHHmm(sumHours).text}`}</TableElement>
-      <TableElement>${`${totalEarnings?.toFixed(2)}`}</TableElement>
+      <TableElement>{`${totalEarnings ? `$${totalEarnings?.toFixed(2)}` : "..."}`}</TableElement>
     </>
   );
 }
