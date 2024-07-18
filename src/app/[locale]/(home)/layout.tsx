@@ -23,11 +23,6 @@ const Header = dynamic(() => import("@/components/ui/Header"), {
   ),
 });
 
-const Ham = dynamic(() => import("@/components/structures/share/Ham"), {
-  ssr: false,
-  loading: () => <Skeleton classes="h-8 w-12" />,
-});
-
 interface Props {
   children: ReactElement;
 }
