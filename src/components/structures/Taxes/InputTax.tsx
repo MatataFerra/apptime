@@ -74,9 +74,9 @@ function InputTax({ addTax }: Props) {
 
     if (dbTax) {
       return Toast({
-        message: "Not added because the tax was found in Database",
+        message: "Not added. Tax already exists",
         type: "warning",
-        duration: 1000,
+        duration: 1500,
       });
     }
 

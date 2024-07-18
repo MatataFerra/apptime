@@ -1,37 +1,27 @@
 "use client";
 
-import { useEffect, useId, useRef } from "react";
-
-import { useShallow } from "zustand/react/shallow";
+import { useId } from "react";
 
 import Textarea from "@/components/ui/Textarea";
 
-import { useNotesStore } from "@/store/useNotesStore";
+import { useNotes } from "@/store/useNotesStore";
 
 type Props = {};
 
 function NotesTextarea(props: Props) {
-  const setNotes = useNotesStore(useShallow((state) => state.setNotes));
-  const notes = useNotesStore(useShallow((state) => state.notes));
-  const isNotesOpen = useNotesStore(useShallow((state) => state.isNotesOpen));
-  const refTextArea = useRef<HTMLTextAreaElement>(null);
+  const { error, setError, notes, setNotes } = useNotes();
   const id = useId();
-
-  useEffect(() => {
-    if (isNotesOpen) {
-      if (!refTextArea.current) return;
-      refTextArea.current?.focus();
-      refTextArea.current.selectionStart = refTextArea.current.value.length;
-    }
-  }, [isNotesOpen]);
 
   return (
     <Textarea
       id={id}
-      ref={refTextArea}
-      classes="mx-1 h-full resize-none rounded-none bg-transparent p-2 text-2xl outline-none"
+      classes={`h-full w-[97%] resize-none rounded-sm bg-transparent p-2 text-lg shadow-sm outline-none ${error ? "ring-2 ring-red-700" : "ring-2 ring-transparent"}`}
       value={notes}
-      onChange={(e) => setNotes(e.target.value)}
+      onChange={(e) => {
+        if (error) setError();
+
+        return setNotes(e.target.value);
+      }}
       {...props}
     />
   );
