@@ -29,7 +29,7 @@ function ShiftState() {
       shiftUnclosed.shift?.endDate ?? ""
     );
     setShiftTime(text);
-  }, 10000);
+  }, 5000);
 
   return (
     <>
