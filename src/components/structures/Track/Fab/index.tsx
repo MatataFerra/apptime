@@ -11,9 +11,11 @@ import Icon from "@/components/ui/Icons";
 import useStatus from "@/hooks/useStatus";
 import useTrack from "@/hooks/useTrack";
 
-import { useNotesStore } from "@/store/useNotesStore";
-
 const TaxDialog = dynamic(() => import("@/components/structures/Track/Tax"), {
+  ssr: false,
+});
+
+const Notes = dynamic(() => import("@/components/modules/Notes/Notes"), {
   ssr: false,
 });
 
@@ -23,7 +25,6 @@ function FabNotes() {
   const menuRef = useRef<HTMLButtonElement>(null);
   const notesRef = useRef<HTMLButtonElement>(null);
   const taxesRef = useRef<HTMLButtonElement>(null);
-  const { notesToggle } = useNotesStore();
   const { isShiftActive } = useTrack();
   const status = useStatus(isShiftActive);
   const [show, setShow] = useState(false);
@@ -73,13 +74,14 @@ function FabNotes() {
         onClick={onShowMenu}
         icon={<Icon.plus />}
       />
-      <FloatingActionButton
-        ref={notesRef}
-        disabled={!status}
-        onClick={() => notesToggle()}
-        classes={`absolute bottom-[6.5rem] right-4 z-10 size-12 border-none bg-gradient-to-br from-amber-200 to-yellow-300 [&>span]:text-xs ${!status ? "bg-gradient-to-br from-gray-300 to-stone-500" : "active:shadow-button-inner"}`}
-        text="Notes"
-      />
+      <Notes>
+        <FloatingActionButton
+          ref={notesRef}
+          disabled={!status}
+          classes={`absolute bottom-[6.5rem] right-4 z-10 size-12 border-none bg-gradient-to-br from-amber-200 to-yellow-300 [&>span]:text-xs ${!status ? "bg-gradient-to-br from-gray-300 to-stone-500" : "active:shadow-button-inner"}`}
+          text="Notes"
+        />
+      </Notes>
       <TaxDialog>
         <FloatingActionButton
           ref={taxesRef}

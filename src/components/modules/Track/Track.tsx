@@ -8,10 +8,6 @@ import Skeleton from "@/components/ui/Skeleton";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-const NotesPortal = dynamic(() => import("@/components/modules/Notes/Portal"), {
-  ssr: false,
-});
-
 const FabMenu = dynamic(() => import("@/components/structures/Track/Fab"), {
   ssr: false,
   loading: () => <Skeleton classes="absolute bottom-36 right-2 size-20 rounded-full  p-2" />,
@@ -27,7 +23,6 @@ async function Track() {
     <>
       <HydrateStore data={{ user }}>
         <FabMenu />
-        <NotesPortal />
       </HydrateStore>
     </>
   );

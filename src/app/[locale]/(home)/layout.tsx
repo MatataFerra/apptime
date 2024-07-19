@@ -5,11 +5,11 @@ import dynamic from "next/dynamic";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
-const Drawer = dynamic(() => import("@/components/modules/Drawer/Menu"), {
+const SheetHamMenu = dynamic(() => import("@/components/modules/SheetHamMenu/SheetHamMenu"), {
   ssr: false,
 });
 
-const UserInfo = dynamic(() => import("@/components/structures/Drawer/UserInfo"), {
+const UserInfo = dynamic(() => import("@/components/structures/SheetHamMenu/UserInfo"), {
   ssr: false,
 });
 
@@ -21,11 +21,6 @@ const Header = dynamic(() => import("@/components/ui/Header"), {
       <Skeleton classes="w-50 h-10" />
     </Stack>
   ),
-});
-
-const Ham = dynamic(() => import("@/components/structures/share/Ham"), {
-  ssr: false,
-  loading: () => <Skeleton classes="h-10 w-10" />,
 });
 
 interface Props {
@@ -41,10 +36,9 @@ export default async function HomeLayout({ children }: Props) {
         data-testid="drawer-close"
       >
         <Header position="between" classes="relative">
-          <Ham />
-          <Drawer>
+          <SheetHamMenu>
             <UserInfo />
-          </Drawer>
+          </SheetHamMenu>
         </Header>
         {children}
       </main>

@@ -1,4 +1,4 @@
-import { FULL_MONTHS_NAMES, TYPE_SHIFT } from "@/utils/constants";
+import { FULL_MONTHS_NAMES } from "@/utils/constants";
 
 /**
  * @name CustomChartTooltip
@@ -10,9 +10,16 @@ import { FULL_MONTHS_NAMES, TYPE_SHIFT } from "@/utils/constants";
  * @param showDates
  * @returns React.ReactNode
  */
-function CustomChartTooltip({ active, payload, label, legend, customLegend, showDates }: any) {
+function CustomChartTooltip({
+  active,
+  payload,
+  label,
+  legend = "Total",
+  customLegend,
+  showDates,
+}: any) {
   if (active && payload && payload.length) {
-    const { dates, shiftsWorked, type } = payload[0].payload;
+    const { dates, shiftsWorked } = payload[0].payload;
 
     const sumValue = payload.reduce((acc: number, curr: any) => {
       if (typeof curr.value === "string") return;
@@ -25,8 +32,8 @@ function CustomChartTooltip({ active, payload, label, legend, customLegend, show
     );
 
     return (
-      <div className="flex flex-col divide-y-2 rounded-lg bg-white p-4 shadow-lg">
-        <p className="w-full py-1 text-base text-gray-700">
+      <div className="flex flex-col divide-y-2 rounded-lg bg-white p-2 shadow-lg">
+        <p className="w-full py-1 text-xs text-gray-700">
           {findMonthName !== -1 ? FULL_MONTHS_NAMES[findMonthName] : label}
         </p>
         {customLegend ? (

@@ -2,8 +2,9 @@
 
 import ChartService from "@/services/Chart";
 
-import { UserType } from "@/types";
+import type { UserType } from "@/types";
 
+import AreaChartComponent from "@/components/ui/Chart/AreaChart";
 import Line from "@/components/ui/Chart/Line";
 
 // Override console.error
@@ -24,7 +25,7 @@ type Props = {
 function CompareShifts({ user }: Props) {
   const earnsPerType = new ChartService(user?.shifts).earnsPerType();
 
-  return <Line data={earnsPerType} />;
+  return <AreaChartComponent data={earnsPerType} />;
 }
 
 export default CompareShifts;

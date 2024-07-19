@@ -1,4 +1,4 @@
-import { devices, PlaywrightTestConfig } from "@playwright/test";
+import { devices, type PlaywrightTestConfig } from "@playwright/test";
 import path from "path";
 
 // ignore test
