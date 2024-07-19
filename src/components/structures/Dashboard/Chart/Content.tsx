@@ -3,26 +3,25 @@
 import dynamic from "next/dynamic";
 
 import Skeleton from "@/components/ui/Skeleton";
-import Text from "@/components/ui/Text";
 
 import useDashboard from "@/hooks/useDashboard";
 
 const EarnsPerDay = dynamic(() => import("@/components/structures/Dashboard/Chart/EarnsPerDay"), {
   ssr: false,
-  loading: () => <Skeleton classes="h-[500px] w-full" />,
+  loading: () => <Skeleton classes="h-72 w-full" />,
 });
 
 const CompareShifts = dynamic(
   () => import("@/components/structures/Dashboard/Chart/CompareShifts"),
   {
     ssr: false,
-    loading: () => <Skeleton classes="h-[500px] w-full" />,
+    loading: () => <Skeleton classes="h-72 w-full" />,
   }
 );
 
 const ChartEmpty = dynamic(() => import("@/components/structures/Dashboard/Chart/Empty"), {
   ssr: false,
-  loading: () => <Skeleton classes="h-[500px] w-full" />,
+  loading: () => <Skeleton classes="h-72 w-full" />,
 });
 
 const CarouselContent = dynamic(
@@ -43,20 +42,14 @@ function Content() {
   const { user } = useDashboard();
 
   return (
-    <CarouselContent>
+    <CarouselContent className="h-72">
       <ChartEmpty data={user?.shifts}>
         <CarouselItem>
-          <Text gradient="secondary" classes="mb-2 text-lg">
-            Earnings per day
-          </Text>
           <EarnsPerDay user={user} />
         </CarouselItem>
       </ChartEmpty>
       <ChartEmpty data={user?.shifts}>
         <CarouselItem>
-          <Text gradient="secondary" classes="mb-2 text-lg">
-            Compare shifts earnings
-          </Text>
           <CompareShifts user={user} />
         </CarouselItem>
       </ChartEmpty>

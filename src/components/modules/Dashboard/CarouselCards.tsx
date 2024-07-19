@@ -12,12 +12,12 @@ import Text from "@/components/ui/Text";
 
 const Card = dynamic(() => import("@/components/ui/Card"), {
   ssr: false,
-  loading: () => <Skeleton classes="h-60 w-full" />,
+  loading: () => <Skeleton classes="h-40 w-full" />,
 });
 
 const Carousel = dynamic(() => import("@/components/ui/Carousel").then((mod) => mod.Carousel), {
   ssr: false,
-  loading: () => <Skeleton classes="mx-auto mt-8 h-full w-full max-w-xl" />,
+  loading: () => <Skeleton classes="mx-auto mt-8 h-40 w-full max-w-[90svw] overflow-hidden" />,
 });
 
 const CarouselContent = dynamic(
@@ -107,34 +107,36 @@ async function CarouselDashboard({ params }: Props) {
   };
 
   return (
-    <Stack orientation="horizontal" as="header" classes="w-full">
-      <Carousel
-        opts={{
-          align: "center",
-          containScroll: "trimSnaps",
-          dragFree: true,
-          dragThreshold: 0.1,
-        }}
-        className="w-full max-w-[90svw] overflow-hidden"
-      >
-        <CarouselContent>
-          {Object.keys(CARDS_CONTENT).map((key, index) => (
-            <CarouselItem key={index} className="basis-1/2 sm:basis-1/3 md:basis-1/5">
-              <Card>
-                <Text classes="text-pretty text-sm">
-                  {CARDS_CONTENT[key as keyof typeof CARDS_CONTENT].title}
-                </Text>
-                <Text
-                  classes={`text-wrap text-2xl font-bold ${key === "estimatedWeeklyEarnings" && "text-base"}`}
-                >
-                  {String(CARDS_CONTENT[key as keyof typeof CARDS_CONTENT].value)}
-                </Text>
-              </Card>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </Carousel>
-    </Stack>
+    <>
+      <Stack orientation="horizontal" as="header" classes="w-full">
+        <Carousel
+          opts={{
+            align: "center",
+            containScroll: "trimSnaps",
+            dragFree: true,
+            dragThreshold: 0.1,
+          }}
+          className="w-full max-w-[90svw] overflow-hidden"
+        >
+          <CarouselContent>
+            {Object.keys(CARDS_CONTENT).map((key, index) => (
+              <CarouselItem key={index} className="basis-1/2 sm:basis-1/3 md:basis-1/5">
+                <Card>
+                  <Text classes="text-pretty text-sm">
+                    {CARDS_CONTENT[key as keyof typeof CARDS_CONTENT].title}
+                  </Text>
+                  <Text
+                    classes={`text-wrap text-2xl font-bold ${key === "estimatedWeeklyEarnings" && "text-base"}`}
+                  >
+                    {String(CARDS_CONTENT[key as keyof typeof CARDS_CONTENT].value)}
+                  </Text>
+                </Card>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      </Stack>
+    </>
   );
 }
 

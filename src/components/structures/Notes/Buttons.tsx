@@ -1,8 +1,7 @@
-import { useEffect } from "react";
-
 import Toast from "@/services/Toast";
 
 import Button from "@/components/ui/Button";
+import { SheetClose } from "@/components/ui/Sheet";
 import Stack from "@/components/ui/Stack";
 
 import useTrack from "@/hooks/useTrack";
@@ -14,19 +13,15 @@ function Buttons() {
     updateShift,
     shiftUnclosed: { shift },
   } = useTrack();
-  const { notesToggle, notes, setNotes, localNote, setlocalNote, removelocalNote } = useNotes();
-
-  useEffect(() => {
-    if (!notes.length && localNote) setNotes(localNote);
-    if (!localNote) removelocalNote();
-  }, [localNote, notes, removelocalNote, setNotes]);
+  const { notes, setlocalNote, setError, setOpen } = useNotes();
 
   async function onSaveNotes() {
-    if (notes.length <= 3) return;
+    if (notes.length <= 3) return setError();
     if (!shift) return;
 
     updateShift({ notes, id: shift.id });
     setlocalNote(notes);
+    setOpen(false);
 
     Toast({
       message: "Note added",
@@ -34,15 +29,22 @@ function Buttons() {
       description: "Your note has been added to the shift.",
       duration: 2000,
     });
-
-    notesToggle();
   }
   return (
     <Stack orientation="horizontal" justifyContent="end" classes="p-2">
-      <Button type="button" variant="danger" classes="w-28 select-none p-2" onClick={notesToggle}>
-        Cancel
-      </Button>
-      <Button type="button" variant="post-it" classes="w-28 select-none p-2" onClick={onSaveNotes}>
+      <SheetClose asChild>
+        <Button type="button" variant="danger" size="sm" classes="w-20 select-none">
+          Cancel
+        </Button>
+      </SheetClose>
+
+      <Button
+        type="button"
+        variant="post-it"
+        size="sm"
+        classes="w-20 select-none"
+        onClick={onSaveNotes}
+      >
         Save
       </Button>
     </Stack>

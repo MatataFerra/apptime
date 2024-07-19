@@ -6,7 +6,7 @@ import Text from "@/components/ui/Text";
 
 import { shortEmail } from "@/utils/helpers/shortEmail";
 
-async function DrawerUserInfo() {
+async function UserInfo() {
   const user = await UserService.getSessionUser();
 
   return (
@@ -35,4 +35,4 @@ async function DrawerUserInfo() {
   );
 }
 
-export default DrawerUserInfo;
+export default UserInfo;

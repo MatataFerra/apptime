@@ -27,8 +27,9 @@ function ChartEmpty({ data, children }: PropsWithChildren<Props>) {
       {isEmpty(data?.hourly) && isEmpty(data?.production) ? (
         <CarouselItem>
           <Stack
-            grid
-            classes="h-80 w-full place-content-center rounded-lg border border-gray-200 p-4 shadow-input"
+            justifyContent="center"
+            alignItems="center"
+            classes="flex h-72 w-full rounded-lg border border-gray-200 p-4 shadow-input"
           >
             <Text>No data</Text>
           </Stack>
