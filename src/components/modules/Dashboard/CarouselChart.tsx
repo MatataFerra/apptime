@@ -5,7 +5,7 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 
 import Button from "@/components/ui/Button";
-import { type CarouselApi } from "@/components/ui/Carousel";
+import type { CarouselApi } from "@/components/ui/Carousel";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
@@ -14,7 +14,7 @@ import { useDot } from "@/hooks/useDot";
 
 const Carousel = dynamic(() => import("@/components/ui/Carousel").then((mod) => mod.Carousel), {
   ssr: false,
-  loading: () => <Skeleton classes="mx-auto mt-8 h-[500px] w-full max-w-xl" />,
+  loading: () => <Skeleton classes="mx-auto mt-8 h-72 w-full max-w-xl" />,
 });
 
 const Content = dynamic(() => import("@/components/structures/Dashboard/Chart/Content"), {
@@ -51,7 +51,7 @@ function CarouselChart() {
         dragFree: true,
         dragThreshold: 0.1,
       }}
-      className="mx-auto mt-8 h-[500px] w-full max-w-xl"
+      className="mx-auto mt-8 h-fit w-full max-w-xl"
     >
       <Content />
       <Stack
