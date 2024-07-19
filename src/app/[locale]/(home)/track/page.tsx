@@ -16,7 +16,7 @@ const Track = dynamic(() => import("@/components/modules/Track/Track"), {
 
 const Title = dynamic(() => import("@/components/structures/share/ModuleTitle"), {
   ssr: false,
-  loading: () => <Skeleton classes="h-60 w-40" />,
+  loading: () => <Skeleton classes="h-20 w-80" />,
 });
 
 export default async function TrackPage({ params }: { params: LocaleParams }) {
