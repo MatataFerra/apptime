@@ -1,5 +1,8 @@
 import type { ReactNode } from "react";
 
+import UserService from "@/services/User";
+
+import HydrateStore from "@/components/structures/Track/HydrateStore";
 import Stack from "@/components/ui/Stack";
 
 type Props = {
@@ -7,11 +10,15 @@ type Props = {
   monitor: ReactNode;
 };
 
-export default function Layout({ children, monitor }: Props) {
+export default async function Layout({ children, monitor }: Props) {
+  const user = await UserService.getSessionUser();
+
   return (
-    <Stack orientation="vertical" spacing={8}>
-      {children}
-      {monitor}
-    </Stack>
+    <HydrateStore data={{ user }}>
+      <Stack orientation="vertical" spacing={8}>
+        {children}
+        {monitor}
+      </Stack>
+    </HydrateStore>
   );
 }
