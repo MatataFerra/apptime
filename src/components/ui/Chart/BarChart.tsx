@@ -13,8 +13,6 @@ import {
   CardTitle,
 } from "@/components/ui/Chart/card";
 
-import { MONTHS } from "@/utils/constants";
-
 const chartConfig = {
   desktop: {
     label: "earnings",
@@ -57,10 +55,7 @@ export default function BarChartComponent({ data, legend, showDates, customLegen
                 // value format 18 de julio
                 const [day, _, month] = value.split(" ");
 
-                const turnMonthInNumber =
-                  MONTHS.findIndex((m) => m.toLowerCase() === month.toLowerCase()) + 1;
-
-                return `${day}/${turnMonthInNumber}`;
+                return `${day}-${month}`;
               }}
             />
             <ChartTooltip
