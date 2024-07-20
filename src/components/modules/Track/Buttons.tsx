@@ -2,14 +2,25 @@
 
 import { useEffect } from "react";
 
+import dynamic from "next/dynamic";
+
 import HourlyService from "@/services/Shift/Hourly";
 
-import StartDialog from "@/components/modules/Track/Flow/Start/Dialog";
-import FinishButton from "@/components/structures/Track/Flow/Finish/Button";
+import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
 import useButtonStatus from "@/hooks/useButtonStatus";
 import useTrack from "@/hooks/useTrack";
+
+const StartDialog = dynamic(() => import("@/components/modules/Track/Flow/Start/Dialog"), {
+  ssr: false,
+  loading: () => <Skeleton classes="h-12 w-full" />,
+});
+
+const FinishButton = dynamic(() => import("@/components/structures/Track/Flow/Finish/Button"), {
+  ssr: false,
+  loading: () => <Skeleton classes="h-12 w-full" />,
+});
 
 function ShiftButtons() {
   const { user, updateShiftStatus } = useTrack();

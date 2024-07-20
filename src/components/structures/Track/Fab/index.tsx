@@ -1,15 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import dynamic from "next/dynamic";
 import { useOnClickOutside } from "usehooks-ts";
 
+import { useDrawerTaxesFromDB } from "@/components/structures/Taxes/TaxesFromDB/Drawer";
+import { useTaxDialog } from "@/components/structures/Track/Tax";
 import FloatingActionButton from "@/components/ui/Fab";
 import Icon from "@/components/ui/Icons";
 
+import useDelayed from "@/hooks/useDelayed";
 import useStatus from "@/hooks/useStatus";
 import useTrack from "@/hooks/useTrack";
+
+import { useNotes } from "@/store/useNotesStore";
 
 const TaxDialog = dynamic(() => import("@/components/structures/Track/Tax"), {
   ssr: false,
@@ -19,16 +24,22 @@ const Notes = dynamic(() => import("@/components/modules/Notes/Notes"), {
   ssr: false,
 });
 
-const FAB_MS_STAGER = 150;
+const FAB_MS_STAGER = 300;
 
 function FabNotes() {
   const menuRef = useRef<HTMLButtonElement>(null);
   const notesRef = useRef<HTMLButtonElement>(null);
   const taxesRef = useRef<HTMLButtonElement>(null);
   const { isShiftActive } = useTrack();
+  const { open } = useNotes();
+  const { isOpen: isTaxDialogOpen } = useTaxDialog();
+  const { isOpen: isDrawerTaxOpen } = useDrawerTaxesFromDB((state) => state);
   const status = useStatus(isShiftActive);
   const [show, setShow] = useState(false);
+  const showDelayed = useDelayed(show, FAB_MS_STAGER);
+
   useOnClickOutside([menuRef, notesRef, taxesRef], () => {
+    if (open || isDrawerTaxOpen || isTaxDialogOpen) return;
     setShow(false);
   });
 
@@ -36,60 +47,38 @@ function FabNotes() {
     setShow((prev) => !prev);
   }
 
-  useEffect(() => {
-    /*
-      Toggle the position when show is true of Notes Fab Button
-    */
-    if (show) {
-      notesRef.current?.classList.add("bottom-[10.5rem]");
-      notesRef.current?.classList.remove("bottom-[6.5rem]");
-    } else {
-      notesRef.current?.classList.remove("bottom-[10.5rem]");
-      notesRef.current?.classList.add("bottom-[6.5rem]");
-    }
-  }, [show]);
-
-  useEffect(() => {
-    /*
-      Toggle the position when show is true and wait certain ms of Taxes Fab Button
-    */
-    if (show) {
-      setTimeout(() => {
-        taxesRef.current?.classList.add("bottom-[14rem]");
-        taxesRef.current?.classList.remove("bottom-[6.5rem]");
-      }, FAB_MS_STAGER);
-    } else {
-      setTimeout(() => {
-        taxesRef.current?.classList.remove("bottom-[14rem]");
-        taxesRef.current?.classList.add("bottom-[6.5rem]");
-      }, FAB_MS_STAGER);
-    }
-  }, [show]);
-
   return (
     <>
-      <FloatingActionButton
-        ref={menuRef}
-        classes="absolute bottom-24 right-2 z-50 size-16 border-none bg-gradient-to-br from-green-400 to-blue-500 active:shadow-button-inner"
-        onClick={onShowMenu}
-        icon={<Icon.plus />}
-      />
-      <Notes>
-        <FloatingActionButton
-          ref={notesRef}
-          disabled={!status}
-          classes={`absolute bottom-[6.5rem] right-4 z-10 size-12 border-none bg-gradient-to-br from-amber-200 to-yellow-300 [&>span]:text-xs ${!status ? "bg-gradient-to-br from-gray-300 to-stone-500" : "active:shadow-button-inner"}`}
-          text="Notes"
-        />
-      </Notes>
-      <TaxDialog>
-        <FloatingActionButton
-          ref={taxesRef}
-          disabled={!status}
-          classes={`absolute bottom-[6.5rem] right-4 z-0 size-12 border-none bg-gradient-to-br from-red-200 to-violet-300 [&>span]:text-xs ${!status ? "bg-gradient-to-br from-gray-300 to-stone-500" : "active:shadow-button-inner"}`}
-          text="Taxes"
-        />
-      </TaxDialog>
+      {isShiftActive ? (
+        <>
+          <FloatingActionButton
+            ref={menuRef}
+            classes="absolute bottom-24 right-2 z-50 size-16 animate-fade-in border-none bg-gradient-to-br from-green-400 to-blue-500 active:shadow-button-inner"
+            onClick={onShowMenu}
+            icon={<Icon.plus />}
+          />
+          {showDelayed ? (
+            <>
+              <Notes>
+                <FloatingActionButton
+                  ref={notesRef}
+                  disabled={!status}
+                  classes={`absolute bottom-[10.5rem] right-4 z-10 size-12 border-none bg-gradient-to-br from-amber-200 to-yellow-300 transition-all [&>span]:text-xs ${!status ? "bg-gradient-to-br from-gray-300 to-stone-500" : "active:shadow-button-inner"} ${show ? "show_up" : "show_down"}`}
+                  text="Notes"
+                />
+              </Notes>
+              <TaxDialog>
+                <FloatingActionButton
+                  ref={taxesRef}
+                  disabled={!status}
+                  classes={`absolute bottom-[14rem] right-4 z-0 size-12 border-none bg-gradient-to-br from-red-200 to-violet-300 transition-all [&>span]:text-xs ${!status ? "bg-gradient-to-br from-gray-300 to-stone-500" : "active:shadow-button-inner"} ${show ? "show_up_dialog" : "show_down_dialog"}`}
+                  text="Taxes"
+                />
+              </TaxDialog>
+            </>
+          ) : null}
+        </>
+      ) : null}
     </>
   );
 }
