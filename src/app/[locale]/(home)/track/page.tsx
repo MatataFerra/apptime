@@ -10,11 +10,6 @@ import Skeleton from "@/components/ui/Skeleton";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-// const Fab = dynamic(() => import("@/components/modules/Track/Fab"), {
-//   ssr: false,
-//   loading: () => <Skeleton />,
-// });
-
 const Title = dynamic(() => import("@/components/structures/share/ModuleTitle"), {
   ssr: false,
   loading: () => <Skeleton classes="h-20 w-80" />,
@@ -33,10 +28,5 @@ export default async function TrackPage({ params }: { params: LocaleParams }) {
     return ut.redirectTo(PATH_NAMES.LOGIN);
   }
 
-  return (
-    <>
-      <Title title="Track" subtitle="Get your exact time while you work" />
-      {/* <Fab /> */}
-    </>
-  );
+  return <Title title="Track" subtitle="Get your exact time while you work" />;
 }

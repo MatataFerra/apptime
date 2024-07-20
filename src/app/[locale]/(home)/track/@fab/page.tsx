@@ -7,8 +7,6 @@ const FabMenu = dynamic(() => import("@/components/structures/Track/Fab"), {
   loading: () => <Skeleton classes="absolute bottom-36 right-2 size-20 rounded-full  p-2" />,
 });
 
-async function Fab() {
+export default async function FabPage() {
   return <FabMenu />;
 }
-
-export default Fab;

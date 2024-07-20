@@ -8,9 +8,10 @@ import Stack from "@/components/ui/Stack";
 type Props = {
   children: ReactNode;
   monitor: ReactNode;
+  fab: ReactNode;
 };
 
-export default async function Layout({ children, monitor }: Props) {
+export default async function Layout({ children, monitor, fab }: Props) {
   const user = await UserService.getSessionUser();
 
   return (
@@ -18,6 +19,7 @@ export default async function Layout({ children, monitor }: Props) {
       <Stack orientation="vertical" spacing={8}>
         {children}
         {monitor}
+        {fab}
       </Stack>
     </HydrateStore>
   );
