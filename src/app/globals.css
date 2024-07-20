@@ -185,3 +185,72 @@ div[data-radio-state="false"] .animate_fade_out {
   @apply relative w-full px-4 py-1 text-sm text-left active:after:absolute active:after:inset-0 active:after:-z-10 active:after:bg-slate-100 hover:after:bg-slate-100 hover:after:absolute hover:after:inset-0 hover:after:-z-10;
 }
 
+
+/* Animations for FABs show and hide*/
+.show_up {
+  animation: show_up 150ms ease-in-out backwards;
+}
+
+.show_down {
+  animation: show_down 150ms ease-in-out forwards;
+}
+
+.show_up_dialog {
+  animation: show_up_dialog 150ms ease-in-out backwards;
+  animation-delay: 150ms;
+}
+
+.show_down_dialog {
+  animation: show_down_dialog 150ms ease-in-out forwards;
+  animation-delay: 150ms;
+}
+
+@keyframes show_up_dialog {
+  0% {
+    opacity: 0;
+    transform: translateY(250%);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+}
+
+@keyframes show_down_dialog {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(250%);
+  }
+}
+
+@keyframes show_up {
+  0% {
+    opacity: 0;
+    transform: translateY(150%);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes show_down {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(150%);
+  }
+}
+

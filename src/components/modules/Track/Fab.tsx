@@ -13,7 +13,7 @@ const FabMenu = dynamic(() => import("@/components/structures/Track/Fab"), {
   loading: () => <Skeleton classes="absolute bottom-36 right-2 size-20 rounded-full  p-2" />,
 });
 
-async function Track() {
+async function Fab() {
   const user = await UserService.getSessionUser();
 
   if (!user) {
@@ -28,4 +28,4 @@ async function Track() {
   );
 }
 
-export default Track;
+export default Fab;

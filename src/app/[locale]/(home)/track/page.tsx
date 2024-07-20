@@ -10,8 +10,9 @@ import Skeleton from "@/components/ui/Skeleton";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-const Track = dynamic(() => import("@/components/modules/Track/Track"), {
+const Fab = dynamic(() => import("@/components/modules/Track/Fab"), {
   ssr: false,
+  loading: () => <Skeleton />,
 });
 
 const Title = dynamic(() => import("@/components/structures/share/ModuleTitle"), {
@@ -35,7 +36,7 @@ export default async function TrackPage({ params }: { params: LocaleParams }) {
   return (
     <>
       <Title title="Track" subtitle="Get your exact time while you work" />
-      <Track />
+      <Fab />
     </>
   );
 }
