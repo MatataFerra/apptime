@@ -10,6 +10,8 @@ interface DashboardState {
   user: UserType | null;
   isUserLoaded: boolean;
   initialShifts: UserType["shifts"];
+  isDateFiltered: boolean;
+  setIsDateFiltered: () => void;
   setUser: (user: UserType) => void;
   setInitialShifts: (shifts: UserType["shifts"]) => void;
   update: (props: Partial<UserType>) => void;
@@ -23,6 +25,7 @@ export const useDashboardStore = create(
   devtools<DashboardState>(
     (set, get) => ({
       isUserLoaded: false,
+      isDateFiltered: false,
       initialShifts: {
         id: 0,
         userId: "",
@@ -61,11 +64,29 @@ export const useDashboardStore = create(
           },
         });
       },
+      setIsDateFiltered: () => {
+        return set({ isDateFiltered: !get().isDateFiltered });
+      },
       filterByDate: (date) => {
         const initial = get().initialShifts;
         const production = initial?.production?.filter((shift) => {
           if (!date?.from) return false;
           if (!date?.to) return false;
+
+          const startAndEndAreSame = isSameDay(new Date(date?.from), new Date(date?.to));
+          const startAndGivenDateAreSame = isSameDay(
+            new Date(shift.startDate),
+            new Date(date?.from)
+          );
+          const endAndGivenDateAreSame = isSameDay(new Date(shift.startDate), new Date(date?.to));
+
+          if (startAndEndAreSame) {
+            if (startAndGivenDateAreSame) {
+              return true;
+            }
+          }
+
+          if (startAndGivenDateAreSame || endAndGivenDateAreSame) return true;
 
           return isWithinInterval(new Date(shift.startDate), {
             start: new Date(date?.from),
@@ -113,6 +134,7 @@ export const useDashboardStore = create(
                   production: prepareProduction,
                 },
               },
+              isDateFiltered: true,
             };
           },
           false,
@@ -131,6 +153,7 @@ export const useDashboardStore = create(
                 production: get().initialShifts?.production ?? [],
               },
             },
+            isDateFiltered: false,
           },
           false,
           "RESET_SHIFTS"
