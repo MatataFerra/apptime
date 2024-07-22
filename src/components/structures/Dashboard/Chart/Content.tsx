@@ -42,7 +42,7 @@ function Content() {
   const { user } = useDashboard();
 
   return (
-    <CarouselContent className="h-72">
+    <CarouselContent className="h-auto">
       <ChartEmpty data={user?.shifts}>
         <CarouselItem>
           <EarnsPerDay user={user} />
