@@ -1,0 +1,13 @@
+import Stack from "@/components/ui/Stack";
+import Text from "@/components/ui/Text";
+
+export default async function DefaultHistory() {
+  return (
+    <Stack
+      orientation="vertical"
+      classes="h-fit max-h-60 min-h-60 w-full overflow-y-scroll rounded-lg border border-gray-200 bg-white shadow-input"
+    >
+      <Text variant="error">Error during loading</Text>
+    </Stack>
+  );
+}
