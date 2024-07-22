@@ -12,7 +12,7 @@ import Text from "@/components/ui/Text";
 import useTrack from "@/hooks/useTrack";
 
 function ShiftState() {
-  const { shiftUnclosed } = useTrack();
+  const { shiftUnclosed, isShiftActive } = useTrack();
   const [shiftTime, setShiftTime] = useState("loading...");
 
   useEffect(() => {
@@ -23,13 +23,20 @@ function ShiftState() {
     setShiftTime(text);
   }, [shiftUnclosed.shift?.endDate, shiftUnclosed.shift?.startDate]);
 
-  useInterval(() => {
+  function updateShiftTime() {
+    if (!isShiftActive) {
+      setShiftTime("0h 0m");
+
+      return null;
+    }
     const { text } = ShiftService.differenceInHHmm(
       shiftUnclosed.shift?.startDate ?? "",
       shiftUnclosed.shift?.endDate ?? ""
     );
     setShiftTime(text);
-  }, 5000);
+  }
+
+  useInterval(updateShiftTime, 5000);
 
   return (
     <>

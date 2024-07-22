@@ -5,9 +5,6 @@ import { useRouter } from "next/navigation";
 import ShiftService from "@/services/Shift";
 import Toast from "@/services/Toast";
 
-import type { UserType } from "@/types";
-
-import { cancelTrackQuery, optimisticFinishTrack } from "@/components/structures/Track/optimistic";
 import Button from "@/components/ui/Button";
 import Loader from "@/components/ui/Loader";
 
@@ -42,7 +39,7 @@ function FinishButton({ buttonStatus }: Props) {
 
   function onFinishShift() {
     const currentShift = getShift(shift?.id);
-    const updateTrackedShift = new ShiftService({ ...currentShift })
+    const updateTrackedShift = new ShiftService({ ...currentShift, isClosed: true })
       .closeShift()
       .differenceInMinsBetweenStartAndEnd()
       .checkPublicHoliday()
@@ -52,7 +49,6 @@ function FinishButton({ buttonStatus }: Props) {
      * Optimistic update
      */
 
-    optimisticFinishTrack(updateTrackedShift as Hourly, user as UserType, queryClient);
     updateShift({ ...updateTrackedShift });
 
     /*
@@ -72,7 +68,6 @@ function FinishButton({ buttonStatus }: Props) {
       updateShiftStatus(false);
 
       if (response) {
-        queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
         router.refresh();
         removelocalNote();
 
@@ -84,6 +79,8 @@ function FinishButton({ buttonStatus }: Props) {
           duration: 1000,
         });
 
+        queryClient.refetchQueries({ queryKey: ["user", user?.email] });
+
         return;
       }
 
@@ -91,7 +88,6 @@ function FinishButton({ buttonStatus }: Props) {
         updateShiftsInfo();
         updateShiftUnclosed();
         updateShiftStatus(true);
-        cancelTrackQuery(user as UserType, queryClient);
         updateShift({ ...currentShift });
       }, 1500);
 
@@ -102,6 +98,8 @@ function FinishButton({ buttonStatus }: Props) {
         action: <Loader.spinner bg="text-black" spinColor="fill-gray-50" />,
         duration: 1000,
       });
+
+      queryClient.refetchQueries({ queryKey: ["user", user?.email] });
     });
   }
 

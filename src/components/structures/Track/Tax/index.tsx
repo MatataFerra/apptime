@@ -10,33 +10,22 @@ import {
   useDrawerTaxesFromDB,
 } from "@/components/structures/Taxes/TaxesFromDB/Drawer";
 import Button from "@/components/ui/Button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/Dialog";
 import Skeleton from "@/components/ui/Skeleton";
 
 import { cn } from "@/utils/helpers/styleMerger";
 
 import { useTrackTaxesStore } from "@/store/useTaxStore";
 
-const Dialog = dynamic(() => import("@/components/ui/Dialog").then((mod) => mod.Dialog), {
-  ssr: false,
-});
-
 const DialogClose = dynamic(() => import("@/components/ui/Dialog").then((mod) => mod.DialogClose), {
   ssr: false,
 });
-
-const DialogContent = dynamic(
-  () => import("@/components/ui/Dialog").then((mod) => mod.DialogContent),
-  {
-    ssr: false,
-  }
-);
-
-const DialogDescription = dynamic(
-  () => import("@/components/ui/Dialog").then((mod) => mod.DialogDescription),
-  {
-    ssr: false,
-  }
-);
 
 const DialogFooter = dynamic(
   () => import("@/components/ui/Dialog").then((mod) => mod.DialogFooter),
@@ -44,17 +33,6 @@ const DialogFooter = dynamic(
     ssr: false,
   }
 );
-
-const DialogHeader = dynamic(
-  () => import("@/components/ui/Dialog").then((mod) => mod.DialogHeader),
-  {
-    ssr: false,
-  }
-);
-
-const DialogTitle = dynamic(() => import("@/components/ui/Dialog").then((mod) => mod.DialogTitle), {
-  ssr: false,
-});
 
 const DialogTrigger = dynamic(
   () => import("@/components/ui/Dialog").then((mod) => mod.DialogTrigger),
