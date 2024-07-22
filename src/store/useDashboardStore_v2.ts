@@ -1,6 +1,6 @@
 import { type DateRange } from "react-day-picker";
 
-import { isWithinInterval } from "date-fns";
+import { isSameDay, isWithinInterval } from "date-fns";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
@@ -75,6 +75,21 @@ export const useDashboardStore = create(
         const hourly = initial?.hourly?.filter((shift) => {
           if (!date?.from) return false;
           if (!date?.to) return false;
+
+          const startAndEndAreSame = isSameDay(new Date(date?.from), new Date(date?.to));
+          const startAndGivenDateAreSame = isSameDay(
+            new Date(shift.startDate),
+            new Date(date?.from)
+          );
+          const endAndGivenDateAreSame = isSameDay(new Date(shift.startDate), new Date(date?.to));
+
+          if (startAndEndAreSame) {
+            if (startAndGivenDateAreSame) {
+              return true;
+            }
+          }
+
+          if (startAndGivenDateAreSame || endAndGivenDateAreSame) return true;
 
           return isWithinInterval(new Date(shift.startDate), {
             start: new Date(date?.from),

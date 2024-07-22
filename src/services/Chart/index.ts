@@ -1,6 +1,5 @@
-import { Hourly, Production, Shift } from "@prisma/client";
-import { isSameDay } from "date-fns";
-import { groupBy } from "lodash";
+import type { Hourly, Production, Shift } from "@prisma/client";
+import groupBy from "lodash/groupBy";
 
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
@@ -9,8 +8,6 @@ import type { EarnsMonthData } from "@/types";
 
 import { MONTHS } from "@/utils/constants";
 import { isProductionShift } from "@/utils/helpers/isProductionShift";
-
-type Merge = (Hourly | Production)[];
 
 type Shifts =
   | (Shift & {

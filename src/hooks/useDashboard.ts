@@ -24,7 +24,6 @@ function useDashboard() {
   useEffect(() => {
     if (isLoading) return;
     if (isEmpty(data)) return;
-    if (!isEmpty(user)) return;
 
     setUser(data);
   }, [data, isLoading, user, setUser]);
@@ -32,7 +31,6 @@ function useDashboard() {
   useEffect(() => {
     if (isLoading) return;
     if (isEmpty(data)) return;
-    if (isUserLoaded) return;
 
     setInitialShifts(data?.shifts);
 

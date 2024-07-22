@@ -29,6 +29,7 @@ function useUser() {
     enabled: !!email,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
+    refetchInterval: 3600 * 10,
   });
 
   return { data: data?.user, isLoading };
