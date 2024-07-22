@@ -2,6 +2,7 @@
 
 import type { PropsWithChildren } from "react";
 
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
@@ -14,8 +15,10 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetDescription,
   SheetFooter,
   SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/Sheet";
 import Skeleton from "@/components/ui/Skeleton";
@@ -50,8 +53,19 @@ function SheetHamMenu({ children }: PropsWithChildren<Props>) {
       <SheetTrigger>
         <Ham />
       </SheetTrigger>
-      <SheetContent side="left" className="isolate bg-white/90 shadow-2xl backdrop-blur-md">
-        <SheetHeader>{children}</SheetHeader>
+      <SheetContent
+        aria-describedby={"main menu"}
+        side="left"
+        className="isolate bg-white/90 shadow-2xl backdrop-blur-md"
+      >
+        <SheetHeader>
+          <SheetTitle>{children}</SheetTitle>
+          <SheetDescription>
+            <VisuallyHidden.Root>
+              This is the main menu, you can navigate to different sections of the app.
+            </VisuallyHidden.Root>
+          </SheetDescription>
+        </SheetHeader>
         <Options />
         <SheetFooter>
           <SheetClose asChild>

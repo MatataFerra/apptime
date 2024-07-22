@@ -16,6 +16,8 @@ import {
   CardTitle,
 } from "@/components/ui/Chart/card";
 
+import { MONTHS } from "@/utils/constants";
+
 const chartConfig = {
   desktop: {
     label: "Desktop",
@@ -55,10 +57,15 @@ export default function AreaChartComponent({ data }: Props) {
               axisLine={false}
               tickMargin={8}
               tickFormatter={(value) => {
-                // value format 18 de julio
-                const [day, _, month] = value.split(" ");
+                const dateSplitted: string[] = value.split(" ");
+                const day = dateSplitted[0];
+                const getMonth = dateSplitted
+                  .map((s) => {
+                    return MONTHS.find((month) => month.toLowerCase() === s.toLowerCase());
+                  })
+                  .filter((d) => d);
 
-                return `${day}-${month}`;
+                return `${day}-${getMonth}`;
               }}
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
