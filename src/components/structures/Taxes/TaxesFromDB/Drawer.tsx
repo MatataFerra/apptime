@@ -1,48 +1,66 @@
 "use client";
 
 import type { Tax } from "@prisma/client";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import dynamic from "next/dynamic";
 import { create } from "zustand";
 
-import TaxesFromDB from "@/components/structures/Taxes/TaxesFromDB/TaxesFromDB";
 import Button from "@/components/ui/Button";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
-  DrawerFooter,
+  DrawerDescription,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from "@/components/ui/Drawer";
+import Skeleton from "@/components/ui/Skeleton";
+
+const DrawerClose = dynamic(() => import("@/components/ui/Drawer").then((mod) => mod.DrawerClose), {
+  ssr: false,
+});
+
+const DrawerFooter = dynamic(
+  () => import("@/components/ui/Drawer").then((mod) => mod.DrawerFooter),
+  {
+    ssr: false,
+  }
+);
+
+const DrawerTrigger = dynamic(
+  () => import("@/components/ui/Drawer").then((mod) => mod.DrawerTrigger),
+  {
+    ssr: false,
+  }
+);
+
+const TaxesFromDB = dynamic(() => import("@/components/structures/Taxes/TaxesFromDB/TaxesFromDB"), {
+  ssr: false,
+  loading: () => <Skeleton classes="h-32 w-full" />,
+});
 
 type Props = {
   addTax: (tax: Omit<Tax, "id">) => void;
   shouldScaleBackground?: boolean;
 };
 
-interface Observer {
+export interface Observer {
   isOpen: boolean;
-  openDrawer: () => void;
-  close: () => void;
+  setIsOpen: (isOpen: boolean) => void;
 }
 
-export const observer = create<Observer>((set) => ({
+export const useDrawerTaxesFromDB = create<Pick<Observer, "isOpen" | "setIsOpen">>((set) => ({
   isOpen: false,
-  openDrawer: () => set({ isOpen: true }),
-  close: () => set({ isOpen: false }),
+  setIsOpen: (isOpen) => set({ isOpen }),
 }));
 
 function DrawerFromDB({ addTax, shouldScaleBackground = false }: Props) {
-  const { openDrawer, close } = observer((state) => state);
+  const { isOpen, setIsOpen } = useDrawerTaxesFromDB((state) => state);
   return (
     <Drawer
+      open={isOpen}
       shouldScaleBackground={shouldScaleBackground}
-      onOpenChange={(open) => {
-        if (open) {
-          openDrawer();
-        } else {
-          close();
-        }
+      onOpenChange={(value) => {
+        setIsOpen(value);
       }}
     >
       <DrawerTrigger asChild>
@@ -58,6 +76,11 @@ function DrawerFromDB({ addTax, shouldScaleBackground = false }: Props) {
       <DrawerContent>
         <DrawerHeader className="text-left">
           <DrawerTitle>Use your previous taxes</DrawerTitle>
+          <DrawerDescription>
+            <VisuallyHidden.Root>
+              Select from your previous taxes to add them to your current taxes.
+            </VisuallyHidden.Root>
+          </DrawerDescription>
         </DrawerHeader>
         <article className="mx-auto my-0 h-full w-11/12 border border-slate-500/20 p-4 shadow-md">
           <TaxesFromDB addTax={addTax} />

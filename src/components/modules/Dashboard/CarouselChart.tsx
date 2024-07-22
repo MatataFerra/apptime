@@ -57,7 +57,7 @@ function CarouselChart() {
       <Stack
         as="footer"
         orientation="horizontal"
-        classes="px-2"
+        classes="my-4 px-2"
         alignItems="center"
         justifyContent="between"
       >

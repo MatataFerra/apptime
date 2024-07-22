@@ -61,6 +61,7 @@ export default async function onUpdateTrackJob(
       .catch((error) => JSON.stringify(error.message));
 
     revalidatePath("/dashboard", "page");
+    revalidatePath("/[locale]/(home)/dashboard/@table/@history/page", "page");
 
     return {
       response: typeof response !== "string",

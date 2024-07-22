@@ -1,39 +1,88 @@
 import type { PropsWithChildren } from "react";
 
+import dynamic from "next/dynamic";
+import { create } from "zustand";
+
 import Toast from "@/services/Toast";
 
-import InputTax from "@/components/structures/Taxes/InputTax";
-import TableTax from "@/components/structures/Taxes/Table";
-import DrawerFromDB, { observer } from "@/components/structures/Taxes/TaxesFromDB/Drawer";
+import {
+  type Observer,
+  useDrawerTaxesFromDB,
+} from "@/components/structures/Taxes/TaxesFromDB/Drawer";
 import Button from "@/components/ui/Button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/Dialog";
+import Skeleton from "@/components/ui/Skeleton";
 
 import { cn } from "@/utils/helpers/styleMerger";
 
 import { useTrackTaxesStore } from "@/store/useTaxStore";
 
+const DialogClose = dynamic(() => import("@/components/ui/Dialog").then((mod) => mod.DialogClose), {
+  ssr: false,
+});
+
+const DialogFooter = dynamic(
+  () => import("@/components/ui/Dialog").then((mod) => mod.DialogFooter),
+  {
+    ssr: false,
+  }
+);
+
+const DialogTrigger = dynamic(
+  () => import("@/components/ui/Dialog").then((mod) => mod.DialogTrigger),
+  {
+    ssr: false,
+  }
+);
+
+const DrawerFromDB = dynamic(() => import("@/components/structures/Taxes/TaxesFromDB/Drawer"), {
+  ssr: false,
+});
+
+const InputTax = dynamic(() => import("@/components/structures/Taxes/InputTax"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex w-full flex-col">
+      <div className="flex justify-between">
+        <Skeleton classes="h-12 w-full" />
+        <Skeleton classes="h-12 w-full" />
+        <Skeleton classes="h-12 w-full" />
+      </div>
+      <Skeleton classes="h-12 w-full" />
+    </div>
+  ),
+});
+
+const TableTax = dynamic(() => import("@/components/structures/Taxes/Table"), {
+  ssr: false,
+  loading: () => <Skeleton classes="h-60 w-full" />,
+});
+
+export const useTaxDialog = create<Observer>((set) => ({
+  isOpen: false,
+  setIsOpen: (isOpen) => set({ isOpen }),
+}));
+
 type Props = {};
 
 function TaxDialog({ children }: PropsWithChildren<Props>) {
   const { taxes, addTax, removeTax } = useTrackTaxesStore();
-  const { isOpen } = observer((state) => state);
+  const { isOpen: isDrawerTaxesOpen } = useDrawerTaxesFromDB((state) => state);
+  const { isOpen: isTaxDialogOpen, setIsOpen } = useTaxDialog((state) => state);
 
   return (
-    <Dialog>
+    <Dialog open={isTaxDialogOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
         className={cn(
           "h-96 overflow-y-scroll",
-          isOpen ? "scale-95 transform" : "scale-100 transform"
+          isDrawerTaxesOpen ? "scale-95 transform" : "scale-100 transform"
         )}
       >
         <DialogHeader>

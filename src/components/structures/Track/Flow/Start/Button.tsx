@@ -5,9 +5,6 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import Toast from "@/services/Toast";
 
-import type { UserType } from "@/types";
-
-import { cancelTrackQuery, optimisticStartTrack } from "@/components/structures/Track/optimistic";
 import Button from "@/components/ui/Button";
 import { DialogClose } from "@/components/ui/Dialog";
 
@@ -49,8 +46,6 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
       ...mock,
     });
 
-    optimisticStartTrack(mock, user as UserType, queryClient);
-
     onCreateTrackJob({
       startDate: new Date().toString(),
       isClosed: false,
@@ -73,18 +68,20 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
 
         queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
 
-        const updateShift = getShift(mock.id)!;
+        const { id, ...rest } = getShift(mock.id)!;
         const prepareShift = {
-          ...updateShift,
-          ...response.shift,
+          ...rest,
+          ...response?.shift!,
         };
 
         // success response
         createShift({
           ...prepareShift,
         });
+
         updateShiftsInfo();
         updateShiftUnclosed();
+        deleteShift(mock.id);
 
         return;
       }
@@ -93,10 +90,9 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
         message: "Error creating shift, please try again",
         type: "error",
       });
+
       updateShiftStatus(false);
       deleteShift(mock.id);
-
-      cancelTrackQuery(user as UserType, queryClient);
     });
   }
 

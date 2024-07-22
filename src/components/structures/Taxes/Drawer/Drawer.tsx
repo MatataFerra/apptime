@@ -6,7 +6,9 @@ import Toast from "@/services/Toast";
 
 import InputTax from "@/components/structures/Taxes/InputTax";
 import TableTax from "@/components/structures/Taxes/Table";
-import DrawerFromDB, { observer } from "@/components/structures/Taxes/TaxesFromDB/Drawer";
+import DrawerFromDB, {
+  useDrawerTaxesFromDB,
+} from "@/components/structures/Taxes/TaxesFromDB/Drawer";
 import Button from "@/components/ui/Button";
 import {
   Drawer as DrawerContainer,
@@ -36,7 +38,7 @@ type Props = {
 
 function Drawer({ taxes, addTax, removeTax, children }: PropsWithChildren<Props>) {
   const [addMoreTaxes, setAddMoreTaxes] = useState(false);
-  const { isOpen } = observer((state) => state);
+  const isOpen = useDrawerTaxesFromDB((state) => state.isOpen);
 
   return (
     <DrawerContainer shouldScaleBackground>

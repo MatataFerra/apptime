@@ -57,13 +57,15 @@ export default function AreaChartComponent({ data }: Props) {
               axisLine={false}
               tickMargin={8}
               tickFormatter={(value) => {
-                // value format 18 de julio
-                const [day, _, month] = value.split(" ");
+                const dateSplitted: string[] = value.split(" ");
+                const day = dateSplitted[0];
+                const getMonth = dateSplitted
+                  .map((s) => {
+                    return MONTHS.find((month) => month.toLowerCase() === s.toLowerCase());
+                  })
+                  .filter((d) => d);
 
-                const turnMonthInNumber =
-                  MONTHS.findIndex((m) => m.toLowerCase() === month.toLowerCase()) + 1;
-
-                return `${day}/${turnMonthInNumber}`;
+                return `${day}-${getMonth}`;
               }}
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />

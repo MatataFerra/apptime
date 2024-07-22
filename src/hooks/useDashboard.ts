@@ -19,20 +19,20 @@ function useDashboard() {
     isUserLoaded,
     setIsUserLoaded,
     setInitialShifts,
+    isDateFiltered,
   } = useDashboardStore((state) => state);
 
   useEffect(() => {
     if (isLoading) return;
     if (isEmpty(data)) return;
-    if (!isEmpty(user)) return;
+    if (isDateFiltered) return;
 
     setUser(data);
-  }, [data, isLoading, user, setUser]);
+  }, [data, isLoading, user, setUser, isDateFiltered]);
 
   useEffect(() => {
     if (isLoading) return;
     if (isEmpty(data)) return;
-    if (isUserLoaded) return;
 
     setInitialShifts(data?.shifts);
 
