@@ -1,26 +1,23 @@
 "use client";
 
 import type { Tax } from "@prisma/client";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import dynamic from "next/dynamic";
 import { create } from "zustand";
 
 import Button from "@/components/ui/Button";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/Drawer";
 import Skeleton from "@/components/ui/Skeleton";
-
-const Drawer = dynamic(() => import("@/components/ui/Drawer").then((mod) => mod.Drawer), {
-  ssr: false,
-});
 
 const DrawerClose = dynamic(() => import("@/components/ui/Drawer").then((mod) => mod.DrawerClose), {
   ssr: false,
 });
-
-const DrawerContent = dynamic(
-  () => import("@/components/ui/Drawer").then((mod) => mod.DrawerContent),
-  {
-    ssr: false,
-  }
-);
 
 const DrawerFooter = dynamic(
   () => import("@/components/ui/Drawer").then((mod) => mod.DrawerFooter),
@@ -28,17 +25,6 @@ const DrawerFooter = dynamic(
     ssr: false,
   }
 );
-
-const DrawerHeader = dynamic(
-  () => import("@/components/ui/Drawer").then((mod) => mod.DrawerHeader),
-  {
-    ssr: false,
-  }
-);
-
-const DrawerTitle = dynamic(() => import("@/components/ui/Drawer").then((mod) => mod.DrawerTitle), {
-  ssr: false,
-});
 
 const DrawerTrigger = dynamic(
   () => import("@/components/ui/Drawer").then((mod) => mod.DrawerTrigger),
@@ -90,6 +76,11 @@ function DrawerFromDB({ addTax, shouldScaleBackground = false }: Props) {
       <DrawerContent>
         <DrawerHeader className="text-left">
           <DrawerTitle>Use your previous taxes</DrawerTitle>
+          <DrawerDescription>
+            <VisuallyHidden.Root>
+              Select from your previous taxes to add them to your current taxes.
+            </VisuallyHidden.Root>
+          </DrawerDescription>
         </DrawerHeader>
         <article className="mx-auto my-0 h-full w-11/12 border border-slate-500/20 p-4 shadow-md">
           <TaxesFromDB addTax={addTax} />
