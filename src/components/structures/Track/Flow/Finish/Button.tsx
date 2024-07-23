@@ -107,7 +107,7 @@ function FinishButton({ buttonStatus }: Props) {
     <>
       <Button
         variant="danger"
-        classes="w-full shadow-button active:shadow-button-inner"
+        classes="w-full animate-fade-up shadow-button transition-all active:shadow-button-inner"
         disabled={buttonStatus.disabled}
         onClick={onFinishShift}
       >
