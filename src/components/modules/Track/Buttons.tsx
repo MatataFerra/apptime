@@ -23,7 +23,7 @@ const FinishButton = dynamic(() => import("@/components/structures/Track/Flow/Fi
 });
 
 function ShiftButtons() {
-  const { user, updateShiftStatus } = useTrack();
+  const { user, updateShiftStatus, isShiftActive } = useTrack();
   const shiftUnclosed = HourlyService.findUnClosedShift(user?.shifts?.hourly);
   const buttonStatus = useButtonStatus();
 
@@ -34,8 +34,11 @@ function ShiftButtons() {
 
   return (
     <Stack classes="h-fit w-full" spacing={10} alignItems="center" justifyContent="between">
-      <StartDialog triggerStatus={buttonStatus?.startButton} />
-      <FinishButton buttonStatus={buttonStatus.finishButton} />
+      {isShiftActive ? (
+        <FinishButton buttonStatus={buttonStatus.finishButton} />
+      ) : (
+        <StartDialog triggerStatus={buttonStatus?.startButton} />
+      )}
     </Stack>
   );
 }

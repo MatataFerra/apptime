@@ -7,15 +7,15 @@ const ShiftState = dynamic(() => import("@/components/structures/Track/Monitor/S
   loading: () => <Skeleton classes="h-10 w-3/4" />,
 });
 
-// const ShiftInfo = dynamic(() => import("@/components/structures/Track/Monitor/ShiftInfo"), {
-//   ssr: false,
-// });
+const ShiftInfo = dynamic(() => import("@/components/structures/Track/Monitor/ShiftInfo"), {
+  ssr: false,
+});
 
 function Tracker() {
   return (
     <>
       <ShiftState />
-      {/* <ShiftInfo /> */}
+      <ShiftInfo />
     </>
   );
 }
