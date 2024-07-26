@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 
-import { Hourly } from "@prisma/client";
+import { Hourly, Production } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { format, isBefore } from "date-fns";
 import isEqual from "lodash/isEqual";
@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 
 import Toast from "@/services/Toast";
 
-import { UserType } from "@/types";
+import type { HourlyType, UserType } from "@/types";
 
 import Button from "@/components/ui/Button";
 import { DialogFooter } from "@/components/ui/Dialog";
@@ -18,6 +18,7 @@ import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
+import { useTaxesHandlerDelete } from "../store/taxesHandlerDelete";
 import onEditShift from "@/server-actions/edit-shift";
 import { useTableStore } from "@/store/useTableStore";
 
@@ -45,6 +46,7 @@ function TableDialogEditHourly({ shift, user }: Props) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { setStep } = useTableStore((state) => state);
+  const { taxesToDelete, addTaxToDelete } = useTaxesHandlerDelete((state) => state);
 
   function onHandleEdit(data: EditShiftHourlyForm) {
     const { startDate, endDate, hourValue, holidayPayRate, isPublicHoliday, publicHolidayWorked } =
@@ -87,7 +89,7 @@ function TableDialogEditHourly({ shift, user }: Props) {
       return;
     }
 
-    onEditShift(shiftUpdated).then((res) => {
+    onEditShift(shiftUpdated, taxesToDelete).then((res) => {
       if (res) {
         Toast({
           type: "success",
@@ -163,8 +165,45 @@ function TableDialogEditHourly({ shift, user }: Props) {
             Have you worked it?
           </Text>
         </Stack>
+        <Stack
+          orientation="vertical"
+          classes="h-40 w-full overflow-y-scroll rounded-md p-2 shadow-md"
+          spacing={4}
+        >
+          <Text classes="font-semibold">Remove wrong taxes:</Text>
+          <div className="grid grid-cols-2 gap-4 gap-y-8">
+            {/* {shift.taxes?.map((tax) => (
+              <div key={tax.id} className="flex items-center gap-4">
+                <article className="flex gap-1 text-balance text-sm">
+                  <p>
+                    {tax.name} {tax.value}%
+                  </p>
+                  {!!tax.description ? <p className="line-clamp-1">({tax.description})</p> : null}
+                </article>
+                <Button
+                  type="button"
+                  variant="outlined"
+                  size="xs"
+                  classes="cursor-pointer border border-red-400 text-gray-900 transition-colors active:bg-red-200 active:shadow-button-inner"
+                  onClick={() => {
+                    addTaxToDelete(tax);
+                    Toast({
+                      type: "info",
+                      message: "Tax will be deleted",
+                      description: "Please press save to delete it",
+                      duration: 1500,
+                      classes: "text-gray-900",
+                    });
+                  }}
+                >
+                  delete
+                </Button>
+              </div>
+            ))} */}
+          </div>
+        </Stack>
       </Stack>
-      <DialogFooter className="flex w-full flex-row items-center justify-end gap-4">
+      <DialogFooter className="mt-2 flex w-full flex-row items-center justify-end gap-4">
         <Button
           type="button"
           size="sm"

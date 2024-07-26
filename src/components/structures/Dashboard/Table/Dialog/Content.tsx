@@ -1,9 +1,19 @@
-import type { Hourly, Production } from "@prisma/client";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
+import isEmpty from "lodash/isEmpty";
 
 import DateHumanizer from "@/services/Date";
+import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
 import ProductionService from "@/services/Shift/Production";
 
+import type { ShiftType } from "@/types";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/Dropdown";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
@@ -11,7 +21,7 @@ import { TYPE_SHIFT } from "@/utils/constants";
 import { isProductionShift } from "@/utils/helpers/isProductionShift";
 
 type Props = {
-  shift: Production | Hourly;
+  shift: ShiftType;
 };
 
 function TableDialogContent({ shift }: Props) {
@@ -58,21 +68,6 @@ function TableDialogContent({ shift }: Props) {
       ) : null}
       <Text>
         <Text as="span" classes="font-bold">
-          Earnings:
-        </Text>{" "}
-        {isProductionShift(shift)
-          ? `$${String(
-              ProductionService.earnings({
-                itemValue: shift.itemValue,
-                itemQuantity: shift.itemQuantity,
-                holidayPayRate: shift.holidayPayRate,
-                publicHolidayWorked: shift.publicHolidayWorked,
-              }).toFixed(2)
-            )}`
-          : `$${String(new ShiftService(shift).calculateEarnings())}`}
-      </Text>
-      <Text>
-        <Text as="span" classes="font-bold">
           Public Holiday:
         </Text>{" "}
         {shift?.isPublicHoliday ? "✅" : "❌"}
@@ -106,6 +101,27 @@ function TableDialogContent({ shift }: Props) {
         </Text>{" "}
         {isProductionShift(shift) ? TYPE_SHIFT.PRODUCTION : TYPE_SHIFT.TRACK}
       </Text>
+      <Text color="text-red-700">Gross pay: {`$${new Pay(shift).gross()}`}</Text>
+      {!!new Pay(shift).netPay() ? (
+        <Text color="text-green-700">Net pay: {`$${new Pay(shift).netPay()?.toFixed(2)}`}</Text>
+      ) : null}
+      {!isEmpty(shift.taxes) ? (
+        <Stack>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="group flex w-7/12 items-center justify-between py-2 pr-4 font-bold text-gray-800 dark:text-gray-100">
+              Taxes {`(${shift.taxes?.length ?? 0})`}
+              <ChevronDownIcon className="transition-all group-data-[state=open]:rotate-180 group-data-[state=open]:transform" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {shift.taxes?.map((tax) => (
+                <DropdownMenuItem key={tax.id}>
+                  {tax.name} {tax.value}%
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </Stack>
+      ) : null}
     </Stack>
   );
 }

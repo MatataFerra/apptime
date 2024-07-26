@@ -1,13 +1,11 @@
-import { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 
-import { Hourly, Production, Shift } from "@prisma/client";
-import { isEmpty } from "lodash";
+import type { Hourly, Production, Shift } from "@prisma/client";
+import isEmpty from "lodash/isEmpty";
 
 import { CarouselItem } from "@/components/ui/Carousel";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
-
-type Merge = (Hourly | Production)[];
 
 type Shifts =
   | (Shift & {

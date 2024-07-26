@@ -3,6 +3,7 @@
 import type { PropsWithChildren, ReactNode } from "react";
 
 import type { Hourly, Production } from "@prisma/client";
+import * as VisualyHidden from "@radix-ui/react-visually-hidden";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -90,6 +91,11 @@ function TableDialog({ title, content, shift, type, children }: Props) {
             <>
               <DialogHeader>
                 <DialogTitle className="border-b border-gray-800 py-2">{title}</DialogTitle>
+                <DialogDescription>
+                  <VisualyHidden.Root>
+                    Take a quick view about your job, edit it if you need
+                  </VisualyHidden.Root>
+                </DialogDescription>
               </DialogHeader>
               {content}
               <DialogFooter>
