@@ -1,5 +1,6 @@
 import type { Hourly, Tax } from "@prisma/client";
 import { differenceInMinutes } from "date-fns";
+import has from "lodash/has";
 import isEmpty from "lodash/isEmpty";
 
 import TaxService from "@/services/Tax";
@@ -94,26 +95,44 @@ class HourlyService implements HourlyInterface {
   async update(id: number) {
     const { deleteTaxes, createTaxes } = this.options || {};
 
-    const updateData: any = { ...this.shift };
-
+    // Delete case
     if (this.getTaxesIds(deleteTaxes ?? []).length > 0) {
-      updateData.taxes = {
-        deleteMany: { id: { in: this.getTaxesIds(deleteTaxes ?? []) } },
-      };
+      const updatedShiftData = await prisma.hourly.update({
+        where: { id },
+        data: {
+          ...this.shift,
+          taxes: {
+            deleteMany: { id: { in: this.getTaxesIds(deleteTaxes ?? []) } },
+          },
+        },
+      });
+
+      return updatedShiftData;
     }
 
+    // Create case
     if (createTaxes && createTaxes?.length > 0) {
       await this.addtaxes(createTaxes);
-      updateData.taxes = {
-        ...updateData.taxes,
-        connect: this.taxes,
-      };
+      const updatedShiftData = await prisma.hourly.update({
+        where: { id },
+        data: {
+          ...this.shift,
+          taxes: {
+            connect: this.taxes,
+          },
+        },
+      });
+
+      return updatedShiftData;
     }
 
+    // Default case
     const updatedShiftData = await prisma.hourly.update({
       where: { id },
-      data: updateData,
-      include: { taxes: true },
+      data: {
+        ...this.shift,
+        taxes: {},
+      },
     });
 
     return updatedShiftData;
