@@ -192,6 +192,30 @@ const TaxUpdateSchema = TaxSchema.omit({
 });
 
 /*
+===================================================================
+-------------------------Shift  with Tax---------------------------
+===================================================================
+*/
+
+const BaseShiftWithTaxes = BaseShiftSchema.merge(
+  z.object({
+    taxes: TaxSchema.array().nullable(),
+  })
+);
+
+const HourlyShiftWithTaxes = HourlyShiftSchema.merge(
+  z.object({
+    taxes: TaxSchema.array().nullable(),
+  })
+);
+
+const ProductionShiftWithTaxes = ProductionShiftSchema.merge(
+  z.object({
+    taxes: TaxSchema.array().nullable(),
+  })
+);
+
+/*
 ============================================================================
 ============================================================================
 */
@@ -321,17 +345,20 @@ const HandleErrorTypeSchema = z.enum([
 
 export {
   BaseShiftSchema,
+  BaseShiftWithTaxes,
   FastChargeFormCheckDataSchema,
   FastChargeFormSchema,
   HandleErrorTypeSchema,
   HourlyCreateSchema,
   HourlyShiftSchema,
+  HourlyShiftWithTaxes,
   HourlyUpdateSchema,
   PasswordSchema,
   ProductionCreateSchema,
   ProductionJobFormCheckDataSchema,
   ProductionJobFormSchema,
   ProductionShiftSchema,
+  ProductionShiftWithTaxes,
   ProductionUpdateSchema,
   ProfileCreateSchema,
   ProfileSchema,

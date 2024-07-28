@@ -12,9 +12,19 @@ export interface UserType extends User {
   profile: Profile | null;
 }
 
+export type ShiftType = ProductionType | HourlyType;
+
+export type ProductionType = Production & {
+  taxes?: Tax[] | null;
+};
+
+export type HourlyType = Hourly & {
+  taxes?: Tax[] | null;
+};
+
 export type Shifts = Shift & {
-  production: Production[];
-  hourly: Hourly[];
+  production: ProductionType[];
+  hourly: HourlyType[];
 };
 
 export type Taxes = Tax & {
