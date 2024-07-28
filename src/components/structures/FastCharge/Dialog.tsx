@@ -2,6 +2,7 @@
 
 import { type PropsWithChildren, useEffect, useMemo } from "react";
 
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import isEmpty from "lodash/isEmpty";
 
 import DateHumanizer from "@/services/Date";
@@ -13,6 +14,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -95,6 +97,11 @@ function DialogHourly({ children }: PropsWithChildren<Props>) {
               New Shift will be created with the following details. Please confirm.
             </Text>
           </DialogTitle>
+          <DialogDescription>
+            <VisuallyHidden.Root>
+              Please check the data and submit if everything is ok
+            </VisuallyHidden.Root>
+          </DialogDescription>
         </DialogHeader>
         <Stack orientation="vertical" classes="mt-4" spacing={4}>
           <DialogValue content="Time details">
