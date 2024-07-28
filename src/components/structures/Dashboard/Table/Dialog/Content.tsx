@@ -4,7 +4,6 @@ import isEmpty from "lodash/isEmpty";
 import DateHumanizer from "@/services/Date";
 import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
-import ProductionService from "@/services/Shift/Production";
 
 import type { ShiftType } from "@/types";
 
@@ -108,7 +107,7 @@ function TableDialogContent({ shift }: Props) {
       {!isEmpty(shift.taxes) ? (
         <Stack>
           <DropdownMenu>
-            <DropdownMenuTrigger className="group flex w-7/12 items-center justify-between py-2 pr-4 font-bold text-gray-800 dark:text-gray-100">
+            <DropdownMenuTrigger className="group flex w-full items-center justify-between py-2 pr-4 font-bold text-gray-800 dark:text-gray-100">
               Taxes {`(${shift.taxes?.length ?? 0})`}
               <ChevronDownIcon className="transition-all group-data-[state=open]:rotate-180 group-data-[state=open]:transform" />
             </DropdownMenuTrigger>
