@@ -14,6 +14,7 @@ import type { UserType } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 
 import TableDialogEditShift from "@/components/structures/Dashboard/Table/Dialog/Edit";
+import { useTaxesHandlerDelete } from "@/components/structures/Dashboard/Table/Dialog/store/taxesHandlerDelete";
 import Button from "@/components/ui/Button";
 import {
   Dialog,
@@ -40,6 +41,7 @@ type Props = PropsWithChildren<{
 function TableDialog({ title, content, shift, type, children }: Props) {
   const { setStep, step } = useTableStore((state) => state);
   const { user, update, deleteShift } = useDashboard();
+  const { reset } = useTaxesHandlerDelete((state) => state);
   const queryClient = useQueryClient();
   const router = useRouter();
   const { mutate } = useMutation({
@@ -79,6 +81,7 @@ function TableDialog({ title, content, shift, type, children }: Props) {
       <Dialog
         onOpenChange={(open) => {
           if (!open) {
+            reset();
             setTimeout(() => {
               setStep("info");
             }, 100);
