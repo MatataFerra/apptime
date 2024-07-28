@@ -2,7 +2,6 @@
 
 import { useForm } from "react-hook-form";
 
-import { Hourly, Production } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { format, isBefore } from "date-fns";
 import isEqual from "lodash/isEqual";
@@ -12,18 +11,18 @@ import Toast from "@/services/Toast";
 
 import type { HourlyType, UserType } from "@/types";
 
-import Button from "@/components/ui/Button";
-import { DialogFooter } from "@/components/ui/Dialog";
+import Footer from "@/components/structures/Dashboard/Table/Dialog/Edit/Footer";
+import Taxes from "@/components/structures/Dashboard/Table/Dialog/Edit/Taxes";
+import { useTaxesHandlerDelete } from "@/components/structures/Dashboard/Table/Dialog/store/taxesHandlerDelete";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
-import { useTaxesHandlerDelete } from "../store/taxesHandlerDelete";
 import onEditShift from "@/server-actions/edit-shift";
 import { useTableStore } from "@/store/useTableStore";
 
 type Props = {
-  shift: Hourly;
+  shift: HourlyType;
   user: UserType | null | undefined;
 };
 
@@ -46,7 +45,7 @@ function TableDialogEditHourly({ shift, user }: Props) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { setStep } = useTableStore((state) => state);
-  const { taxesToDelete, addTaxToDelete } = useTaxesHandlerDelete((state) => state);
+  const { taxesToDelete, reset } = useTaxesHandlerDelete((state) => state);
 
   function onHandleEdit(data: EditShiftHourlyForm) {
     const { startDate, endDate, hourValue, holidayPayRate, isPublicHoliday, publicHolidayWorked } =
@@ -79,7 +78,7 @@ function TableDialogEditHourly({ shift, user }: Props) {
     // Check if user made any changes
     const isShiftEqual = isEqual(shiftUpdated, shift);
 
-    if (isShiftEqual) {
+    if (isShiftEqual && taxesToDelete.length <= 0) {
       Toast({
         type: "error",
         message: "No changes were made.",
@@ -96,8 +95,10 @@ function TableDialogEditHourly({ shift, user }: Props) {
           message: "Shift updated successfully!",
           duration: 2000,
         });
+
         queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
         setStep("info");
+        reset();
         router.refresh();
       } else {
         Toast({
@@ -171,52 +172,10 @@ function TableDialogEditHourly({ shift, user }: Props) {
           spacing={4}
         >
           <Text classes="font-semibold">Remove wrong taxes:</Text>
-          <div className="grid grid-cols-2 gap-4 gap-y-8">
-            {/* {shift.taxes?.map((tax) => (
-              <div key={tax.id} className="flex items-center gap-4">
-                <article className="flex gap-1 text-balance text-sm">
-                  <p>
-                    {tax.name} {tax.value}%
-                  </p>
-                  {!!tax.description ? <p className="line-clamp-1">({tax.description})</p> : null}
-                </article>
-                <Button
-                  type="button"
-                  variant="outlined"
-                  size="xs"
-                  classes="cursor-pointer border border-red-400 text-gray-900 transition-colors active:bg-red-200 active:shadow-button-inner"
-                  onClick={() => {
-                    addTaxToDelete(tax);
-                    Toast({
-                      type: "info",
-                      message: "Tax will be deleted",
-                      description: "Please press save to delete it",
-                      duration: 1500,
-                      classes: "text-gray-900",
-                    });
-                  }}
-                >
-                  delete
-                </Button>
-              </div>
-            ))} */}
-          </div>
+          <Taxes shift={shift} />
         </Stack>
       </Stack>
-      <DialogFooter className="mt-2 flex w-full flex-row items-center justify-end gap-4">
-        <Button
-          type="button"
-          size="sm"
-          variant="white"
-          classes="active:shadow-button-inner"
-          onClick={() => setStep("info")}
-        >
-          back
-        </Button>
-        <Button type="submit" size="sm" variant="success">
-          Save
-        </Button>
-      </DialogFooter>
+      <Footer />
     </Stack>
   );
 }

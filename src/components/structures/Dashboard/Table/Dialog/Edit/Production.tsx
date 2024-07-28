@@ -2,7 +2,6 @@
 
 import { useForm } from "react-hook-form";
 
-import { Production } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { format, isBefore } from "date-fns";
 import isEqual from "lodash/isEqual";
@@ -10,10 +9,11 @@ import { useRouter } from "next/navigation";
 
 import Toast from "@/services/Toast";
 
-import { UserType } from "@/types";
+import type { ProductionType, UserType } from "@/types";
 
-import Button from "@/components/ui/Button";
-import { DialogFooter } from "@/components/ui/Dialog";
+import Footer from "@/components/structures/Dashboard/Table/Dialog/Edit/Footer";
+import Taxes from "@/components/structures/Dashboard/Table/Dialog/Edit/Taxes";
+import { useTaxesHandlerDelete } from "@/components/structures/Dashboard/Table/Dialog/store/taxesHandlerDelete";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
@@ -22,7 +22,7 @@ import onEditShift from "@/server-actions/edit-shift";
 import { useTableStore } from "@/store/useTableStore";
 
 type Props = {
-  shift: Production;
+  shift: ProductionType;
   user: UserType | null | undefined;
 };
 
@@ -46,6 +46,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { setStep } = useTableStore((state) => state);
+  const { taxesToDelete, reset } = useTaxesHandlerDelete((state) => state);
 
   function onHandleEdit(data: EditProductionShiftForm) {
     const {
@@ -72,7 +73,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
     // Check if user made any changes
     const isShiftEqual = isEqual(shiftUpdated, shift);
 
-    if (isShiftEqual) {
+    if (isShiftEqual && taxesToDelete.length <= 0) {
       Toast({
         type: "error",
         message: "No changes were made.",
@@ -96,7 +97,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
       return;
     }
 
-    onEditShift(shiftUpdated).then((res) => {
+    onEditShift(shiftUpdated, taxesToDelete).then((res) => {
       if (res) {
         Toast({
           type: "success",
@@ -105,6 +106,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
         });
         queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
         setStep("info");
+        reset();
         router.refresh();
       } else {
         Toast({
@@ -181,21 +183,16 @@ function TableDialogEditProduction({ shift, user }: Props) {
             Have you worked it?
           </Text>
         </Stack>
-      </Stack>
-      <DialogFooter className="flex w-full flex-row items-center justify-end gap-4">
-        <Button
-          type="button"
-          size="sm"
-          variant="white"
-          classes="active:shadow-button-inner"
-          onClick={() => setStep("info")}
+        <Stack
+          orientation="vertical"
+          classes="h-40 w-full overflow-y-scroll rounded-md p-2 shadow-md"
+          spacing={4}
         >
-          back
-        </Button>
-        <Button type="submit" size="sm" variant="success">
-          Save
-        </Button>
-      </DialogFooter>
+          <Text classes="font-semibold">Remove wrong taxes:</Text>
+          <Taxes shift={shift} />
+        </Stack>
+      </Stack>
+      <Footer />
     </Stack>
   );
 }
