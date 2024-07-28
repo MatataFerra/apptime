@@ -1,10 +1,18 @@
 import type { Hourly, Tax } from "@prisma/client";
 import { differenceInMinutes } from "date-fns";
+import has from "lodash/has";
 import isEmpty from "lodash/isEmpty";
 
 import TaxService from "@/services/Tax";
 
+import type { HourlyType } from "@/types";
+
 import prisma from "../../../prisma/client";
+
+type HourlyOptions = {
+  deleteTaxes?: Tax[];
+  createTaxes?: Omit<Tax, "id">[];
+};
 
 interface HourlyInterface {
   update(id: number): Promise<Hourly>;
@@ -35,10 +43,12 @@ interface HourlyInterface {
  */
 
 class HourlyService implements HourlyInterface {
-  taxes: Pick<Tax, "id">[];
-  shift: Omit<Hourly, "shiftId" | "id">;
-  constructor(shift: Omit<Hourly, "shiftId" | "id">) {
+  private taxes: Pick<Tax, "id">[];
+  private options?: HourlyOptions;
+  shift: Omit<HourlyType, "shiftId" | "id">;
+  constructor(shift: Omit<HourlyType, "shiftId" | "id">, options?: HourlyOptions) {
     this.shift = shift;
+    this.options = options;
     this.taxes = [];
   }
 
@@ -58,7 +68,7 @@ class HourlyService implements HourlyInterface {
     if (isEmpty(this.taxes)) {
       const hourlyShiftWithoutTax = await prisma.hourly.create({
         data: {
-          ...this.shift,
+          ...(this.shift as Hourly),
         },
       });
 
@@ -83,32 +93,49 @@ class HourlyService implements HourlyInterface {
     ===========================
   */
   async update(id: number) {
-    if (isEmpty(this.taxes)) {
-      const updateHourlyShiftWithoutTax = await prisma.hourly.update({
-        where: {
-          id: id,
-        },
+    const { deleteTaxes, createTaxes } = this.options || {};
+
+    // Delete case
+    if (this.getTaxesIds(deleteTaxes ?? []).length > 0) {
+      const updatedShiftData = await prisma.hourly.update({
+        where: { id },
         data: {
           ...this.shift,
+          taxes: {
+            deleteMany: { id: { in: this.getTaxesIds(deleteTaxes ?? []) } },
+          },
         },
       });
 
-      return updateHourlyShiftWithoutTax;
+      return updatedShiftData;
     }
 
-    const updateHourlyShift = await prisma.hourly.update({
-      where: {
-        id: id,
-      },
+    // Create case
+    if (createTaxes && createTaxes?.length > 0) {
+      await this.addtaxes(createTaxes);
+      const updatedShiftData = await prisma.hourly.update({
+        where: { id },
+        data: {
+          ...this.shift,
+          taxes: {
+            connect: this.taxes,
+          },
+        },
+      });
+
+      return updatedShiftData;
+    }
+
+    // Default case
+    const updatedShiftData = await prisma.hourly.update({
+      where: { id },
       data: {
         ...this.shift,
-        taxes: {
-          connect: this.taxes,
-        },
+        taxes: {},
       },
     });
 
-    return updateHourlyShift;
+    return updatedShiftData;
   }
 
   /*
@@ -251,6 +278,25 @@ class HourlyService implements HourlyInterface {
     const minute = Math.round((float - hour) * 60);
 
     return `${hour.toString().padStart(2, "0")}:${minute}`;
+  }
+  /*  
+    ============================================================
+    Private methods
+    ============================================================
+  */
+
+  private getTaxesIdsDictionary(taxes: Tax[]) {
+    return taxes.map((tax) => ({ id: tax.id }));
+  }
+
+  private getTaxesIds(taxes: Tax[]): number[] {
+    const idTaxes = taxes.reduce((acc: number[], curr) => {
+      const { id } = curr;
+
+      return [...acc, id];
+    }, []);
+
+    return idTaxes;
   }
 }
 

@@ -3,7 +3,14 @@ import isEmpty from "lodash/isEmpty";
 
 import TaxService from "@/services/Tax";
 
+import type { ProductionType } from "@/types";
+
 import prisma from "../../../prisma/client";
+
+type HourlyOptions = {
+  deleteTaxes?: Tax[];
+  createTaxes?: Tax[];
+};
 
 interface ProductionInterface {
   update(id: number): Promise<Production>;
@@ -31,11 +38,13 @@ interface ProductionInterface {
  */
 
 class ProductionService implements ProductionInterface {
-  taxes: Pick<Tax, "id">[];
-  shift: Omit<Production, "shiftId" | "id">;
-  constructor(shift: Omit<Production, "shiftId" | "id">) {
+  private taxes: Pick<Tax, "id">[];
+  private options?: HourlyOptions;
+  shift: Omit<ProductionType, "shiftId" | "id">;
+  constructor(shift: Omit<ProductionType, "shiftId" | "id">, options?: HourlyOptions) {
     this.shift = shift;
     this.taxes = [];
+    this.options = options;
   }
 
   /*  
@@ -54,7 +63,7 @@ class ProductionService implements ProductionInterface {
     if (isEmpty(this.taxes)) {
       const productionShiftWithoutTax = await prisma.production.create({
         data: {
-          ...this.shift,
+          ...(this.shift as Production),
         },
       });
 
@@ -80,16 +89,49 @@ class ProductionService implements ProductionInterface {
   */
 
   async update(id: number) {
-    const updateProductionShift = await prisma.production.update({
-      where: {
-        id: id,
-      },
+    const { deleteTaxes, createTaxes } = this.options || {};
+
+    // Delete case
+    if (this.getTaxesIds(deleteTaxes ?? []).length > 0) {
+      const updatedShiftData = await prisma.production.update({
+        where: { id },
+        data: {
+          ...this.shift,
+          taxes: {
+            deleteMany: { id: { in: this.getTaxesIds(deleteTaxes ?? []) } },
+          },
+        },
+      });
+
+      return updatedShiftData;
+    }
+
+    // Create case
+    if (createTaxes && createTaxes?.length > 0) {
+      await this.addtaxes(createTaxes);
+      const updatedShiftData = await prisma.production.update({
+        where: { id },
+        data: {
+          ...this.shift,
+          taxes: {
+            connect: this.taxes,
+          },
+        },
+      });
+
+      return updatedShiftData;
+    }
+
+    // Default case
+    const updatedShiftData = await prisma.production.update({
+      where: { id },
       data: {
         ...this.shift,
+        taxes: {},
       },
     });
 
-    return updateProductionShift;
+    return updatedShiftData;
   }
 
   /*
@@ -212,6 +254,22 @@ class ProductionService implements ProductionInterface {
     }
 
     return itemValue * itemQuantity * publicHolidayRate * holidayPayRateValue;
+  }
+
+  /*  
+    ============================================================
+    Private methods
+    ============================================================
+  */
+
+  private getTaxesIds(taxes: Tax[]): number[] {
+    const idTaxes = taxes.reduce((acc: number[], curr) => {
+      const { id } = curr;
+
+      return [...acc, id];
+    }, []);
+
+    return idTaxes;
   }
 }
 

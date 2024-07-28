@@ -205,6 +205,7 @@ function Inputs() {
           isClosed: true,
           notes: "",
           shiftId: user?.shifts?.id,
+          taxes: parseData.taxes,
         },
       ];
 
