@@ -169,6 +169,7 @@ function Inputs() {
           isClosed: true,
           notes: "",
           shiftId: user?.shifts?.id,
+          taxes: parseData.taxes,
         },
       ];
 
@@ -209,7 +210,7 @@ function Inputs() {
         queryKey: ["user", user?.email],
       });
 
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: ["tax"],
       });
 
