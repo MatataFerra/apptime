@@ -10,7 +10,7 @@ import prisma from "../../../prisma/client";
 
 type HourlyOptions = {
   deleteTaxes?: Tax[];
-  createTaxes?: Tax[];
+  createTaxes?: Omit<Tax, "id">[];
 };
 
 interface HourlyInterface {
@@ -42,9 +42,9 @@ interface HourlyInterface {
  */
 
 class HourlyService implements HourlyInterface {
-  taxes: Pick<Tax, "id">[];
+  private taxes: Pick<Tax, "id">[];
+  private options?: HourlyOptions;
   shift: Omit<HourlyType, "shiftId" | "id">;
-  options?: HourlyOptions;
   constructor(shift: Omit<HourlyType, "shiftId" | "id">, options?: HourlyOptions) {
     this.shift = shift;
     this.options = options;
@@ -102,10 +102,11 @@ class HourlyService implements HourlyInterface {
       };
     }
 
-    if (this.getTaxesIdsDictionary(createTaxes ?? []).length > 0) {
+    if (createTaxes && createTaxes?.length > 0) {
+      await this.addtaxes(createTaxes);
       updateData.taxes = {
         ...updateData.taxes,
-        connect: this.getTaxesIdsDictionary(createTaxes ?? []),
+        connect: this.taxes,
       };
     }
 

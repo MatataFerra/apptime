@@ -50,14 +50,10 @@ export default async function onUpdateTrackJob(
     });
 
   try {
-    const response = await new HourlyService(shift)
-      .addtaxes(taxesFromLocal)
-      .then((service) => {
-        return service.update(shiftId);
-      })
-      .then((updatedtrack) => {
-        return updatedtrack;
-      })
+    const response = await new HourlyService(shift, {
+      createTaxes: taxesFromLocal,
+    })
+      .update(shiftId)
       .catch((error) => JSON.stringify(error.message));
 
     revalidatePath("/dashboard", "page");

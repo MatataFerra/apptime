@@ -38,9 +38,9 @@ interface ProductionInterface {
  */
 
 class ProductionService implements ProductionInterface {
-  taxes: Pick<Tax, "id">[];
+  private taxes: Pick<Tax, "id">[];
+  private options?: HourlyOptions;
   shift: Omit<ProductionType, "shiftId" | "id">;
-  options?: HourlyOptions;
   constructor(shift: Omit<ProductionType, "shiftId" | "id">, options?: HourlyOptions) {
     this.shift = shift;
     this.taxes = [];
@@ -99,10 +99,11 @@ class ProductionService implements ProductionInterface {
       };
     }
 
-    if (this.getTaxesIdsDictionary(createTaxes ?? []).length > 0) {
+    if (createTaxes && createTaxes?.length > 0) {
+      await this.addtaxes(createTaxes);
       updateData.taxes = {
         ...updateData.taxes,
-        connect: this.getTaxesIdsDictionary(createTaxes ?? []),
+        connect: this.taxes,
       };
     }
 
@@ -242,10 +243,6 @@ class ProductionService implements ProductionInterface {
     Private methods
     ============================================================
   */
-
-  private getTaxesIdsDictionary(taxes: Tax[]) {
-    return taxes.map((tax) => ({ id: tax.id }));
-  }
 
   private getTaxesIds(taxes: Tax[]): number[] {
     const idTaxes = taxes.reduce((acc: number[], curr) => {
