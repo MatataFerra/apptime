@@ -7,12 +7,6 @@ import { USER_ROLES } from "@/utils/constants";
 
 import prisma from "#/prisma/client";
 
-type Options = {
-  profile?: boolean;
-  shifts?: boolean;
-  config?: boolean;
-};
-
 type FindUniqueUserType = {
   id?: string;
   email?: string;
@@ -56,8 +50,16 @@ class UserService {
         password: true,
         shifts: {
           include: {
-            hourly: options.shifts,
-            production: options.shifts,
+            hourly: {
+              include: {
+                taxes: options.shifts,
+              },
+            },
+            production: {
+              include: {
+                taxes: options.shifts,
+              },
+            },
           },
         },
         profile: options.profile,
@@ -107,7 +109,12 @@ class UserService {
     }, {});
   }
 
-  static async getSessionUser({ shifts = true, profile = true, config = true } = {} as Options) {
+  static async getSessionUser(
+    { shifts = true, profile = true, config = true } = {} as Pick<
+      FindUniqueUserType,
+      "profile" | "config" | "shifts"
+    >
+  ) {
     const session = await getServerSession();
     const user = await UserService.findUniqueUser({
       email: session?.user?.email ?? "",

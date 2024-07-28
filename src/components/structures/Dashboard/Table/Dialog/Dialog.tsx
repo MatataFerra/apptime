@@ -3,6 +3,7 @@
 import type { PropsWithChildren, ReactNode } from "react";
 
 import type { Hourly, Production } from "@prisma/client";
+import * as VisualyHidden from "@radix-ui/react-visually-hidden";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -13,6 +14,7 @@ import type { UserType } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 
 import TableDialogEditShift from "@/components/structures/Dashboard/Table/Dialog/Edit";
+import { useTaxesHandlerDelete } from "@/components/structures/Dashboard/Table/Dialog/store/taxesHandlerDelete";
 import Button from "@/components/ui/Button";
 import {
   Dialog,
@@ -39,6 +41,7 @@ type Props = PropsWithChildren<{
 function TableDialog({ title, content, shift, type, children }: Props) {
   const { setStep, step } = useTableStore((state) => state);
   const { user, update, deleteShift } = useDashboard();
+  const { reset } = useTaxesHandlerDelete((state) => state);
   const queryClient = useQueryClient();
   const router = useRouter();
   const { mutate } = useMutation({
@@ -78,6 +81,7 @@ function TableDialog({ title, content, shift, type, children }: Props) {
       <Dialog
         onOpenChange={(open) => {
           if (!open) {
+            reset();
             setTimeout(() => {
               setStep("info");
             }, 100);
@@ -90,6 +94,11 @@ function TableDialog({ title, content, shift, type, children }: Props) {
             <>
               <DialogHeader>
                 <DialogTitle className="border-b border-gray-800 py-2">{title}</DialogTitle>
+                <DialogDescription>
+                  <VisualyHidden.Root>
+                    Take a quick view about your job, edit it if you need
+                  </VisualyHidden.Root>
+                </DialogDescription>
               </DialogHeader>
               {content}
               <DialogFooter>
