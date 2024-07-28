@@ -3,7 +3,14 @@ import isEmpty from "lodash/isEmpty";
 
 import TaxService from "@/services/Tax";
 
+import type { ProductionType } from "@/types";
+
 import prisma from "../../../prisma/client";
+
+type HourlyOptions = {
+  deleteTaxes?: Tax[];
+  createTaxes?: Tax[];
+};
 
 interface ProductionInterface {
   update(id: number): Promise<Production>;
@@ -32,10 +39,12 @@ interface ProductionInterface {
 
 class ProductionService implements ProductionInterface {
   taxes: Pick<Tax, "id">[];
-  shift: Omit<Production, "shiftId" | "id">;
-  constructor(shift: Omit<Production, "shiftId" | "id">) {
+  shift: Omit<ProductionType, "shiftId" | "id">;
+  options?: HourlyOptions;
+  constructor(shift: Omit<ProductionType, "shiftId" | "id">, options?: HourlyOptions) {
     this.shift = shift;
     this.taxes = [];
+    this.options = options;
   }
 
   /*  
@@ -54,7 +63,7 @@ class ProductionService implements ProductionInterface {
     if (isEmpty(this.taxes)) {
       const productionShiftWithoutTax = await prisma.production.create({
         data: {
-          ...this.shift,
+          ...(this.shift as Production),
         },
       });
 
@@ -80,16 +89,30 @@ class ProductionService implements ProductionInterface {
   */
 
   async update(id: number) {
-    const updateProductionShift = await prisma.production.update({
-      where: {
-        id: id,
-      },
-      data: {
-        ...this.shift,
-      },
+    const { deleteTaxes, createTaxes } = this.options || {};
+
+    const updateData: any = { ...this.shift };
+
+    if (this.getTaxesIds(deleteTaxes ?? []).length > 0) {
+      updateData.taxes = {
+        deleteMany: { id: { in: this.getTaxesIds(deleteTaxes ?? []) } },
+      };
+    }
+
+    if (this.getTaxesIdsDictionary(createTaxes ?? []).length > 0) {
+      updateData.taxes = {
+        ...updateData.taxes,
+        connect: this.getTaxesIdsDictionary(createTaxes ?? []),
+      };
+    }
+
+    const updatedShiftData = await prisma.production.update({
+      where: { id },
+      data: updateData,
+      include: { taxes: true },
     });
 
-    return updateProductionShift;
+    return updatedShiftData;
   }
 
   /*
@@ -212,6 +235,26 @@ class ProductionService implements ProductionInterface {
     }
 
     return itemValue * itemQuantity * publicHolidayRate * holidayPayRateValue;
+  }
+
+  /*  
+    ============================================================
+    Private methods
+    ============================================================
+  */
+
+  private getTaxesIdsDictionary(taxes: Tax[]) {
+    return taxes.map((tax) => ({ id: tax.id }));
+  }
+
+  private getTaxesIds(taxes: Tax[]): number[] {
+    const idTaxes = taxes.reduce((acc: number[], curr) => {
+      const { id } = curr;
+
+      return [...acc, id];
+    }, []);
+
+    return idTaxes;
   }
 }
 
