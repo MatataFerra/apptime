@@ -2,23 +2,19 @@
 
 import { useEffect } from "react";
 
-import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
-import Skeleton from "@/components/ui/Skeleton";
+import Image from "@/components/ui/Image";
 import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
 
 import useTrack from "@/hooks/useTrack";
 
-const State = dynamic(() => import("@/components/structures/Track/State"), {
-  ssr: false,
-  loading: () => <Skeleton classes="h-12 w-1/3" />,
-});
+export const dynamic = "force-static";
 
 export default function ScreenPage() {
   const router = useRouter();
   const { isShiftActive } = useTrack();
+
   useEffect(() => {
     if (isShiftActive) {
       router.replace("/track/tracker");
@@ -31,12 +27,21 @@ export default function ScreenPage() {
         as="article"
         orientation="vertical"
         alignItems="start"
-        classes="h-full w-full bg-gradient-to-br from-white via-slate-100 to-slate-300 p-4 shadow-input"
+        classes="h-[50dvh] w-full bg-gradient-to-br from-white via-slate-100 to-slate-300 p-4 shadow-input transition-all"
         spacing={6}
         justifyContent="between"
       >
-        <div className="flex h-full w-full flex-col items-center justify-center space-y-4 text-center">
-          <h1 className="text-2xl font-bold text-gray-800">Loading...</h1>
+        <div className="flex h-full w-full flex-col items-center justify-center gap-4 text-center">
+          <Image
+            src="/assets/clock_non_shifts.webp"
+            alt="Clock lay down shown when there is no shift open"
+            width={150}
+            height={150}
+            classes="aspect-square size-auto"
+            priority
+          />
+
+          <h1 className="text-2xl font-bold text-gray-800">No shift has started</h1>
         </div>
       </Stack>
     </Stack>

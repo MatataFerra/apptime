@@ -69,6 +69,7 @@ function FinishButton({ buttonStatus }: Props) {
 
       if (response) {
         router.refresh();
+        router.replace("/track");
         removelocalNote();
 
         Toast({

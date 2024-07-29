@@ -1,17 +1,13 @@
-import type { ReactNode } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 
+import isEmpty from "lodash/isEmpty";
 import dynamic from "next/dynamic";
 
+import HourlyService from "@/services/Shift/Hourly";
 import UserService from "@/services/User";
 
-import HydrateStore from "@/components/structures/Track/HydrateStore";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
-
-const Buttons = dynamic(() => import("@/components/modules/Track/Buttons"), {
-  ssr: false,
-  loading: () => <Skeleton classes="h-12 w-full" />,
-});
 
 const State = dynamic(() => import("@/components/structures/Track/State"), {
   ssr: false,
@@ -19,28 +15,22 @@ const State = dynamic(() => import("@/components/structures/Track/State"), {
 });
 
 type Props = {
-  children: ReactNode;
   screen: ReactNode;
+  start: ReactNode;
 };
 
-export default async function Layout({ children, screen }: Props) {
+export default async function Layout({ children, screen, start }: PropsWithChildren<Props>) {
   const user = await UserService.getSessionUser();
+  const shiftUnclosed = HourlyService.findUnClosedShift(user?.shifts?.hourly);
 
   return (
-    <HydrateStore data={{ user }}>
-      <Stack orientation="vertical" spacing={8}>
-        {children}
-        <Stack
-          orientation="vertical"
-          justifyContent="between"
-          classes="h-[65dvh] w-full"
-          spacing={8}
-        >
-          <State />
-          {screen}
-          <Buttons />
-        </Stack>
+    <Stack orientation="vertical" spacing={8}>
+      {children}
+      <Stack orientation="vertical" justifyContent="between" classes="h-[65dvh] w-full" spacing={8}>
+        <State />
+        {screen}
+        {isEmpty(shiftUnclosed) ? <>{start}</> : null}
       </Stack>
-    </HydrateStore>
+    </Stack>
   );
 }
