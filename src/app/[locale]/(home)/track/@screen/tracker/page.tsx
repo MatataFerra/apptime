@@ -7,6 +7,16 @@ const MonitorScreen = dynamic(() => import("@/components/modules/Track/Monitor/S
   loading: () => <Skeleton classes="h-[50dvh] w-full" />,
 });
 
+const FabMenu = dynamic(() => import("@/components/structures/Track/Fab"), {
+  ssr: false,
+  loading: () => <Skeleton classes="absolute bottom-24 right-2 z-50 size-16 rounded-full p-2" />,
+});
+
 export default async function MonitorPage() {
-  return <MonitorScreen />;
+  return (
+    <>
+      <MonitorScreen />
+      <FabMenu />
+    </>
+  );
 }
