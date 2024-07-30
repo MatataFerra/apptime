@@ -1,13 +1,5 @@
 import type { PropsWithChildren, ReactNode } from "react";
 
-export default async function FinishLayout({
-  button,
-  children,
-}: PropsWithChildren<{ button: ReactNode }>) {
-  return (
-    <>
-      {children}
-      {button}
-    </>
-  );
+export default async function FinishLayout({ children }: PropsWithChildren<{ button: ReactNode }>) {
+  return <>{children}</>;
 }
