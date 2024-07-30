@@ -19,7 +19,7 @@ function Screen() {
       as="article"
       orientation="vertical"
       alignItems="start"
-      classes="h-full w-full bg-gradient-to-br from-white via-slate-100 to-slate-300 p-4 shadow-input"
+      classes="h-monitor w-full bg-gradient-to-br from-white via-slate-100 to-slate-300 p-4 shadow-input"
       spacing={6}
       justifyContent="between"
     >
