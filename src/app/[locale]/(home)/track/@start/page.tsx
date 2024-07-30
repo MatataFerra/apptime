@@ -1,11 +1,5 @@
-import dynamic from "next/dynamic";
-
+import ButtonsStart from "@/components/modules/Track/Flow/Start/Button";
 import Skeleton from "@/components/ui/Skeleton";
-
-const ButtonsStart = dynamic(() => import("@/components/modules/Track/Flow/Start/Button"), {
-  ssr: false,
-  loading: () => <Skeleton classes="h-18 w-full" />,
-});
 
 export const maxDuration = 15;
 

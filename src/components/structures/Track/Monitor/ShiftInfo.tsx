@@ -1,12 +1,15 @@
+"use client";
+
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
-import UserService from "@/services/User";
 
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
-async function ShiftTrackInfo() {
-  const getUser = await UserService.getSessionUser();
+import useTrack from "@/hooks/useTrack";
+
+function ShiftTrackInfo() {
+  const { user: getUser } = useTrack();
 
   const lastShift = getUser?.shifts?.hourly.at(-1);
   const dateHumanized = new DateHumanizer("long").humanizeDate(

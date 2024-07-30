@@ -9,8 +9,5 @@ export default async function LayoutScreen({
   children,
   tracker,
 }: PropsWithChildren<{ tracker: ReactNode }>) {
-  const user = await UserService.getSessionUser();
-  const shiftOpen = HourlyService.findUnClosedShift(user?.shifts?.hourly);
-
-  return <>{isEmpty(shiftOpen) ? <>{children}</> : <>{tracker}</>}</>;
+  return <>{tracker}</>;
 }
