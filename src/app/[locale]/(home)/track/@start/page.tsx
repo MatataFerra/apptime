@@ -2,21 +2,31 @@
 
 import { type PropsWithChildren, useEffect } from "react";
 
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
-import Button from "@/components/ui/Button";
+import HourlyService from "@/services/Shift/Hourly";
 
+import Button from "@/components/ui/Button";
+import Skeleton from "@/components/ui/Skeleton";
+
+import useButtonStatus from "@/hooks/useButtonStatus";
 import useTrack from "@/hooks/useTrack";
 
+const StartDialog = dynamic(() => import("@/components/modules/Track/Flow/Start/Dialog"), {
+  ssr: false,
+  loading: () => <Skeleton classes="h-18 w-full" />,
+});
+
 export default function ButtonsPage() {
-  const router = useRouter();
-  const { isShiftActive } = useTrack();
+  const { user, updateShiftStatus, isShiftActive } = useTrack();
+  const shiftUnclosed = HourlyService.findUnClosedShift(user?.shifts?.hourly);
+  const buttonStatus = useButtonStatus();
 
   useEffect(() => {
-    if (isShiftActive) return;
+    if (!shiftUnclosed) return;
+    updateShiftStatus(!shiftUnclosed?.isClosed);
+  }, [shiftUnclosed, updateShiftStatus]);
 
-    router.replace("/track/button");
-  }, [isShiftActive, router]);
-
-  return null;
+  return <>{isShiftActive ? null : <StartDialog triggerStatus={buttonStatus?.startButton} />}</>;
 }

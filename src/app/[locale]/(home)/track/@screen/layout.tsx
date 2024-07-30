@@ -1,5 +1,16 @@
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 
-export default async function LayoutScreen({ children }: PropsWithChildren) {
-  return <>{children}</>;
+import isEmpty from "lodash/isEmpty";
+
+import HourlyService from "@/services/Shift/Hourly";
+import UserService from "@/services/User";
+
+export default async function LayoutScreen({
+  children,
+  tracker,
+}: PropsWithChildren<{ tracker: ReactNode }>) {
+  const user = await UserService.getSessionUser();
+  const shiftOpen = HourlyService.findUnClosedShift(user?.shifts?.hourly);
+
+  return <>{isEmpty(shiftOpen) ? <>{children}</> : <>{tracker}</>}</>;
 }
