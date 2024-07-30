@@ -2,12 +2,10 @@ import type { PropsWithChildren, ReactNode } from "react";
 
 import isEmpty from "lodash/isEmpty";
 import dynamic from "next/dynamic";
-import { redirect } from "next/navigation";
 
 import HourlyService from "@/services/Shift/Hourly";
 import UserService from "@/services/User";
 
-import Image from "@/components/ui/Image";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
@@ -19,10 +17,17 @@ const State = dynamic(() => import("@/components/structures/Track/State"), {
 type Props = {
   screen: ReactNode;
   start: ReactNode;
+  finish: ReactNode;
 };
 
-export default async function Layout({ children, start, screen }: PropsWithChildren<Props>) {
+export default async function Layout({
+  children,
+  start,
+  screen,
+  finish,
+}: PropsWithChildren<Props>) {
   const user = await UserService.getSessionUser();
+  const shiftOpen = HourlyService.findUnClosedShift(user?.shifts?.hourly);
 
   return (
     <Stack orientation="vertical" spacing={8}>
@@ -30,7 +35,9 @@ export default async function Layout({ children, start, screen }: PropsWithChild
       <Stack orientation="vertical" justifyContent="between" classes="h-[65dvh] w-full" spacing={8}>
         <State />
         {screen}
-        {start}
+        <div className="flex w-full items-center justify-between">
+          {isEmpty(shiftOpen) ? <>{start}</> : <>{finish}</>}
+        </div>
       </Stack>
     </Stack>
   );

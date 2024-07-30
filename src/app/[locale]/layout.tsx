@@ -27,7 +27,7 @@ export default async function RootLayout({
   let messages;
 
   try {
-    messages = (await import(`#/messages/${params.locale}.json`)).default;
+    messages = (await import(`../../../messages/${params.locale}.json`)).default;
   } catch (error) {
     redirect(PATH_NAMES.HOME);
   }

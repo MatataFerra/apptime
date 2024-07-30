@@ -1,5 +1,13 @@
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 
-export default async function StartLayout({ children }: PropsWithChildren) {
-  return <>{children}</>;
+export default async function StartLayout({
+  button,
+  children,
+}: PropsWithChildren<{ button: ReactNode }>) {
+  return (
+    <>
+      {children}
+      {button}
+    </>
+  );
 }
