@@ -1,6 +1,11 @@
+"use client";
+
 import dynamic from "next/dynamic";
 
+import Image from "@/components/ui/Image";
 import Skeleton from "@/components/ui/Skeleton";
+
+import useTrack from "@/hooks/useTrack";
 
 const ShiftState = dynamic(() => import("@/components/structures/Track/Monitor/ShiftState"), {
   ssr: false,
@@ -12,10 +17,28 @@ const ShiftInfo = dynamic(() => import("@/components/structures/Track/Monitor/Sh
 });
 
 function Tracker() {
+  const { isShiftActive } = useTrack();
   return (
     <>
-      <ShiftState />
-      <ShiftInfo />
+      {isShiftActive ? (
+        <>
+          <ShiftState />
+          <ShiftInfo />
+        </>
+      ) : (
+        <div className="flex h-full w-full flex-col items-center justify-center gap-4 text-center">
+          <Image
+            src="/assets/clock_non_shifts.webp"
+            alt="Clock lay down shown when there is no shift open"
+            width={150}
+            height={150}
+            classes="aspect-square size-auto"
+            priority
+          />
+
+          <h1 className="text-2xl font-bold text-gray-800">No shift has started</h1>
+        </div>
+      )}
     </>
   );
 }

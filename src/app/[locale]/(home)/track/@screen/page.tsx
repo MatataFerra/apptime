@@ -1,30 +1,22 @@
-import Image from "@/components/ui/Image";
-import Stack from "@/components/ui/Stack";
+import dynamic from "next/dynamic";
 
-export const dynamic = "force-static";
+import Skeleton from "@/components/ui/Skeleton";
 
-export default async function ScreenPage() {
+const MonitorScreen = dynamic(() => import("@/components/modules/Track/Monitor/Screen"), {
+  ssr: false,
+  loading: () => <Skeleton classes="h-monitor w-full" />,
+});
+
+const FabMenu = dynamic(() => import("@/components/structures/Track/Fab"), {
+  ssr: false,
+  loading: () => <Skeleton classes="absolute bottom-24 right-2 z-50 size-16 rounded-full p-2" />,
+});
+
+export default async function MonitorPage() {
   return (
-    <Stack
-      as="article"
-      orientation="vertical"
-      alignItems="start"
-      classes="h-monitor w-full bg-gradient-to-br from-white via-slate-100 to-slate-300 p-4 shadow-input transition-all"
-      spacing={6}
-      justifyContent="between"
-    >
-      <div className="flex h-full w-full flex-col items-center justify-center gap-4 text-center">
-        <Image
-          src="/assets/clock_non_shifts.webp"
-          alt="Clock lay down shown when there is no shift open"
-          width={150}
-          height={150}
-          classes="aspect-square size-auto"
-          priority
-        />
-
-        <h1 className="text-2xl font-bold text-gray-800">No shift has started</h1>
-      </div>
-    </Stack>
+    <>
+      <MonitorScreen />
+      <FabMenu />
+    </>
   );
 }

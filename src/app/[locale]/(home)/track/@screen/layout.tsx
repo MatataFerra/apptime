@@ -1,13 +1,13 @@
-import type { PropsWithChildren, ReactNode } from "react";
+import { PropsWithChildren, ReactNode } from "react";
 
-import isEmpty from "lodash/isEmpty";
-
-import HourlyService from "@/services/Shift/Hourly";
-import UserService from "@/services/User";
-
-export default async function LayoutScreen({
+export default async function TrackerLayout({
   children,
-  tracker,
-}: PropsWithChildren<{ tracker: ReactNode }>) {
-  return <>{tracker}</>;
+  finish,
+}: PropsWithChildren<{ finish: ReactNode; start: ReactNode }>) {
+  return (
+    <>
+      {children}
+      {finish}
+    </>
+  );
 }
