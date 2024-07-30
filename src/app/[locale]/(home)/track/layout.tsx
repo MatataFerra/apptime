@@ -1,13 +1,7 @@
 import type { PropsWithChildren, ReactNode } from "react";
 
-import isEmpty from "lodash/isEmpty";
 import dynamic from "next/dynamic";
-import { redirect } from "next/navigation";
 
-import HourlyService from "@/services/Shift/Hourly";
-import UserService from "@/services/User";
-
-import Image from "@/components/ui/Image";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
@@ -22,8 +16,6 @@ type Props = {
 };
 
 export default async function Layout({ children, start, screen }: PropsWithChildren<Props>) {
-  const user = await UserService.getSessionUser();
-
   return (
     <Stack orientation="vertical" spacing={8}>
       {children}

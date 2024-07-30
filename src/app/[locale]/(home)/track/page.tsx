@@ -15,6 +15,8 @@ const Title = dynamic(() => import("@/components/structures/share/ModuleTitle"),
   loading: () => <Skeleton classes="h-20 w-80" />,
 });
 
+export const maxDuration = 15;
+
 export default async function TrackPage({ params }: { params: LocaleParams }) {
   const isLocaleSupported = new i18n(params.locale).isLocaleSupported();
 
