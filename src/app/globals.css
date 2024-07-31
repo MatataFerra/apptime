@@ -254,3 +254,6 @@ div[data-radio-state="false"] .animate_fade_out {
   }
 }
 
+.h-monitor {
+  @apply h-[45dvh]
+}
