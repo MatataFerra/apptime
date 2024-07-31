@@ -15,7 +15,6 @@ const PRIVATES_ROUTES = [
   "/track",
   "/production",
   "/admin",
-  "/track/tracker",
 ];
 
 export default async function middleware(req: NextRequest) {
@@ -115,17 +114,5 @@ export const config = {
     "/production",
     "/es/production",
     "/en/production",
-    "/track/tracker",
-    "/es/track/tracker",
-    "/en/track/tracker",
-    "/track/screen",
-    "/es/track/screen",
-    "/en/track/screen",
-    "/track/start",
-    "/es/track/start",
-    "/en/track/start",
-    "/track/button",
-    "/es/track/button",
-    "/en/track/button",
   ],
 };
