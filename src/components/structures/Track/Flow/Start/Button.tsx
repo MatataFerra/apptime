@@ -26,14 +26,8 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
     updateShiftStatus,
     createShift,
     updateShiftUnclosed,
-    getShift,
-    deleteShift,
+    setIsClosing,
   } = useTrack();
-
-  const mock: Hourly = Object.freeze({
-    id: Math.random(),
-    ...data,
-  });
 
   function onStartShift() {
     Toast({
@@ -42,9 +36,6 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
     });
 
     updateShiftStatus(true);
-    createShift({
-      ...mock,
-    });
 
     onCreateTrackJob({
       startDate: new Date().toString(),
@@ -68,10 +59,11 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
 
         queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
 
-        const { id, ...rest } = getShift(mock.id)!;
-        const prepareShift = {
-          ...rest,
-          ...response?.shift!,
+        const prepareShift: Hourly = {
+          ...data,
+          id: response.shift?.id!,
+          endDate: null,
+          isClosed: false,
         };
 
         // success response
@@ -81,7 +73,7 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
 
         updateShiftsInfo();
         updateShiftUnclosed();
-        deleteShift(mock.id);
+        setIsClosing(false);
 
         return;
       }
@@ -92,7 +84,7 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
       });
 
       updateShiftStatus(false);
-      deleteShift(mock.id);
+      setIsClosing(true);
     });
   }
 

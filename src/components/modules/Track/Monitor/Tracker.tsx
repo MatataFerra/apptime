@@ -17,10 +17,11 @@ const ShiftInfo = dynamic(() => import("@/components/structures/Track/Monitor/Sh
 });
 
 function Tracker() {
-  const { isShiftActive } = useTrack();
+  const { isShiftActive, isClosing } = useTrack();
+
   return (
     <>
-      {isShiftActive ? (
+      {isShiftActive && !isClosing ? (
         <>
           <ShiftState />
           <ShiftInfo />

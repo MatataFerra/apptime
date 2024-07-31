@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
-import HourlyService from "@/services/Shift/Hourly";
+import ut from "@/services/Utilities/client";
 
 import StartDialog from "@/components/modules/Track/Flow/Start/Dialog";
 
@@ -10,14 +10,23 @@ import useButtonStatus from "@/hooks/useButtonStatus";
 import useTrack from "@/hooks/useTrack";
 
 export default function ButtonsStart() {
-  const { user, updateShiftStatus, isShiftActive } = useTrack();
-  const shiftUnclosed = HourlyService.findUnClosedShift(user?.shifts?.hourly);
+  const {
+    isShiftActive,
+    updateShiftStatus,
+    shiftUnclosed: { shift },
+  } = useTrack();
   const buttonStatus = useButtonStatus();
+  const checkCloseShift = useCallback(() => {
+    if (typeof shift?.isClosed === "undefined") {
+      return false;
+    }
+
+    return ut.isFalsyValue(shift?.isClosed);
+  }, [shift?.isClosed]);
 
   useEffect(() => {
-    if (!shiftUnclosed) return;
-    updateShiftStatus(!shiftUnclosed?.isClosed);
-  }, [shiftUnclosed, updateShiftStatus]);
+    updateShiftStatus(checkCloseShift());
+  }, [checkCloseShift, updateShiftStatus]);
 
   return <>{!isShiftActive ? <StartDialog triggerStatus={buttonStatus?.startButton} /> : null}</>;
 }

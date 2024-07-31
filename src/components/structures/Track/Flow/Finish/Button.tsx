@@ -1,6 +1,5 @@
 import type { Hourly } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 
 import ShiftService from "@/services/Shift";
 import Toast from "@/services/Toast";
@@ -25,7 +24,6 @@ function FinishButton({ buttonStatus }: Props) {
   const queryClient = useQueryClient();
   const { removelocalNote } = useNotes();
   const { taxes } = useTrackTaxesStore();
-  const router = useRouter();
 
   const {
     user,
@@ -34,6 +32,7 @@ function FinishButton({ buttonStatus }: Props) {
     updateShiftUnclosed,
     updateShift,
     getShift,
+    setIsClosing,
     shiftUnclosed: { shift },
   } = useTrack();
 
@@ -55,7 +54,7 @@ function FinishButton({ buttonStatus }: Props) {
       server action
     */
 
-    onUpdateTrackJob({ ...shift }, taxes, shift?.id).then((response) => {
+    onUpdateTrackJob({ ...updateTrackedShift }, taxes, shift?.id).then((response) => {
       Toast({
         message: "Closing shift",
         type: "plain",
@@ -63,13 +62,14 @@ function FinishButton({ buttonStatus }: Props) {
         action: <Loader.spinner bg="text-black" spinColor="fill-slate-100" />,
         duration: 2000,
       });
+
+      // set closing to true
+      setIsClosing(true);
       updateShiftsInfo();
       updateShiftUnclosed();
       updateShiftStatus(false);
 
       if (response) {
-        router.refresh();
-        router.replace("/track");
         removelocalNote();
 
         Toast({
@@ -85,12 +85,12 @@ function FinishButton({ buttonStatus }: Props) {
         return;
       }
 
-      setTimeout(() => {
-        updateShiftsInfo();
-        updateShiftUnclosed();
-        updateShiftStatus(true);
-        updateShift({ ...currentShift });
-      }, 1500);
+      updateShiftsInfo();
+      updateShiftUnclosed();
+      updateShiftStatus(true);
+      updateShift({ ...currentShift });
+      // set closing to false
+      setIsClosing(false);
 
       Toast({
         message: "Error",
