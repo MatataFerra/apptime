@@ -2,11 +2,21 @@ import dynamic from "next/dynamic";
 
 import Skeleton from "@/components/ui/Skeleton";
 
-const State = dynamic(() => import("@/components/structures/Track/State"), {
+const MonitorScreen = dynamic(() => import("@/components/modules/Track/Monitor/Screen"), {
   ssr: false,
-  loading: () => <Skeleton classes="h-12 w-1/3" />,
+  loading: () => <Skeleton classes="h-monitor w-full" />,
 });
 
-export default async function ScreenPage() {
-  return <State />;
+const FabMenu = dynamic(() => import("@/components/structures/Track/Fab"), {
+  ssr: false,
+  loading: () => <Skeleton classes="absolute bottom-24 right-2 z-50 size-16 rounded-full p-2" />,
+});
+
+export default async function MonitorPage() {
+  return (
+    <>
+      <MonitorScreen />
+      <FabMenu />
+    </>
+  );
 }
