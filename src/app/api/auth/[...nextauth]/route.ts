@@ -106,8 +106,6 @@ async function authOptions(req: NextApiRequest & NextRequest, res: NextResponse 
   });
 }
 
-export const maxDuration = 15;
-
 export async function GET(req: NextApiRequest & NextRequest, res: NextResponse & NextApiResponse) {
   return await authOptions(req, res);
 }
