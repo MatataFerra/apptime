@@ -1,6 +1,5 @@
-import { User } from "@prisma/client";
+import type { User } from "@prisma/client";
 import has from "lodash/has";
-import isEmpty from "lodash/isEmpty";
 import { NextRequest, NextResponse } from "next/server";
 
 import AuthService from "@/services/Auth";
@@ -8,12 +7,14 @@ import ErrorFactory from "@/services/Error/factory";
 
 import { UserCreateSchema } from "@/types";
 
-import prisma from "#/prisma/client";
-
 export async function POST(req: NextRequest) {
   const body: User = await req.json();
   try {
     const parsedBody = UserCreateSchema.safeParse(body);
+
+    if (parsedBody.data?.role === "ADMIN") {
+      throw ErrorFactory.createError("DataProvidedIsNotValid");
+    }
 
     if (!parsedBody.success) {
       throw ErrorFactory.createError("DataProvidedIsNotValid", {

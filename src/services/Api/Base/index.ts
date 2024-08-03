@@ -3,11 +3,12 @@ import { ENV_URL } from "@/utils/constants/endpoints";
 interface GET_PROPS {
   endpoint: string;
   hasEnvUrl?: boolean;
+  headers?: HeadersInit;
   options?: NextFetchRequestConfig;
 }
 
 interface POST_PROPS extends GET_PROPS {
-  body: Record<string, unknown>;
+  body?: Record<string, unknown>;
 }
 
 interface PUT_PROPS extends POST_PROPS {}
@@ -19,20 +20,27 @@ class ApiBase {
     return hasEnvUrl ? ENV_URL : "";
   }
 
-  static async get({ endpoint, hasEnvUrl = false, options }: GET_PROPS) {
-    const response = await fetch(`${this.hasUrl(hasEnvUrl)}${endpoint}`, { next: options });
+  static async get({ endpoint, hasEnvUrl = false, options, headers }: GET_PROPS) {
+    const response = await fetch(`${this.hasUrl(hasEnvUrl)}${endpoint}`, {
+      next: options,
+      headers,
+    });
     const data = await response.json();
 
     return data;
   }
 
-  static async post({ endpoint, body, hasEnvUrl = false, options }: POST_PROPS) {
+  static async post({
+    endpoint,
+    body,
+    headers = { "Content-Type": "application/json" },
+    hasEnvUrl = false,
+    options,
+  }: POST_PROPS) {
     const response = await fetch(`${this.hasUrl(hasEnvUrl)}${endpoint}`, {
       method: "POST",
       body: JSON.stringify(body),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       next: options,
     });
 
