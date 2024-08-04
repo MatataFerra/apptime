@@ -141,7 +141,8 @@ model PasswordResetToken {
   token     String    @unique
   createdAt DateTime  @default(now())
   resetAt   DateTime?
+  emailId   String?
 
   user   User   @relation(fields: [userId], references: [id])
-  userId String @unique
+  userId String 
 }
