@@ -1,4 +1,4 @@
-import type { HTMLInputTypeAttribute } from "react";
+import type { HTMLInputTypeAttribute, Ref } from "react";
 
 import { z } from "zod";
 
@@ -42,6 +42,8 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
   description?: string;
   measure?: string;
   measurePlace?: "left" | "right";
+  showPassword?: boolean;
+  onShowPasswordChange?: () => void;
 }
 
 export interface InputMeasureProps extends InputProps {
