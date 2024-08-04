@@ -1,4 +1,4 @@
-import { PassedErrors } from "@/types";
+import type { PassedErrors } from "@/types";
 
 import Icon from "@/components/ui/Icons";
 
