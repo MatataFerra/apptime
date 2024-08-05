@@ -69,6 +69,16 @@ function ResetForm() {
       password: data.password,
       token: token,
     }).then((res) => {
+      if (!res) {
+        Toast({
+          type: "error",
+          message: "Something went wrong, please try again",
+          duration: 3000,
+        });
+
+        return;
+      }
+
       if (!res.response) {
         Toast({
           type: "error",

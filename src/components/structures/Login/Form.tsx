@@ -105,7 +105,7 @@ export default function FormLogin() {
             <p>
               <Link
                 className="font-bold text-slate-800 underline"
-                href={`/${locale}/${PATH_NAMES.REGISTER}`}
+                href={`/${locale}${PATH_NAMES.REGISTER}`}
               >
                 register new account
               </Link>
@@ -113,7 +113,7 @@ export default function FormLogin() {
             <p>
               <Link
                 className="text-slate-800 underline"
-                href={`/${locale}/${PATH_NAMES.RESET_PASSWORD}`}
+                href={`/${locale}${PATH_NAMES.RESET_PASSWORD}`}
               >
                 forgotten password?
               </Link>
