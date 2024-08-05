@@ -20,7 +20,7 @@ const ICONS = {
   [PATH_NAMES.FAST_CHARGE]: <Icon.lightning width={"100%"} height={"100%"} />,
   [PATH_NAMES.TRACK]: <Icon.clock width={"100%"} height={"100%"} />,
   [PATH_NAMES.PRODUCTION]: <Icon.box width={"100%"} height={"100%"} />,
-  [PATH_NAMES.HISTORY_SHIFT]: <Icon.dashboard width={"100%"} height={"100%"} />,
+  [PATH_NAMES.DASHBOARD]: <Icon.dashboard width={"100%"} height={"100%"} />,
   [PATH_NAMES.INCOMES]: <Icon.incomes width={"100%"} height={"100%"} />,
   [PATH_NAMES.COMPARE]: <Icon.compare width={"100%"} height={"100%"} />,
   default: <Icon.default width={"100%"} height={"100%"} className="animate-pulse duration-5000" />,

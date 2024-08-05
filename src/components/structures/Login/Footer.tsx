@@ -28,13 +28,13 @@ function LoginFooter({ classes, idForm = "form" }: Props) {
     <Footer classes={classes}>
       <Button
         type="submit"
-        variant="primary"
-        classes={"w-full text-2xl font-bold active:shadow-inner"}
+        variant="black"
+        classes={"flex w-full items-center justify-center text-lg active:shadow-inner"}
         form={idForm}
       >
         Login
       </Button>
-      <GoogleButton onGoogleAuth={onGoogleAuth} disabled />
+      <GoogleButton onGoogleAuth={() => {}} disabled />
     </Footer>
   );
 }

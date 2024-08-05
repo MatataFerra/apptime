@@ -12,18 +12,18 @@ function GoogleButton({ onGoogleAuth, ...props }: Props) {
     <Button
       type="button"
       variant={props.disabled ? "disabled" : "google"}
-      classes="mx-0 my-auto grid w-full grid-cols-1 items-center"
+      classes="relative mx-0 my-auto flex w-full items-center"
       onClick={onGoogleAuth}
       {...props}
     >
       <Img
-        classes="col-start-1 col-end-2 row-start-1 row-end-2"
         src="/assets/google-logo.webp"
         alt="Google logo"
+        classes="absolute left-0 ml-4"
         width={30}
         height={30}
       />
-      <Text as="span" classes="col-start-1 col-end-2 row-start-1 row-end-2 text-2xl">
+      <Text as="span" classes="mx-auto my-0 text-lg">
         Google
       </Text>
     </Button>
