@@ -18,9 +18,10 @@ export function EmailTemplate({ firstName, url, locale, endpoint, token }: Email
         Please click in the following link to change your password. The link will be able for a few
         hours
       </p>
-      <a href={`${url}/${locale}/${endpoint}/${token}`}>
+      <a href={`${url}${locale}/${endpoint}/${token}`}>
         <span>
-          {url}/{locale}/{endpoint}/{token}
+          {url}
+          {locale}/{endpoint}/{token}
         </span>
       </a>
     </div>
