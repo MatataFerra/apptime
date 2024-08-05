@@ -16,6 +16,8 @@ export const envSchema = z.object({
   GATEWAY_PASSWORD: z.string(),
   JWT_SECRET: z.string(),
   RESEND_API_KEY: z.string(),
+  RESEND_SENDER: z.string(),
+  RESEND_SUBJECT: z.string(),
 });
 
 declare global {

@@ -48,9 +48,9 @@ export default async function onSendEmailToResetPassword(email: string, locale?:
   });
 
   const { data, error } = await resend.emails.send({
-    from: "CasualApp Team <resetpassword@inchequeable.com.ar>",
+    from: `CasualApp Team <resetpassword@${process.env.RESEND_SENDER}>`,
     to: user.email,
-    subject: "Please reset your password",
+    subject: process.env.RESEND_SUBJECT,
     react: EmailTemplate({
       firstName: user.name,
       url: process.env.NEXTAUTH_URL!,
