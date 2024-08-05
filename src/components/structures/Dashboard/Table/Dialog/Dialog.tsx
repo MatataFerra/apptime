@@ -1,18 +1,20 @@
 "use client";
 
-import { PropsWithChildren, ReactNode } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 
-import { Hourly, Production, Shift } from "@prisma/client";
+import type { Hourly, Production } from "@prisma/client";
+import * as VisualyHidden from "@radix-ui/react-visually-hidden";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 import api from "@/services/Api/Shift";
 import Toast from "@/services/Toast";
 
-import { UserType } from "@/types";
-import { SuccessApiResponse } from "@/types/api_response";
+import type { UserType } from "@/types";
+import type { SuccessApiResponse } from "@/types/api_response";
 
 import TableDialogEditShift from "@/components/structures/Dashboard/Table/Dialog/Edit";
+import { useTaxesHandlerDelete } from "@/components/structures/Dashboard/Table/Dialog/store/taxesHandlerDelete";
 import Button from "@/components/ui/Button";
 import {
   Dialog,
@@ -25,24 +27,27 @@ import {
 } from "@/components/ui/Dialog";
 import Stack from "@/components/ui/Stack";
 
-import { useDashboardContext } from "@/store/useDashboardStore";
+import useDashboard from "@/hooks/useDashboard";
+
 import { useTableStore } from "@/store/useTableStore";
 
 type Props = PropsWithChildren<{
   title: string;
   shift: Hourly | Production;
   content: ReactNode;
+  type: "hourly" | "production";
 }>;
 
-function TableDialog({ title, content, shift, children }: Props) {
+function TableDialog({ title, content, shift, type, children }: Props) {
   const { setStep, step } = useTableStore((state) => state);
-  const { user, update, deleteShift } = useDashboardContext((state) => state);
+  const { user, update, deleteShift } = useDashboard();
+  const { reset } = useTaxesHandlerDelete((state) => state);
   const queryClient = useQueryClient();
   const router = useRouter();
   const { mutate } = useMutation({
-    mutationFn: api.deleteShift.bind(api) as unknown as ({
-      id,
-    }: {
+    mutationFn: (type === "hourly"
+      ? api.deleteHourly.bind(api)
+      : api.deleteProduction.bind(api)) as unknown as (data: {
       id: number;
     }) => Promise<SuccessApiResponse<UserType>>,
 
@@ -76,6 +81,7 @@ function TableDialog({ title, content, shift, children }: Props) {
       <Dialog
         onOpenChange={(open) => {
           if (!open) {
+            reset();
             setTimeout(() => {
               setStep("info");
             }, 100);
@@ -88,6 +94,11 @@ function TableDialog({ title, content, shift, children }: Props) {
             <>
               <DialogHeader>
                 <DialogTitle className="border-b border-gray-800 py-2">{title}</DialogTitle>
+                <DialogDescription>
+                  <VisualyHidden.Root>
+                    Take a quick view about your job, edit it if you need
+                  </VisualyHidden.Root>
+                </DialogDescription>
               </DialogHeader>
               {content}
               <DialogFooter>

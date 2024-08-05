@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
-import { Hourly } from "@prisma/client";
+import type { Hourly } from "@prisma/client";
 import dynamic from "next/dynamic";
 
 import ShiftService from "@/services/Shift";
 
+import { COLUMNS } from "@/components/modules/Dashboard/TableHistory";
 import Icon from "@/components/ui/Icons";
 import Skeleton from "@/components/ui/Skeleton";
 import TableElement from "@/components/ui/TableElement";
@@ -17,7 +18,7 @@ const TableDialog = dynamic(() => import("@/components/structures/Dashboard/Tabl
   ssr: false,
   loading: () => (
     <TableElement as="tr">
-      <TableElement>
+      <TableElement colSpan={COLUMNS.length}>
         <Skeleton classes="h-40 w-full" />
       </TableElement>
     </TableElement>
@@ -28,7 +29,7 @@ const TableDialogContent = dynamic(
   () => import("@/components/structures/Dashboard/Table/Dialog/Content"),
   {
     ssr: false,
-    loading: () => <Skeleton classes="h-40 w-full" />,
+    loading: () => <Skeleton classes="h-20 w-full" />,
   }
 );
 
@@ -39,20 +40,21 @@ function HourlyRow({ shift }: { shift: Hourly }) {
     return new ShiftService(shift).calculateEarnings();
   }, []);
 
-  function getHours(minutes: number) {
-    return ShiftService.convertAmountInDecimal(minutes);
-  }
+  const getTimeDifference = useMemo(() => {
+    return ShiftService.differenceInHHmm(shift.startDate, shift?.endDate);
+  }, [shift?.endDate, shift.startDate]);
 
   return (
     <TableDialog
       title="Info about this shift"
       shift={shift}
+      type="hourly"
       content={<TableDialogContent shift={shift} />}
     >
       <TableElement as="tr" type="tr">
         <TableElement>{shortDate}</TableElement>
         <TableElement>
-          {shift?.amount ? `${String(getHours(shift?.amount ?? 0))}h` : "..."}
+          {getTimeDifference.diff ? `${String(getTimeDifference.text)}` : "..."}
         </TableElement>
         <TableElement>${String(calculateEarnings(shift))}</TableElement>
         <TableElement align="center">

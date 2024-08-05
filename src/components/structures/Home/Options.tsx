@@ -13,7 +13,7 @@ const HomeCardOption = dynamic(() => import("@/components/ui/OptionCard"), {
 function Options() {
   return (
     <Stack alignItems="center" classes="w-full">
-      <HomeCardOption classes="size-12" path={PATH_NAMES.HISTORY_SHIFT} />
+      <HomeCardOption classes="size-12" path={PATH_NAMES.DASHBOARD} />
       <HomeCardOption classes="size-12" path={PATH_NAMES.INCOMES} />
       <HomeCardOption classes="size-12" path={PATH_NAMES.COMPARE} />
     </Stack>

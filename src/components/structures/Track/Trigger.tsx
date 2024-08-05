@@ -30,7 +30,8 @@ function Trigger({ status, triggerText = "Start Shift" }: Props) {
                 ? BUTTON_VARIANTS.black
                 : BUTTON_VARIANTS.danger
               : BUTTON_VARIANTS.disabled
-          }`
+          }`,
+          `${triggerText.toLowerCase().includes("start") ? "animate-fade-up transition-all" : ""}`
         )}
         disabled={status?.disabled}
         aria-disabled={status?.disabled}

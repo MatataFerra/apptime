@@ -21,7 +21,7 @@ const poppinsFont = Poppins({
   subsets: ["latin"],
   variable: "--font-poppins",
   fallback: ["system-ui"],
-  preload: false,
+  preload: true,
 });
 
 function Layout({ children }: { children: ReactNode }) {

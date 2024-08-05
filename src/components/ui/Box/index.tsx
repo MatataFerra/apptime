@@ -1,7 +1,9 @@
 import { forwardRef, PropsWithChildren, Ref } from "react";
 
+import { cn } from "../../../utils/helpers/styleMerger";
+
 type Props = {
-  classes: string;
+  classes?: string;
 };
 
 /**
@@ -13,7 +15,7 @@ type Props = {
  */
 function Box({ classes, children, ...props }: PropsWithChildren<Props>, ref: Ref<HTMLElement>) {
   return (
-    <section className={classes} ref={ref} {...props}>
+    <section className={cn(classes)} ref={ref} {...props}>
       {children}
     </section>
   );

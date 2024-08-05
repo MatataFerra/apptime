@@ -5,8 +5,9 @@ import { create } from "zustand";
 interface RangeSelectedState {
   isRangeSelected: boolean;
   date: DateRange | undefined;
-  setIsRangeSelected: (isRangeSelected: boolean) => void;
   setDate: (date: DateRange | undefined) => void;
+  resetRange: () => void;
+  setIsRangeSelected: (isRangeSelected: boolean) => void;
 }
 
 export const useRangeSelected = create<RangeSelectedState>((set) => ({
@@ -15,6 +16,7 @@ export const useRangeSelected = create<RangeSelectedState>((set) => ({
     from: undefined,
     to: undefined,
   },
-  setIsRangeSelected: (isRangeSelected: boolean) => set({ isRangeSelected }),
   setDate: (date: DateRange | undefined) => set({ date }),
+  resetRange: () => set({ date: { from: undefined, to: undefined } }),
+  setIsRangeSelected: (isRangeSelected: boolean) => set({ isRangeSelected }),
 }));

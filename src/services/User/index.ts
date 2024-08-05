@@ -1,7 +1,7 @@
 import { User } from "@prisma/client";
 import { getServerSession } from "next-auth";
 
-import { UserType } from "@/types";
+import type { UserType } from "@/types";
 
 import { USER_ROLES } from "@/utils/constants";
 
@@ -12,6 +12,7 @@ type FindUniqueUserType = {
   email?: string;
   profile?: boolean;
   shifts?: boolean;
+  config?: boolean;
 };
 
 /**
@@ -40,13 +41,6 @@ class UserService {
         name: true,
         type_account: true,
         role: true,
-        shifts: {
-          include: {
-            hourly: options.shifts,
-            production: options.shifts,
-          },
-        },
-        profile: options.profile,
         emailVerified: true,
         formCompleted: true,
         image: true,
@@ -54,6 +48,22 @@ class UserService {
         online: true,
         passwordAttemps: true,
         password: true,
+        shifts: {
+          include: {
+            hourly: {
+              include: {
+                taxes: options.shifts,
+              },
+            },
+            production: {
+              include: {
+                taxes: options.shifts,
+              },
+            },
+          },
+        },
+        profile: options.profile,
+        config: options.config,
       },
     });
 
@@ -99,12 +109,18 @@ class UserService {
     }, {});
   }
 
-  static async getSessionUser() {
+  static async getSessionUser(
+    { shifts = true, profile = true, config = true } = {} as Pick<
+      FindUniqueUserType,
+      "profile" | "config" | "shifts"
+    >
+  ) {
     const session = await getServerSession();
     const user = await UserService.findUniqueUser({
       email: session?.user?.email ?? "",
-      shifts: true,
-      profile: true,
+      shifts,
+      profile,
+      config,
     });
 
     return user;
@@ -118,6 +134,17 @@ class UserService {
         password: this.user.password,
         name: this.user.name,
         type_account: this.user.type_account,
+        shifts: {
+          create: {
+            hourly: {},
+            production: {},
+          },
+        },
+        config: {
+          create: {
+            weekStartsOn: "monday",
+          },
+        },
       },
     });
   }

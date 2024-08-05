@@ -1,15 +1,15 @@
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
 
 import dynamic from "next/dynamic";
 
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
-const Drawer = dynamic(() => import("@/components/modules/Drawer/Menu"), {
+const SheetHamMenu = dynamic(() => import("@/components/modules/SheetHamMenu/SheetHamMenu"), {
   ssr: false,
 });
 
-const UserInfo = dynamic(() => import("@/components/structures/Drawer/UserInfo"), {
+const UserInfo = dynamic(() => import("@/components/structures/SheetHamMenu/UserInfo"), {
   ssr: false,
 });
 
@@ -23,27 +23,22 @@ const Header = dynamic(() => import("@/components/ui/Header"), {
   ),
 });
 
-const Ham = dynamic(() => import("@/components/structures/share/Ham"), {
-  ssr: false,
-  loading: () => <Skeleton classes="h-10 w-10" />,
-});
-
 interface Props {
   children: ReactElement;
-  params: {
-    locale: string;
-  };
 }
 
-export default async function HomeLayout({ children, params }: Props) {
+export default async function HomeLayout({ children }: Props) {
   return (
     <>
-      <main className="grid h-[100dvh] grid-rows-[auto,1fr] gap-8 p-4" data-testid="drawer-close">
+      <main
+        vaul-drawer-wrapper=""
+        className="grid h-dvh grid-rows-[auto,1fr] gap-8 bg-white p-4"
+        data-testid="drawer-close"
+      >
         <Header position="between" classes="relative">
-          <Ham />
-          <Drawer>
+          <SheetHamMenu>
             <UserInfo />
-          </Drawer>
+          </SheetHamMenu>
         </Header>
         {children}
       </main>

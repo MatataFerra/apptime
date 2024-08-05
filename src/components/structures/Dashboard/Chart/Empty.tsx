@@ -1,23 +1,33 @@
-import { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 
-import { isEmpty } from "lodash";
+import type { Hourly, Production, Shift } from "@prisma/client";
+import isEmpty from "lodash/isEmpty";
 
 import { CarouselItem } from "@/components/ui/Carousel";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
+type Shifts =
+  | (Shift & {
+      hourly: Hourly[];
+      production: Production[];
+    })
+  | null
+  | undefined;
+
 interface Props {
-  data: unknown[];
+  data: Shifts;
 }
 
 function ChartEmpty({ data, children }: PropsWithChildren<Props>) {
   return (
     <>
-      {isEmpty(data) ? (
+      {isEmpty(data?.hourly) && isEmpty(data?.production) ? (
         <CarouselItem>
           <Stack
-            grid
-            classes="h-80 w-full place-content-center rounded-lg border border-gray-200 p-4 shadow-input"
+            justifyContent="center"
+            alignItems="center"
+            classes="flex h-72 w-full rounded-lg border border-gray-200 p-4 shadow-input"
           >
             <Text>No data</Text>
           </Stack>

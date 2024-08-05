@@ -8,6 +8,7 @@ import Password from "@/services/Auth/password";
   - Shift
   - Profile
   - User
+  - Tax
   - SearchParams
   - Suscribe
   - Validate password
@@ -153,6 +154,13 @@ const UserUpdateSchema = UserModelSchema.partial().superRefine((values, ctx) => 
     });
   }
 
+  if (values.role === "ADMIN") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Can't create the user",
+    });
+  }
+
   if (values.password || values.email) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -163,9 +171,79 @@ const UserUpdateSchema = UserModelSchema.partial().superRefine((values, ctx) => 
 
 const UserCreateSchema = UserModelSchema.omit({
   id: true,
+}).superRefine((values, ctx) => {
+  if (Object.keys(values).length < 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "One field must be provided",
+    });
+  }
+
+  if (values.role === "ADMIN") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Can't create admin user",
+    });
+  }
+});
+
+const UserCreateSafeAdminSchema = UserModelSchema.omit({
+  id: true,
+}).superRefine((values, ctx) => {
+  if (Object.keys(values).length < 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "One field must be provided",
+    });
+  }
+});
+
+/*
+===================================================================
+-------------------------Tax---------------------------------------
+===================================================================
+*/
+
+const TaxSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  value: z.number(),
+  description: z.string().nullable(),
+});
+
+const TaxCreateSchema = TaxSchema.omit({
+  id: true,
 }).refine((values) => Object.keys(values).length > 0, {
   message: "One of the fields must be defined",
 });
+
+const TaxUpdateSchema = TaxSchema.omit({
+  id: true,
+});
+
+/*
+===================================================================
+-------------------------Shift  with Tax---------------------------
+===================================================================
+*/
+
+const BaseShiftWithTaxes = BaseShiftSchema.merge(
+  z.object({
+    taxes: TaxSchema.array().nullable(),
+  })
+);
+
+const HourlyShiftWithTaxes = HourlyShiftSchema.merge(
+  z.object({
+    taxes: TaxSchema.array().nullable(),
+  })
+);
+
+const ProductionShiftWithTaxes = ProductionShiftSchema.merge(
+  z.object({
+    taxes: TaxSchema.array().nullable(),
+  })
+);
 
 /*
 ============================================================================
@@ -179,6 +257,7 @@ const UserCreateSchema = UserModelSchema.omit({
 const SearchParamsSchema = z.object({
   shifts: z.string().nullable(),
   profile: z.string().nullable(),
+  config: z.string().nullable(),
   email: z.string().nullable(),
   only: z.string().nullable(),
 });
@@ -237,12 +316,14 @@ const FastChargeFormSchema = z.object({
   "hour-value": z.string().refine((value) => !!value, {
     message: "Hour value must be greater than 0",
   }),
-  "unpaid-breaks": z.string().refine((value) => !!value, {
-    message: "Unpaid breaks must be greater than 0",
-  }),
-  "holiday-pay-rate": z.string().refine((value) => !!value, {
-    message: "Holiday pay rate must be greater than 0",
-  }),
+  "unpaid-breaks": z.string().nullable(),
+  "holiday-pay-rate": z.string().nullable(),
+});
+
+const FastChargeFormCheckDataSchema = z.object({
+  startDate: z.string().min(1),
+  finishDate: z.string().min(1),
+  hourValue: z.string().min(1),
 });
 
 /* 
@@ -258,11 +339,16 @@ const ProductionJobFormSchema = z.object({
   "item-quantity": z.string().refine((value) => !!value, {
     message: "Hour value must be greater than 0",
   }),
-  "holiday-pay-rate": z.string().refine((value) => !!value, {
-    message: "Holiday pay rate must be greater than 0",
-  }),
+  "holiday-pay-rate": z.string().nullable(),
   "is-public-holiday": z.boolean(),
   "is-worked": z.boolean(),
+});
+
+const ProductionJobFormCheckDataSchema = z.object({
+  startDate: z.string().min(1),
+  finishDate: z.string().min(1),
+  itemValue: z.string().min(1),
+  itemQuantity: z.string().min(1),
 });
 
 /**
@@ -289,15 +375,20 @@ const HandleErrorTypeSchema = z.enum([
 
 export {
   BaseShiftSchema,
+  BaseShiftWithTaxes,
+  FastChargeFormCheckDataSchema,
   FastChargeFormSchema,
   HandleErrorTypeSchema,
   HourlyCreateSchema,
   HourlyShiftSchema,
+  HourlyShiftWithTaxes,
   HourlyUpdateSchema,
   PasswordSchema,
   ProductionCreateSchema,
+  ProductionJobFormCheckDataSchema,
   ProductionJobFormSchema,
   ProductionShiftSchema,
+  ProductionShiftWithTaxes,
   ProductionUpdateSchema,
   ProfileCreateSchema,
   ProfileSchema,
@@ -307,6 +398,10 @@ export {
   ShiftModelSchema,
   ShiftUpdateSchema,
   SuscribeSchema,
+  TaxCreateSchema,
+  TaxSchema,
+  TaxUpdateSchema,
+  UserCreateSafeAdminSchema,
   UserCreateSchema,
   UserModelSchema,
   UserUpdateSchema,

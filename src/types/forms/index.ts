@@ -1,10 +1,17 @@
-import { HTMLInputTypeAttribute } from "react";
+import type { HTMLInputTypeAttribute, Ref } from "react";
 
 import { z } from "zod";
 
-import { CSSClassNames, FastChargeFormSchema, ProductionJobFormSchema } from "@/types";
+import {
+  type CSSClassNames,
+  FastChargeFormSchema,
+  HourlyShiftSchema,
+  ProductionJobFormSchema,
+} from "@/types";
 
 import { INPUT_VARIANTS } from "@/utils/constants/tailwind";
+
+import type { TaxElement } from "@/store/useTaxStore";
 
 export enum FormStep {
   PERSONAL_INFO,
@@ -35,6 +42,8 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
   description?: string;
   measure?: string;
   measurePlace?: "left" | "right";
+  showPassword?: boolean;
+  onShowPasswordChange?: () => void;
 }
 
 export interface InputMeasureProps extends InputProps {
@@ -53,6 +62,8 @@ export type FastChargeInputsParsed = {
   holidayPay: boolean;
   holidayPayRate: number;
   unpaidBreaks: number;
+  saveTaxes: boolean;
+  taxes: TaxElement[] | [];
 };
 
 // Production Form
@@ -65,4 +76,9 @@ export type ProductionInputsParsed = {
   holidayPayRate: number;
   isPublicHoliday: boolean;
   publicHolidayWorked: boolean;
+  taxes: TaxElement[] | [];
+  saveTaxes: boolean;
 };
+
+// Track Form
+export type TrackInputs = z.infer<typeof HourlyShiftSchema>;

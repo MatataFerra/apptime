@@ -1,17 +1,18 @@
 "use client";
 
+import { FormProvider, useForm } from "react-hook-form";
+
+import { zodResolver } from "@hookform/resolvers/zod";
 import dynamic from "next/dynamic";
+
+import { FastChargeFormSchema } from "@/types";
 
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
-const Report = dynamic(() => import("@/components/structures/FastCharge/Report"), {
+const Drawer = dynamic(() => import("@/components/modules/Production/Drawer"), {
   ssr: false,
-  loading: () => (
-    <Stack orientation="vertical" classes="h-full w-full">
-      <Skeleton classes="h-28 w-1/2" />
-    </Stack>
-  ),
+  loading: () => <Skeleton classes="h-12 w-full" />,
 });
 
 const Inputs = dynamic(() => import("@/components/structures/FastCharge/Inputs"), {
@@ -20,24 +21,24 @@ const Inputs = dynamic(() => import("@/components/structures/FastCharge/Inputs")
     <>
       <Stack orientation="vertical" classes="w-full">
         <Stack orientation="horizontal" wrap classes="w-full">
-          <Skeleton classes="input-flex min-h-12 w-full" />
-          <Skeleton classes="input-flex min-h-12 w-full" />
-          <Skeleton classes="input-flex min-h-12 w-full" />
-          <Skeleton classes="input-flex min-h-12 w-full" />
-          <Skeleton classes="input-flex min-h-12 w-full" />
-          <Skeleton classes="input-flex min-h-12 w-full" />
-          <Skeleton classes="input-flex min-h-12 w-full" />
+          <Skeleton classes="input-flex min-h-16 w-full" />
+          <Skeleton classes="input-flex min-h-16 w-full" />
+          <Skeleton classes="input-flex min-h-16 w-full" />
+          <Skeleton classes="input-flex min-h-16 w-full" />
+          <Skeleton classes="input-flex min-h-16 w-full" />
+          <Skeleton classes="input-flex min-h-16 w-full" />
+          <Skeleton classes="input-flex min-h-16 w-full" />
         </Stack>
         <Stack orientation="horizontal" classes="w-full">
-          <Skeleton classes="h-5 w-full" />
-          <Skeleton classes="h-5 w-full" />
+          <Skeleton classes="h-8 w-full" />
+          <Skeleton classes="h-8 w-full" />
         </Stack>
       </Stack>
     </>
   ),
 });
 
-const Submit = dynamic(() => import("@/components/structures/share/SubmitForm"), {
+const Submit = dynamic(() => import("@/components/structures/FastCharge/Submit"), {
   ssr: false,
   loading: () => (
     <Stack justifyContent="end" classes="w-full">
@@ -47,11 +48,17 @@ const Submit = dynamic(() => import("@/components/structures/share/SubmitForm"),
 });
 
 function Form() {
+  const methods = useForm({
+    resolver: zodResolver(FastChargeFormSchema),
+  });
+
   return (
     <>
-      <Inputs />
-      <Report />
-      <Submit form="fast-charge" />
+      <FormProvider {...methods}>
+        <Inputs />
+        <Drawer />
+        <Submit />
+      </FormProvider>
     </>
   );
 }

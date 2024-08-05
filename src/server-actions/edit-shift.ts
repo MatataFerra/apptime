@@ -1,12 +1,14 @@
 "use server";
 
-import { Hourly, Production } from "@prisma/client";
+import type { Tax } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 import ShiftService from "@/services/Shift";
 import UserService from "@/services/User";
 
-export default async function onEditShift(data: Production | Hourly) {
+import type { HourlyType, ProductionType } from "@/types";
+
+export default async function onEditShift(data: ProductionType | HourlyType, taxes?: Tax[] | null) {
   const currentUser = await UserService.getSessionUser();
 
   if (!currentUser) {
@@ -20,8 +22,11 @@ export default async function onEditShift(data: Production | Hourly) {
       .closeShift()
       .build();
 
-    const updateShift = await new ShiftService(buildShift).update(data.id);
-    revalidatePath("/[locale]/(home)/history-shifts", "page");
+    const updateShift = await new ShiftService(buildShift).update(data.id, {
+      deleteTaxes: taxes ?? [],
+    });
+
+    revalidatePath("/[locale]/(home)/dashboard", "page");
 
     return updateShift;
   } catch (error) {

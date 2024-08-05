@@ -1,3 +1,5 @@
+import { User } from "@prisma/client";
+import jwt from "jsonwebtoken";
 import { cookies as cookieStore } from "next/headers";
 import { decode, encode } from "next-auth/jwt";
 
@@ -53,6 +55,12 @@ class TokenService implements TokenServiceInterface {
       },
       secret: process.env.NEXTAUTH_SECRET,
     });
+
+    return token;
+  }
+
+  static creatSha256Token(data: User): string {
+    const token = jwt.sign(data, process.env.JWT_SECRET);
 
     return token;
   }

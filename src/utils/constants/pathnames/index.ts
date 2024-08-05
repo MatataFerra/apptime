@@ -4,7 +4,7 @@ export const PATH_NAMES = {
   NO_MOBILE: "/no-mobile",
   LOGIN: "/login",
   REGISTER: "/register",
-  HISTORY_SHIFT: "/dashboard",
+  DASHBOARD: "/dashboard",
   FAST_CHARGE: "/fast-charge",
   INCOMES: "/incomes",
   FORM: "/form",
@@ -12,4 +12,7 @@ export const PATH_NAMES = {
   TRACK: "/track",
   COMPARE: "/compare",
   SETTINGS: "/settings",
+  RESET_PASSWORD: "/forgot-password",
+  RESET_TOKEN: "/reset",
+  RESET_SUCCESS: "/success",
 } as const;

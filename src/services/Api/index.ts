@@ -1,12 +1,12 @@
-import { Profile, User } from "@prisma/client";
+import type { Profile, User } from "@prisma/client";
 
-import ApiBaseService from "@/services/Api/base";
+import ApiBase from "@/services/Api/Base";
 
 import type { ApiResponse, SuccessUserApiResponse } from "@/types/api_response";
 
 import { API_ENDPOINTS } from "@/utils/constants/endpoints";
 
-class ApiService extends ApiBaseService {
+class ApiService extends ApiBase {
   constructor() {
     super();
   }
@@ -14,7 +14,6 @@ class ApiService extends ApiBaseService {
     return this.post({
       endpoint: API_ENDPOINTS.WAITING_LIST,
       body: { email },
-      hasEnvUrl: false,
     });
   }
 
@@ -23,7 +22,6 @@ class ApiService extends ApiBaseService {
       const response: SuccessUserApiResponse = await this.post({
         endpoint: API_ENDPOINTS.REGISTER,
         body: { email, password, emailVerified: null },
-        hasEnvUrl: false,
       });
 
       return response;
@@ -37,20 +35,30 @@ class ApiService extends ApiBaseService {
     filters,
     shifts = false,
     profile = false,
-    hasEnvUrl = true,
+    config = false,
+    hasEnvUrl,
     options,
   }: {
     email?: string | null;
     filters?: keyof User | (keyof User)[];
     shifts?: boolean;
     profile?: boolean;
+    config?: boolean;
     hasEnvUrl?: boolean;
     options?: NextFetchRequestConfig;
   }) {
     const parseFilters = Array.isArray(filters) ? filters.join(",") : "";
 
+    const buildEndpoint = ApiService.addSearchParamsToEndpoint(API_ENDPOINTS.USER, [
+      { name: "email", value: email ?? "" },
+      { name: "only", value: parseFilters },
+      { name: "shifts", value: String(shifts) },
+      { name: "profile", value: String(profile) },
+      { name: "config", value: String(config) },
+    ]);
+
     const response: SuccessUserApiResponse = await this.get({
-      endpoint: `${API_ENDPOINTS.USER}?email=${email}&only=${parseFilters}&shifts=${shifts}&profile=${profile}`,
+      endpoint: buildEndpoint,
       hasEnvUrl,
       options,
     });
@@ -60,7 +68,7 @@ class ApiService extends ApiBaseService {
 
   static async updateUser({
     user,
-    hasEnvUrl = true,
+    hasEnvUrl,
   }: {
     user: Partial<User>;
     hasEnvUrl?: boolean;
@@ -76,7 +84,7 @@ class ApiService extends ApiBaseService {
 
   static async createProfile({
     profile,
-    hasEnvUrl = true,
+    hasEnvUrl,
   }: {
     profile: Omit<Profile, "id">;
     hasEnvUrl?: boolean;
@@ -94,6 +102,46 @@ class ApiService extends ApiBaseService {
     // eslint-disable-next-line no-console
     const response = console.log("delayed", ms);
     return new Promise((resolve) => setTimeout(() => resolve(response), ms));
+  }
+
+  /**
+   * @name createAdminUser
+   * @description static method to handle the creation of admin users, first you will need a token created with TokenService.creatSha256Token() static method, the user provided must be an admin user
+   * @param user
+   * @param token
+   * @returns User type created based on token provided and password to verify the integrity of the user
+   */
+  static async createAdminUser({
+    user,
+    token,
+  }: {
+    user: Omit<User, "id">;
+    token: string;
+  }): Promise<{
+    message: string;
+    response: true;
+    user: User;
+  }> {
+    return this.post({
+      endpoint: API_ENDPOINTS.USER + `/admin?token=${token}`,
+      body: {
+        ...user,
+      },
+    });
+  }
+
+  private static addSearchParamsToEndpoint(
+    endpoint: (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS],
+    params: Array<{ name: string; value: string }>
+  ) {
+    const parse = params
+      .map(({ name, value }) => {
+        if (!value) return "";
+        return `${name}=${value}`;
+      })
+      .filter((param) => param !== "");
+
+    return `${endpoint}?${parse.join("&")}`;
   }
 }
 

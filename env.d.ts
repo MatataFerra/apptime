@@ -11,6 +11,13 @@ export const envSchema = z.object({
   NEXT_PUBLIC_TURSO_DATABASE_URL: z.string(),
   TURSO_ON: z.string(),
   STAGING: z.string(),
+  GATEWAY_URL: z.string(),
+  GATEWAY_SECRET: z.string(),
+  GATEWAY_PASSWORD: z.string(),
+  JWT_SECRET: z.string(),
+  RESEND_API_KEY: z.string(),
+  RESEND_SENDER: z.string(),
+  RESEND_SUBJECT: z.string(),
 });
 
 declare global {

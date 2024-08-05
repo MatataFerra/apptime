@@ -21,12 +21,15 @@ export const GRADIENTS = {
 };
 
 export const BUTTON_VARIANTS = {
-  primary: "shadow-button bg-aquatic p-3 font-bold text-black",
+  primary:
+    "shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px] bg-aquatic p-3 font-bold text-black",
   secondary: "bg-gray-200 text-gray-800 dark:bg-gray-800 dark:text-gray-100 p-3",
-  danger: "bg-red-500 text-white p-3 shadow-button active:shadow-button-inner",
-  success: "bg-green-500 text-white p-3 shadow-button active:shadow-button-inner",
+  danger:
+    "bg-red-500 text-white p-3 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:bg-red-700/80 active:shadow-button-inner",
+  success:
+    "bg-green-500 text-white p-3 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px] active:shadow-button-inner",
   warning: "bg-yellow-500 text-white p-3",
-  info: "bg-blue-500 text-white p-3 font-bold text-white shadow-button",
+  info: "bg-blue-500 text-white p-3 font-bold text-white shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:bg-blue-600 transition-colors",
   rounded: "text-black p-3 rounded-full bg-transparent",
   gradient_primary: "border_gradient_1",
   gradient_secondary: "border_gradient_2",
@@ -36,8 +39,9 @@ export const BUTTON_VARIANTS = {
   disabled: "bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-100 p-3 cursor-not-allowed",
   black:
     "bg-slate-950 text-white p-3 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px]",
-  teal: "bg-light-blue text-white p-3 text-black shadow-button active:shadow-button-inner",
-  "post-it": "bg-post-it-button text-white p-3 text-black shadow-button active:shadow-button-inner",
+  teal: "bg-light-blue text-white p-3 text-black shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px] active:shadow-button-inner",
+  "post-it":
+    "bg-post-it-button text-white p-3 text-black shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px] active:shadow-button-inner",
 };
 
 export const INPUT_VARIANTS = {
@@ -78,6 +82,7 @@ export const STACK_ALIGN = {
   start: "items-start",
   center: "items-center",
   end: "items-end",
+  baseline: "items-baseline",
 } as const;
 
 export const BADGE_STATUS = {

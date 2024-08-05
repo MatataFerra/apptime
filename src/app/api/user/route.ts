@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getToken, JWT } from "next-auth/jwt";
+import { getToken, type JWT } from "next-auth/jwt";
 
 import ErrorFactory from "@/services/Error/factory";
 import UserService from "@/services/User";
@@ -25,11 +25,13 @@ export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const shifts = searchParams.get(QUERY_PARAMS.SHIFTS);
   const profile = searchParams.get(QUERY_PARAMS.PROFILE);
+  const config = searchParams.get(QUERY_PARAMS.CONFIG);
   const email = parseEmailFromParams(checkToken, searchParams.get(QUERY_PARAMS.EMAIL));
   const only = searchParams.get(QUERY_PARAMS.ONLY);
 
   const parsedSearchParams = SearchParamsSchema.safeParse({
     shifts,
+    config,
     profile,
     email,
     only,
@@ -58,11 +60,20 @@ export async function GET(req: NextRequest) {
       include: {
         shifts: {
           include: {
-            hourly: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
-            production: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
+            hourly: {
+              include: {
+                taxes: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
+              },
+            },
+            production: {
+              include: {
+                taxes: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
+              },
+            },
           },
         },
         profile: JSON.parse(parsedSearchParams.data.profile ?? "false"),
+        config: JSON.parse(parsedSearchParams.data.config ?? "false"),
       },
     });
 

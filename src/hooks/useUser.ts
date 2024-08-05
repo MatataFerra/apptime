@@ -1,61 +1,38 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 
 import api from "@/services/Api";
 
-import { UserType } from "@/types";
-import { SuccessApiResponse } from "@/types/api_response";
+import type { UserType } from "@/types";
+import type { SuccessApiResponse } from "@/types/api_response";
 
 function useUser() {
-  const [isLoading, setIsloading] = useState(true);
   const session = useSession();
-  const queryClient = useQueryClient();
-  const data = queryClient.getQueryData<SuccessApiResponse<UserType>>([
-    "user",
-    session.data?.user?.email,
-  ]);
-  const [user, setUser] = useState<UserType | undefined>(data?.user);
+  const email = session.data?.user?.email;
+
   const fetchUser = useCallback(async () => {
-    if (!data && session.data?.user?.email) {
-      await queryClient
-        .fetchQuery({
-          queryKey: ["user", session.data?.user?.email],
-          queryFn: () =>
-            api.getUserByEmail.bind(api)({
-              email: session.data?.user?.email,
-              hasEnvUrl: false,
-              profile: true,
-              shifts: true,
-            }) as unknown as SuccessApiResponse<UserType>,
-        })
-        .then((res) => {
-          setUser(res?.user);
-        });
-    }
+    if (!email) return;
 
-    queryClient.invalidateQueries({
-      queryKey: ["user", session.data?.user?.email],
-    });
+    return api.getUserByEmail({
+      email: email,
+      profile: true,
+      shifts: true,
+      config: true,
+    }) as unknown as SuccessApiResponse<UserType>;
+  }, [email]);
 
-    return user;
-  }, [data, queryClient, session.data?.user?.email, user]);
+  const { data, isLoading } = useQuery({
+    queryKey: ["user", email],
+    queryFn: fetchUser,
+    enabled: !!email,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchInterval: 3600 * 1000,
+  });
 
-  useEffect(() => {
-    fetchUser()
-      .then((user) => {
-        if (user) {
-          return setIsloading(false);
-        }
-        setIsloading(true);
-      })
-      .catch((err) => {
-        setIsloading(false);
-      });
-  }, [fetchUser]);
-
-  return { data: user, isLoading };
+  return { data: data?.user, isLoading };
 }
 
 export default useUser;

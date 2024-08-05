@@ -49,11 +49,10 @@ const MainOptions = dynamic(() => import("@/components/structures/Home/MainOptio
 });
 
 type Props = {
-  user?: UserType | null;
   params: LocaleParams;
 };
 
-function Content({ user, params }: Props) {
+function Content({ params }: Props) {
   return (
     <Stack orientation="vertical" spacing={8}>
       <Stack as="div" orientation="vertical" spacing={4}>

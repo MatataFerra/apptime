@@ -1,9 +1,9 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 
-import { LocaleParams } from "@/types";
+import type { LocaleParams } from "@/types";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 

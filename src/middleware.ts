@@ -17,12 +17,15 @@ const PRIVATES_ROUTES = [
   "/admin",
 ];
 
+const LOGGED_ROUTES = ["/forgot-password", "/reset", "/success"];
+
 export default async function middleware(req: NextRequest) {
   const nextPathName = req.nextUrl.pathname;
   const I18N = new i18n("en");
   const locale = I18N.getLocale(req) ?? "en";
   const routeLocale = Router.addLocale(nextPathName, locale);
   const router = new Router(PRIVATES_ROUTES).addLocalesToRoutes();
+  const loggedRoutes = new Router(LOGGED_ROUTES).addLocalesToRoutes();
   const token = await new TokenService(NEXT_AUTH_SESSION_TOKEN).decodedCookieData();
 
   const pathnameIsMissingLocale = Router.isMissingLocale(nextPathName);
@@ -33,7 +36,34 @@ export default async function middleware(req: NextRequest) {
     return ut.redirect(req, routeLocale);
   }
 
+  // check if user is logged and redirect if try to go to logged routes
+  if (loggedRoutes.isRoute(routeLocale)) {
+    const noMobilePath = Router.addLocale(PATH_NAMES.NO_MOBILE, locale);
+
+    // redirect to the no-mobile page if the user is not on a mobile device
+    if (!ut.isMobile({ request: req })) {
+      return ut.redirect(req, noMobilePath);
+    }
+
+    if (token) {
+      const url = req.nextUrl.clone();
+      const home = Router.addLocale(PATH_NAMES.HOME, locale);
+      url.pathname = home;
+
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // check if the route is a private route
   if (router.isRoute(routeLocale)) {
+    const noMobilePath = Router.addLocale(PATH_NAMES.NO_MOBILE, locale);
+
+    // redirect to the no-mobile page if the user is not on a mobile device
+    if (!ut.isMobile({ request: req })) {
+      return ut.redirect(req, noMobilePath);
+    }
+
+    // redirect to the login page if the user is not authenticated
     if (!token) {
       const url = req.nextUrl.clone();
       const login = Router.addLocale(PATH_NAMES.LOGIN, locale);
@@ -43,6 +73,7 @@ export default async function middleware(req: NextRequest) {
       return NextResponse.redirect(url);
     }
 
+    // check if the user is an admin
     if (Router.isRouteSupported(PATH_NAMES.ADMIN, nextPathName)) {
       if (token?.role !== USER_ROLES.ADMIN) {
         return ut.redirect(req, PATH_NAMES.HOME);
@@ -54,15 +85,18 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // check if the route is the no-mobile page
   if (Router.isRouteSupported(PATH_NAMES.NO_MOBILE, nextPathName)) {
     const homePath = Router.addLocale(PATH_NAMES.HOME, locale);
 
+    // redirect to the home page if the user is on a mobile device
     if (ut.isMobile({ request: req })) {
       return ut.redirect(req, homePath);
     }
   } else {
     const noMobilePath = Router.addLocale(PATH_NAMES.NO_MOBILE, locale);
 
+    // redirect to the no-mobile page if the user is not on a mobile device
     if (!ut.isMobile({ request: req })) {
       return ut.redirect(req, noMobilePath);
     }
@@ -101,5 +135,14 @@ export const config = {
     "/production",
     "/es/production",
     "/en/production",
+    "/forgot-password",
+    "/es/forgot-password",
+    "/en/forgot-password",
+    "/reset",
+    "/es/reset",
+    "/en/reset",
+    "/success",
+    "/es/success",
+    "/en/success",
   ],
 };

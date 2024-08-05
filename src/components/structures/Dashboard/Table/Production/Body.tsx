@@ -2,19 +2,19 @@
 
 import { useMemo } from "react";
 
-import { Production } from "@prisma/client";
+import type { Production } from "@prisma/client";
 import isEmpty from "lodash/isEmpty";
 
 import ShiftService from "@/services/Shift";
-import ProductionService from "@/services/Shift/Production";
 
 import Row from "@/components/structures/Dashboard/Table/Production/Row";
 import TableBody from "@/components/ui/TableBody";
 
-import { useDashboardContext } from "@/store/useDashboardStore";
+import useDashboard from "@/hooks/useDashboard";
 
 function ProductionBody() {
-  const { user } = useDashboardContext((state) => state);
+  const { user } = useDashboard();
+
   const productionShifts = useMemo(() => {
     return user?.shifts?.production;
   }, [user?.shifts?.production]);

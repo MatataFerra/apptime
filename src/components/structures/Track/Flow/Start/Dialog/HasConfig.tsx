@@ -1,16 +1,14 @@
 "use client";
 
-import { useMemo } from "react";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
 import StartButton from "@/components/structures/Track/Flow/Start/Button";
 import Dropdown from "@/components/structures/Track/Flow/Start/Dialog/Dropdown";
 import Button from "@/components/ui/Button";
-import { DialogHeader, DialogTitle } from "@/components/ui/Dialog";
+import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
 import Image from "@/components/ui/Image";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
-
-import { TAX_CODES } from "@/utils/constants";
 
 import { useShiftData } from "@/store/useShiftData";
 
@@ -32,6 +30,11 @@ function ShiftStartHasConfigStep() {
             <Text>A previous shift configuration was found</Text>
           </Stack>
         </DialogTitle>
+        <DialogDescription>
+          <VisuallyHidden.Root>
+            A previous shift configuration was found. Do you want to use it?
+          </VisuallyHidden.Root>
+        </DialogDescription>
       </DialogHeader>
       <Stack orientation="vertical" alignItems="center">
         <ul className="grid grid-cols-2 gap-x-3 gap-y-2 text-left text-sm text-gray-500 dark:text-gray-400">

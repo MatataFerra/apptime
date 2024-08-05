@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import ApiBaseService from "@/services/Api/base";
+import ApiBase from "@/services/Api/Base";
 
 import { HourlyCreateSchema, ProductionCreateSchema } from "@/types";
 
@@ -10,7 +10,7 @@ type ProductionSchema = z.infer<typeof ProductionCreateSchema>;
 type HourlySchema = z.infer<typeof HourlyCreateSchema>;
 type ShiftTypes = ProductionSchema | HourlySchema;
 
-class ApiShiftService extends ApiBaseService {
+class ApiShift extends ApiBase {
   constructor() {
     super();
   }
@@ -25,7 +25,6 @@ class ApiShiftService extends ApiBaseService {
     const response = await this.put({
       endpoint: `${API_ENDPOINTS.SHIFT}/${id}`,
       body,
-      hasEnvUrl: false,
     });
     return response;
   }
@@ -40,7 +39,6 @@ class ApiShiftService extends ApiBaseService {
     const response = await this.put({
       endpoint: `${API_ENDPOINTS.SHIFT}/${id}`,
       body,
-      hasEnvUrl: false,
     });
     return response;
   }
@@ -49,7 +47,6 @@ class ApiShiftService extends ApiBaseService {
     const response = await this.post({
       endpoint: `${API_ENDPOINTS.SHIFT}/hourly`,
       body,
-      hasEnvUrl: false,
     });
     return response;
   }
@@ -58,7 +55,6 @@ class ApiShiftService extends ApiBaseService {
     const response = await this.post({
       endpoint: `${API_ENDPOINTS.SHIFT}`,
       body,
-      hasEnvUrl: false,
     });
     return response;
   }
@@ -67,7 +63,6 @@ class ApiShiftService extends ApiBaseService {
     const response = await this.post({
       endpoint: `${API_ENDPOINTS.SHIFT}`,
       body,
-      hasEnvUrl: false,
     });
     return response;
   }
@@ -75,10 +70,23 @@ class ApiShiftService extends ApiBaseService {
   static async deleteShift({ id }: { id: number }) {
     const response = await this.delete({
       endpoint: `${API_ENDPOINTS.SHIFT}/${id}`,
-      hasEnvUrl: false,
+    });
+    return response;
+  }
+
+  static async deleteHourly({ id }: { id: number }) {
+    const response = await this.delete({
+      endpoint: `${API_ENDPOINTS.SHIFT}/hourly/${id}`,
+    });
+    return response;
+  }
+
+  static async deleteProduction({ id }: { id: number }) {
+    const response = await this.delete({
+      endpoint: `${API_ENDPOINTS.SHIFT}/production/${id}`,
     });
     return response;
   }
 }
 
-export default ApiShiftService;
+export default ApiShift;

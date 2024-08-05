@@ -7,8 +7,6 @@ export const SETTINGS_FIELDS = {
   personal: {
     country: "Country",
     city: "City",
-    firstname: "Firstname",
-    lastname: "Lastname",
   },
 
   configs: {

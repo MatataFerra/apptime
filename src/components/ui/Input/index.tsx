@@ -1,4 +1,6 @@
-import { forwardRef, Ref } from "react";
+import { forwardRef, type Ref } from "react";
+
+import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons";
 
 import { InputProps } from "@/types/forms";
 
@@ -16,6 +18,7 @@ import { cn } from "@/utils/helpers/styleMerger";
  * @param description
  * @param measure
  * @param measurePlace
+ * @param showPassword
  * @param ref
  * @returns
  */
@@ -33,6 +36,9 @@ const input = forwardRef(function Input(
     label,
     labelClasses,
     basis,
+    containerClasses,
+    showPassword = false,
+    onShowPasswordChange,
     ...props
   }: InputProps,
   ref: Ref<HTMLInputElement>
@@ -45,10 +51,18 @@ const input = forwardRef(function Input(
     );
   }
 
+  if (showPassword && !onShowPasswordChange && process.env.NODE_ENV === "development") {
+    // eslint-disable-next-line no-console
+    console.log(
+      "\x1b[31m%s\x1b[0m",
+      "showPassword is true, the input needs to be controlled with onShowPasswordChange()"
+    );
+  }
+
   const flexBasis = basis ? `${basis}` : "input-flex";
 
   return (
-    <section className={`${flexBasis} w-full`}>
+    <div className={cn(flexBasis, containerClasses, "w-full")}>
       {label && (
         <label
           htmlFor={props.name}
@@ -60,7 +74,7 @@ const input = forwardRef(function Input(
 
       <div
         className={cn(
-          "flex w-full items-center justify-between rounded-lg bg-transparent px-2 py-2",
+          "group flex w-full items-center justify-between rounded-lg bg-transparent px-2 py-2",
           type === "radio" || type === "checkbox"
             ? INPUT_VARIANTS["radio"]
             : INPUT_VARIANTS[variant],
@@ -95,18 +109,33 @@ const input = forwardRef(function Input(
             {measure}
           </span>
         )}
+        {showPassword ? (
+          <>
+            <label htmlFor={"eye-" + props.name} className="order-2">
+              <input
+                hidden
+                type="checkbox"
+                id={"eye-" + props.name}
+                className="peer"
+                onChange={onShowPasswordChange}
+              />
+              <EyeClosedIcon className={cn("block", "peer-checked:hidden")} />
+              <EyeOpenIcon className={cn("hidden", "peer-checked:block")} />
+            </label>
+          </>
+        ) : null}
       </div>
       {description && (
         <small
           className={cn(
-            "mt-0 block text-[.5rem]",
-            isError ? "font-semibold text-red-500" : "font-normal text-slate-600"
+            "mt-0 block text-xs",
+            isError ? "font-normal text-red-500" : "font-normal text-slate-600"
           )}
         >
           {description}
         </small>
       )}
-    </section>
+    </div>
   );
 });
 

@@ -178,6 +178,28 @@ module.exports = {
           },
         },
 
+        'fade-down-out':{
+          '0%': {
+              opacity: '1',
+              transform: 'translateY(0)',
+          },
+          '100%': {
+              opacity: '0',
+              transform: 'translateY(-2rem)',
+          },
+        },
+
+        'fade-up-out':{
+          '0%': {
+              opacity: '1',
+              transform: 'translateY(0)',
+          },
+          '100%': {
+              opacity: '0',
+              transform: 'translateY(2rem)',
+          },
+        },
+
         'fade-up': {
           '0%': {
               opacity: '0',
@@ -255,16 +277,29 @@ module.exports = {
           "100%": {
             backgroundPosition: "10% 0%",
           },
+        },
+        progress: {
+          '0%': { transform: ' translateX(0) scaleX(0)' },
+          '40%': { transform: 'translateX(0) scaleX(0.4)' },
+          '100%': { transform: 'translateX(100%) scaleX(0.5)' },
+        },
+
+        "grow-in": {
+          '0%': {transform: "translateX(100%)", opacity: 0},
+          '100%': {transform: "translateX(0)", opacity: 1}
         }
       },
       animation: {
+        progress: 'progress 1s infinite linear',
         "fade-out-left": "fade-out-left 1s ease-out",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         text: "text 5s ease infinite",
         shake: "shake 1s ease 1",
         "fade-down": "fade-down 0.5s ease-in-out",
+        "fade-down-out": "fade-down-out 0.5s ease-in-out",
         "fade-up": "fade-up 0.5s ease-in-out",
+        "fade-up-out": "fade-up-out 0.5s ease-in-out",
         "hide-left": "show-left 0.5s ease-in-out forwards",
         "show-right": "show-right 0.5s ease-in-out forwards",
         "hide-right": "hide-right 0.5s ease-in-out forwards",
@@ -275,7 +310,11 @@ module.exports = {
         "fade-in": "fade-in .5s ease-out",
         "fade-out": "fade-out .5s ease-out",
         "bg-gradient": "bg-gradient 5s ease-in-out infinite",
+        "grow-in": "grow-in 150ms ease-out backwards"
       },
+      transformOrigin: {
+        'left-right': '0% 50%',
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],

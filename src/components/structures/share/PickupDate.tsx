@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { type DateRange } from "react-day-picker";
 
 import Button from "@/components/ui/Button";
@@ -7,15 +8,22 @@ import DateRangePicker from "@/components/ui/DateRangePicker";
 import Icon from "@/components/ui/Icons";
 import Stack from "@/components/ui/Stack";
 
+import useDashboard from "@/hooks/useDashboard";
 import useDelayed from "@/hooks/useDelayed";
 
-import { useDashboardContext } from "@/store/useDashboardStore";
 import { useRangeSelected } from "@/store/useRangeSelected";
 
 function PickupDate() {
-  const { isRangeSelected, setDate, setIsRangeSelected } = useRangeSelected((state) => state);
+  const { isRangeSelected, setDate, setIsRangeSelected, resetRange } = useRangeSelected(
+    (state) => state
+  );
   const isRangeSelectedDelayed = useDelayed(isRangeSelected, 500);
-  const { filterByDate, resetShifts } = useDashboardContext((state) => state);
+  const { filterByDate, resetShifts } = useDashboard();
+
+  useEffect(() => {
+    resetRange();
+    setIsRangeSelected(false);
+  }, [resetRange, setIsRangeSelected]);
 
   function onFilterByDate(date: DateRange | undefined) {
     filterByDate(date);

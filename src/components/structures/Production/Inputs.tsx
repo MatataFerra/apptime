@@ -1,62 +1,115 @@
-import { useForm } from "react-hook-form";
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
+import { useFormContext } from "react-hook-form";
+
+import type { Tax } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { isBefore } from "date-fns";
 
 import Toast from "@/services/Toast";
 
-import { ProductionJobFormSchema } from "@/types";
-import { type ProductionInputs } from "@/types/forms";
+import { ProductionJobFormCheckDataSchema, type UserType } from "@/types";
+import type { SuccessApiResponse } from "@/types/api_response";
+import type { ProductionInputs } from "@/types/forms";
 
+import { observer } from "@/components/structures/Taxes/observer";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
+import useGetUniqueTaxes from "@/hooks/useGetUniqueTaxes";
 import useUser from "@/hooks/useUser";
 
-import onSubmitProductionJob from "@/server-actions/production-job";
+import onCreateProductionShift from "@/server-actions/production-job";
 import { useProductionForm } from "@/store/useProductionForm";
+import { useProductionTaxesStore } from "@/store/useTaxStore";
 
 function Inputs() {
-  const { setValues, reset: resetValues } = useProductionForm((state) => state);
-  const queryClient = useQueryClient();
-  const { data: user } = useUser();
+  /*
+    Custom hook to get the values from the form
+  */
+  const {
+    setValues,
+    reset: resetValues,
+    setIsFormReady,
+    setDialogState,
+  } = useProductionForm((state) => state);
+
+  /*
+    Custom hook to get the taxes from the store
+  */
+  const { taxes, saveTaxes, clearTaxes, setSaveTaxes } = useProductionTaxesStore((state) => state);
+
+  /*
+    Use data and methods from the useForm hook
+  */
   const {
     handleSubmit,
     register,
     watch,
     reset,
-    setError,
-    setFocus,
     formState: { errors },
-  } = useForm<ProductionInputs>({
-    resolver: zodResolver(ProductionJobFormSchema),
-  });
+  } = useFormContext<ProductionInputs>();
+
+  /*
+    observe when the submit is done
+  */
+  const { setDone } = observer();
+
+  const queryClient = useQueryClient();
+  const { data: user } = useUser();
+  const getUniqueTaxes = useGetUniqueTaxes({ localTaxes: taxes });
+
+  /*
+    ================================================================================
+    ================================================================================
+  */
+
+  /*
+    Watch the values of the form fields
+  */
 
   const startDateWatch = watch("start-date");
   const finishDateWatch = watch("finish-date");
+  const itemValueWatch = watch("item-value");
+  const itemQuantityWatch = watch("item-quantity");
+
+  useEffect(() => {
+    const data = {
+      startDate: startDateWatch,
+      finishDate: finishDateWatch,
+      itemValue: itemValueWatch,
+      itemQuantity: itemQuantityWatch,
+    };
+
+    // Check if the data from form is valid
+    const checkData = ProductionJobFormCheckDataSchema.safeParse(data);
+
+    // If the data is valid, set the form as ready and release the button to submit
+    if (checkData.success) {
+      setIsFormReady(true);
+    } else {
+      setIsFormReady(false);
+    }
+  }, [finishDateWatch, itemQuantityWatch, itemValueWatch, setIsFormReady, startDateWatch]);
+
+  /*
+    ================================================================================
+    ================================================================================
+  */
 
   function onSubmit(formData: ProductionInputs) {
     const parseData = {
       startDate: new Date(formData["start-date"]).toString(),
       endDate: new Date(formData["finish-date"]).toString(),
       itemValue: parseFloat(formData["item-value"]),
-      holidayPayRate: parseFloat(formData["holiday-pay-rate"]),
+      holidayPayRate: parseFloat(formData["holiday-pay-rate"] || "0"),
       itemQuantity: parseFloat(formData["item-quantity"]),
       isPublicHoliday: formData["is-public-holiday"],
       publicHolidayWorked: formData["is-worked"],
+      taxes: taxes,
+      saveTaxes,
     };
-
-    if (isBefore(new Date(finishDateWatch), new Date(startDateWatch))) {
-      setError("finish-date", {
-        message: "Finish date must be after start date",
-      });
-
-      setFocus("finish-date");
-
-      return;
-    }
 
     Toast({
       type: "info",
@@ -65,11 +118,81 @@ function Inputs() {
       duration: 1000,
     });
 
-    onSubmitProductionJob(parseData).then((response: any) => {
-      if (response) {
-        queryClient.invalidateQueries({
-          queryKey: ["user", user?.email],
-        });
+    const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
+      "user",
+      user?.email,
+    ]);
+
+    const previousTaxData = queryClient.getQueryData<SuccessApiResponse<Tax[]>>(["tax"]);
+
+    //* Optimistic update
+    queryClient.cancelQueries({ queryKey: ["tax"] }).then(() => {
+      const prev = previousTaxData?.tax.map((tax) => {
+        return {
+          ...tax,
+        };
+      });
+
+      const lastId = prev?.at(-1)?.id ?? Math.random();
+
+      const unique = getUniqueTaxes?.map((tax) => ({
+        ...tax,
+        id: lastId + 1,
+      }));
+
+      const all = prev?.concat(unique ?? []);
+
+      queryClient.setQueryData(["tax"], {
+        ...previousTaxData,
+        tax: all,
+      });
+
+      return { previousTaxData };
+    });
+
+    //* Optimistic update
+    queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+      const lastId = previousUserData?.user?.shifts?.production?.at(-1)?.id ?? Math.random();
+      const newProduction = [
+        ...(previousUserData?.user?.shifts?.production ?? []),
+        {
+          id: lastId + 1,
+          startDate: parseData.startDate,
+          endDate: parseData.endDate,
+          holidayPayRate: parseData.holidayPayRate,
+          itemValue: parseData.itemValue,
+          itemQuantity: parseData.itemQuantity,
+          isPublicHoliday: parseData.isPublicHoliday,
+          publicHolidayWorked: parseData.publicHolidayWorked,
+          holidayPay: parseData.holidayPayRate > 0,
+          amount: 0,
+          isClosed: true,
+          notes: "",
+          shiftId: user?.shifts?.id,
+          taxes: parseData.taxes,
+        },
+      ];
+
+      queryClient.setQueryData(["user", user?.email], {
+        ...previousUserData,
+        user: {
+          ...previousUserData?.user,
+          shifts: {
+            ...previousUserData?.user.shifts,
+            production: newProduction,
+          },
+        },
+      });
+
+      return { previousUserData };
+    });
+
+    setDialogState(false);
+    setSaveTaxes(false);
+
+    onCreateProductionShift(parseData).then((response) => {
+      setDone(true);
+      if (response?.response) {
         Toast({
           type: "success",
           message: "Success",
@@ -78,9 +201,48 @@ function Inputs() {
         });
 
         resetValues();
+        clearTaxes();
 
         return reset();
       }
+
+      queryClient.invalidateQueries({
+        queryKey: ["user", user?.email],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["tax"],
+      });
+
+      queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
+        queryClient.setQueryData(["user", user?.email], {
+          ...previousUserData,
+          user: {
+            ...previousUserData?.user,
+            profile: {
+              ...previousUserData?.user.profile,
+            },
+            shifts: {
+              ...previousUserData?.user.shifts,
+              production: previousUserData?.user.shifts?.production,
+            },
+          },
+        });
+
+        return { previousUserData };
+      });
+
+      queryClient.cancelQueries({ queryKey: ["tax"] }).then(() => {
+        queryClient.setQueryData(["tax"], {
+          ...previousTaxData,
+          tax: previousTaxData?.tax,
+        });
+
+        return { previousTaxData };
+      });
+
+      setSaveTaxes(false);
+      setDialogState(false);
 
       Toast({
         type: "error",
@@ -123,10 +285,13 @@ function Inputs() {
           })}
         />
         <Input
-          label="Item value"
+          labelClasses="text-xs"
+          label="Value of each item"
+          min={0}
           type="number"
           step={"any"}
           measure="$"
+          description="If you produce boxes, each box costs $0.023"
           measurePlace="left"
           {...register("item-value", {
             onChange(e) {
@@ -136,6 +301,7 @@ function Inputs() {
         />
         <Input
           label="Quantity"
+          min={0}
           type="number"
           {...register("item-quantity", {
             onChange(e) {
@@ -154,7 +320,7 @@ function Inputs() {
             },
           })}
         />
-        <Stack orientation="horizontal" wrap>
+        <Stack orientation="horizontal" wrap classes="mt-4">
           <Stack alignItems="center">
             <input
               className="size-4"

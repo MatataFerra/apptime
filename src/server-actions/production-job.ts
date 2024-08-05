@@ -1,14 +1,15 @@
 "use server";
 
-import { Production } from "@prisma/client";
+import type { Production } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 import ShiftService from "@/services/Shift";
+import ProductionService from "@/services/Shift/Production";
 import UserService from "@/services/User";
 
 import { ProductionInputsParsed } from "@/types/forms";
 
-export default async function onSubmitFastCharge(data: ProductionInputsParsed) {
+export default async function onCreateProductionShift(data: ProductionInputsParsed) {
   const currentUser = await UserService.getSessionUser();
 
   if (!currentUser) {
@@ -20,7 +21,13 @@ export default async function onSubmitFastCharge(data: ProductionInputsParsed) {
   }
 
   const shift = new ShiftService({
-    ...data,
+    startDate: data.startDate,
+    endDate: data.endDate,
+    holidayPayRate: data.holidayPayRate,
+    itemValue: data.itemValue,
+    itemQuantity: data.itemQuantity,
+    isPublicHoliday: data.isPublicHoliday,
+    publicHolidayWorked: data.publicHolidayWorked,
     holidayPay: data.holidayPayRate > 0,
     amount: 0,
     isClosed: true,
@@ -33,11 +40,30 @@ export default async function onSubmitFastCharge(data: ProductionInputsParsed) {
     .build<Production>();
 
   try {
-    const createShift = await new ShiftService(shift).create();
+    const taxesFromLocal = data.taxes
+      .filter((tax) => tax.name && tax.value)
+      .map((tax) => {
+        return {
+          name: tax.name,
+          value: tax.value,
+          description: tax.description,
+        };
+      });
 
-    revalidatePath("/[locale]/(home)/history-shifts", "page");
+    const response = await new ProductionService(shift)
+      .addtaxes(taxesFromLocal)
+      .then((service) => {
+        return service.create();
+      })
+      .then((createdProduction) => createdProduction)
+      .catch((error) => JSON.stringify(error.message));
 
-    return createShift;
+    revalidatePath("/dashboard", "page");
+
+    return {
+      response: typeof response !== "string",
+      createShift: response,
+    };
   } catch (error) {
     return null;
   }

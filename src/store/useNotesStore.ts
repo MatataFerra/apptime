@@ -1,31 +1,59 @@
+import { useEffect } from "react";
+
+import { useLocalStorage } from "usehooks-ts";
+import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { shallow } from "zustand/shallow";
-import { createWithEqualityFn } from "zustand/traditional";
 
 type NotesStore = {
-  isNotesOpen: boolean;
+  open: boolean;
   notes: string;
+  error: boolean;
+  setError: () => void;
   setNotes: (note: string) => void;
-  notesToggle: () => void;
+  setOpen: (value: boolean) => void;
 };
 
-export const useNotesStore = createWithEqualityFn(
+export const useNotesStore = create(
   devtools<NotesStore>(
     (set, get) => ({
-      isNotesOpen: false,
+      open: false,
       notes: "",
+      error: false,
+      setError: () => {
+        set({ error: !get().error });
+      },
       setNotes: (note) => {
         set({ notes: note }, false, "setNotes");
       },
-      notesToggle: () => {
-        set((state) => ({
-          isNotesOpen: !state.isNotesOpen,
-        }));
+      setOpen: (value) => {
+        set({ open: value });
       },
     }),
     {
       name: "notes",
     }
-  ),
-  shallow
+  )
 );
+
+/**
+ * Custom hook to use the notes store.
+ * @returns The notes store and its actions.
+ */
+export function useNotes() {
+  const { notes, ...rest } = useNotesStore((state) => state);
+  const [localNote, setlocalNote, removelocalNote] = useLocalStorage("notes", notes);
+
+  useEffect(() => {
+    if (!notes.length && localNote) rest.setNotes(localNote);
+    if (!localNote) removelocalNote();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return {
+    notes,
+    localNote,
+    setlocalNote,
+    removelocalNote,
+    ...rest,
+  };
+}
