@@ -9,7 +9,7 @@ import prisma from "#/prisma/client";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export default async function onSendEmailToResetPassword(email: string) {
+export default async function onSendEmailToResetPassword(email: string, locale?: string) {
   const user = await prisma.user.findUnique({
     where: {
       email,
@@ -54,6 +54,7 @@ export default async function onSendEmailToResetPassword(email: string) {
     react: EmailTemplate({
       firstName: user.name,
       url: process.env.NEXTAUTH_URL!,
+      locale: locale ?? "en",
       endpoint: "reset",
       token: token.token,
     }),
