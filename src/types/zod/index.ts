@@ -154,6 +154,13 @@ const UserUpdateSchema = UserModelSchema.partial().superRefine((values, ctx) => 
     });
   }
 
+  if (values.role === "ADMIN") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Can't create the user",
+    });
+  }
+
   if (values.password || values.email) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -164,8 +171,31 @@ const UserUpdateSchema = UserModelSchema.partial().superRefine((values, ctx) => 
 
 const UserCreateSchema = UserModelSchema.omit({
   id: true,
-}).refine((values) => Object.keys(values).length > 0, {
-  message: "One of the fields must be defined",
+}).superRefine((values, ctx) => {
+  if (Object.keys(values).length < 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "One field must be provided",
+    });
+  }
+
+  if (values.role === "ADMIN") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Can't create admin user",
+    });
+  }
+});
+
+const UserCreateSafeAdminSchema = UserModelSchema.omit({
+  id: true,
+}).superRefine((values, ctx) => {
+  if (Object.keys(values).length < 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "One field must be provided",
+    });
+  }
 });
 
 /*
@@ -371,6 +401,7 @@ export {
   TaxCreateSchema,
   TaxSchema,
   TaxUpdateSchema,
+  UserCreateSafeAdminSchema,
   UserCreateSchema,
   UserModelSchema,
   UserUpdateSchema,

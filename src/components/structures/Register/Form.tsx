@@ -15,7 +15,7 @@ import Toast from "@/services/Toast";
 
 import { ApiResponse } from "@/types/api_response";
 
-import List from "@/components/structures/Register/List";
+import List from "@/components/structures/share/PasswordReqList";
 import Form from "@/components/ui/Form";
 import Input from "@/components/ui/Input";
 import Loader from "@/components/ui/Loader";

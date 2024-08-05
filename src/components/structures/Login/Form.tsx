@@ -82,7 +82,7 @@ export default function FormLogin() {
         onSubmit={handleSubmit(onSubmit)}
         id="formLogin"
       >
-        <section className="grid grid-rows-[1fr,2rem,auto] gap-3 self-center">
+        <section className="grid grid-rows-[1fr,2rem,auto] gap-4 self-center">
           <fieldset className="flex flex-col gap-4">
             <Input
               variant="default"
@@ -101,15 +101,24 @@ export default function FormLogin() {
               {...register("password")}
             />
           </fieldset>
-          <p className="row-start-3 text-xl">
-            {t("account.has_account")}{" "}
-            <Link
-              className="font-bold text-zinc-950 underline"
-              href={`/${locale}/${PATH_NAMES.REGISTER}`}
-            >
-              {t("account.register")}
-            </Link>
-          </p>
+          <div className="flex items-center justify-between text-base ">
+            <p>
+              <Link
+                className="font-bold text-slate-800 underline"
+                href={`/${locale}${PATH_NAMES.REGISTER}`}
+              >
+                register new account
+              </Link>
+            </p>
+            <p>
+              <Link
+                className="text-slate-800 underline"
+                href={`/${locale}${PATH_NAMES.RESET_PASSWORD}`}
+              >
+                forgotten password?
+              </Link>
+            </p>
+          </div>
         </section>
       </Form>
     </>

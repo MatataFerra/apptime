@@ -30,21 +30,22 @@ model Shift {
 }
 
 model User {
-  id              String           @id @default(cuid())
-  email           String           @unique
-  emailVerified   DateTime?
-  image           String?
-  name            String
-  password        String?
-  type_account    String           @default("CREDENTIALS")
-  role            String           @default("USER")
-  online          Boolean          @default(false)
-  formCompleted   Boolean          @default(false)
-  isActive        Boolean          @default(true)
-  shifts          Shift?
-  profile         Profile?
-  config          Config?
-  passwordAttemps PasswordAttemps?
+  id                 String               @id @default(cuid())
+  email              String               @unique
+  emailVerified      DateTime?
+  image              String?
+  name               String
+  password           String?
+  type_account       String               @default("CREDENTIALS")
+  role               String               @default("USER")
+  online             Boolean              @default(false)
+  formCompleted      Boolean              @default(false)
+  isActive           Boolean              @default(true)
+  shifts             Shift?
+  profile            Profile?
+  config             Config?
+  passwordAttemps    PasswordAttemps?
+  passwordResetToken PasswordResetToken[]
 }
 
 model Profile {
@@ -97,30 +98,29 @@ model Hourly {
 }
 
 model Tax {
-  id           Int         @id @default(autoincrement())
-  name         String
-  value        Float
-  description  String?
-  production   Production[] 
-  hourly       Hourly[]     
+  id          Int          @id @default(autoincrement())
+  name        String
+  value       Float
+  description String?
+  production  Production[]
+  hourly      Hourly[]
 }
 
 model Contribution {
-  id           Int         @id @default(autoincrement())
-  name         String
-  value        Float
-  description  String?
-  production   Production[]
-  hourly       Hourly[]  
+  id          Int          @id @default(autoincrement())
+  name        String
+  value       Float
+  description String?
+  production  Production[]
+  hourly      Hourly[]
 }
 
 model Config {
-  id           Int       @id @default(autoincrement())
-  weekStartsOn String    @default("monday")
-  userId       String?   @unique
-  user         User?     @relation(fields: [userId], references: [id])
+  id           Int     @id @default(autoincrement())
+  weekStartsOn String  @default("monday")
+  userId       String? @unique
+  user         User?   @relation(fields: [userId], references: [id])
 }
-
 
 model PasswordAttemps {
   id           Int       @id @default(autoincrement())
@@ -134,4 +134,15 @@ model WaitingListDesktop {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        Int       @id @default(autoincrement())
+  token     String    @unique
+  createdAt DateTime  @default(now())
+  resetAt   DateTime?
+  emailId   String?
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String 
 }

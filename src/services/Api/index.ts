@@ -104,6 +104,32 @@ class ApiService extends ApiBase {
     return new Promise((resolve) => setTimeout(() => resolve(response), ms));
   }
 
+  /**
+   * @name createAdminUser
+   * @description static method to handle the creation of admin users, first you will need a token created with TokenService.creatSha256Token() static method, the user provided must be an admin user
+   * @param user
+   * @param token
+   * @returns User type created based on token provided and password to verify the integrity of the user
+   */
+  static async createAdminUser({
+    user,
+    token,
+  }: {
+    user: Omit<User, "id">;
+    token: string;
+  }): Promise<{
+    message: string;
+    response: true;
+    user: User;
+  }> {
+    return this.post({
+      endpoint: API_ENDPOINTS.USER + `/admin?token=${token}`,
+      body: {
+        ...user,
+      },
+    });
+  }
+
   private static addSearchParamsToEndpoint(
     endpoint: (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS],
     params: Array<{ name: string; value: string }>
