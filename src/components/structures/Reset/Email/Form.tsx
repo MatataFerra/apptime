@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import { z } from "zod";
 
 import Toast from "@/services/Toast";
@@ -26,6 +27,7 @@ type ResetInputs = {
 
 function ResetForm() {
   const router = useRouter();
+  const locale = useLocale();
   const {
     handleSubmit,
     register,
@@ -36,7 +38,7 @@ function ResetForm() {
   });
 
   async function onSubmit(data: ResetInputs) {
-    onSendEmailToResetPassword(data.email).then((res) => {
+    onSendEmailToResetPassword(data.email, locale).then((res) => {
       if (!res.response) {
         Toast({
           type: "error",

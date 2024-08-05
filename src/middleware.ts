@@ -17,12 +17,15 @@ const PRIVATES_ROUTES = [
   "/admin",
 ];
 
+const LOGGED_ROUTES = ["/forgot-password", "/reset", "/success"];
+
 export default async function middleware(req: NextRequest) {
   const nextPathName = req.nextUrl.pathname;
   const I18N = new i18n("en");
   const locale = I18N.getLocale(req) ?? "en";
   const routeLocale = Router.addLocale(nextPathName, locale);
   const router = new Router(PRIVATES_ROUTES).addLocalesToRoutes();
+  const loggedRoutes = new Router(LOGGED_ROUTES).addLocalesToRoutes();
   const token = await new TokenService(NEXT_AUTH_SESSION_TOKEN).decodedCookieData();
 
   const pathnameIsMissingLocale = Router.isMissingLocale(nextPathName);
@@ -31,6 +34,24 @@ export default async function middleware(req: NextRequest) {
     // e.g. incoming request is /products
     // The new URL is now /en-US/products;
     return ut.redirect(req, routeLocale);
+  }
+
+  // check if user is logged and redirect if try to go to logged routes
+  if (loggedRoutes.isRoute(routeLocale)) {
+    const noMobilePath = Router.addLocale(PATH_NAMES.NO_MOBILE, locale);
+
+    // redirect to the no-mobile page if the user is not on a mobile device
+    if (!ut.isMobile({ request: req })) {
+      return ut.redirect(req, noMobilePath);
+    }
+
+    if (token) {
+      const url = req.nextUrl.clone();
+      const home = Router.addLocale(PATH_NAMES.HOME, locale);
+      url.pathname = home;
+
+      return NextResponse.redirect(url);
+    }
   }
 
   // check if the route is a private route
