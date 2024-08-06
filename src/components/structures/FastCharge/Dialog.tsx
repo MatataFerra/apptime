@@ -3,6 +3,7 @@
 import { type PropsWithChildren, useEffect, useMemo } from "react";
 
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import { differenceInMinutes } from "date-fns";
 import isEmpty from "lodash/isEmpty";
 
 import DateHumanizer from "@/services/Date";
@@ -29,9 +30,7 @@ import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
 import { useFastChargeStore } from "@/store/useFastChargeStore";
 import { useHourlyTaxesStore } from "@/store/useTaxStore";
 
-type Props = {};
-
-function DialogHourly({ children }: PropsWithChildren<Props>) {
+function DialogHourly({ children }: PropsWithChildren) {
   const {
     values: {
       startDate,
@@ -64,15 +63,25 @@ function DialogHourly({ children }: PropsWithChildren<Props>) {
     time: finishTime ?? "",
   });
 
+  const totalTimeWorked = useMemo(() => {
+    const getDifference = differenceInMinutes(formatEnd, formatStart);
+    const time = ShiftService.convertDifferenceInHHmm(getDifference);
+
+    return time.text;
+  }, [formatEnd, formatStart]);
+
   const calculateEarn = useMemo(() => {
-    const earnings = ShiftService.calculateEarnings({
+    const prepareShift = {
       startDate: formatStart,
       endDate: formatEnd,
-      isPublicHoliday: fastWorked,
+      isPublicHoliday: fastHoliday,
+      publicHolidayWorked: fastWorked,
       hourValue: Number(hourValue),
       holidayPayRate: Number(holidayPayRate),
       unpaidBreaks: Number(unpaidBreaks),
-    });
+    };
+
+    const earnings = new ShiftService(prepareShift).checkPublicHoliday().calculateEarnings();
 
     const getTaxesDiscount = taxes?.reduce((acc, tax) => {
       const value = Number(tax.value);
@@ -84,7 +93,16 @@ function DialogHourly({ children }: PropsWithChildren<Props>) {
       sharp: isNaN(earnings) ? 0 : earnings,
       afterTaxes: isNaN(getTaxesDiscount) ? 0 : getTaxesDiscount,
     };
-  }, [fastWorked, formatEnd, formatStart, holidayPayRate, hourValue, taxes, unpaidBreaks]);
+  }, [
+    fastHoliday,
+    fastWorked,
+    formatEnd,
+    formatStart,
+    holidayPayRate,
+    hourValue,
+    taxes,
+    unpaidBreaks,
+  ]);
 
   return (
     <Dialog open={dialog} onOpenChange={setDialogState}>
@@ -111,6 +129,7 @@ function DialogHourly({ children }: PropsWithChildren<Props>) {
             <Text classes="text-sm">
               Finish: {new DateHumanizer("short").humanizeDate(new Date(formatEnd!))}
             </Text>
+            <Text classes="text-sm">Total time worked: {totalTimeWorked}</Text>
           </DialogValue>
           <DialogValue content="Job details">
             <Text classes="text-sm">Hour value: ${hourValue}</Text>

@@ -1,11 +1,9 @@
-import { Hourly, Production, Shift } from "@prisma/client";
+import type { Hourly, Production } from "@prisma/client";
 import { addDays, addMinutes } from "date-fns";
 import cloneDeep from "lodash/cloneDeep";
 import { describe, expect, test } from "vitest";
 
 import ShiftService from "@/services/Shift";
-
-import { TypeShift } from "@/types";
 
 import { now } from "@/utils/constants";
 
@@ -164,23 +162,6 @@ describe("ShiftService", () => {
       expect(earnings).toBe(70);
     });
 
-    test("Should calculate the earnings of a shift when is public holiday", () => {
-      const mock = {
-        ...shiftMock.shift,
-        startDate: now.toString(),
-        endDate: addMinutes(now, DIFFERENCE_SHIFT).toString(),
-        isPublicHoliday: true,
-        publicHolidayWorked: true,
-        shiftId: 1,
-      };
-
-      const shift = new ShiftService({ ...mock }).differenceInMinsBetweenStartAndEnd().build();
-
-      const earnings = new ShiftService(shift).calculateEarnings();
-
-      expect(earnings).toBe(75);
-    });
-
     test("Should calculate the earnings when user pass start and end dates instead shift", () => {
       const start = now.toString();
       const end = addMinutes(now, DIFFERENCE_SHIFT).toString();
@@ -225,6 +206,57 @@ describe("ShiftService", () => {
       const earnings = new ShiftService(shift).calculateEarnings();
 
       expect(earnings).toBe(100);
+    });
+    test("Should calculate the earnings of a shift when is public holiday", () => {
+      const mock = {
+        ...shiftMock.shift,
+        startDate: now.toString(),
+        endDate: addMinutes(now, DIFFERENCE_SHIFT).toString(),
+        isPublicHoliday: true,
+        publicHolidayWorked: true,
+        shiftId: 1,
+      };
+
+      const shift = new ShiftService({ ...mock })
+        .checkPublicHoliday()
+        .differenceInMinsBetweenStartAndEnd()
+        .build();
+
+      const earnings = new ShiftService(shift).calculateEarnings();
+
+      expect(earnings).toBe(75);
+    });
+    test("Should calculate the earnings of a shift that spans multiple days during a public holiday", () => {
+      // Mock date for the test
+      const startDate = new Date(2024, 7, 5, 22, 0); // August 5, 2024, 22:00
+      const endDate = new Date(2024, 7, 6, 6, 0); // August 6, 2024, 6:00
+
+      // Mock data
+      const mock = {
+        startDate: startDate.toString(),
+        endDate: endDate.toString(),
+        isPublicHoliday: true,
+        hourValue: 20, // $20 per hour
+        unpaidBreaks: 1, // 30 minutes
+      };
+
+      // Initialize the shift service with mock data
+      const shift = new ShiftService(mock)
+        .checkPublicHoliday()
+        .differenceInMinsBetweenStartAndEnd()
+        .build();
+
+      // Calculate earnings
+      const earnings = new ShiftService(shift).calculateEarnings();
+
+      // Expected result calculation
+      // Duration: 8 hours (480 minutes)
+      // Unpaid Breaks: 30 minutes
+      // Net Worked Time: 450 minutes
+      // Hourly Rate: $20 / 60 = $0.333 per minute
+      // Holiday Pay Rate: 50% extra (1.5 multiplier)
+
+      expect(earnings).toBeCloseTo(169.5, 0); // Use toBeCloseTo for floating point precision
     });
   });
 });

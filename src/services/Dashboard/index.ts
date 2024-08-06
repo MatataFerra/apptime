@@ -1,5 +1,5 @@
 import { isThisWeek, isValid, max } from "date-fns";
-import { isNaN as isLodashNan } from "lodash";
+import isLodashNan from "lodash/isNaN";
 
 import ShiftService from "@/services/Shift";
 
