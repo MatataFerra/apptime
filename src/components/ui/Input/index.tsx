@@ -35,7 +35,6 @@ const input = forwardRef(function Input(
     measurePlace,
     label,
     labelClasses,
-    basis,
     containerClasses,
     showPassword = false,
     onShowPasswordChange,
@@ -59,10 +58,8 @@ const input = forwardRef(function Input(
     );
   }
 
-  const flexBasis = basis ? `${basis}` : "input-flex";
-
   return (
-    <div className={cn(flexBasis, containerClasses, "w-full")}>
+    <div className={cn(containerClasses, "w-full")}>
       {label && (
         <label
           htmlFor={props.name}

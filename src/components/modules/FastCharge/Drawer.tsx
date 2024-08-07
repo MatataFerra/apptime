@@ -18,7 +18,7 @@ function Drawer() {
     (state) => state
   );
   return (
-    <Stack classes="my-8 w-full">
+    <Stack classes="my-4 w-full">
       <TaxesDrawer
         addTax={addTax}
         taxes={taxes}

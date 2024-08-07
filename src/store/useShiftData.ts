@@ -1,4 +1,4 @@
-import { Hourly, Shift } from "@prisma/client";
+import type { Hourly } from "@prisma/client";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
@@ -24,7 +24,7 @@ export const useShiftData = create(
     (set, get) => ({
       data: {
         hourValue: 0,
-        startDate: new Date().toString(),
+        startDate: "",
         isClosed: false,
         amount: 0,
         endDate: null,
