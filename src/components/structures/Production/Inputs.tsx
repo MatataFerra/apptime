@@ -103,7 +103,6 @@ function Inputs() {
       startDate: new Date(formData["start-date"]).toString(),
       endDate: new Date(formData["finish-date"]).toString(),
       itemValue: parseFloat(formData["item-value"]),
-      holidayPayRate: parseFloat(formData["holiday-pay-rate"] || "0"),
       itemQuantity: parseFloat(formData["item-quantity"]),
       isPublicHoliday: formData["is-public-holiday"],
       publicHolidayWorked: formData["is-worked"],
@@ -159,12 +158,10 @@ function Inputs() {
           id: lastId + 1,
           startDate: parseData.startDate,
           endDate: parseData.endDate,
-          holidayPayRate: parseData.holidayPayRate,
           itemValue: parseData.itemValue,
           itemQuantity: parseData.itemQuantity,
           isPublicHoliday: parseData.isPublicHoliday,
           publicHolidayWorked: parseData.publicHolidayWorked,
-          holidayPay: parseData.holidayPayRate > 0,
           amount: 0,
           isClosed: true,
           notes: "",
@@ -244,6 +241,11 @@ function Inputs() {
       setSaveTaxes(false);
       setDialogState(false);
 
+      resetValues();
+      clearTaxes();
+
+      reset();
+
       Toast({
         type: "error",
         message: "Error",
@@ -285,6 +287,7 @@ function Inputs() {
           })}
         />
         <Input
+          containerClasses="flex-1"
           labelClasses="text-xs"
           label="Value of each item"
           min={0}
@@ -300,23 +303,13 @@ function Inputs() {
           })}
         />
         <Input
+          containerClasses="flex-1"
           label="Quantity"
           min={0}
           type="number"
           {...register("item-quantity", {
             onChange(e) {
               setValues({ itemQuantity: e.target.value });
-            },
-          })}
-        />
-        <Input
-          label="Holiday pay rate"
-          min={0}
-          measure="%"
-          type="number"
-          {...register("holiday-pay-rate", {
-            onChange(e) {
-              setValues({ holidayPayRate: e.target.value });
             },
           })}
         />

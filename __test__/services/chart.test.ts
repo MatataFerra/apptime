@@ -18,8 +18,6 @@ const SHIFTS: UserType["shifts"] = {
       startDate: new Date(start).toString(),
       endDate: addHours(new Date(end), 8).toString(),
       id: 15,
-      holidayPay: false,
-      holidayPayRate: 0.5,
       hourValue: 27,
       isClosed: true,
       isPublicHoliday: false,

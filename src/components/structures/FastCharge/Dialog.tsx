@@ -39,7 +39,6 @@ function DialogHourly({ children }: PropsWithChildren) {
       finishTime,
       fastWorked,
       hourValue,
-      holidayPayRate,
       unpaidBreaks,
       fastHoliday,
     },
@@ -77,7 +76,6 @@ function DialogHourly({ children }: PropsWithChildren) {
       isPublicHoliday: fastHoliday,
       publicHolidayWorked: fastWorked,
       hourValue: Number(hourValue),
-      holidayPayRate: Number(holidayPayRate),
       unpaidBreaks: Number(unpaidBreaks),
     };
 
@@ -93,16 +91,7 @@ function DialogHourly({ children }: PropsWithChildren) {
       sharp: isNaN(earnings) ? 0 : earnings,
       afterTaxes: isNaN(getTaxesDiscount) ? 0 : getTaxesDiscount,
     };
-  }, [
-    fastHoliday,
-    fastWorked,
-    formatEnd,
-    formatStart,
-    holidayPayRate,
-    hourValue,
-    taxes,
-    unpaidBreaks,
-  ]);
+  }, [fastHoliday, fastWorked, formatEnd, formatStart, hourValue, taxes, unpaidBreaks]);
 
   return (
     <Dialog open={dialog} onOpenChange={setDialogState}>
@@ -135,7 +124,6 @@ function DialogHourly({ children }: PropsWithChildren) {
             <Text classes="text-sm">Hour value: ${hourValue}</Text>
           </DialogValue>
           <DialogValue content="Pay details">
-            {holidayPayRate && <Text classes="text-sm">Holday pay rate: {holidayPayRate}%</Text>}
             <Text classes="text-sm">Public holiday: {fastHoliday ? "Yes" : "No"}</Text>
             <Text classes="text-sm">Public holiday worked: {fastWorked ? "Yes" : "No"}</Text>
             <Stack>

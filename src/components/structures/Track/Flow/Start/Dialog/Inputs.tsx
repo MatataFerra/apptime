@@ -19,9 +19,6 @@ const InputsSchema = z.object({
     .refine((value) => !!value, {
       message: "Hour value is required",
     }),
-  holidayPayRate: z.string().refine((value) => !!value, {
-    message: "Holiday pay rate is required",
-  }),
   unpaidBreaks: z.string().refine((value) => !!value, {
     message: "Unpaid breaks is required",
   }),
@@ -33,31 +30,23 @@ function ShiftStartInputs() {
     resolver: zodResolver(InputsSchema),
     defaultValues: {
       hourValue: "",
-      holidayPayRate: "8",
       unpaidBreaks: "1",
     },
   });
 
   const hourValue = watch("hourValue");
-  const holidayPayRate = watch("holidayPayRate");
   const unpaidBreaks = watch("unpaidBreaks");
 
   useEffect(() => {
     if (!hourValue) setErrors(true);
-    if (!holidayPayRate) setErrors(true);
     if (!unpaidBreaks) setErrors(true);
 
-    if (hourValue && holidayPayRate && unpaidBreaks) setErrors(false);
-  }, [holidayPayRate, hourValue, setErrors, unpaidBreaks]);
+    if (hourValue && unpaidBreaks) setErrors(false);
+  }, [hourValue, setErrors, unpaidBreaks]);
 
   useEffect(() => {
     if (hourValue) setData({ hourValue: Number(hourValue) });
   }, [hourValue, setData]);
-
-  useEffect(() => {
-    if (holidayPayRate)
-      setData({ holidayPayRate: holidayPayRate ? Number(holidayPayRate) : 8, holidayPay: true });
-  }, [holidayPayRate, setData]);
 
   useEffect(() => {
     if (unpaidBreaks) setData({ unpaidBreaks: unpaidBreaks ? Number(unpaidBreaks) : 1 });
@@ -74,14 +63,6 @@ function ShiftStartInputs() {
           required
           min={0}
           {...register("hourValue", {})}
-        />
-        <Input
-          description="Holiday Pay"
-          measure="%"
-          type="number"
-          min={0}
-          required
-          {...register("holidayPayRate", {})}
         />
         <Input
           description="Unpaid Breaks"

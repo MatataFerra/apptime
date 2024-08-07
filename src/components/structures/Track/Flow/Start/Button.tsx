@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 import type { Hourly } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -46,8 +48,6 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
       notes: "",
       publicHolidayWorked: data.publicHolidayWorked,
       hourValue: Number(data.hourValue),
-      holidayPay: data.holidayPay ?? false,
-      holidayPayRate: Number(data.holidayPayRate),
       unpaidBreaks: Number(data.unpaidBreaks),
       shiftId: user?.shifts?.id as number | null,
     }).then((response) => {
@@ -61,6 +61,7 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
 
         const prepareShift: Hourly = {
           ...data,
+          startDate: new Date().toString(),
           id: response.shift?.id!,
           endDate: null,
           isClosed: false,
