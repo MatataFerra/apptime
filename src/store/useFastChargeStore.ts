@@ -5,7 +5,6 @@ interface FastCharge {
     startDate?: string;
     finishDate?: string;
     hourValue?: string;
-    holidayPayRate?: string;
     startTime?: string;
     finishTime?: string;
     fastHoliday?: boolean;
@@ -93,7 +92,6 @@ export const useFastChargeStore = create<FastCharge>((set, get) => ({
         startDate: "",
         finishDate: "",
         hourValue: "",
-        holidayPayRate: "",
         startTime: "",
         finishTime: "",
         fastHoliday: false,

@@ -59,8 +59,6 @@ export type FastChargeInputsParsed = {
   endDate: string;
   isPublicHoliday: boolean;
   isWorked: boolean;
-  holidayPay: boolean;
-  holidayPayRate: number;
   unpaidBreaks: number;
   saveTaxes: boolean;
   taxes: TaxElement[] | [];
@@ -73,7 +71,6 @@ export type ProductionInputsParsed = {
   endDate: string;
   itemValue: number;
   itemQuantity: number;
-  holidayPayRate: number;
   isPublicHoliday: boolean;
   publicHolidayWorked: boolean;
   taxes: TaxElement[] | [];

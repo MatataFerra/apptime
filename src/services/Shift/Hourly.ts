@@ -20,7 +20,7 @@ interface HourlyInterface {
   addtaxes(taxes: Tax[] | Omit<Tax, "id">[]): Promise<HourlyService>;
   build(): Omit<Hourly, "shiftId" | "id">;
   calculateEarnings(): number;
-  getConfig(): Pick<Hourly, "hourValue" | "holidayPay" | "holidayPayRate" | "unpaidBreaks">;
+  getConfig(): Pick<Hourly, "hourValue" | "unpaidBreaks">;
 }
 
 /**
@@ -176,9 +176,6 @@ class HourlyService implements HourlyInterface {
     let amountHolidayPayable = 0;
     let totalTime = 0;
 
-    const holidayPayRateValue = this.shift?.holidayPayRate
-      ? this.shift.holidayPayRate / 100 + 1
-      : 1;
     const hourJobValue = this.shift?.hourValue || 0;
     const unpaidBreaksValue = this.shift?.unpaidBreaks || 0;
     const minutesUnpaids = unpaidBreaksValue * 30;
@@ -210,7 +207,7 @@ class HourlyService implements HourlyInterface {
       totalTime = amount + amountHolidayPayable * publicHolidayRate - minutesUnpaids;
     }
 
-    const earnings = totalTime * minuteRate * holidayPayRateValue;
+    const earnings = totalTime * minuteRate;
 
     return Math.round(earnings * 100) / 100;
   }
@@ -218,8 +215,6 @@ class HourlyService implements HourlyInterface {
   getConfig() {
     return {
       hourValue: this.shift.hourValue,
-      holidayPay: this.shift.holidayPay,
-      holidayPayRate: this.shift.holidayPayRate,
       unpaidBreaks: this.shift.unpaidBreaks,
     };
   }
@@ -242,8 +237,6 @@ class HourlyService implements HourlyInterface {
 
     const config = {
       hourValue: lastShift?.hourValue,
-      holidayPay: lastShift?.holidayPay,
-      holidayPayRate: lastShift?.holidayPayRate,
       unpaidBreaks: lastShift?.unpaidBreaks,
     };
 

@@ -26,11 +26,9 @@ export default async function onCreateHourlyShift(data: FastChargeInputsParsed) 
     isPublicHoliday: data.isPublicHoliday,
     publicHolidayWorked: data.isWorked,
     hourValue: data.hourValue,
-    holidayPay: data.holidayPay,
     amount: 0,
     isClosed: true,
     notes: "",
-    holidayPayRate: data.holidayPayRate,
     unpaidBreaks: data.unpaidBreaks,
     shiftId: currentUser.shifts?.id,
   })

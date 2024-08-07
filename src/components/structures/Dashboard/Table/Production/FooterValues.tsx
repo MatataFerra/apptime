@@ -2,7 +2,7 @@
 
 import type { Production } from "@prisma/client";
 
-import ProductionService from "@/services/Shift/Production";
+import ShiftService from "@/services/Shift";
 
 import TableElement from "@/components/ui/TableElement";
 
@@ -11,12 +11,11 @@ import useDashboard from "@/hooks/useDashboard";
 function FooterValues() {
   const { user } = useDashboard();
   function calculateEarnings(shift: Production) {
-    return ProductionService.earnings({
-      holidayPayRate: shift?.holidayPayRate ?? 0,
+    return new ShiftService({
       itemQuantity: shift?.itemQuantity ?? 0,
       itemValue: shift?.itemValue ?? 0,
       publicHolidayWorked: shift?.publicHolidayWorked ?? false,
-    });
+    }).calculateEarnings();
   }
 
   function totalEarnings() {

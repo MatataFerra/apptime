@@ -31,7 +31,6 @@ type EditProductionShiftForm = {
   endDate: string;
   itemValue: number;
   itemQuantity: number;
-  holidayPayRate: number;
   isPublicHoliday: boolean;
   publicHolidayWorked: boolean;
 };
@@ -49,15 +48,8 @@ function TableDialogEditProduction({ shift, user }: Props) {
   const { taxesToDelete, reset } = useTaxesHandlerDelete((state) => state);
 
   function onHandleEdit(data: EditProductionShiftForm) {
-    const {
-      startDate,
-      endDate,
-      itemValue,
-      holidayPayRate,
-      isPublicHoliday,
-      publicHolidayWorked,
-      itemQuantity,
-    } = data;
+    const { startDate, endDate, itemValue, isPublicHoliday, publicHolidayWorked, itemQuantity } =
+      data;
 
     const shiftUpdated = {
       ...shift,
@@ -65,7 +57,6 @@ function TableDialogEditProduction({ shift, user }: Props) {
       endDate: new Date(endDate).toString(),
       itemValue: Number(itemValue),
       itemQuantity: Number(itemQuantity),
-      holidayPayRate: Number(holidayPayRate),
       isPublicHoliday,
       publicHolidayWorked,
     };
@@ -149,15 +140,6 @@ function TableDialogEditProduction({ shift, user }: Props) {
         placeholder={shift?.itemQuantity?.toString()}
         {...register("itemQuantity", {
           value: shift.itemQuantity ?? 0,
-        })}
-      />
-      <Input
-        type="number"
-        label="Holiday Pay Rate"
-        measure="%"
-        placeholder={shift.holidayPayRate?.toString()}
-        {...register("holidayPayRate", {
-          value: shift.holidayPayRate ?? 0,
         })}
       />
       <Stack orientation="horizontal" wrap>

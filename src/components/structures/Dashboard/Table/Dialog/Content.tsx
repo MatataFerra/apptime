@@ -111,18 +111,11 @@ function TableDialogContent({ shift }: Props) {
 
       <Text>
         <Text as="span" classes="font-bold">
-          Holiday Pay Rate:
-        </Text>{" "}
-        {shift?.holidayPayRate ? `${shift?.holidayPayRate}%` : "..."}
-      </Text>
-
-      <Text>
-        <Text as="span" classes="font-bold">
           Notes:
         </Text>{" "}
         {shift?.notes ? shift.notes : "..."}
       </Text>
-      <Text>
+      <Text classes="col-span-2">
         <Text as="span" classes="font-bold">
           Type of Shift:
         </Text>{" "}
