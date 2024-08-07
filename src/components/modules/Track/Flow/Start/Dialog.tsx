@@ -44,8 +44,6 @@ function StartDialog({ triggerStatus }: Props) {
   function resetData() {
     setStep("HasConfig");
     setData({
-      holidayPay: last?.holidayPay,
-      holidayPayRate: last?.holidayPayRate,
       unpaidBreaks: last?.unpaidBreaks,
       hourValue: last?.hourValue,
     });
@@ -59,8 +57,6 @@ function StartDialog({ triggerStatus }: Props) {
             if (hasConfig) {
               setStep("HasConfig");
               setData({
-                holidayPay: last?.holidayPay,
-                holidayPayRate: last?.holidayPayRate,
                 unpaidBreaks: last?.unpaidBreaks,
                 hourValue: last?.hourValue,
               });

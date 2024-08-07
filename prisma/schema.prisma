@@ -70,8 +70,6 @@ model Production {
   notes               String?
   itemValue           Float?
   itemQuantity        Float?
-  holidayPay          Boolean
-  holidayPayRate      Float?
   shiftId             Int?
   taxes               Tax[]
   contributions       Contribution[]
@@ -88,8 +86,6 @@ model Hourly {
   isClosed            Boolean        @default(false)
   notes               String?
   hourValue           Float
-  holidayPay          Boolean
-  holidayPayRate      Float?
   unpaidBreaks        Float?
   shiftId             Int?
   taxes               Tax[]

@@ -23,12 +23,10 @@ export default async function onCreateProductionShift(data: ProductionInputsPars
   const shift = new ShiftService({
     startDate: data.startDate,
     endDate: data.endDate,
-    holidayPayRate: data.holidayPayRate,
     itemValue: data.itemValue,
     itemQuantity: data.itemQuantity,
     isPublicHoliday: data.isPublicHoliday,
     publicHolidayWorked: data.publicHolidayWorked,
-    holidayPay: data.holidayPayRate > 0,
     amount: 0,
     isClosed: true,
     notes: "",

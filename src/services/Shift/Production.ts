@@ -19,7 +19,7 @@ interface ProductionInterface {
   addtaxes(taxes: Tax[] | Omit<Tax, "id">[]): Promise<ProductionService>;
   build(): Omit<Production, "shiftId" | "id">;
   calculateEarnings(): number;
-  getConfig(): Pick<Production, "itemValue" | "itemQuantity" | "holidayPay" | "holidayPayRate">;
+  getConfig(): Pick<Production, "itemValue" | "itemQuantity">;
 }
 
 /**
@@ -168,22 +168,20 @@ class ProductionService implements ProductionInterface {
 
   calculateEarnings() {
     let publicHolidayRate = 1;
-    let holidayPayRateValue = !!this.shift.holidayPayRate ? this.shift.holidayPayRate / 100 + 1 : 1;
+
     if (!this.shift.itemValue || !this.shift.itemQuantity) return 0;
 
     if (this.shift.publicHolidayWorked) {
       publicHolidayRate = 1.5;
     }
 
-    return this.shift.itemValue * this.shift.itemQuantity * publicHolidayRate * holidayPayRateValue;
+    return this.shift.itemValue * this.shift.itemQuantity * publicHolidayRate;
   }
 
   getConfig() {
     return {
       itemValue: this.shift.itemValue,
       itemQuantity: this.shift.itemQuantity,
-      holidayPay: this.shift.holidayPay,
-      holidayPayRate: this.shift.holidayPayRate,
     };
   }
 
@@ -206,8 +204,6 @@ class ProductionService implements ProductionInterface {
     const config = {
       itemValue: lastShift?.itemValue,
       itemQuantity: lastShift?.itemQuantity,
-      holidayPay: lastShift?.holidayPay,
-      holidayPayRate: lastShift?.holidayPayRate,
     };
 
     return config;

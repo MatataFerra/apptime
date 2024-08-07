@@ -1,6 +1,5 @@
 import type { Hourly, Tax } from "@prisma/client";
-import { differenceInMinutes } from "date-fns";
-import has from "lodash/has";
+import { differenceInMinutes, endOfDay, isSameDay, startOfDay } from "date-fns";
 import isEmpty from "lodash/isEmpty";
 
 import TaxService from "@/services/Tax";
@@ -21,7 +20,7 @@ interface HourlyInterface {
   addtaxes(taxes: Tax[] | Omit<Tax, "id">[]): Promise<HourlyService>;
   build(): Omit<Hourly, "shiftId" | "id">;
   calculateEarnings(): number;
-  getConfig(): Pick<Hourly, "hourValue" | "holidayPay" | "holidayPayRate" | "unpaidBreaks">;
+  getConfig(): Pick<Hourly, "hourValue" | "unpaidBreaks">;
 }
 
 /**
@@ -172,38 +171,43 @@ class HourlyService implements HourlyInterface {
   }
 
   calculateEarnings() {
-    const MIN_MINUTES_WORKED = 8 * 60;
+    const MIN_MINUTES_WORKED = this.shift?.unpaidBreaks ? this.shift?.unpaidBreaks * 30 : 30;
     let amount = 0;
+    let amountHolidayPayable = 0;
     let totalTime = 0;
-    let publicHolidayRate = 1;
-    const holidayPayRateValue = this.shift?.holidayPayRate
-      ? this.shift?.holidayPayRate / 100 + 1
-      : 1;
-    const hourJobValue = this.shift?.hourValue;
-    const unpaidBreaksValue = this.shift?.unpaidBreaks;
-    const minutesUnpaids = (unpaidBreaksValue ?? 0) * 30;
 
-    let minuteRate = hourJobValue ? hourJobValue / 60 : 0;
+    const hourJobValue = this.shift?.hourValue || 0;
+    const unpaidBreaksValue = this.shift?.unpaidBreaks || 0;
+    const minutesUnpaids = unpaidBreaksValue * 30;
+    const minuteRate = hourJobValue / 60;
 
-    if (this.shift.startDate && this.shift.endDate) {
-      const start = new Date(this.shift?.startDate ?? "");
-      const end = new Date(this.shift?.endDate ?? "");
-      amount = differenceInMinutes(end, start);
+    const start = this.shift?.startDate ? new Date(this.shift.startDate) : null;
+    const end = this.shift?.endDate ? new Date(this.shift.endDate) : null;
+    const isPublicHoliday = this.shift?.isPublicHoliday || false;
+
+    if (start && end) {
+      if (isSameDay(start, end)) {
+        isPublicHoliday
+          ? (amountHolidayPayable = differenceInMinutes(end, start))
+          : (amount = differenceInMinutes(end, start));
+      } else {
+        amount = differenceInMinutes(end, startOfDay(end));
+        amountHolidayPayable = differenceInMinutes(endOfDay(start), start);
+      }
     }
 
-    if (amount <= 0) amount = 0;
+    const totalAmount = amount + amountHolidayPayable;
 
-    if (this.shift?.isPublicHoliday) {
-      publicHolidayRate = 1.5;
-    }
+    // Adjust for public holiday rate and minimum minutes worked
+    const publicHolidayRate = this.shift.publicHolidayWorked ? 1.5 : 1;
 
-    if (amount < MIN_MINUTES_WORKED) {
-      totalTime = amount;
+    if (totalAmount < MIN_MINUTES_WORKED) {
+      totalTime = amount + amountHolidayPayable * publicHolidayRate;
     } else {
-      totalTime = amount - minutesUnpaids;
+      totalTime = amount + amountHolidayPayable * publicHolidayRate - minutesUnpaids;
     }
 
-    const earnings = totalTime * minuteRate * publicHolidayRate * holidayPayRateValue;
+    const earnings = totalTime * minuteRate;
 
     return Math.round(earnings * 100) / 100;
   }
@@ -211,8 +215,6 @@ class HourlyService implements HourlyInterface {
   getConfig() {
     return {
       hourValue: this.shift.hourValue,
-      holidayPay: this.shift.holidayPay,
-      holidayPayRate: this.shift.holidayPayRate,
       unpaidBreaks: this.shift.unpaidBreaks,
     };
   }
@@ -235,8 +237,6 @@ class HourlyService implements HourlyInterface {
 
     const config = {
       hourValue: lastShift?.hourValue,
-      holidayPay: lastShift?.holidayPay,
-      holidayPayRate: lastShift?.holidayPayRate,
       unpaidBreaks: lastShift?.unpaidBreaks,
     };
 

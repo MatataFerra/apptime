@@ -1,11 +1,12 @@
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import isEmpty from "lodash/isEmpty";
+import { useLocale } from "next-intl";
 
 import DateHumanizer from "@/services/Date";
 import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
 
-import type { ShiftType } from "@/types";
+import type { Locale, ShiftType } from "@/types";
 
 import {
   DropdownMenu,
@@ -23,20 +24,47 @@ type Props = {
   shift: ShiftType;
 };
 
+const CONECTORS = {
+  of: {
+    es: "de",
+    en: "of",
+  },
+
+  from: {
+    es: "desde",
+    en: "from",
+  },
+
+  to: {
+    es: "hasta",
+    en: "to",
+  },
+};
+
 function TableDialogContent({ shift }: Props) {
+  const locale = useLocale() as Locale;
+
   return (
     <Stack grid cols={2}>
       <Text>
         <Text as="span" classes="font-bold">
           Start Date:
         </Text>{" "}
-        {new DateHumanizer("short").humanizeDate(new Date(shift.startDate))}
+        {new DateHumanizer("short").humanizeDate(new Date(shift.startDate), {
+          dateFormat: `d MMM '${CONECTORS.of[locale]}' yyyy',' '${CONECTORS.from[locale]}: ' HH:mm`,
+          locale: locale,
+        })}
       </Text>
       <Text>
         <Text as="span" classes="font-bold">
           End Date:
         </Text>{" "}
-        {shift.endDate ? new DateHumanizer("short").humanizeDate(new Date(shift.endDate)) : "..."}
+        {shift.endDate
+          ? new DateHumanizer("short").humanizeDate(new Date(shift.endDate), {
+              dateFormat: `d MMM '${CONECTORS.of[locale]}' yyyy',' '${CONECTORS.to[locale]}: ' HH:mm`,
+              locale: locale,
+            })
+          : "..."}
       </Text>
       <Text>
         {isProductionShift(shift) ? (
@@ -83,24 +111,17 @@ function TableDialogContent({ shift }: Props) {
 
       <Text>
         <Text as="span" classes="font-bold">
-          Holiday Pay Rate:
-        </Text>{" "}
-        {shift?.holidayPayRate ? `${shift?.holidayPayRate}%` : "..."}
-      </Text>
-
-      <Text>
-        <Text as="span" classes="font-bold">
           Notes:
         </Text>{" "}
         {shift?.notes ? shift.notes : "..."}
       </Text>
-      <Text>
+      <Text classes="col-span-2">
         <Text as="span" classes="font-bold">
           Type of Shift:
         </Text>{" "}
         {isProductionShift(shift) ? TYPE_SHIFT.PRODUCTION : TYPE_SHIFT.TRACK}
       </Text>
-      <Text color="text-red-700">Gross pay: {`$${new Pay(shift).gross()}`}</Text>
+      <Text color="text-red-700">Gross pay: {`$${new Pay(shift).gross()?.toFixed(2)}`}</Text>
       {!!new Pay(shift).netPay() ? (
         <Text color="text-green-700">Net pay: {`$${new Pay(shift).netPay()?.toFixed(2)}`}</Text>
       ) : null}

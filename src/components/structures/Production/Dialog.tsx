@@ -6,6 +6,7 @@ import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import isEmpty from "lodash/isEmpty";
 
 import DateHumanizer from "@/services/Date";
+import ShiftService from "@/services/Shift";
 import ProductionService from "@/services/Shift/Production";
 
 import DialogValue from "@/components/structures/share/DialogValue";
@@ -38,12 +39,13 @@ function DialogProduction({ children }: PropsWithChildren<Props>) {
   }, [formError, setDialogState]);
 
   const calculateEarn = useMemo(() => {
-    const earnings = ProductionService.earnings({
+    const prepareShift = {
       itemValue: Number(values.itemValue ?? 0),
       itemQuantity: Number(values.itemQuantity),
       holidayPayRate: Number(values.holidayPayRate),
       publicHolidayWorked: !!values.publicHolidayWorked,
-    });
+    };
+    const earnings = new ShiftService(prepareShift).checkPublicHoliday().calculateEarnings();
 
     const getTaxesDiscount = taxes?.reduce((acc, tax) => {
       const value = Number(tax.value);

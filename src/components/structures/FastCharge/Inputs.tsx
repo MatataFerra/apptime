@@ -132,12 +132,8 @@ function Inputs() {
     const parseData = {
       startDate: formatStart,
       endDate: formatEnd,
-      isPublicHoliday: formData["fast-holiday"] ?? false,
-      isWorked: formData["fast-worked"] ?? false,
-      holidayPay: !!Number(formData["holiday-pay-rate"]),
-      holidayPayRate: isNaN(Number(formData["holiday-pay-rate"]))
-        ? 0
-        : Number(formData["holiday-pay-rate"]),
+      isPublicHoliday: formData["is-public-holiday"] ?? false,
+      isWorked: formData["is-public-holiday-worked"] ?? false,
       hourValue: isNaN(Number(formData["hour-value"])) ? 0 : Number(formData["hour-value"]),
       unpaidBreaks: isNaN(Number(formData["unpaid-breaks"]))
         ? 0
@@ -195,11 +191,9 @@ function Inputs() {
           id: lastId + 1,
           startDate: parseData.startDate,
           endDate: parseData.endDate,
-          holidayPayRate: parseData.holidayPayRate,
           hourValue: parseData.hourValue,
           isPublicHoliday: parseData.isPublicHoliday,
           publicHolidayWorked: parseData.isWorked,
-          holidayPay: parseData.holidayPayRate > 0,
           unpaidBreaks: parseData.unpaidBreaks,
           amount: 0,
           isClosed: true,
@@ -285,6 +279,11 @@ function Inputs() {
       setSaveTaxes(false);
       setDialogState(false);
 
+      resetValues();
+      clearTaxes();
+
+      reset();
+
       Toast({
         type: "error",
         message: "Error",
@@ -307,6 +306,7 @@ function Inputs() {
         onSubmit={handleSubmit(onSubmit)}
       >
         <Input
+          containerClasses="flex-1"
           classes="h-full"
           label="Start date"
           type="date"
@@ -322,6 +322,7 @@ function Inputs() {
           })}
         />
         <Input
+          containerClasses="flex-1"
           classes="h-full"
           label="Finish date"
           type="date"
@@ -335,6 +336,7 @@ function Inputs() {
           })}
         />
         <Input
+          containerClasses="flex-1"
           label="Start time"
           type="time"
           isError={!!errors["start-time"]}
@@ -346,6 +348,7 @@ function Inputs() {
           })}
         />
         <Input
+          containerClasses="flex-1"
           label="Finish time"
           type="time"
           isError={!!errors["finish-time"]}
@@ -376,23 +379,13 @@ function Inputs() {
             },
           })}
         />
-        <Input
-          label="Holiday pay rate"
-          measure="%"
-          type="number"
-          {...register("holiday-pay-rate", {
-            onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              setValues({ holidayPayRate: e.target.value });
-            },
-          })}
-        />
         <Stack orientation="horizontal" wrap classes="mt-4">
           <Stack alignItems="center">
             <input
               className="size-4"
               type="checkbox"
-              id="fast-holiday"
-              {...register("fast-holiday", {
+              id="fast-is-public-holiday"
+              {...register("is-public-holiday", {
                 onChange: (e: ChangeEvent<HTMLInputElement>) => {
                   setValues({
                     fastHoliday: e.target.checked as boolean,
@@ -400,7 +393,7 @@ function Inputs() {
                 },
               })}
             />
-            <Text as="label" htmlFor="fast-holiday">
+            <Text as="label" htmlFor="fast-is-public-holiday">
               is it a public holiday?
             </Text>
           </Stack>
@@ -408,8 +401,8 @@ function Inputs() {
             <input
               className="size-4"
               type="checkbox"
-              id="fast-worked"
-              {...register("fast-worked", {
+              id="fast-is-public-holiday-worked"
+              {...register("is-public-holiday-worked", {
                 onChange: (e: ChangeEvent<HTMLInputElement>) => {
                   setValues({
                     fastWorked: e.target.checked as boolean,
@@ -417,7 +410,7 @@ function Inputs() {
                 },
               })}
             />
-            <Text as="label" htmlFor="fast-worked">
+            <Text as="label" htmlFor="fast-is-public-holiday-worked">
               did you work it?
             </Text>
           </Stack>
