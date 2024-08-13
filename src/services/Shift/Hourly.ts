@@ -1,7 +1,7 @@
-import type { Hourly, Tax } from "@prisma/client";
+import type { Contribution, Hourly, Tax } from "@prisma/client";
 import { differenceInMinutes, endOfDay, isSameDay, startOfDay } from "date-fns";
-import isEmpty from "lodash/isEmpty";
 
+import ContributionService from "@/services/Contribution";
 import TaxService from "@/services/Tax";
 
 import type { HourlyType } from "@/types";
@@ -43,12 +43,14 @@ interface HourlyInterface {
 
 class HourlyService implements HourlyInterface {
   private taxes: Pick<Tax, "id">[];
+  private contributions: Pick<Contribution, "id">[];
   private options?: HourlyOptions;
   shift: Omit<HourlyType, "shiftId" | "id">;
   constructor(shift: Omit<HourlyType, "shiftId" | "id">, options?: HourlyOptions) {
     this.shift = shift;
     this.options = options;
     this.taxes = [];
+    this.contributions = [];
   }
 
   /*  
@@ -64,21 +66,14 @@ class HourlyService implements HourlyInterface {
   */
 
   async create() {
-    if (isEmpty(this.taxes)) {
-      const hourlyShiftWithoutTax = await prisma.hourly.create({
-        data: {
-          ...(this.shift as Hourly),
-        },
-      });
-
-      return hourlyShiftWithoutTax;
-    }
-
     const createHourlyShift = await prisma.hourly.create({
       data: {
         ...this.shift,
         taxes: {
           connect: this.taxes,
+        },
+        contributions: {
+          connect: this.contributions,
         },
       },
     });
@@ -159,10 +154,19 @@ class HourlyService implements HourlyInterface {
     ============================================================
   */
 
-  async addtaxes(taxes: Tax[] | Omit<Tax, "id">[]) {
-    const taxesCreated = await new TaxService(taxes).create();
+  async addContributions(contributions: Contribution[] | Omit<Contribution, "id">[]) {
+    const created = await new ContributionService(contributions).create();
 
-    this.taxes = taxesCreated;
+    this.contributions = created;
+
+    return this;
+  }
+
+  async addtaxes(taxes: Tax[] | Omit<Tax, "id">[]) {
+    const created = await new TaxService(taxes).create();
+
+    this.taxes = created;
+
     return this;
   }
 
@@ -285,9 +289,7 @@ class HourlyService implements HourlyInterface {
     ============================================================
   */
 
-  private getTaxesIdsDictionary(taxes: Tax[]) {
-    return taxes.map((tax) => ({ id: tax.id }));
-  }
+  private async add() {}
 
   private getTaxesIds(taxes: Tax[]): number[] {
     const idTaxes = taxes.reduce((acc: number[], curr) => {
