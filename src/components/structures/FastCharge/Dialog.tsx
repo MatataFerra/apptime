@@ -28,7 +28,7 @@ import Text from "@/components/ui/Text";
 import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
 
 import { useFastChargeStore } from "@/store/useFastChargeStore";
-import { useHourlyTaxesStore } from "@/store/useTaxStore";
+import { useHourlyTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
 
 function DialogHourly({ children }: PropsWithChildren) {
   const {
@@ -46,7 +46,11 @@ function DialogHourly({ children }: PropsWithChildren) {
     setDialogState,
     formError,
   } = useFastChargeStore((state) => state);
-  const { taxes } = useHourlyTaxesStore((state) => state);
+
+  const {
+    taxesModule: { salaryElement: taxes },
+    contributionsModule: { salaryElement: contributions },
+  } = useHourlyTaxesOrContributionsStore((state) => state);
 
   useEffect(() => {
     if (formError) return setDialogState(false);
@@ -143,6 +147,17 @@ function DialogHourly({ children }: PropsWithChildren) {
                 {taxes?.map((tax) => (
                   <Text key={tax.name} classes="text-sm">
                     {tax.name}: {tax.value}%
+                  </Text>
+                ))}
+              </Stack>
+            </DialogValue>
+          ) : null}
+          {!isEmpty(contributions) ? (
+            <DialogValue content="Contributions">
+              <Stack grid cols={3}>
+                {contributions?.map((contribution) => (
+                  <Text key={contribution.name} classes="text-sm">
+                    {contribution.name}: {contribution.value}%
                   </Text>
                 ))}
               </Stack>

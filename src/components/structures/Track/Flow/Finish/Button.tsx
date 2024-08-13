@@ -11,7 +11,7 @@ import useTrack from "@/hooks/useTrack";
 
 import onUpdateTrackJob from "@/server-actions/update-track";
 import { useNotes } from "@/store/useNotesStore";
-import { useTrackTaxesStore } from "@/store/useTaxStore";
+import { useTrackTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
 
 type Props = {
   buttonStatus: {
@@ -23,7 +23,9 @@ type Props = {
 function FinishButton({ buttonStatus }: Props) {
   const queryClient = useQueryClient();
   const { removelocalNote } = useNotes();
-  const { taxes } = useTrackTaxesStore();
+  const {
+    taxesModule: { salaryElement: taxes },
+  } = useTrackTaxesOrContributionsStore();
 
   const {
     user,
