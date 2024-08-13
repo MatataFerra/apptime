@@ -9,7 +9,7 @@ import UserService from "@/services/User";
 
 import type { TrackInputs } from "@/types/forms";
 
-import type { TaxElement } from "@/store/useTaxStore";
+import type { TaxElement } from "@/store/useTaxOrContributionStore";
 
 export default async function onUpdateTrackJob(
   data: Partial<TrackInputs> | null,
