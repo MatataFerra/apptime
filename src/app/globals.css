@@ -205,6 +205,16 @@ div[data-radio-state="false"] .animate_fade_out {
   animation-delay: 150ms;
 }
 
+.show_up_contribution {
+  animation: show_up_contribution 150ms ease-in-out backwards;
+  animation-delay: 300ms;
+}
+
+.show_down_contribution {
+  animation: show_down_contribution 150ms ease-in-out forwards;
+  animation-delay: 300ms;
+}
+
 @keyframes show_up_dialog {
   0% {
     opacity: 0;
@@ -219,6 +229,31 @@ div[data-radio-state="false"] .animate_fade_out {
 }
 
 @keyframes show_down_dialog {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(250%);
+  }
+}
+
+@keyframes show_up_contribution {
+  0% {
+    opacity: 0;
+    transform: translateY(250%);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+}
+
+@keyframes show_down_contribution {
   0% {
     opacity: 1;
     transform: translateY(0);
