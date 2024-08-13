@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/Drawer";
 import Skeleton from "@/components/ui/Skeleton";
 
+import { TypeOfSalaryItem } from "@/store/useTaxOrContributionStore";
+
 const DrawerClose = dynamic(() => import("@/components/ui/Drawer").then((mod) => mod.DrawerClose), {
   ssr: false,
 });
@@ -33,14 +35,22 @@ const DrawerTrigger = dynamic(
   }
 );
 
-const TaxesFromDB = dynamic(() => import("@/components/structures/Taxes/TaxesFromDB/TaxesFromDB"), {
-  ssr: false,
-  loading: () => <Skeleton classes="h-32 w-full" />,
-});
+const SalaryItemsFromDB = dynamic(
+  () => import("@/components/structures/SalaryItems/SalaryItemsFromDB/SalaryItemsFromDB"),
+  {
+    ssr: false,
+    loading: () => <Skeleton classes="h-32 w-full" />,
+  }
+);
 
 type Props = {
-  addTax: (tax: Omit<Tax, "id">) => void;
+  type: TypeOfSalaryItem;
   shouldScaleBackground?: boolean;
+  drawerStateHandler: {
+    isOpen: boolean;
+    setIsOpen: (isOpen: boolean) => void;
+  };
+  add: (tax: Omit<Tax, "id">) => void;
 };
 
 export interface Observer {
@@ -48,19 +58,23 @@ export interface Observer {
   setIsOpen: (isOpen: boolean) => void;
 }
 
-export const useDrawerTaxesFromDB = create<Pick<Observer, "isOpen" | "setIsOpen">>((set) => ({
-  isOpen: false,
-  setIsOpen: (isOpen) => set({ isOpen }),
-}));
+// export const useDrawerSalaryItemsFromDB = create<Observer>((set) => ({
+//   isOpen: false,
+//   setIsOpen: (isOpen) => set({ isOpen }),
+// }));
 
-function DrawerFromDB({ addTax, shouldScaleBackground = false }: Props) {
-  const { isOpen, setIsOpen } = useDrawerTaxesFromDB((state) => state);
+function DrawerSalaryItemsFromDB({
+  add,
+  type,
+  drawerStateHandler,
+  shouldScaleBackground = false,
+}: Props) {
   return (
     <Drawer
-      open={isOpen}
+      open={drawerStateHandler.isOpen}
       shouldScaleBackground={shouldScaleBackground}
       onOpenChange={(value) => {
-        setIsOpen(value);
+        drawerStateHandler.setIsOpen(value);
       }}
     >
       <DrawerTrigger asChild>
@@ -70,20 +84,21 @@ function DrawerFromDB({ addTax, shouldScaleBackground = false }: Props) {
           size="md"
           classes={`w-full animate-pulse border-none bg-gradient-to-tr from-sky-300/30 to-blue-400/40 font-medium transition-all duration-700 repeat-[3] hover:from-sky-300/40 hover:to-blue-400/50 active:shadow-button-inner`}
         >
-          Click to use previous taxes
+          Click to use previous
         </Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="text-left">
-          <DrawerTitle>Use your previous taxes</DrawerTitle>
+          <DrawerTitle>Use the previous ones</DrawerTitle>
           <DrawerDescription>
             <VisuallyHidden.Root>
-              Select from your previous taxes to add them to your current taxes.
+              Select from your previous taxes or contributions to add them to your current tax or
+              contribution element.
             </VisuallyHidden.Root>
           </DrawerDescription>
         </DrawerHeader>
         <article className="mx-auto my-0 h-full w-11/12 border border-slate-500/20 p-4 shadow-md">
-          <TaxesFromDB addTax={addTax} />
+          <SalaryItemsFromDB add={add} type={type} />
         </article>
         <DrawerFooter>
           <DrawerClose asChild>
@@ -97,4 +112,4 @@ function DrawerFromDB({ addTax, shouldScaleBackground = false }: Props) {
   );
 }
 
-export default DrawerFromDB;
+export default DrawerSalaryItemsFromDB;
