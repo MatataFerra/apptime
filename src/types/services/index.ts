@@ -1,4 +1,13 @@
-import type { Config, Hourly, Production, Profile, Shift, Tax, User } from "@prisma/client";
+import type {
+  Config,
+  Contribution,
+  Hourly,
+  Production,
+  Profile,
+  Shift,
+  Tax,
+  User,
+} from "@prisma/client";
 import type { JWT } from "next-auth/jwt";
 import { z } from "zod";
 
@@ -28,6 +37,11 @@ export type Shifts = Shift & {
 };
 
 export type Taxes = Tax & {
+  hourly: Hourly[];
+  production: Production[];
+};
+
+export type Contributions = Contribution & {
   hourly: Hourly[];
   production: Production[];
 };
