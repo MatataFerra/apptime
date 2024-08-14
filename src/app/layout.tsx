@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 
+import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Poppins } from "next/font/google";
 
@@ -24,11 +25,12 @@ const poppinsFont = Poppins({
   preload: true,
 });
 
-function Layout({ children }: { children: ReactNode }) {
+async function Layout({ children }: { children: ReactNode }) {
   return (
     <html className={cn(poppinsFont.className)}>
       <body>
         {children}
+        <Analytics />
         <SpeedInsights />
       </body>
     </html>
