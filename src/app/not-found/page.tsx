@@ -1,15 +1,28 @@
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import UserService from "@/services/User";
+import ut from "@/services/Utilities";
+import utClient from "@/services/Utilities/client";
+
+import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 export default async function NotFound() {
   const user = await UserService.getSessionUser();
+  const userAgent = headers().get("user-agent") ?? "";
+  const isMobileHeader = ut.isMobile({ headers: userAgent });
+  const isMobile = utClient.isTruthyValue(isMobileHeader);
+
+  if (!isMobile) {
+    return redirect(PATH_NAMES.NO_MOBILE);
+  }
+
   if (process.env.STAGING === "false") {
-    return redirect("/");
+    return redirect(PATH_NAMES.HOME);
   }
 
   if (process.env.STAGING === "true" && user?.role === "ADMIN") {
-    return redirect("/");
+    return redirect(PATH_NAMES.HOME);
   }
 
   return (

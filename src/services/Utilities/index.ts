@@ -20,7 +20,7 @@ class Utilities {
   }: {
     request?: NextRequest;
     headers?: string;
-  }): boolean {
+  } = {}): boolean {
     const nextHeaders = (request ? new Headers(request?.headers).get("user-agent") : headers) ?? "";
     const isMobile =
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Mobile Safari/i.test(

@@ -1,3 +1,4 @@
+import isEmpty from "lodash/isEmpty";
 import { NextRequest, NextResponse } from "next/server";
 
 import i18n from "@/services/i18n";
@@ -30,12 +31,17 @@ export default async function middleware(req: NextRequest) {
 
   const pathnameIsMissingLocale = Router.isMissingLocale(nextPathName);
 
-  if (process.env.STAGING === "true" && !token) {
-    return ut.redirect(req, `/${locale}/login`);
-  }
+  if (process.env.STAGING === "true" && ut.isMobile({ request: req })) {
+    if (isEmpty(token)) {
+      const loginPath = Router.addLocale(PATH_NAMES.LOGIN, locale);
+      return ut.redirect(req, loginPath);
+    }
 
-  if (process.env.STAGING === "true" && token?.role !== "ADMIN") {
-    return ut.redirect(req, `/not-found`);
+    if (token?.role !== "ADMIN") {
+      return ut.redirect(req, `/not-found`);
+    }
+
+    return;
   }
 
   if (pathnameIsMissingLocale) {
