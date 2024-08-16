@@ -30,19 +30,6 @@ export default async function middleware(req: NextRequest) {
 
   const pathnameIsMissingLocale = Router.isMissingLocale(nextPathName);
 
-  if (process.env.STAGING === "true" && ut.isMobile({ request: req })) {
-    if (!token) {
-      const loginPath = Router.addLocale(PATH_NAMES.LOGIN, locale);
-      return ut.redirect(req, loginPath);
-    }
-
-    if (token?.role !== "ADMIN") {
-      return ut.redirect(req, `/not-found`);
-    }
-
-    return;
-  }
-
   if (pathnameIsMissingLocale) {
     // e.g. incoming request is /products
     // The new URL is now /en-US/products;
