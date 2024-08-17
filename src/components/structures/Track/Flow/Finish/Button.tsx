@@ -25,6 +25,7 @@ function FinishButton({ buttonStatus }: Props) {
   const { removelocalNote } = useNotes();
   const {
     taxesModule: { salaryElement: taxes },
+    contributionsModule: { salaryElement: contributions },
   } = useTrackTaxesOrContributionsStore();
 
   const {
@@ -52,11 +53,17 @@ function FinishButton({ buttonStatus }: Props) {
 
     updateShift({ ...updateTrackedShift });
 
+    const prepareShiftToBeUpdated = {
+      ...updateTrackedShift,
+      taxes,
+      contributions,
+    };
+
     /*
       server action
     */
 
-    onUpdateTrackJob({ ...updateTrackedShift }, taxes, shift?.id).then((response) => {
+    onUpdateTrackJob({ ...prepareShiftToBeUpdated }, shift?.id).then((response) => {
       Toast({
         message: "Closing shift",
         type: "plain",

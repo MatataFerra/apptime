@@ -114,6 +114,9 @@ class HourlyService implements HourlyInterface {
           taxes: {
             connect: this.taxes,
           },
+          contributions: {
+            connect: this.contributions,
+          },
         },
       });
 
@@ -125,7 +128,12 @@ class HourlyService implements HourlyInterface {
       where: { id },
       data: {
         ...this.shift,
-        taxes: {},
+        taxes: {
+          connect: this.taxes,
+        },
+        contributions: {
+          connect: this.contributions,
+        },
       },
     });
 
