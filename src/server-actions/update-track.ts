@@ -1,6 +1,7 @@
 "use server";
 
 import type { Hourly } from "@prisma/client";
+import isEmpty from "lodash/isEmpty";
 import { revalidatePath } from "next/cache";
 
 import ShiftService from "@/services/Shift";
@@ -9,13 +10,14 @@ import UserService from "@/services/User";
 
 import type { TrackInputs } from "@/types/forms";
 
-import type { TaxElement } from "@/store/useTaxStore";
+import type { ContributionElement, TaxElement } from "@/store/useTaxOrContributionStore";
 
-export default async function onUpdateTrackJob(
-  data: Partial<TrackInputs> | null,
-  taxes: TaxElement[],
-  shiftId: number | undefined
-) {
+type UpdateTrackData = Partial<TrackInputs> & {
+  taxes: TaxElement[];
+  contributions: ContributionElement[];
+};
+
+export default async function onUpdateTrackJob(data: UpdateTrackData, shiftId: number | undefined) {
   const currentUser = await UserService.getSessionUser();
 
   if (!currentUser) {
@@ -39,7 +41,7 @@ export default async function onUpdateTrackJob(
     .checkPublicHoliday()
     .build<Hourly>();
 
-  const taxesFromLocal = taxes
+  const taxesFromLocal = data.taxes
     .filter((tax) => tax.name && tax.value)
     .map((tax) => {
       return {
@@ -49,12 +51,25 @@ export default async function onUpdateTrackJob(
       };
     });
 
+  const contributionsFromLocal = data.contributions
+    .filter((contrib) => contrib.name && contrib.value)
+    .map((contrib) => {
+      return {
+        name: contrib.name,
+        value: contrib.value,
+        description: contrib.description,
+      };
+    });
+
   try {
-    const response = await new HourlyService(shift, {
-      createTaxes: taxesFromLocal,
-    })
-      .update(shiftId)
-      .catch((error) => JSON.stringify(error.message));
+    if (isEmpty(data)) return null;
+
+    const hourlyService = new HourlyService(shift);
+
+    await hourlyService.addContributions(contributionsFromLocal);
+    await hourlyService.addtaxes(taxesFromLocal);
+
+    const response = await hourlyService.update(data.id!);
 
     revalidatePath("/dashboard", "page");
     revalidatePath("/[locale]/(home)/dashboard/@table/@history/page", "page");

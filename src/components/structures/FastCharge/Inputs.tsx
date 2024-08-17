@@ -3,7 +3,6 @@
 import { type ChangeEvent, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 
-import type { Tax } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 
@@ -13,18 +12,19 @@ import { FastChargeFormCheckDataSchema, type UserType } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 import type { FastChargeInputs } from "@/types/forms";
 
-import { observer } from "@/components/structures/Taxes/observer";
+import { observer } from "@/components/structures/SalaryItems/observer";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
 import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
-import useGetUniqueTaxes from "@/hooks/useGetUniqueTaxes";
+import useGetUniqueSalaryItems from "@/hooks/useGetUniqueSalaryItems";
+import type { SalaryItems } from "@/hooks/useSalaryItems";
 import useUser from "@/hooks/useUser";
 
 import onCreateHourlyShift from "@/server-actions/hourly-job";
 import { useFastChargeStore } from "@/store/useFastChargeStore";
-import { useHourlyTaxesStore } from "@/store/useTaxStore";
+import { useHourlyTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
 
 function Inputs() {
   /*
@@ -41,7 +41,10 @@ function Inputs() {
   /*
     Custom hook to get the taxes from the store
   */
-  const { clearTaxes, setSaveTaxes, taxes, saveTaxes } = useHourlyTaxesStore((state) => state);
+  const {
+    taxesModule: { clear: clearTaxes, salaryElement: taxes },
+    contributionsModule: { clear: clearContributions, salaryElement: contributions },
+  } = useHourlyTaxesOrContributionsStore((state) => state);
 
   /*
     Use data and methods from the useForm hook
@@ -58,7 +61,10 @@ function Inputs() {
   const queryClient = useQueryClient();
   const { data: user } = useUser();
 
-  const getUniqueTaxes = useGetUniqueTaxes({ localTaxes: taxes });
+  const { uniqueTaxes, uniqueContributions } = useGetUniqueSalaryItems({
+    localTaxes: taxes,
+    localContributions: contributions,
+  });
 
   /*
     observe when the submit is done
@@ -139,7 +145,7 @@ function Inputs() {
         ? 0
         : Number(formData["unpaid-breaks"]),
       taxes,
-      saveTaxes,
+      contributions,
     };
 
     Toast({
@@ -154,31 +160,51 @@ function Inputs() {
       user?.email,
     ]);
 
-    const previousTaxData = queryClient.getQueryData<SuccessApiResponse<Tax[]>>(["tax"]);
+    const previousSalaryItemsData = queryClient.getQueryData<SuccessApiResponse<SalaryItems>>([
+      "salary",
+    ]);
 
     //* Optimistic update
-    queryClient.cancelQueries({ queryKey: ["tax"] }).then(() => {
-      const prev = previousTaxData?.tax.map((tax) => {
+    queryClient.cancelQueries({ queryKey: ["salary"] }).then(() => {
+      const prevTaxes = previousSalaryItemsData?.salaryItems.taxes.map((taxes) => {
         return {
-          ...tax,
+          ...taxes,
         };
       });
 
-      const lastId = prev?.at(-1)?.id ?? Math.random();
+      const prevContributions = previousSalaryItemsData?.salaryItems.contributions.map(
+        (contributions) => {
+          return {
+            ...contributions,
+          };
+        }
+      );
 
-      const unique = getUniqueTaxes?.map((tax) => ({
+      const lastIdTax = prevTaxes?.at(-1)?.id ?? Math.random();
+      const lastIdContribution = prevContributions?.at(-1)?.id ?? Math.random();
+
+      const uniqueTax = uniqueTaxes?.map((tax) => ({
         ...tax,
-        id: lastId + 1,
+        id: lastIdTax + 1,
       }));
 
-      const all = prev?.concat(unique ?? []);
+      const uniqueContribution = uniqueContributions?.map((contribution) => ({
+        ...contribution,
+        id: lastIdContribution + 1,
+      }));
 
-      queryClient.setQueryData(["tax"], {
-        ...previousTaxData,
-        tax: all,
+      const all = prevTaxes?.concat(uniqueTax ?? []);
+      const allContributions = prevContributions?.concat(uniqueContribution ?? []);
+
+      queryClient.setQueryData(["salary"], {
+        ...previousSalaryItemsData,
+        salaryItems: {
+          taxes: all,
+          contributions: allContributions,
+        },
       });
 
-      return { previousTaxData };
+      return { previousSalaryItemsData };
     });
 
     //* Optimistic update
@@ -200,6 +226,7 @@ function Inputs() {
           notes: "",
           shiftId: user?.shifts?.id,
           taxes: parseData.taxes,
+          contributions: parseData.contributions,
         },
       ];
 
@@ -220,10 +247,7 @@ function Inputs() {
       return { previousUserData };
     });
 
-    resetValues();
     setDialogState(false);
-    setSaveTaxes(false);
-    clearTaxes();
 
     onCreateHourlyShift(parseData).then((response) => {
       setDone(true);
@@ -236,6 +260,7 @@ function Inputs() {
 
         resetValues();
         clearTaxes();
+        clearContributions();
 
         return reset();
       }
@@ -245,7 +270,7 @@ function Inputs() {
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["tax"],
+        queryKey: ["salary"],
       });
 
       // reset state if the shift was not created
@@ -267,20 +292,22 @@ function Inputs() {
         return { previousUserData };
       });
 
-      queryClient.cancelQueries({ queryKey: ["tax"] }).then(() => {
-        queryClient.setQueryData(["tax"], {
-          ...previousTaxData,
-          tax: previousTaxData?.tax,
+      queryClient.cancelQueries({ queryKey: ["salary"] }).then(() => {
+        queryClient.setQueryData(["salary"], {
+          ...previousSalaryItemsData,
+          salaryItems: {
+            ...previousSalaryItemsData?.salaryItems,
+          },
         });
 
-        return { previousTaxData };
+        return { previousSalaryItemsData };
       });
 
-      setSaveTaxes(false);
       setDialogState(false);
 
       resetValues();
       clearTaxes();
+      clearContributions();
 
       reset();
 
