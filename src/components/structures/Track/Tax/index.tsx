@@ -1,14 +1,11 @@
-import type { PropsWithChildren } from "react";
+import { type PropsWithChildren } from "react";
 
 import dynamic from "next/dynamic";
 import { create } from "zustand";
 
 import Toast from "@/services/Toast";
 
-import {
-  type Observer,
-  useDrawerTaxesFromDB,
-} from "@/components/structures/Taxes/TaxesFromDB/Drawer";
+import { type Observer } from "@/components/structures/SalaryItems/SalaryItemsFromDB/Drawer";
 import Button from "@/components/ui/Button";
 import {
   Dialog,
@@ -21,7 +18,7 @@ import Skeleton from "@/components/ui/Skeleton";
 
 import { cn } from "@/utils/helpers/styleMerger";
 
-import { useTrackTaxesStore } from "@/store/useTaxStore";
+import { useTrackTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
 
 const DialogClose = dynamic(() => import("@/components/ui/Dialog").then((mod) => mod.DialogClose), {
   ssr: false,
@@ -41,25 +38,31 @@ const DialogTrigger = dynamic(
   }
 );
 
-const DrawerFromDB = dynamic(() => import("@/components/structures/Taxes/TaxesFromDB/Drawer"), {
-  ssr: false,
-});
+const DrawerFromDB = dynamic(
+  () => import("@/components/structures/SalaryItems/SalaryItemsFromDB/Drawer"),
+  {
+    ssr: false,
+  }
+);
 
-const InputTax = dynamic(() => import("@/components/structures/Taxes/InputTax"), {
-  ssr: false,
-  loading: () => (
-    <div className="flex w-full flex-col">
-      <div className="flex justify-between">
-        <Skeleton classes="h-12 w-full" />
-        <Skeleton classes="h-12 w-full" />
+const InputSalaryItem = dynamic(
+  () => import("@/components/structures/SalaryItems/InputSalaryItem"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex w-full flex-col">
+        <div className="flex justify-between">
+          <Skeleton classes="h-12 w-full" />
+          <Skeleton classes="h-12 w-full" />
+          <Skeleton classes="h-12 w-full" />
+        </div>
         <Skeleton classes="h-12 w-full" />
       </div>
-      <Skeleton classes="h-12 w-full" />
-    </div>
-  ),
-});
+    ),
+  }
+);
 
-const TableTax = dynamic(() => import("@/components/structures/Taxes/Table"), {
+const TableTax = dynamic(() => import("@/components/structures/SalaryItems/Table"), {
   ssr: false,
   loading: () => <Skeleton classes="h-60 w-full" />,
 });
@@ -69,11 +72,18 @@ export const useTaxDialog = create<Observer>((set) => ({
   setIsOpen: (isOpen) => set({ isOpen }),
 }));
 
-type Props = {};
+export const useDrawerTaxFromDB = create<Observer>((set) => ({
+  isOpen: false,
+  setIsOpen: (isOpen) => set({ isOpen }),
+}));
 
-function TaxDialog({ children }: PropsWithChildren<Props>) {
-  const { taxes, addTax, removeTax } = useTrackTaxesStore();
-  const { isOpen: isDrawerTaxesOpen } = useDrawerTaxesFromDB((state) => state);
+function TaxDialog({ children }: PropsWithChildren) {
+  const {
+    taxesModule: { salaryElement: taxes, add: addTax, remove: removeTax },
+  } = useTrackTaxesOrContributionsStore();
+  const { isOpen: isDrawerTaxesOpen, setIsOpen: setIsDrawerTaxesOpen } = useDrawerTaxFromDB(
+    (state) => state
+  );
   const { isOpen: isTaxDialogOpen, setIsOpen } = useTaxDialog((state) => state);
 
   return (
@@ -92,12 +102,19 @@ function TaxDialog({ children }: PropsWithChildren<Props>) {
         <div className="space-y-8">
           <div className="space-y-2">
             <p>Add new tax</p>
-            <InputTax addTax={addTax} />
+            <InputSalaryItem add={addTax} type="taxes" />
           </div>
-          <TableTax data={taxes} addTax={addTax} removeTax={removeTax} />
+          <TableTax data={taxes} remove={removeTax} type="taxes" />
         </div>
         <DialogFooter className="my-4 grid grid-cols-[1fr_auto] gap-2">
-          <DrawerFromDB addTax={addTax} />
+          <DrawerFromDB
+            add={addTax}
+            type="taxes"
+            drawerStateHandler={{
+              isOpen: isDrawerTaxesOpen,
+              setIsOpen: setIsDrawerTaxesOpen,
+            }}
+          />
           <DialogClose asChild>
             <Button
               variant={taxes.length === 0 ? "danger" : "gradient_secondary"}
@@ -122,7 +139,7 @@ function TaxDialog({ children }: PropsWithChildren<Props>) {
                 });
               }}
             >
-              {taxes.length === 0 ? "Close" : "Save taxes"}
+              {taxes.length === 0 ? "Close" : "Save"}
             </Button>
           </DialogClose>
         </DialogFooter>

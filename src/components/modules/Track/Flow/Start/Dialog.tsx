@@ -35,8 +35,6 @@ function StartDialog({ triggerStatus }: Props) {
     () => ShiftService.getLastConfigShift(user?.shifts?.hourly),
     [user?.shifts?.hourly]
   ) as {
-    holidayPay: boolean;
-    holidayPayRate: number;
     unpaidBreaks: number;
     hourValue: number;
   };
@@ -44,8 +42,6 @@ function StartDialog({ triggerStatus }: Props) {
   function resetData() {
     setStep("HasConfig");
     setData({
-      holidayPay: last?.holidayPay,
-      holidayPayRate: last?.holidayPayRate,
       unpaidBreaks: last?.unpaidBreaks,
       hourValue: last?.hourValue,
     });
@@ -59,8 +55,6 @@ function StartDialog({ triggerStatus }: Props) {
             if (hasConfig) {
               setStep("HasConfig");
               setData({
-                holidayPay: last?.holidayPay,
-                holidayPayRate: last?.holidayPayRate,
                 unpaidBreaks: last?.unpaidBreaks,
                 hourValue: last?.hourValue,
               });

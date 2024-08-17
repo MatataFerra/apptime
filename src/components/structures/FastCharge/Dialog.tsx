@@ -3,6 +3,7 @@
 import { type PropsWithChildren, useEffect, useMemo } from "react";
 
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import { differenceInMinutes } from "date-fns";
 import isEmpty from "lodash/isEmpty";
 
 import DateHumanizer from "@/services/Date";
@@ -27,11 +28,9 @@ import Text from "@/components/ui/Text";
 import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
 
 import { useFastChargeStore } from "@/store/useFastChargeStore";
-import { useHourlyTaxesStore } from "@/store/useTaxStore";
+import { useHourlyTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
 
-type Props = {};
-
-function DialogHourly({ children }: PropsWithChildren<Props>) {
+function DialogHourly({ children }: PropsWithChildren) {
   const {
     values: {
       startDate,
@@ -40,7 +39,6 @@ function DialogHourly({ children }: PropsWithChildren<Props>) {
       finishTime,
       fastWorked,
       hourValue,
-      holidayPayRate,
       unpaidBreaks,
       fastHoliday,
     },
@@ -48,7 +46,11 @@ function DialogHourly({ children }: PropsWithChildren<Props>) {
     setDialogState,
     formError,
   } = useFastChargeStore((state) => state);
-  const { taxes } = useHourlyTaxesStore((state) => state);
+
+  const {
+    taxesModule: { salaryElement: taxes },
+    contributionsModule: { salaryElement: contributions },
+  } = useHourlyTaxesOrContributionsStore((state) => state);
 
   useEffect(() => {
     if (formError) return setDialogState(false);
@@ -64,15 +66,24 @@ function DialogHourly({ children }: PropsWithChildren<Props>) {
     time: finishTime ?? "",
   });
 
+  const totalTimeWorked = useMemo(() => {
+    const getDifference = differenceInMinutes(formatEnd, formatStart);
+    const time = ShiftService.convertDifferenceInHHmm(getDifference);
+
+    return time.text;
+  }, [formatEnd, formatStart]);
+
   const calculateEarn = useMemo(() => {
-    const earnings = ShiftService.calculateEarnings({
+    const prepareShift = {
       startDate: formatStart,
       endDate: formatEnd,
-      isPublicHoliday: fastWorked,
+      isPublicHoliday: fastHoliday,
+      publicHolidayWorked: fastWorked,
       hourValue: Number(hourValue),
-      holidayPayRate: Number(holidayPayRate),
       unpaidBreaks: Number(unpaidBreaks),
-    });
+    };
+
+    const earnings = new ShiftService(prepareShift).checkPublicHoliday().calculateEarnings();
 
     const getTaxesDiscount = taxes?.reduce((acc, tax) => {
       const value = Number(tax.value);
@@ -84,7 +95,7 @@ function DialogHourly({ children }: PropsWithChildren<Props>) {
       sharp: isNaN(earnings) ? 0 : earnings,
       afterTaxes: isNaN(getTaxesDiscount) ? 0 : getTaxesDiscount,
     };
-  }, [fastWorked, formatEnd, formatStart, holidayPayRate, hourValue, taxes, unpaidBreaks]);
+  }, [fastHoliday, fastWorked, formatEnd, formatStart, hourValue, taxes, unpaidBreaks]);
 
   return (
     <Dialog open={dialog} onOpenChange={setDialogState}>
@@ -111,12 +122,12 @@ function DialogHourly({ children }: PropsWithChildren<Props>) {
             <Text classes="text-sm">
               Finish: {new DateHumanizer("short").humanizeDate(new Date(formatEnd!))}
             </Text>
+            <Text classes="text-sm">Total time worked: {totalTimeWorked}</Text>
           </DialogValue>
           <DialogValue content="Job details">
             <Text classes="text-sm">Hour value: ${hourValue}</Text>
           </DialogValue>
           <DialogValue content="Pay details">
-            {holidayPayRate && <Text classes="text-sm">Holday pay rate: {holidayPayRate}%</Text>}
             <Text classes="text-sm">Public holiday: {fastHoliday ? "Yes" : "No"}</Text>
             <Text classes="text-sm">Public holiday worked: {fastWorked ? "Yes" : "No"}</Text>
             <Stack>
@@ -136,6 +147,17 @@ function DialogHourly({ children }: PropsWithChildren<Props>) {
                 {taxes?.map((tax) => (
                   <Text key={tax.name} classes="text-sm">
                     {tax.name}: {tax.value}%
+                  </Text>
+                ))}
+              </Stack>
+            </DialogValue>
+          ) : null}
+          {!isEmpty(contributions) ? (
+            <DialogValue content="Contributions">
+              <Stack grid cols={3}>
+                {contributions?.map((contribution) => (
+                  <Text key={contribution.name} classes="text-sm">
+                    {contribution.name}: {contribution.value}%
                   </Text>
                 ))}
               </Stack>

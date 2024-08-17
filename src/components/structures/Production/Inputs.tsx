@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 
-import type { Tax } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
 
 import Toast from "@/services/Toast";
@@ -12,17 +11,18 @@ import { ProductionJobFormCheckDataSchema, type UserType } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 import type { ProductionInputs } from "@/types/forms";
 
-import { observer } from "@/components/structures/Taxes/observer";
+import { observer } from "@/components/structures/SalaryItems/observer";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
-import useGetUniqueTaxes from "@/hooks/useGetUniqueTaxes";
+import useGetUniqueSalaryItems from "@/hooks/useGetUniqueSalaryItems";
+import type { SalaryItems } from "@/hooks/useSalaryItems";
 import useUser from "@/hooks/useUser";
 
 import onCreateProductionShift from "@/server-actions/production-job";
 import { useProductionForm } from "@/store/useProductionForm";
-import { useProductionTaxesStore } from "@/store/useTaxStore";
+import { useProductionTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
 
 function Inputs() {
   /*
@@ -38,8 +38,10 @@ function Inputs() {
   /*
     Custom hook to get the taxes from the store
   */
-  const { taxes, saveTaxes, clearTaxes, setSaveTaxes } = useProductionTaxesStore((state) => state);
-
+  const {
+    taxesModule: { clear: clearTaxes, salaryElement: taxes },
+    contributionsModule: { clear: clearContributions, salaryElement: contributions },
+  } = useProductionTaxesOrContributionsStore((state) => state);
   /*
     Use data and methods from the useForm hook
   */
@@ -58,7 +60,10 @@ function Inputs() {
 
   const queryClient = useQueryClient();
   const { data: user } = useUser();
-  const getUniqueTaxes = useGetUniqueTaxes({ localTaxes: taxes });
+  const { uniqueTaxes, uniqueContributions } = useGetUniqueSalaryItems({
+    localTaxes: taxes,
+    localContributions: contributions,
+  });
 
   /*
     ================================================================================
@@ -103,12 +108,11 @@ function Inputs() {
       startDate: new Date(formData["start-date"]).toString(),
       endDate: new Date(formData["finish-date"]).toString(),
       itemValue: parseFloat(formData["item-value"]),
-      holidayPayRate: parseFloat(formData["holiday-pay-rate"] || "0"),
       itemQuantity: parseFloat(formData["item-quantity"]),
       isPublicHoliday: formData["is-public-holiday"],
       publicHolidayWorked: formData["is-worked"],
-      taxes: taxes,
-      saveTaxes,
+      taxes,
+      contributions,
     };
 
     Toast({
@@ -123,31 +127,51 @@ function Inputs() {
       user?.email,
     ]);
 
-    const previousTaxData = queryClient.getQueryData<SuccessApiResponse<Tax[]>>(["tax"]);
+    const previousSalaryItemsData = queryClient.getQueryData<SuccessApiResponse<SalaryItems>>([
+      "salary",
+    ]);
 
     //* Optimistic update
-    queryClient.cancelQueries({ queryKey: ["tax"] }).then(() => {
-      const prev = previousTaxData?.tax.map((tax) => {
+    queryClient.cancelQueries({ queryKey: ["salary"] }).then(() => {
+      const prevTaxes = previousSalaryItemsData?.salaryItems.taxes.map((taxes) => {
         return {
-          ...tax,
+          ...taxes,
         };
       });
 
-      const lastId = prev?.at(-1)?.id ?? Math.random();
+      const prevContributions = previousSalaryItemsData?.salaryItems.contributions.map(
+        (contributions) => {
+          return {
+            ...contributions,
+          };
+        }
+      );
 
-      const unique = getUniqueTaxes?.map((tax) => ({
+      const lastIdTax = prevTaxes?.at(-1)?.id ?? Math.random();
+      const lastIdContribution = prevContributions?.at(-1)?.id ?? Math.random();
+
+      const uniqueTax = uniqueTaxes?.map((tax) => ({
         ...tax,
-        id: lastId + 1,
+        id: lastIdTax + 1,
       }));
 
-      const all = prev?.concat(unique ?? []);
+      const uniqueContribution = uniqueContributions?.map((contribution) => ({
+        ...contribution,
+        id: lastIdContribution + 1,
+      }));
 
-      queryClient.setQueryData(["tax"], {
-        ...previousTaxData,
-        tax: all,
+      const all = prevTaxes?.concat(uniqueTax ?? []);
+      const allContributions = prevContributions?.concat(uniqueContribution ?? []);
+
+      queryClient.setQueryData(["salary"], {
+        ...previousSalaryItemsData,
+        salaryItems: {
+          taxes: all,
+          contributions: allContributions,
+        },
       });
 
-      return { previousTaxData };
+      return { previousSalaryItemsData };
     });
 
     //* Optimistic update
@@ -159,17 +183,16 @@ function Inputs() {
           id: lastId + 1,
           startDate: parseData.startDate,
           endDate: parseData.endDate,
-          holidayPayRate: parseData.holidayPayRate,
           itemValue: parseData.itemValue,
           itemQuantity: parseData.itemQuantity,
           isPublicHoliday: parseData.isPublicHoliday,
           publicHolidayWorked: parseData.publicHolidayWorked,
-          holidayPay: parseData.holidayPayRate > 0,
           amount: 0,
           isClosed: true,
           notes: "",
           shiftId: user?.shifts?.id,
           taxes: parseData.taxes,
+          contributions: parseData.contributions,
         },
       ];
 
@@ -188,7 +211,6 @@ function Inputs() {
     });
 
     setDialogState(false);
-    setSaveTaxes(false);
 
     onCreateProductionShift(parseData).then((response) => {
       setDone(true);
@@ -202,6 +224,7 @@ function Inputs() {
 
         resetValues();
         clearTaxes();
+        clearContributions();
 
         return reset();
       }
@@ -211,7 +234,7 @@ function Inputs() {
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["tax"],
+        queryKey: ["salary"],
       });
 
       queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
@@ -232,17 +255,24 @@ function Inputs() {
         return { previousUserData };
       });
 
-      queryClient.cancelQueries({ queryKey: ["tax"] }).then(() => {
-        queryClient.setQueryData(["tax"], {
-          ...previousTaxData,
-          tax: previousTaxData?.tax,
+      queryClient.cancelQueries({ queryKey: ["salary"] }).then(() => {
+        queryClient.setQueryData(["salary"], {
+          ...previousSalaryItemsData,
+          salaryItems: {
+            ...previousSalaryItemsData?.salaryItems,
+          },
         });
 
-        return { previousTaxData };
+        return { previousSalaryItemsData };
       });
 
-      setSaveTaxes(false);
       setDialogState(false);
+
+      resetValues();
+      clearTaxes();
+      clearContributions();
+
+      reset();
 
       Toast({
         type: "error",
@@ -285,6 +315,7 @@ function Inputs() {
           })}
         />
         <Input
+          containerClasses="flex-1"
           labelClasses="text-xs"
           label="Value of each item"
           min={0}
@@ -300,23 +331,13 @@ function Inputs() {
           })}
         />
         <Input
+          containerClasses="flex-1"
           label="Quantity"
           min={0}
           type="number"
           {...register("item-quantity", {
             onChange(e) {
               setValues({ itemQuantity: e.target.value });
-            },
-          })}
-        />
-        <Input
-          label="Holiday pay rate"
-          min={0}
-          measure="%"
-          type="number"
-          {...register("holiday-pay-rate", {
-            onChange(e) {
-              setValues({ holidayPayRate: e.target.value });
             },
           })}
         />

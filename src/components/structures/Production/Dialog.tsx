@@ -6,6 +6,7 @@ import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import isEmpty from "lodash/isEmpty";
 
 import DateHumanizer from "@/services/Date";
+import ShiftService from "@/services/Shift";
 import ProductionService from "@/services/Shift/Production";
 
 import DialogValue from "@/components/structures/share/DialogValue";
@@ -25,25 +26,29 @@ import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
 import { useProductionForm } from "@/store/useProductionForm";
-import { useProductionTaxesStore } from "@/store/useTaxStore";
+import { useProductionTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
 
 type Props = {};
 
 function DialogProduction({ children }: PropsWithChildren<Props>) {
   const { values, dialog, setDialogState, formError } = useProductionForm((state) => state);
-  const { taxes } = useProductionTaxesStore((state) => state);
+  const {
+    taxesModule: { salaryElement: taxes },
+    contributionsModule: { salaryElement: contributions },
+  } = useProductionTaxesOrContributionsStore((state) => state);
 
   useEffect(() => {
     if (formError) return setDialogState(false);
   }, [formError, setDialogState]);
 
   const calculateEarn = useMemo(() => {
-    const earnings = ProductionService.earnings({
+    const prepareShift = {
       itemValue: Number(values.itemValue ?? 0),
       itemQuantity: Number(values.itemQuantity),
       holidayPayRate: Number(values.holidayPayRate),
       publicHolidayWorked: !!values.publicHolidayWorked,
-    });
+    };
+    const earnings = new ShiftService(prepareShift).checkPublicHoliday().calculateEarnings();
 
     const getTaxesDiscount = taxes?.reduce((acc, tax) => {
       const value = Number(tax.value);
@@ -119,6 +124,17 @@ function DialogProduction({ children }: PropsWithChildren<Props>) {
                 {taxes?.map((tax) => (
                   <Text key={tax.name} classes="text-sm">
                     {tax.name}: {tax.value}%
+                  </Text>
+                ))}
+              </Stack>
+            </DialogValue>
+          ) : null}
+          {!isEmpty(contributions) ? (
+            <DialogValue content="Contributions">
+              <Stack grid cols={3}>
+                {contributions?.map((contribution) => (
+                  <Text key={contribution.name} classes="text-sm">
+                    {contribution.name}: {contribution.value}%
                   </Text>
                 ))}
               </Stack>

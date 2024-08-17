@@ -1,6 +1,6 @@
-import type { Production, Tax } from "@prisma/client";
-import isEmpty from "lodash/isEmpty";
+import type { Contribution, Production, Tax } from "@prisma/client";
 
+import ContributionService from "@/services/Contribution";
 import TaxService from "@/services/Tax";
 
 import type { ProductionType } from "@/types";
@@ -19,7 +19,7 @@ interface ProductionInterface {
   addtaxes(taxes: Tax[] | Omit<Tax, "id">[]): Promise<ProductionService>;
   build(): Omit<Production, "shiftId" | "id">;
   calculateEarnings(): number;
-  getConfig(): Pick<Production, "itemValue" | "itemQuantity" | "holidayPay" | "holidayPayRate">;
+  getConfig(): Pick<Production, "itemValue" | "itemQuantity">;
 }
 
 /**
@@ -39,12 +39,14 @@ interface ProductionInterface {
 
 class ProductionService implements ProductionInterface {
   private taxes: Pick<Tax, "id">[];
+  private contributions: Pick<Contribution, "id">[];
   private options?: HourlyOptions;
   shift: Omit<ProductionType, "shiftId" | "id">;
   constructor(shift: Omit<ProductionType, "shiftId" | "id">, options?: HourlyOptions) {
     this.shift = shift;
-    this.taxes = [];
     this.options = options;
+    this.taxes = [];
+    this.contributions = [];
   }
 
   /*  
@@ -60,21 +62,14 @@ class ProductionService implements ProductionInterface {
   */
 
   async create() {
-    if (isEmpty(this.taxes)) {
-      const productionShiftWithoutTax = await prisma.production.create({
-        data: {
-          ...(this.shift as Production),
-        },
-      });
-
-      return productionShiftWithoutTax;
-    }
-
     const createProductionShift = await prisma.production.create({
       data: {
         ...this.shift,
         taxes: {
           connect: this.taxes,
+        },
+        contributions: {
+          connect: this.contributions,
         },
       },
     });
@@ -156,9 +151,19 @@ class ProductionService implements ProductionInterface {
     ============================================================
   */
 
+  async addContributions(contributions: Contribution[] | Omit<Contribution, "id">[]) {
+    const created = await new ContributionService(contributions).create();
+
+    this.contributions = created;
+
+    return this;
+  }
+
   async addtaxes(taxes: Tax[] | Omit<Tax, "id">[]) {
-    const createTaxes = await new TaxService(taxes).create();
-    this.taxes = createTaxes;
+    const created = await new TaxService(taxes).create();
+
+    this.taxes = created;
+
     return this;
   }
 
@@ -168,22 +173,20 @@ class ProductionService implements ProductionInterface {
 
   calculateEarnings() {
     let publicHolidayRate = 1;
-    let holidayPayRateValue = !!this.shift.holidayPayRate ? this.shift.holidayPayRate / 100 + 1 : 1;
+
     if (!this.shift.itemValue || !this.shift.itemQuantity) return 0;
 
     if (this.shift.publicHolidayWorked) {
       publicHolidayRate = 1.5;
     }
 
-    return this.shift.itemValue * this.shift.itemQuantity * publicHolidayRate * holidayPayRateValue;
+    return this.shift.itemValue * this.shift.itemQuantity * publicHolidayRate;
   }
 
   getConfig() {
     return {
       itemValue: this.shift.itemValue,
       itemQuantity: this.shift.itemQuantity,
-      holidayPay: this.shift.holidayPay,
-      holidayPayRate: this.shift.holidayPayRate,
     };
   }
 
@@ -206,8 +209,6 @@ class ProductionService implements ProductionInterface {
     const config = {
       itemValue: lastShift?.itemValue,
       itemQuantity: lastShift?.itemQuantity,
-      holidayPay: lastShift?.holidayPay,
-      holidayPayRate: lastShift?.holidayPayRate,
     };
 
     return config;

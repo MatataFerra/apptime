@@ -5,24 +5,25 @@ import { useForm } from "react-hook-form";
 
 import Toast from "@/services/Toast";
 
-import { observer } from "@/components/structures/Taxes/observer";
+import { observer } from "@/components/structures/SalaryItems/observer";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 
-import useTax from "@/hooks/useTax";
+import useSalaryItems from "@/hooks/useSalaryItems";
 
-import type { TaxElement } from "@/store/useTaxStore";
+import type { ContributionOrTax, TypeOfSalaryItem } from "@/store/useTaxOrContributionStore";
 
 type TaxField = {
   [key: string]: string;
 };
 
 type Props = {
-  addTax: (tax: TaxElement) => void;
+  type: TypeOfSalaryItem;
+  add: (element: ContributionOrTax) => void;
 };
 
-function InputTax({ addTax }: Props) {
+function InputSalaryItem({ add, type }: Props) {
   const {
     register,
     watch,
@@ -32,7 +33,7 @@ function InputTax({ addTax }: Props) {
     resetField,
     formState: { errors },
   } = useForm<TaxField>();
-  const { data: dbTaxes } = useTax();
+  const { data: dataSalary } = useSalaryItems();
 
   /*
     Observes the submit of both forms and when they are done the callback is called
@@ -48,10 +49,10 @@ function InputTax({ addTax }: Props) {
     };
   }, [setDone, done, clearErrors]);
 
-  function onAddingTax() {
+  function onAdd() {
     if (!watch("name")) {
       setError("name", {
-        message: "Name of tax is required",
+        message: "Name is required",
       });
       setFocus("name");
       return;
@@ -70,11 +71,13 @@ function InputTax({ addTax }: Props) {
       return;
     }
 
-    const dbTax = dbTaxes?.tax.some((tax) => tax.name === watch("name"));
+    const dbElement = dataSalary?.salaryItems[type].some(
+      (element) => element.name === watch("name")
+    );
 
-    if (dbTax) {
+    if (dbElement) {
       return Toast({
-        message: "Not added. Tax already exists",
+        message: "Not added. Element already exists",
         type: "warning",
         duration: 1500,
       });
@@ -82,7 +85,7 @@ function InputTax({ addTax }: Props) {
 
     clearErrors();
 
-    addTax({
+    add({
       name: watch("name"),
       value: Number(watch("value")),
       description: watch("description"),
@@ -100,7 +103,7 @@ function InputTax({ addTax }: Props) {
   return (
     <Stack as="div" orientation="horizontal" grid cols={3} classes="w-full">
       <Input
-        placeholder="Name of tax"
+        placeholder="Name"
         classes="min-h-8 w-full text-sm"
         isError={!!errors["name"]}
         description={errors["name"]?.message}
@@ -135,12 +138,12 @@ function InputTax({ addTax }: Props) {
         variant="info"
         size="md"
         classes="col-span-3 w-full"
-        onClick={() => onAddingTax()}
+        onClick={() => onAdd()}
       >
-        add tax
+        Add
       </Button>
     </Stack>
   );
 }
 
-export default InputTax;
+export default InputSalaryItem;

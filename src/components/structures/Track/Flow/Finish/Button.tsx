@@ -11,7 +11,7 @@ import useTrack from "@/hooks/useTrack";
 
 import onUpdateTrackJob from "@/server-actions/update-track";
 import { useNotes } from "@/store/useNotesStore";
-import { useTrackTaxesStore } from "@/store/useTaxStore";
+import { useTrackTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
 
 type Props = {
   buttonStatus: {
@@ -23,7 +23,10 @@ type Props = {
 function FinishButton({ buttonStatus }: Props) {
   const queryClient = useQueryClient();
   const { removelocalNote } = useNotes();
-  const { taxes } = useTrackTaxesStore();
+  const {
+    taxesModule: { salaryElement: taxes },
+    contributionsModule: { salaryElement: contributions },
+  } = useTrackTaxesOrContributionsStore();
 
   const {
     user,
@@ -50,11 +53,17 @@ function FinishButton({ buttonStatus }: Props) {
 
     updateShift({ ...updateTrackedShift });
 
+    const prepareShiftToBeUpdated = {
+      ...updateTrackedShift,
+      taxes,
+      contributions,
+    };
+
     /*
       server action
     */
 
-    onUpdateTrackJob({ ...updateTrackedShift }, taxes, shift?.id).then((response) => {
+    onUpdateTrackJob({ ...prepareShiftToBeUpdated }, shift?.id).then((response) => {
       Toast({
         message: "Closing shift",
         type: "plain",

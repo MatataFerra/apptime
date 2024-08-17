@@ -30,7 +30,6 @@ type EditShiftHourlyForm = {
   startDate: string;
   endDate: string;
   hourValue: number;
-  holidayPayRate: number;
   isPublicHoliday: boolean;
   publicHolidayWorked: boolean;
 };
@@ -48,8 +47,7 @@ function TableDialogEditHourly({ shift, user }: Props) {
   const { taxesToDelete, reset } = useTaxesHandlerDelete((state) => state);
 
   function onHandleEdit(data: EditShiftHourlyForm) {
-    const { startDate, endDate, hourValue, holidayPayRate, isPublicHoliday, publicHolidayWorked } =
-      data;
+    const { startDate, endDate, hourValue, isPublicHoliday, publicHolidayWorked } = data;
 
     if (isBefore(new Date(endDate), new Date(startDate))) {
       setError("endDate", {
@@ -70,7 +68,6 @@ function TableDialogEditHourly({ shift, user }: Props) {
       startDate: new Date(startDate).toString(),
       endDate: new Date(endDate).toString(),
       hourValue: Number(hourValue),
-      holidayPayRate: Number(holidayPayRate),
       isPublicHoliday,
       publicHolidayWorked,
     };
@@ -132,15 +129,6 @@ function TableDialogEditHourly({ shift, user }: Props) {
         placeholder={shift.hourValue.toString()}
         {...register("hourValue", {
           value: shift.hourValue,
-        })}
-      />
-      <Input
-        type="number"
-        label="Holiday Pay Rate"
-        measure="%"
-        placeholder={shift.holidayPayRate?.toString()}
-        {...register("holidayPayRate", {
-          value: shift.holidayPayRate ?? 0,
         })}
       />
       <Stack orientation="horizontal" wrap>

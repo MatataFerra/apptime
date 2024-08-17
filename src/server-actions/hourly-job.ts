@@ -26,11 +26,9 @@ export default async function onCreateHourlyShift(data: FastChargeInputsParsed) 
     isPublicHoliday: data.isPublicHoliday,
     publicHolidayWorked: data.isWorked,
     hourValue: data.hourValue,
-    holidayPay: data.holidayPay,
     amount: 0,
     isClosed: true,
     notes: "",
-    holidayPayRate: data.holidayPayRate,
     unpaidBreaks: data.unpaidBreaks,
     shiftId: currentUser.shifts?.id,
   })
@@ -50,15 +48,22 @@ export default async function onCreateHourlyShift(data: FastChargeInputsParsed) 
         };
       });
 
-    const response = await new HourlyService(shift)
-      .addtaxes(taxesFromLocal)
-      .then((service) => {
-        return service.create();
-      })
-      .then((createdHourly) => {
-        return createdHourly;
-      })
-      .catch((error) => JSON.stringify(error.message));
+    const contributionsFromLocal = data.contributions
+      .filter((contrib) => contrib.name && contrib.value)
+      .map((contrib) => {
+        return {
+          name: contrib.name,
+          value: contrib.value,
+          description: contrib.description,
+        };
+      });
+
+    const hourlyService = new HourlyService(shift);
+
+    await hourlyService.addContributions(contributionsFromLocal);
+    await hourlyService.addtaxes(taxesFromLocal);
+
+    const response = await hourlyService.create();
 
     revalidatePath("/dashboard", "page");
 

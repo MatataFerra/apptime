@@ -9,6 +9,7 @@ import Password from "@/services/Auth/password";
   - Profile
   - User
   - Tax
+  - Shift with Tax
   - SearchParams
   - Suscribe
   - Validate password
@@ -31,8 +32,6 @@ const BaseShiftSchema = z.object({
   isPublicHoliday: z.boolean(),
   publicHolidayWorked: z.boolean(),
   notes: z.string().nullable(),
-  holidayPay: z.boolean(),
-  holidayPayRate: z.number().nullable(),
   unpaidBreaks: z.number().nullable(),
   shiftId: z.number().nullable(),
 });
@@ -223,7 +222,7 @@ const TaxUpdateSchema = TaxSchema.omit({
 
 /*
 ===================================================================
--------------------------Shift  with Tax---------------------------
+-------------------------Shift with Tax---------------------------
 ===================================================================
 */
 
@@ -311,13 +310,12 @@ const FastChargeFormSchema = z.object({
   "finish-time": z.string().refine((value) => !!value, {
     message: "Finish time must be provided",
   }),
-  "fast-holiday": z.boolean(),
-  "fast-worked": z.boolean(),
+  "is-public-holiday": z.boolean(),
+  "is-public-holiday-worked": z.boolean(),
   "hour-value": z.string().refine((value) => !!value, {
     message: "Hour value must be greater than 0",
   }),
   "unpaid-breaks": z.string().nullable(),
-  "holiday-pay-rate": z.string().nullable(),
 });
 
 const FastChargeFormCheckDataSchema = z.object({
@@ -339,7 +337,6 @@ const ProductionJobFormSchema = z.object({
   "item-quantity": z.string().refine((value) => !!value, {
     message: "Hour value must be greater than 0",
   }),
-  "holiday-pay-rate": z.string().nullable(),
   "is-public-holiday": z.boolean(),
   "is-worked": z.boolean(),
 });
