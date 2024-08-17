@@ -7,4 +7,6 @@ export const API_ENDPOINTS = {
   PROFILE: `/api/profile`,
   SHIFT: `/api/shift`,
   TAX: `/api/tax`,
+  CONTRIBUTIONS: `/api/contributions`,
+  SALARY_ITEMS: `/api/salary-items`,
 } as const;

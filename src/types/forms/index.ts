@@ -11,7 +11,7 @@ import {
 
 import { INPUT_VARIANTS } from "@/utils/constants/tailwind";
 
-import type { TaxElement } from "@/store/useTaxStore";
+import type { ContributionElement, TaxElement } from "@/store/useTaxOrContributionStore";
 
 export enum FormStep {
   PERSONAL_INFO,
@@ -60,8 +60,8 @@ export type FastChargeInputsParsed = {
   isPublicHoliday: boolean;
   isWorked: boolean;
   unpaidBreaks: number;
-  saveTaxes: boolean;
   taxes: TaxElement[] | [];
+  contributions: ContributionElement[] | [];
 };
 
 // Production Form
@@ -74,7 +74,7 @@ export type ProductionInputsParsed = {
   isPublicHoliday: boolean;
   publicHolidayWorked: boolean;
   taxes: TaxElement[] | [];
-  saveTaxes: boolean;
+  contributions: ContributionElement[] | [];
 };
 
 // Track Form

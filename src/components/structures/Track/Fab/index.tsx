@@ -5,8 +5,8 @@ import { useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useOnClickOutside } from "usehooks-ts";
 
-import { useDrawerTaxesFromDB } from "@/components/structures/Taxes/TaxesFromDB/Drawer";
-import { useTaxDialog } from "@/components/structures/Track/Tax";
+import { useContributionDialog } from "@/components/structures/Track/Contribution";
+import { useDrawerTaxFromDB, useTaxDialog } from "@/components/structures/Track/Tax";
 import FloatingActionButton from "@/components/ui/Fab";
 import Icon from "@/components/ui/Icons";
 
@@ -20,6 +20,10 @@ const TaxDialog = dynamic(() => import("@/components/structures/Track/Tax"), {
   ssr: false,
 });
 
+const ContributionDialog = dynamic(() => import("@/components/structures/Track/Contribution"), {
+  ssr: false,
+});
+
 const Notes = dynamic(() => import("@/components/modules/Notes/Notes"), {
   ssr: false,
 });
@@ -30,16 +34,18 @@ function FabNotes() {
   const menuRef = useRef<HTMLButtonElement>(null);
   const notesRef = useRef<HTMLButtonElement>(null);
   const taxesRef = useRef<HTMLButtonElement>(null);
+  const contributionRef = useRef<HTMLButtonElement>(null);
   const { isShiftActive } = useTrack();
   const { open } = useNotes();
   const { isOpen: isTaxDialogOpen } = useTaxDialog();
-  const { isOpen: isDrawerTaxOpen } = useDrawerTaxesFromDB((state) => state);
+  const { isOpen: isDrawerTaxOpen } = useDrawerTaxFromDB((state) => state);
+  const { isOpen: isContributionDialogOpen } = useContributionDialog((state) => state);
   const status = useStatus(isShiftActive);
   const [show, setShow] = useState(false);
   const showDelayed = useDelayed(show, FAB_MS_STAGER);
 
-  useOnClickOutside([menuRef, notesRef, taxesRef], () => {
-    if (open || isDrawerTaxOpen || isTaxDialogOpen) return;
+  useOnClickOutside([menuRef, notesRef, taxesRef, contributionRef], () => {
+    if (open || isDrawerTaxOpen || isTaxDialogOpen || isContributionDialogOpen) return;
     setShow(false);
   });
 
@@ -75,6 +81,14 @@ function FabNotes() {
                   text="Taxes"
                 />
               </TaxDialog>
+              <ContributionDialog>
+                <FloatingActionButton
+                  ref={contributionRef}
+                  disabled={!status}
+                  classes={`absolute bottom-[17.5rem] right-4 z-0 size-12 border-none bg-gradient-to-br from-green-200 to-lime-300 transition-all [&>span]:text-xs ${!status ? "bg-gradient-to-br from-gray-300 to-stone-500" : "active:shadow-button-inner"} ${show ? "show_up_contribution" : "show_down_contribution"}`}
+                  text="Contr..."
+                />
+              </ContributionDialog>
             </>
           ) : null}
         </>

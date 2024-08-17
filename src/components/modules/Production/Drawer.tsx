@@ -6,31 +6,19 @@ import Button from "@/components/ui/Button";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
-import { useProductionTaxesStore } from "@/store/useTaxStore";
-
-const TaxesDrawer = dynamic(() => import("@/components/structures/Taxes/Drawer/Drawer"), {
+const SalaryDrawer = dynamic(() => import("@/components/modules/Production/SalaryDrawer"), {
   ssr: false,
   loading: () => <Skeleton classes="h-12 w-full" />,
 });
 
 function Drawer() {
-  const { taxes, clearTaxes, setSaveTaxes, addTax, removeTax } = useProductionTaxesStore(
-    (state) => state
-  );
-
   return (
-    <Stack classes="w-full">
-      <TaxesDrawer
-        addTax={addTax}
-        taxes={taxes}
-        clearTaxes={clearTaxes}
-        setSaveTaxes={setSaveTaxes}
-        removeTax={removeTax}
-      >
+    <Stack classes="my-4 w-full">
+      <SalaryDrawer>
         <Button variant="black" classes="w-full">
           Advanced options
         </Button>
-      </TaxesDrawer>
+      </SalaryDrawer>
     </Stack>
   );
 }

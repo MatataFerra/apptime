@@ -35,8 +35,6 @@ function StartDialog({ triggerStatus }: Props) {
     () => ShiftService.getLastConfigShift(user?.shifts?.hourly),
     [user?.shifts?.hourly]
   ) as {
-    holidayPay: boolean;
-    holidayPayRate: number;
     unpaidBreaks: number;
     hourValue: number;
   };

@@ -7,7 +7,7 @@ import ShiftService from "@/services/Shift";
 import ProductionService from "@/services/Shift/Production";
 import UserService from "@/services/User";
 
-import { ProductionInputsParsed } from "@/types/forms";
+import type { ProductionInputsParsed } from "@/types/forms";
 
 export default async function onCreateProductionShift(data: ProductionInputsParsed) {
   const currentUser = await UserService.getSessionUser();
@@ -48,13 +48,22 @@ export default async function onCreateProductionShift(data: ProductionInputsPars
         };
       });
 
-    const response = await new ProductionService(shift)
-      .addtaxes(taxesFromLocal)
-      .then((service) => {
-        return service.create();
-      })
-      .then((createdProduction) => createdProduction)
-      .catch((error) => JSON.stringify(error.message));
+    const contributionsFromLocal = data.contributions
+      .filter((contrib) => contrib.name && contrib.value)
+      .map((contrib) => {
+        return {
+          name: contrib.name,
+          value: contrib.value,
+          description: contrib.description,
+        };
+      });
+
+    const productionService = new ProductionService(shift);
+
+    await productionService.addContributions(contributionsFromLocal);
+    await productionService.addtaxes(taxesFromLocal);
+
+    const response = await productionService.create();
 
     revalidatePath("/dashboard", "page");
 

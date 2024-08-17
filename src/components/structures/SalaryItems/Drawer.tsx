@@ -1,14 +1,15 @@
 import { type PropsWithChildren, useState } from "react";
 
 import isEmpty from "lodash/isEmpty";
+import { create } from "zustand";
 
 import Toast from "@/services/Toast";
 
-import InputTax from "@/components/structures/Taxes/InputTax";
-import TableTax from "@/components/structures/Taxes/Table";
-import DrawerFromDB, {
-  useDrawerTaxesFromDB,
-} from "@/components/structures/Taxes/TaxesFromDB/Drawer";
+import InputSalaryItem from "@/components/structures/SalaryItems/InputSalaryItem";
+import DrawerSalaryItemsFromDB, {
+  type Observer,
+} from "@/components/structures/SalaryItems/SalaryItemsFromDB/Drawer";
+import TableSalary from "@/components/structures/SalaryItems/Table";
 import Button from "@/components/ui/Button";
 import {
   Drawer as DrawerContainer,
@@ -26,30 +27,48 @@ import Text from "@/components/ui/Text";
 
 import { cn } from "@/utils/helpers/styleMerger";
 
-import type { TaxElement } from "@/store/useTaxStore";
+import type {
+  ContributionElement,
+  TaxElement,
+  TypeOfSalaryItem,
+} from "@/store/useTaxOrContributionStore";
 
 type Props = {
-  taxes: TaxElement[];
-  addTax: (tax: TaxElement) => void;
-  setSaveTaxes: (value: boolean) => void;
-  clearTaxes: () => void;
-  removeTax: (tax: string) => void;
+  store: {
+    type: TypeOfSalaryItem;
+    salaryElement: TaxElement[] | ContributionElement[];
+    add: (tax: TaxElement | ContributionElement) => void;
+    clear: () => void;
+    remove: (tax: string) => void;
+  };
 };
 
-function Drawer({ taxes, addTax, removeTax, children }: PropsWithChildren<Props>) {
-  const [addMoreTaxes, setAddMoreTaxes] = useState(false);
-  const isOpen = useDrawerTaxesFromDB((state) => state.isOpen);
+export const useDrawerSalaryItemsFromDB = create<Observer>((set) => ({
+  isOpen: false,
+  setIsOpen: (isOpen) => set({ isOpen }),
+}));
+
+function Drawer({
+  store: { salaryElement, add, remove, type },
+  children,
+}: PropsWithChildren<Props>) {
+  const [addMoreElements, setAddMoreElements] = useState(false);
+  const { isOpen, setIsOpen } = useDrawerSalaryItemsFromDB((state) => state);
 
   return (
-    <DrawerContainer shouldScaleBackground>
+    <DrawerContainer shouldScaleBackground={false}>
       <DrawerTrigger asChild>{children}</DrawerTrigger>
       <DrawerPortal>
         <DrawerContent className={cn(isOpen ? "!scale-90 !transform" : "scale-100 transform")}>
           <DrawerHeader className="text-left">
-            <DrawerTitle>Taxes</DrawerTitle>
-            <DrawerDescription>Add new taxes or use previous ones</DrawerDescription>
+            <DrawerTitle className="capitalize">
+              {type === "taxes" ? "taxes" : "contributions"}
+            </DrawerTitle>
+            <DrawerDescription>
+              Add new {type === "taxes" ? "taxes" : "contributions"} or use previous ones
+            </DrawerDescription>
           </DrawerHeader>
-          {addMoreTaxes || !isEmpty(taxes) ? (
+          {addMoreElements || !isEmpty(salaryElement) ? (
             <>
               <Stack
                 as="article"
@@ -57,12 +76,12 @@ function Drawer({ taxes, addTax, removeTax, children }: PropsWithChildren<Props>
                 classes="w-full animate-fade-in p-4 transition-all repeat-1"
               >
                 <Text as="h2" classes="text-sm font-medium">
-                  Add new taxes
+                  Add new {type === "taxes" ? "taxes" : "contributions"}
                 </Text>
-                <InputTax addTax={addTax} />
+                <InputSalaryItem add={add} type={type} />
               </Stack>
               <Stack orientation="vertical" classes="w-full p-4">
-                <TableTax addTax={addTax} removeTax={removeTax} data={taxes} />
+                <TableSalary remove={remove} data={salaryElement} type={type} />
               </Stack>
             </>
           ) : (
@@ -72,9 +91,9 @@ function Drawer({ taxes, addTax, removeTax, children }: PropsWithChildren<Props>
                 variant="outlined"
                 size="sm"
                 classes="m-4 flex h-20 w-full animate-fade-in items-center justify-center border border-dashed border-gray-300 bg-gradient-to-tl from-slate-200 via-slate-200/60 to-slate-300 p-4"
-                onClick={() => setAddMoreTaxes(true)}
+                onClick={() => setAddMoreElements(true)}
               >
-                Click to add more taxes
+                Click to add more {type === "taxes" ? "taxes" : "contributions"}
               </Button>
             </Stack>
           )}
@@ -85,7 +104,7 @@ function Drawer({ taxes, addTax, removeTax, children }: PropsWithChildren<Props>
                 size="md"
                 classes="w-auto text-base"
                 onClick={() => {
-                  if (taxes.length > 0) {
+                  if (salaryElement.length > 0) {
                     Toast({
                       message: "Save changes...",
                       type: "plain",
@@ -97,7 +116,14 @@ function Drawer({ taxes, addTax, removeTax, children }: PropsWithChildren<Props>
                 Save & close
               </Button>
             </DrawerClose>
-            <DrawerFromDB addTax={addTax} />
+            <DrawerSalaryItemsFromDB
+              add={add}
+              type={type}
+              drawerStateHandler={{
+                isOpen,
+                setIsOpen,
+              }}
+            />
           </DrawerFooter>
         </DrawerContent>
       </DrawerPortal>

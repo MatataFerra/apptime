@@ -9,7 +9,7 @@ function Title() {
         variant="small"
         classes="animate-pulse text-pretty text-xs fill-mode-backwards repeat-1"
       >
-        Most used taxes
+        Most used
       </Text>
     </Stack>
   );
