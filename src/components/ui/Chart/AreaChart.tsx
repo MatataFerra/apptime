@@ -1,6 +1,9 @@
 "use client";
 
+import { useLocale } from "next-intl";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+
+import type { Locale } from "@/types";
 
 import {
   ChartConfig,
@@ -16,7 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/Chart/card";
 
-import { MONTHS } from "@/utils/constants";
+import { CHART_MONTH } from "@/utils/constants";
 
 const chartConfig = {
   desktop: {
@@ -34,6 +37,7 @@ type Props = {
 };
 
 export default function AreaChartComponent({ data }: Props) {
+  const locale = useLocale() as Locale;
   return (
     <Card>
       <CardHeader>
@@ -61,7 +65,9 @@ export default function AreaChartComponent({ data }: Props) {
                 const day = dateSplitted[0];
                 const getMonth = dateSplitted
                   .map((s) => {
-                    return MONTHS.find((month) => month.toLowerCase() === s.toLowerCase());
+                    return CHART_MONTH[locale].find(
+                      (month) => month.toLowerCase() === s.toLowerCase()
+                    );
                   })
                   .filter((d) => d);
 

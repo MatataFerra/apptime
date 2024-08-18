@@ -98,6 +98,7 @@ class HourlyService implements HourlyInterface {
           taxes: {
             deleteMany: { id: { in: this.getTaxesIds(deleteTaxes ?? []) } },
           },
+          contributions: {},
         },
       });
 

@@ -31,11 +31,31 @@ class Pay implements PayInterface {
   }
 
   netPay() {
-    return this.shift.taxes?.reduce((acc, tax) => {
-      const value = Number(tax.value);
-      const prepareTax = (this.gross() * value) / 100;
-      return (acc -= prepareTax);
-    }, this.gross());
+    return this.afterTaxes();
+  }
+
+  payContributions() {
+    const netAfterTaxes = this.afterTaxes();
+    return (
+      this.shift.contributions?.reduce((acc, contrib) => {
+        const value = Number(contrib.value);
+        const prepareContribution = (acc * value) / 100;
+
+        return acc + prepareContribution;
+      }, netAfterTaxes) ?? 0
+    );
+  }
+
+  afterTaxes() {
+    const gross = this.gross();
+    return (
+      this.shift.taxes?.reduce((acc, tax) => {
+        const value = Number(tax.value);
+        const prepareTax = (acc * value) / 100;
+
+        return acc - prepareTax;
+      }, gross) ?? gross
+    );
   }
 }
 
