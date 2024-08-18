@@ -19,6 +19,7 @@ type Props = {
 
 function Taxes({ shift }: Props) {
   const { taxesToDelete, addTaxToDelete, restoreTax } = useTaxesHandlerDelete((state) => state);
+
   const isTaxAdded = useCallback(
     (id: number) => {
       const tax = taxesToDelete.find((t) => t.id === id);
@@ -38,7 +39,7 @@ function Taxes({ shift }: Props) {
             isTaxAdded(tax.id) ? "text-red-600/80" : "text-gray-800"
           )}
         >
-          <article className="flex gap-1 text-balance text-sm">
+          <article className="flex gap-1 text-balance text-xs">
             <p>
               {tax.name} {tax.value}%
             </p>

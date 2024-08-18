@@ -18,7 +18,6 @@ import {
   DrawerDescription,
   DrawerFooter,
   DrawerHeader,
-  DrawerPortal,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/Drawer";
@@ -58,75 +57,73 @@ function Drawer({
   return (
     <DrawerContainer shouldScaleBackground={false}>
       <DrawerTrigger asChild>{children}</DrawerTrigger>
-      <DrawerPortal>
-        <DrawerContent className={cn(isOpen ? "!scale-90 !transform" : "scale-100 transform")}>
-          <DrawerHeader className="text-left">
-            <DrawerTitle className="capitalize">
-              {type === "taxes" ? "taxes" : "contributions"}
-            </DrawerTitle>
-            <DrawerDescription>
-              Add new {type === "taxes" ? "taxes" : "contributions"} or use previous ones
-            </DrawerDescription>
-          </DrawerHeader>
-          {addMoreElements || !isEmpty(salaryElement) ? (
-            <>
-              <Stack
-                as="article"
-                orientation="vertical"
-                classes="w-full animate-fade-in p-4 transition-all repeat-1"
-              >
-                <Text as="h2" classes="text-sm font-medium">
-                  Add new {type === "taxes" ? "taxes" : "contributions"}
-                </Text>
-                <InputSalaryItem add={add} type={type} />
-              </Stack>
-              <Stack orientation="vertical" classes="w-full p-4">
-                <TableSalary remove={remove} data={salaryElement} type={type} />
-              </Stack>
-            </>
-          ) : (
-            <Stack as="div">
-              <Button
-                type="button"
-                variant="outlined"
-                size="sm"
-                classes="m-4 flex h-20 w-full animate-fade-in items-center justify-center border border-dashed border-gray-300 bg-gradient-to-tl from-slate-200 via-slate-200/60 to-slate-300 p-4"
-                onClick={() => setAddMoreElements(true)}
-              >
-                Click to add more {type === "taxes" ? "taxes" : "contributions"}
-              </Button>
+      <DrawerContent className={cn(isOpen ? "!scale-90 !transform" : "scale-100 transform")}>
+        <DrawerHeader className="text-left">
+          <DrawerTitle className="capitalize">
+            {type === "taxes" ? "taxes" : "contributions"}
+          </DrawerTitle>
+          <DrawerDescription>
+            Add new {type === "taxes" ? "taxes" : "contributions"} or use previous ones
+          </DrawerDescription>
+        </DrawerHeader>
+        {addMoreElements || !isEmpty(salaryElement) ? (
+          <>
+            <Stack
+              as="article"
+              orientation="vertical"
+              classes="w-full animate-fade-in p-4 transition-all repeat-1"
+            >
+              <Text as="h2" classes="text-sm font-medium">
+                Add new {type === "taxes" ? "taxes" : "contributions"}
+              </Text>
+              <InputSalaryItem add={add} type={type} />
             </Stack>
-          )}
-          <DrawerFooter>
-            <DrawerClose asChild>
-              <Button
-                variant="black"
-                size="md"
-                classes="w-auto text-base"
-                onClick={() => {
-                  if (salaryElement.length > 0) {
-                    Toast({
-                      message: "Save changes...",
-                      type: "plain",
-                      duration: 500,
-                    });
-                  }
-                }}
-              >
-                Save & close
-              </Button>
-            </DrawerClose>
-            <DrawerSalaryItemsFromDB
-              add={add}
-              type={type}
-              drawerStateHandler={{
-                isOpen,
-                setIsOpen,
+            <Stack orientation="vertical" classes="w-full p-4">
+              <TableSalary remove={remove} data={salaryElement} type={type} />
+            </Stack>
+          </>
+        ) : (
+          <Stack as="div">
+            <Button
+              type="button"
+              variant="outlined"
+              size="sm"
+              classes="m-4 flex h-20 w-full animate-fade-in items-center justify-center border border-dashed border-gray-300 bg-gradient-to-tl from-slate-200 via-slate-200/60 to-slate-300 p-4"
+              onClick={() => setAddMoreElements(true)}
+            >
+              Click to add more {type === "taxes" ? "taxes" : "contributions"}
+            </Button>
+          </Stack>
+        )}
+        <DrawerFooter>
+          <DrawerClose asChild>
+            <Button
+              variant="black"
+              size="md"
+              classes="w-auto text-base"
+              onClick={() => {
+                if (salaryElement.length > 0) {
+                  Toast({
+                    message: "Save changes...",
+                    type: "plain",
+                    duration: 500,
+                  });
+                }
               }}
-            />
-          </DrawerFooter>
-        </DrawerContent>
-      </DrawerPortal>
+            >
+              Save & close
+            </Button>
+          </DrawerClose>
+          <DrawerSalaryItemsFromDB
+            add={add}
+            type={type}
+            drawerStateHandler={{
+              isOpen,
+              setIsOpen,
+            }}
+          />
+        </DrawerFooter>
+      </DrawerContent>
     </DrawerContainer>
   );
 }

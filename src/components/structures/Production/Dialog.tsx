@@ -7,7 +7,6 @@ import isEmpty from "lodash/isEmpty";
 
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
-import ProductionService from "@/services/Shift/Production";
 
 import DialogValue from "@/components/structures/share/DialogValue";
 import Button from "@/components/ui/Button";
@@ -28,9 +27,7 @@ import Text from "@/components/ui/Text";
 import { useProductionForm } from "@/store/useProductionForm";
 import { useProductionTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
 
-type Props = {};
-
-function DialogProduction({ children }: PropsWithChildren<Props>) {
+function DialogProduction({ children }: PropsWithChildren) {
   const { values, dialog, setDialogState, formError } = useProductionForm((state) => state);
   const {
     taxesModule: { salaryElement: taxes },
@@ -45,8 +42,6 @@ function DialogProduction({ children }: PropsWithChildren<Props>) {
     const prepareShift = {
       itemValue: Number(values.itemValue ?? 0),
       itemQuantity: Number(values.itemQuantity),
-      holidayPayRate: Number(values.holidayPayRate),
-      publicHolidayWorked: !!values.publicHolidayWorked,
     };
     const earnings = new ShiftService(prepareShift).checkPublicHoliday().calculateEarnings();
 
@@ -60,13 +55,7 @@ function DialogProduction({ children }: PropsWithChildren<Props>) {
       sharp: isNaN(earnings) ? 0 : earnings,
       afterTaxes: isNaN(getTaxesDiscount) ? 0 : getTaxesDiscount,
     };
-  }, [
-    taxes,
-    values.holidayPayRate,
-    values.itemQuantity,
-    values.itemValue,
-    values.publicHolidayWorked,
-  ]);
+  }, [taxes, values.itemQuantity, values.itemValue]);
 
   return (
     <Dialog open={dialog} onOpenChange={setDialogState}>
