@@ -128,7 +128,7 @@ function TableDialogContent({ shift }: Props) {
       {!isEmpty(shift.taxes) ? (
         <Stack>
           <DropdownMenu>
-            <DropdownMenuTrigger className="group flex w-full items-center justify-between py-2 pr-4 font-bold text-gray-800 dark:text-gray-100">
+            <DropdownMenuTrigger className="group flex w-full items-center justify-between py-2 pr-4 text-xs text-gray-800 dark:text-gray-100">
               Taxes {`(${shift.taxes?.length ?? 0})`}
               <ChevronDownIcon className="transition-all group-data-[state=open]:rotate-180 group-data-[state=open]:transform" />
             </DropdownMenuTrigger>
@@ -136,6 +136,23 @@ function TableDialogContent({ shift }: Props) {
               {shift.taxes?.map((tax) => (
                 <DropdownMenuItem key={tax.id}>
                   {tax.name} {tax.value}%
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </Stack>
+      ) : null}
+      {!isEmpty(shift.contributions) ? (
+        <Stack>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="group flex w-full items-center justify-between py-2 pr-4 text-xs text-gray-800 dark:text-gray-100">
+              Contributions {`(${shift.contributions?.length ?? 0})`}
+              <ChevronDownIcon className="transition-all group-data-[state=open]:rotate-180 group-data-[state=open]:transform" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {shift.contributions?.map((contrib) => (
+                <DropdownMenuItem key={contrib.id}>
+                  {contrib.name} {contrib.value}%
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>

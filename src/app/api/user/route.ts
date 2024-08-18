@@ -63,11 +63,13 @@ export async function GET(req: NextRequest) {
             hourly: {
               include: {
                 taxes: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
+                contributions: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
               },
             },
             production: {
               include: {
                 taxes: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
+                contributions: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
               },
             },
           },

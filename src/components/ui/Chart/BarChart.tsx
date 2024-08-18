@@ -1,7 +1,10 @@
 "use client";
 
 import isEmpty from "lodash/isEmpty";
+import { useLocale } from "next-intl";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+
+import type { Locale } from "@/types";
 
 import CustomChartTooltip from "@/components/structures/Chart/Tooltip";
 import { type ChartConfig, ChartContainer, ChartTooltip } from "@/components/ui/Chart";
@@ -13,7 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/Chart/card";
 
-import { MONTHS } from "@/utils/constants";
+import { CHART_MONTH } from "@/utils/constants";
 
 const chartConfig = {
   desktop: {
@@ -30,6 +33,7 @@ type Props = {
 };
 
 export default function BarChartComponent({ data, legend, showDates, customLegend }: Props) {
+  const locale = useLocale() as Locale;
   let dataKey = "";
   let xAxis;
 
@@ -58,7 +62,9 @@ export default function BarChartComponent({ data, legend, showDates, customLegen
                 const day = dateSplitted[0];
                 const getMonth = dateSplitted
                   .map((s) => {
-                    return MONTHS.find((month) => month.toLowerCase() === s.toLowerCase());
+                    return CHART_MONTH[locale].find(
+                      (month) => month.toLowerCase() === s.toLowerCase()
+                    );
                   })
                   .filter((d) => d);
 

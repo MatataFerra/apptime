@@ -25,10 +25,12 @@ export type ShiftType = ProductionType | HourlyType;
 
 export type ProductionType = Production & {
   taxes?: Tax[] | null;
+  contributions?: Contribution[] | null;
 };
 
 export type HourlyType = Hourly & {
   taxes?: Tax[] | null;
+  contributions?: Contribution[] | null;
 };
 
 export type Shifts = Shift & {
