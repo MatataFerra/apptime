@@ -93,8 +93,11 @@ class ProductionService implements ProductionInterface {
         data: {
           ...this.shift,
           taxes: {
-            deleteMany: { id: { in: this.getTaxesIds(deleteTaxes ?? []) } },
+            disconnect: deleteTaxes?.map((tax) => ({
+              id: tax.id,
+            })),
           },
+          contributions: {},
         },
       });
 
@@ -111,6 +114,9 @@ class ProductionService implements ProductionInterface {
           taxes: {
             connect: this.taxes,
           },
+          contributions: {
+            connect: this.contributions,
+          },
         },
       });
 
@@ -122,7 +128,12 @@ class ProductionService implements ProductionInterface {
       where: { id },
       data: {
         ...this.shift,
-        taxes: {},
+        taxes: {
+          connect: this.taxes,
+        },
+        contributions: {
+          connect: this.contributions,
+        },
       },
     });
 

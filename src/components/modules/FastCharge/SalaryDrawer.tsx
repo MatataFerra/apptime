@@ -30,7 +30,7 @@ const Drawer = dynamic(() => import("@/components/structures/SalaryItems/Drawer"
 });
 
 function SalaryDrawer({ children }: PropsWithChildren) {
-  const { taxesModule, contributionsModule } = useHourlyTaxesOrContributionsStore((state) => state);
+  const { taxesModule } = useHourlyTaxesOrContributionsStore((state) => state);
 
   return (
     <>
@@ -45,12 +45,6 @@ function SalaryDrawer({ children }: PropsWithChildren) {
             <Drawer store={{ ...taxesModule }}>
               <Button variant="white" classes="h-20 w-full border-none text-xs shadow-md">
                 Taxes
-              </Button>
-            </Drawer>
-
-            <Drawer store={{ ...contributionsModule }}>
-              <Button variant="white" classes="h-20 w-full border-none text-xs shadow-md">
-                Contributions
               </Button>
             </Drawer>
           </Stack>

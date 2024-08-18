@@ -1,5 +1,5 @@
 import { Profile, User } from "@prisma/client";
-import { addDays, addMinutes } from "date-fns";
+import { addDays, addHours, addMinutes, differenceInMinutes } from "date-fns";
 
 import { UserType } from "@/types";
 
@@ -69,8 +69,6 @@ export const userShiftsMocked: UserType["shifts"] = {
     endDate: addMinutes(date, 125 + i).toString(),
     itemValue: 10,
     itemQuantity: 10,
-    holidayPay: true,
-    holidayPayRate: 0,
     taxCode: 0,
     amount: 125 + i,
     isClosed: false,
@@ -113,5 +111,87 @@ export const userMocked: UserType = {
     id: 1,
     userId: userMockedParsed.id,
     weekStartsOn: "sunday",
+  },
+};
+
+export const userTestData: UserType = {
+  id: "user-123",
+  email: "testuser@example.com",
+  emailVerified: new Date("2024-08-01T12:00:00Z"),
+  image: "http://example.com/image.jpg",
+  name: "Test User",
+  password: "hashedpassword123",
+  type_account: "standard",
+  role: "employee",
+  online: true,
+  formCompleted: true,
+  isActive: true,
+  config: {
+    id: 1,
+    weekStartsOn: "Monday",
+    userId: "user-123",
+  },
+  shifts: {
+    id: 1,
+    userId: "user-123",
+    production: [
+      {
+        id: 1,
+        startDate: new Date(Date.now()).toString(),
+        endDate: addHours(new Date(Date.now()), 6).toString(),
+        amount: differenceInMinutes(addHours(new Date(Date.now()), 6), new Date(Date.now())),
+        isPublicHoliday: false,
+        publicHolidayWorked: false,
+        isClosed: false,
+        notes: "Production shift note",
+        itemValue: 50,
+        itemQuantity: 40,
+        shiftId: 1001,
+        taxes: [
+          { id: 1, name: "VAT", value: 10, description: "Value-added tax" },
+          { id: 2, name: "Income Tax", value: 15, description: "Income tax" },
+        ],
+        contributions: [
+          { id: 1, name: "Social Security", value: 5, description: "Social Security contribution" },
+          {
+            id: 2,
+            name: "Health Insurance",
+            value: 7,
+            description: "Health insurance contribution",
+          },
+        ],
+      },
+    ],
+    hourly: [
+      {
+        id: 2,
+        startDate: new Date(Date.now()).toString(),
+        endDate: addHours(new Date(Date.now()), 8).toString(),
+        amount: differenceInMinutes(addHours(new Date(Date.now()), 8), new Date(Date.now())),
+        isPublicHoliday: false,
+        publicHolidayWorked: false,
+        isClosed: false,
+        notes: "Hourly shift note",
+        hourValue: 30,
+        unpaidBreaks: 1,
+        shiftId: 1002,
+        taxes: [
+          { id: 3, name: "State Tax", value: 8, description: "State tax" },
+          { id: 4, name: "Federal Tax", value: 12, description: "Federal tax" },
+        ],
+        contributions: [
+          { id: 3, name: "Pension Fund", value: 4, description: "Pension fund contribution" },
+        ],
+      },
+    ],
+  },
+  profile: {
+    id: 1,
+    firstName: "John",
+    lastName: "Doe",
+    address: "123 Main St",
+    city: "Metropolis",
+    country: "Countryland",
+    userId: "user-123",
   },
 };

@@ -96,8 +96,11 @@ class HourlyService implements HourlyInterface {
         data: {
           ...this.shift,
           taxes: {
-            deleteMany: { id: { in: this.getTaxesIds(deleteTaxes ?? []) } },
+            disconnect: deleteTaxes?.map((tax) => ({
+              id: tax.id,
+            })),
           },
+          contributions: {},
         },
       });
 

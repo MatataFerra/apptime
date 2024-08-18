@@ -7,7 +7,7 @@ import useUser from "@/hooks/useUser";
 import { useDashboardStore } from "@/store/useDashboardStore_v2";
 
 function useDashboard() {
-  const { data, isLoading } = useUser();
+  const { data, isLoading, refetch } = useUser();
   const {
     setUser,
     deleteShift,
@@ -47,6 +47,7 @@ function useDashboard() {
     update,
     user,
     isLoadingUserData: isLoading,
+    refetch,
   };
 }
 

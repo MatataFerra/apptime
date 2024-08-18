@@ -95,14 +95,16 @@ function TableDialogEditProduction({ shift, user }: Props) {
           message: "Shift updated successfully!",
           duration: 2000,
         });
-        queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
+
+        queryClient.refetchQueries({ queryKey: ["user", user?.email] });
         setStep("info");
+
         reset();
         router.refresh();
       } else {
         Toast({
           type: "error",
-          message: "Error updating shift, please try again.",
+          message: "Error updating shift, please reload the page and try again.",
           duration: 2000,
         });
       }
@@ -167,7 +169,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
         </Stack>
         <Stack
           orientation="vertical"
-          classes="h-40 w-full overflow-y-scroll rounded-md p-2 shadow-md"
+          classes="h-36 w-full overflow-y-scroll rounded-md p-2 shadow-md"
           spacing={4}
         >
           <Text classes="font-semibold">Remove wrong taxes:</Text>
