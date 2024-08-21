@@ -6,6 +6,7 @@ import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import isEmpty from "lodash/isEmpty";
 
 import DateHumanizer from "@/services/Date";
+import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
 
 import DialogValue from "@/components/structures/share/DialogValue";
@@ -44,12 +45,7 @@ function DialogProduction({ children }: PropsWithChildren) {
       itemQuantity: Number(values.itemQuantity),
     };
     const earnings = new ShiftService(prepareShift).checkPublicHoliday().calculateEarnings();
-
-    const getTaxesDiscount = taxes?.reduce((acc, tax) => {
-      const value = Number(tax.value);
-      const prepareTax = (earnings * value) / 100;
-      return (acc -= prepareTax);
-    }, earnings);
+    const getTaxesDiscount = Pay.afterTax(earnings, taxes);
 
     return {
       sharp: isNaN(earnings) ? 0 : earnings,
