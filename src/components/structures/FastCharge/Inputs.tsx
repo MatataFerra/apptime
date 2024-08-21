@@ -389,6 +389,8 @@ function Inputs() {
         <Input
           label="Hour value"
           type="number"
+          step="0.01"
+          min={0}
           measure="$"
           measurePlace="left"
           {...register("hour-value", {
@@ -399,6 +401,7 @@ function Inputs() {
         />
         <Input
           label="Unpaid breaks"
+          measure="min."
           type="number"
           {...register("unpaid-breaks", {
             onChange: (e: ChangeEvent<HTMLInputElement>) => {

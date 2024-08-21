@@ -1,3 +1,5 @@
+import type { Tax } from "@prisma/client";
+
 import HourlyService from "@/services/Shift/Hourly";
 import ProductionService from "@/services/Shift/Production";
 
@@ -50,6 +52,17 @@ class Pay implements PayInterface {
     const gross = this.gross();
     return (
       this.shift.taxes?.reduce((acc, tax) => {
+        const value = Number(tax.value);
+        const prepareTax = (acc * value) / 100;
+
+        return acc - prepareTax;
+      }, gross) ?? gross
+    );
+  }
+
+  static afterTax(gross: number, taxes: Omit<Tax, "id">[]) {
+    return (
+      taxes?.reduce((acc, tax) => {
         const value = Number(tax.value);
         const prepareTax = (acc * value) / 100;
 
