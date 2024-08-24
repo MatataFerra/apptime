@@ -26,7 +26,7 @@ function Inputs() {
         id={SETTINGS_FIELDS.account.name.toLowerCase()}
         label={SETTINGS_FIELDS.account.name}
         description="Your full name"
-        variant="plane"
+        variant="outlined"
         value={values.account.name}
         isLoading={isLoading}
         onChange={onChangeInputs}

@@ -29,7 +29,7 @@ function Inputs() {
         id={SETTINGS_FIELDS.personal.city.toLowerCase()}
         label={SETTINGS_FIELDS.personal.city}
         description="Your city"
-        variant="plane"
+        variant="outlined"
         value={values.personal.city}
         isLoading={isLoading}
         onChange={onChangeInputs}
