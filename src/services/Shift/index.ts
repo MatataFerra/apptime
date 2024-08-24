@@ -9,8 +9,14 @@ import ProductionService from "@/services/Shift/Production";
 
 import type { HourlyType, ProductionType, Shifts } from "@/types";
 
-type TypeShift = Hourly | Production;
-type TypeShiftWithTaxes = HourlyType | ProductionType;
+type ShiftHourlyOrProduction = Hourly | Production;
+type ShiftWithTaxesType = HourlyType | ProductionType;
+
+type Shift =
+  | ShiftHourlyOrProduction
+  | ShiftWithTaxesType
+  | Partial<ShiftHourlyOrProduction>
+  | Partial<ShiftWithTaxesType>;
 
 type UpdateOptions = {
   createTaxes?: Tax[];
@@ -18,8 +24,8 @@ type UpdateOptions = {
 };
 
 interface ShiftServiceInterface {
-  shift: TypeShift | TypeShiftWithTaxes | Partial<TypeShift> | Partial<TypeShiftWithTaxes>;
-  create: (taxes?: Omit<Tax, "id">[]) => Promise<TypeShift | undefined>;
+  shift: Shift;
+  create: (taxes?: Omit<Tax, "id">[]) => Promise<ShiftHourlyOrProduction | undefined>;
   differenceInMinsBetweenStartAndEnd: () => this;
   closeShift: () => this;
   checkPublicHoliday: () => this;
@@ -45,10 +51,8 @@ interface ShiftServiceInterface {
  * @method build - Returns the shift
  */
 class ShiftService implements ShiftServiceInterface {
-  shift: TypeShift | TypeShiftWithTaxes | Partial<TypeShift> | Partial<TypeShiftWithTaxes>;
-  constructor(
-    shift: TypeShift | TypeShiftWithTaxes | Partial<TypeShift> | Partial<TypeShiftWithTaxes>
-  ) {
+  shift: Shift;
+  constructor(shift: Shift) {
     this.shift = cloneDeep(shift);
   }
 
@@ -64,7 +68,7 @@ class ShiftService implements ShiftServiceInterface {
     ===========================
   */
 
-  async delete(id: number): Promise<TypeShift | undefined> {
+  async delete(id: number): Promise<ShiftHourlyOrProduction | undefined> {
     if (this.isProductionShift) {
       return await this.deleteProductionShift(id);
     }
@@ -85,7 +89,7 @@ class ShiftService implements ShiftServiceInterface {
     -----------Create----------
     ===========================
   */
-  async create<T extends TypeShift>(): Promise<T | undefined> {
+  async create<T extends ShiftHourlyOrProduction>(): Promise<T | undefined> {
     if (this.isProductionShift) {
       return (await new ProductionService(this.shift as Production).create()) as T;
     }
@@ -98,7 +102,7 @@ class ShiftService implements ShiftServiceInterface {
     ===========================
   */
 
-  async update<T extends TypeShiftWithTaxes>(
+  async update<T extends ShiftWithTaxesType>(
     id?: number,
     options?: UpdateOptions
   ): Promise<T | null> {
@@ -224,7 +228,7 @@ class ShiftService implements ShiftServiceInterface {
     return Math.round((validAmount / 60) * 100) / 100;
   }
 
-  static isProductionShift(shift: TypeShift): shift is Production {
+  static isProductionShift(shift: ShiftHourlyOrProduction): shift is Production {
     return (shift as Production).itemValue !== undefined;
   }
 
@@ -247,7 +251,7 @@ class ShiftService implements ShiftServiceInterface {
         acc[key].push(shift);
         return acc;
       },
-      {} as Record<string, TypeShift[]>
+      {} as Record<string, ShiftHourlyOrProduction[]>
     );
   }
 
@@ -322,14 +326,13 @@ class ShiftService implements ShiftServiceInterface {
     unpaidBreaks?: number;
     isPublicHoliday?: boolean;
   }) {
-    const MIN_MINUTES_WORKED = 8 * 60;
+    const MIN_MINUTES_WORKED = 60;
     let amount = 0;
     let totalTime = 0;
     let publicHolidayRate = 1;
     const holidayPayRateValue = holidayPayRate ? holidayPayRate / 100 + 1 : 1;
     const hourJobValue = hourValue;
-    const unpaidBreaksValue = unpaidBreaks;
-    const minutesUnpaids = (unpaidBreaksValue ?? 0) * 30;
+    const unpaidBreaksValue = unpaidBreaks ?? 0;
 
     let minuteRate = hourJobValue ? hourJobValue / 60 : 0;
 
@@ -350,7 +353,7 @@ class ShiftService implements ShiftServiceInterface {
     if (amount < MIN_MINUTES_WORKED) {
       totalTime = amount;
     } else {
-      totalTime = amount - minutesUnpaids;
+      totalTime = amount - unpaidBreaksValue;
     }
 
     const earnings = totalTime * minuteRate * publicHolidayRate * holidayPayRateValue;
@@ -390,7 +393,7 @@ class ShiftService implements ShiftServiceInterface {
     if (isEmpty(taxes) || !taxes) return this;
 
     if (this.shiftHasTaxes()) {
-      let cache = cloneDeep(this.shift) as TypeShiftWithTaxes;
+      let cache = cloneDeep(this.shift) as ShiftWithTaxesType;
       const taxIdsToDelete = new Set(taxes.map((t) => t.id));
 
       cache.taxes = cache?.taxes?.filter((t) => !taxIdsToDelete.has(t.id));
@@ -420,7 +423,7 @@ class ShiftService implements ShiftServiceInterface {
     return new HourlyService(this.shift as Hourly).build();
   }
 
-  build<T extends TypeShift>(): T {
+  build<T extends ShiftHourlyOrProduction>(): T {
     return this.shift as T;
   }
 
@@ -465,7 +468,7 @@ class ShiftService implements ShiftServiceInterface {
     return !!shift.itemValue;
   }
 
-  private shiftHasTaxes(): this is TypeShiftWithTaxes {
+  private shiftHasTaxes(): this is ShiftWithTaxesType {
     return has(this.shift, "taxes");
   }
 }
