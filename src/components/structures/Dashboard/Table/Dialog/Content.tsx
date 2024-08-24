@@ -26,6 +26,11 @@ type Props = {
 function TableDialogContent({ shift }: Props) {
   return (
     <Stack grid cols={2}>
+      {shift.name ? (
+        <Text classes="col-span-2 border-b border-b-slate-500/40 text-lg text-slate-800">
+          {shift.name}
+        </Text>
+      ) : null}
       <Text>
         <Text as="span" classes="font-bold">
           Start Date:

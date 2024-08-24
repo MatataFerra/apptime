@@ -32,6 +32,7 @@ type EditShiftHourlyForm = {
   hourValue: number;
   isPublicHoliday: boolean;
   publicHolidayWorked: boolean;
+  name: string;
 };
 
 function TableDialogEditHourly({ shift, user }: Props) {
@@ -47,7 +48,7 @@ function TableDialogEditHourly({ shift, user }: Props) {
   const { taxesToDelete, reset } = useTaxesHandlerDelete((state) => state);
 
   function onHandleEdit(data: EditShiftHourlyForm) {
-    const { startDate, endDate, hourValue, isPublicHoliday, publicHolidayWorked } = data;
+    const { startDate, endDate, hourValue, isPublicHoliday, publicHolidayWorked, name } = data;
 
     if (isBefore(new Date(endDate), new Date(startDate))) {
       setError("endDate", {
@@ -70,6 +71,7 @@ function TableDialogEditHourly({ shift, user }: Props) {
       hourValue: Number(hourValue),
       isPublicHoliday,
       publicHolidayWorked,
+      name,
     };
 
     // Check if user made any changes
@@ -111,6 +113,8 @@ function TableDialogEditHourly({ shift, user }: Props) {
 
   return (
     <Stack as="form" orientation="horizontal" wrap onSubmit={handleSubmit(onHandleEdit)}>
+      <Input type="text" label="Job name" {...register("name", { value: shift?.name ?? "" })} />
+
       <Input
         type="datetime-local"
         label="Start Date"
@@ -128,6 +132,8 @@ function TableDialogEditHourly({ shift, user }: Props) {
       <Input
         type="number"
         label="Hour Value"
+        step="0.01"
+        min={0}
         placeholder={shift.hourValue.toString()}
         {...register("hourValue", {
           value: shift.hourValue,

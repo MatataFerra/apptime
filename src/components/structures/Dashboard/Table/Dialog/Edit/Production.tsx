@@ -29,6 +29,7 @@ type Props = {
 type EditProductionShiftForm = {
   startDate: string;
   endDate: string;
+  name: string;
   itemValue: number;
   itemQuantity: number;
   isPublicHoliday: boolean;
@@ -48,8 +49,15 @@ function TableDialogEditProduction({ shift, user }: Props) {
   const { taxesToDelete, reset } = useTaxesHandlerDelete((state) => state);
 
   function onHandleEdit(data: EditProductionShiftForm) {
-    const { startDate, endDate, itemValue, isPublicHoliday, publicHolidayWorked, itemQuantity } =
-      data;
+    const {
+      startDate,
+      endDate,
+      itemValue,
+      isPublicHoliday,
+      publicHolidayWorked,
+      itemQuantity,
+      name,
+    } = data;
 
     const shiftUpdated = {
       ...shift,
@@ -59,6 +67,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
       itemQuantity: Number(itemQuantity),
       isPublicHoliday,
       publicHolidayWorked,
+      name,
     };
 
     // Check if user made any changes
@@ -113,6 +122,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
 
   return (
     <Stack as="form" orientation="horizontal" wrap onSubmit={handleSubmit(onHandleEdit)}>
+      <Input type="text" label="Job name" {...register("name", { value: shift?.name ?? "" })} />
       <Input
         type="datetime-local"
         label="Start Date"
