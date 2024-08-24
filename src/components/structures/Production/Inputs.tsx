@@ -111,6 +111,7 @@ function Inputs() {
       itemQuantity: parseFloat(formData["item-quantity"]),
       isPublicHoliday: formData["is-public-holiday"],
       publicHolidayWorked: formData["is-worked"],
+      name: formData["name"],
       taxes,
       contributions,
     };
@@ -183,14 +184,15 @@ function Inputs() {
           id: lastId + 1,
           startDate: parseData.startDate,
           endDate: parseData.endDate,
-          itemValue: parseData.itemValue,
-          itemQuantity: parseData.itemQuantity,
-          isPublicHoliday: parseData.isPublicHoliday,
-          publicHolidayWorked: parseData.publicHolidayWorked,
+          name: parseData.name,
           amount: 0,
           isClosed: true,
           notes: "",
+          itemValue: parseData.itemValue,
+          itemQuantity: parseData.itemQuantity,
           shiftId: user?.shifts?.id,
+          isPublicHoliday: parseData.isPublicHoliday,
+          publicHolidayWorked: parseData.publicHolidayWorked,
           taxes: parseData.taxes,
           contributions: parseData.contributions,
         },
@@ -292,6 +294,16 @@ function Inputs() {
         wrap
         onSubmit={handleSubmit(onSubmit)}
       >
+        <Input
+          containerClasses="flex-1"
+          label="Name of your job"
+          type="name"
+          {...register("name", {
+            onChange: (e) => {
+              setValues({ name: e.target.value });
+            },
+          })}
+        />
         <Input
           classes="h-full"
           label="Start date"
