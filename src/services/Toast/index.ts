@@ -6,10 +6,10 @@ import { toast } from "@/components/ui/Toast/use-toast";
 import { cn } from "@/utils/helpers/styleMerger";
 
 const TOAST_STYLE = {
-  success: "bg-green-500 text-white",
-  error: "bg-red-500 text-white",
-  warning: "bg-yellow-500 text-gray-900",
-  info: "bg-sky-500 text-white",
+  success: "bg-gradient-to-r from-green-400 to-teal-500 text-slate-800",
+  error: "bg-gradient-to-r from-red-400 to-pink-500 text-white",
+  warning: "bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-800",
+  info: "bg-gradient-to-r from-sky-400 to-cyan-600 text-white",
   plain: "bg-white text-gray-700",
 } as const;
 
