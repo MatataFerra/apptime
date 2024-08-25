@@ -153,7 +153,7 @@ function Inputs() {
       type: "info",
       message: "Your request is being processed",
       description: "Please wait a moment...",
-      duration: 1000,
+      duration: 3000,
     });
 
     const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([

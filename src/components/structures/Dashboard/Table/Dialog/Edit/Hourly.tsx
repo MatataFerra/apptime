@@ -87,7 +87,13 @@ function TableDialogEditHourly({ shift, user }: Props) {
       return;
     }
 
-    onEditShift(shiftUpdated, taxesToDelete).then((res) => {
+    onEditShift(shiftUpdated, taxesToDelete).then(async (res) => {
+      Toast({
+        type: "info",
+        message: "Shift is being updated",
+        duration: Infinity,
+      });
+
       if (res) {
         Toast({
           type: "success",
