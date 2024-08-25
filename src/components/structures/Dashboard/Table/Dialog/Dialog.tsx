@@ -55,7 +55,7 @@ function TableDialog({ title, content, shift, type, children }: Props) {
       Toast({
         type: "info",
         message: "Deleting shift...",
-        duration: 2000,
+        duration: Infinity,
       });
     },
 

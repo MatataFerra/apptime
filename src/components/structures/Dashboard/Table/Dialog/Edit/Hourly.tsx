@@ -88,6 +88,12 @@ function TableDialogEditHourly({ shift, user }: Props) {
     }
 
     onEditShift(shiftUpdated, taxesToDelete).then((res) => {
+      Toast({
+        type: "info",
+        message: "Shift is being updated",
+        duration: Infinity,
+      });
+
       if (res) {
         Toast({
           type: "success",
