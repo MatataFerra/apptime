@@ -8,6 +8,9 @@ const Inputs = dynamic(() => import("@/components/structures/Production/Inputs")
   loading: () => (
     <>
       <Stack orientation="vertical" spacing={8} classes="min-h-[50dvh] w-full">
+        <div className="flex w-full gap-4">
+          <Skeleton classes="min-h-14 w-full" />
+        </div>
         <Stack orientation="horizontal" wrap classes="w-full">
           <Skeleton classes="min-h-12 w-full" />
           <Skeleton classes="min-h-12 w-full" />

@@ -11,14 +11,15 @@ const Inputs = dynamic(() => import("@/components/structures/FastCharge/Inputs")
         <Stack orientation="horizontal" wrap classes="w-full">
           <div className="flex w-full gap-4">
             <Skeleton classes="min-h-14 w-full" />
+          </div>
+          <div className="flex w-full gap-4">
+            <Skeleton classes="min-h-14 w-full" />
             <Skeleton classes="min-h-14 w-full" />
           </div>
           <div className="flex w-full gap-4">
             <Skeleton classes="min-h-14 w-full" />
             <Skeleton classes="min-h-14 w-full" />
           </div>
-          <Skeleton classes="min-h-14 w-full" />
-          <Skeleton classes="min-h-14 w-full" />
         </Stack>
         <Stack orientation="vertical" classes="min-h-10 w-full">
           <Skeleton classes="h-8 w-3/4" />

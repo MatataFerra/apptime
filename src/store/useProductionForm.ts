@@ -10,6 +10,7 @@ interface Production {
     isPublicHoliday?: boolean;
     publicHolidayWorked?: boolean;
     unpaidBreaks?: string;
+    name?: string;
   };
 
   errors: {
@@ -52,6 +53,7 @@ export const useProductionForm = create<Production>((set, get) => ({
   values: {
     startDate: "",
     finishDate: "",
+    name: "",
     itemValue: "",
     itemQuantity: "",
     holidayPayRate: "",
@@ -94,13 +96,14 @@ export const useProductionForm = create<Production>((set, get) => ({
   reset: () =>
     set({
       values: {
+        startDate: "",
         finishDate: "",
+        name: "",
         holidayPayRate: "",
         isPublicHoliday: false,
         itemQuantity: "",
         itemValue: "",
         publicHolidayWorked: false,
-        startDate: "",
         unpaidBreaks: "",
       },
       isFormReady: false,

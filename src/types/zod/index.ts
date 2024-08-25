@@ -27,6 +27,7 @@ import Password from "@/services/Auth/password";
 const BaseShiftSchema = z.object({
   startDate: z.string(),
   endDate: z.string().nullable(),
+  name: z.string().nullable(),
   amount: z.number().nullable(),
   isClosed: z.boolean(),
   isPublicHoliday: z.boolean(),
@@ -310,6 +311,7 @@ const FastChargeFormSchema = z.object({
   "finish-time": z.string().refine((value) => !!value, {
     message: "Finish time must be provided",
   }),
+  name: z.string().nullable(),
   "is-public-holiday": z.boolean(),
   "is-public-holiday-worked": z.boolean(),
   "hour-value": z.string().refine((value) => !!value, {
@@ -331,6 +333,7 @@ const FastChargeFormCheckDataSchema = z.object({
 const ProductionJobFormSchema = z.object({
   "start-date": z.string(),
   "finish-date": z.string(),
+  name: z.string().nullable(),
   "item-value": z.string().refine((value) => !!value, {
     message: "Hour value must be greater than 0",
   }),
