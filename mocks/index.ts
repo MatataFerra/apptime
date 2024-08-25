@@ -67,6 +67,7 @@ export const userShiftsMocked: UserType["shifts"] = {
   production: datesMock.map((date, i) => ({
     startDate: date.toString(),
     endDate: addMinutes(date, 125 + i).toString(),
+    name: "Seasonal work in farm",
     itemValue: 10,
     itemQuantity: 10,
     taxCode: 0,
@@ -80,6 +81,7 @@ export const userShiftsMocked: UserType["shifts"] = {
   })),
   hourly: datesMock.map((date, i) => ({
     startDate: date.toString(),
+    name: "Permanent work in factory",
     endDate: addMinutes(date, 125 + i).toString(),
     hourValue: 10,
     holidayPay: true,
@@ -137,6 +139,7 @@ export const userTestData: UserType = {
     production: [
       {
         id: 1,
+        name: "Seasonal work in farm",
         startDate: new Date(Date.now()).toString(),
         endDate: addHours(new Date(Date.now()), 6).toString(),
         amount: differenceInMinutes(addHours(new Date(Date.now()), 6), new Date(Date.now())),
@@ -165,6 +168,7 @@ export const userTestData: UserType = {
     hourly: [
       {
         id: 2,
+        name: "Permanent work in factory",
         startDate: new Date(Date.now()).toString(),
         endDate: addHours(new Date(Date.now()), 8).toString(),
         amount: differenceInMinutes(addHours(new Date(Date.now()), 8), new Date(Date.now())),

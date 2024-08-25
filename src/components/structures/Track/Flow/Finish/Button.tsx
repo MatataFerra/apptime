@@ -11,6 +11,7 @@ import useTrack from "@/hooks/useTrack";
 
 import onUpdateTrackJob from "@/server-actions/update-track";
 import { useNotes } from "@/store/useNotesStore";
+import { useShiftData } from "@/store/useShiftData";
 import { useTrackTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
 
 type Props = {
@@ -23,6 +24,7 @@ type Props = {
 function FinishButton({ buttonStatus }: Props) {
   const queryClient = useQueryClient();
   const { removelocalNote } = useNotes();
+  const { data } = useShiftData((state) => state);
   const {
     taxesModule: { salaryElement: taxes },
     contributionsModule: { salaryElement: contributions },
@@ -41,7 +43,12 @@ function FinishButton({ buttonStatus }: Props) {
 
   function onFinishShift() {
     const currentShift = getShift(shift?.id);
-    const updateTrackedShift = new ShiftService({ ...currentShift, isClosed: true })
+    const prepareShift = {
+      ...currentShift,
+      name: data.name,
+      shiftId: user?.shifts?.id,
+    };
+    const updateTrackedShift = new ShiftService({ ...prepareShift, isClosed: true })
       .closeShift()
       .differenceInMinsBetweenStartAndEnd()
       .checkPublicHoliday()
@@ -89,7 +96,7 @@ function FinishButton({ buttonStatus }: Props) {
           duration: 1000,
         });
 
-        queryClient.refetchQueries({ queryKey: ["user", user?.email] });
+        queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
 
         return;
       }
@@ -97,7 +104,7 @@ function FinishButton({ buttonStatus }: Props) {
       updateShiftsInfo();
       updateShiftUnclosed();
       updateShiftStatus(true);
-      updateShift({ ...currentShift });
+      updateShift({ ...prepareShift });
       // set closing to false
       setIsClosing(false);
 
@@ -109,7 +116,7 @@ function FinishButton({ buttonStatus }: Props) {
         duration: 1000,
       });
 
-      queryClient.refetchQueries({ queryKey: ["user", user?.email] });
+      queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
     });
   }
 

@@ -18,6 +18,7 @@ describe("ShiftService", () => {
     const PRODUCTION_SHIFT_MOCK: Production = {
       startDate: start,
       endDate: null,
+      name: "Seasonal work in farm",
       itemValue: 10,
       itemQuantity: 10,
       amount: 0,
@@ -32,6 +33,7 @@ describe("ShiftService", () => {
     const HOURLY_SHIFT_MOCK: Hourly = {
       startDate: start,
       endDate: null,
+      name: "Permanent work in factory",
       hourValue: 10,
       amount: 0,
       isClosed: false,
@@ -81,6 +83,7 @@ describe("ShiftService", () => {
       expect(shift).toEqual<Hourly>({
         id: HOURLY_SHIFT_MOCK.id,
         startDate: start,
+        name: "Permanent work in factory",
         isPublicHoliday: false,
         notes: HOURLY_SHIFT_MOCK.notes,
         publicHolidayWorked: false,

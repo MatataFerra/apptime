@@ -23,6 +23,7 @@ export const useShiftData = create(
   devtools<ShiftData>(
     (set, get) => ({
       data: {
+        name: "",
         hourValue: 0,
         startDate: "",
         isClosed: false,

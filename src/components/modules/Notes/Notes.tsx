@@ -19,15 +19,13 @@ import {
 
 import { useNotes } from "@/store/useNotesStore";
 
-type Props = {};
-
-function Notes({ children }: PropsWithChildren<Props>) {
+function Notes({ children }: PropsWithChildren) {
   const { open, setOpen } = useNotes();
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent side="top" className="border-none bg-yellow-400 p-0 [&>button]:top-3">
-        <SheetHeader className="bg-yellow-200 p-2">
+        <SheetHeader className="bg-transparent p-2">
           <SheetTitle>
             <Header />
           </SheetTitle>

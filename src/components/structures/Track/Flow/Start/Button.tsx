@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-
 import type { Hourly } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -41,11 +39,12 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
 
     onCreateTrackJob({
       startDate: new Date().toString(),
-      isClosed: false,
-      amount: 0,
       endDate: null,
-      isPublicHoliday: data.isPublicHoliday,
+      name: data.name,
+      amount: 0,
       notes: "",
+      isClosed: false,
+      isPublicHoliday: data.isPublicHoliday,
       publicHolidayWorked: data.publicHolidayWorked,
       hourValue: Number(data.hourValue),
       unpaidBreaks: Number(data.unpaidBreaks),

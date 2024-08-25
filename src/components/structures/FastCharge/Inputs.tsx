@@ -141,6 +141,7 @@ function Inputs() {
       isPublicHoliday: formData["is-public-holiday"] ?? false,
       isWorked: formData["is-public-holiday-worked"] ?? false,
       hourValue: isNaN(Number(formData["hour-value"])) ? 0 : Number(formData["hour-value"]),
+      name: formData["name"],
       unpaidBreaks: isNaN(Number(formData["unpaid-breaks"]))
         ? 0
         : Number(formData["unpaid-breaks"]),
@@ -217,6 +218,7 @@ function Inputs() {
           id: lastId + 1,
           startDate: parseData.startDate,
           endDate: parseData.endDate,
+          name: parseData.name,
           hourValue: parseData.hourValue,
           isPublicHoliday: parseData.isPublicHoliday,
           publicHolidayWorked: parseData.isWorked,
@@ -332,6 +334,16 @@ function Inputs() {
         wrap
         onSubmit={handleSubmit(onSubmit)}
       >
+        <Input
+          label="Name of your job"
+          variant="outlined"
+          type="name"
+          {...register("name", {
+            onChange: (e: ChangeEvent<HTMLInputElement>) => {
+              setValues({ name: e.target.value });
+            },
+          })}
+        />
         <Input
           containerClasses="flex-1"
           classes="h-full"

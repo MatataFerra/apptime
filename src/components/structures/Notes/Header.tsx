@@ -1,15 +1,16 @@
-import Text from "@/components/ui/Text";
+import Input from "@/components/ui/Input";
 
-import useTrack from "@/hooks/useTrack";
+import { useShiftData } from "@/store/useShiftData";
 
 function Header() {
-  const {
-    shiftUnclosed: { shift },
-  } = useTrack();
+  const { setData } = useShiftData((state) => state);
   return (
-    <Text classes="text-left">
-      New note on Shift {`${new Date(shift?.startDate ?? Date.now()).toLocaleDateString()}`}
-    </Text>
+    <Input
+      placeholder="Title your job"
+      variant="outlined"
+      classes="w-full bg-yellow-200 [&>input]:bg-yellow-200"
+      onChange={(e) => setData({ name: e.target.value })}
+    />
   );
 }
 

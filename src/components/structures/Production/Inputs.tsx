@@ -111,6 +111,7 @@ function Inputs() {
       itemQuantity: parseFloat(formData["item-quantity"]),
       isPublicHoliday: formData["is-public-holiday"],
       publicHolidayWorked: formData["is-worked"],
+      name: formData["name"],
       taxes,
       contributions,
     };
@@ -183,14 +184,15 @@ function Inputs() {
           id: lastId + 1,
           startDate: parseData.startDate,
           endDate: parseData.endDate,
-          itemValue: parseData.itemValue,
-          itemQuantity: parseData.itemQuantity,
-          isPublicHoliday: parseData.isPublicHoliday,
-          publicHolidayWorked: parseData.publicHolidayWorked,
+          name: parseData.name,
           amount: 0,
           isClosed: true,
           notes: "",
+          itemValue: parseData.itemValue,
+          itemQuantity: parseData.itemQuantity,
           shiftId: user?.shifts?.id,
+          isPublicHoliday: parseData.isPublicHoliday,
+          publicHolidayWorked: parseData.publicHolidayWorked,
           taxes: parseData.taxes,
           contributions: parseData.contributions,
         },
@@ -293,29 +295,42 @@ function Inputs() {
         onSubmit={handleSubmit(onSubmit)}
       >
         <Input
-          classes="h-full"
-          label="Start date"
-          type="datetime-local"
-          {...register("start-date", {
-            onChange(e) {
-              setValues({ startDate: e.target.value });
+          containerClasses="flex-grow"
+          variant="outlined"
+          label="Name of your job"
+          type="name"
+          {...register("name", {
+            onChange: (e) => {
+              setValues({ name: e.target.value });
             },
           })}
         />
+        <Stack grid cols={2} as="fieldset" classes="w-full">
+          <Input
+            classes="h-full"
+            label="Start date"
+            type="datetime-local"
+            {...register("start-date", {
+              onChange(e) {
+                setValues({ startDate: e.target.value });
+              },
+            })}
+          />
+          <Input
+            classes="h-full"
+            label="Finish date"
+            type="datetime-local"
+            isError={!!errors["finish-date"]}
+            description={errors["finish-date"]?.message}
+            {...register("finish-date", {
+              onChange(e) {
+                setValues({ finishDate: e.target.value });
+              },
+            })}
+          />
+        </Stack>
         <Input
-          classes="h-full"
-          label="Finish date"
-          type="datetime-local"
-          isError={!!errors["finish-date"]}
-          description={errors["finish-date"]?.message}
-          {...register("finish-date", {
-            onChange(e) {
-              setValues({ finishDate: e.target.value });
-            },
-          })}
-        />
-        <Input
-          containerClasses="flex-1"
+          containerClasses="flex-1 sm:flex-auto"
           labelClasses="text-xs"
           label="Value of each item"
           min={0}
@@ -331,7 +346,7 @@ function Inputs() {
           })}
         />
         <Input
-          containerClasses="flex-1"
+          containerClasses="flex-1 sm:flex-auto"
           label="Quantity"
           min={0}
           type="number"

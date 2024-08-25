@@ -93,7 +93,7 @@ function TableDialog({ title, content, shift, type, children }: Props) {
           {step === "info" ? (
             <>
               <DialogHeader>
-                <DialogTitle className="border-b border-gray-800 py-2">{title}</DialogTitle>
+                <DialogTitle className="py-2 text-left text-xl text-slate-800">{title}</DialogTitle>
                 <DialogDescription>
                   <VisualyHidden.Root>
                     Take a quick view about your job, edit it if you need

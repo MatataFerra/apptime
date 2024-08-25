@@ -1,3 +1,5 @@
+import type { Variants } from "@/types/forms";
+
 import Input from "@/components/ui/Input";
 
 import inputLoading from "@/hoc/InputLoading";
@@ -7,16 +9,7 @@ type Props = {
   id: string;
   label: string;
   description: string;
-  variant:
-    | "error"
-    | "default"
-    | "success"
-    | "warning"
-    | "info"
-    | "plane"
-    | "radio"
-    | "underline"
-    | undefined;
+  variant: Variants | undefined;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };

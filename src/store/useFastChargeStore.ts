@@ -4,6 +4,7 @@ interface FastCharge {
   values: {
     startDate?: string;
     finishDate?: string;
+    name?: string;
     hourValue?: string;
     startTime?: string;
     finishTime?: string;
@@ -51,6 +52,7 @@ export const useFastChargeStore = create<FastCharge>((set, get) => ({
     startDate: "",
     finishDate: "",
     hourValue: "",
+    name: "",
     holidayPayRate: "",
     startTime: "",
     finishTime: "",
@@ -92,6 +94,7 @@ export const useFastChargeStore = create<FastCharge>((set, get) => ({
         startDate: "",
         finishDate: "",
         hourValue: "",
+        name: "",
         startTime: "",
         finishTime: "",
         fastHoliday: false,

@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 
 import ChartService from "@/services/Chart";
 
-import { UserType } from "@/types";
+import type { UserType } from "@/types";
 
 const start = "2021-09-01T00:00:00.000Z";
 const end = "2021-09-01T08:00:00.000Z";
@@ -17,6 +17,7 @@ const SHIFTS: UserType["shifts"] = {
       amount: 15,
       startDate: new Date(start).toString(),
       endDate: addHours(new Date(end), 8).toString(),
+      name: "Permanent work in factory",
       id: 15,
       hourValue: 27,
       isClosed: true,
