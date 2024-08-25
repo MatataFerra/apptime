@@ -295,7 +295,8 @@ function Inputs() {
         onSubmit={handleSubmit(onSubmit)}
       >
         <Input
-          containerClasses="flex-1"
+          containerClasses="flex-grow"
+          variant="outlined"
           label="Name of your job"
           type="name"
           {...register("name", {
@@ -304,30 +305,32 @@ function Inputs() {
             },
           })}
         />
+        <Stack grid cols={2} as="fieldset" classes="w-full">
+          <Input
+            classes="h-full"
+            label="Start date"
+            type="datetime-local"
+            {...register("start-date", {
+              onChange(e) {
+                setValues({ startDate: e.target.value });
+              },
+            })}
+          />
+          <Input
+            classes="h-full"
+            label="Finish date"
+            type="datetime-local"
+            isError={!!errors["finish-date"]}
+            description={errors["finish-date"]?.message}
+            {...register("finish-date", {
+              onChange(e) {
+                setValues({ finishDate: e.target.value });
+              },
+            })}
+          />
+        </Stack>
         <Input
-          classes="h-full"
-          label="Start date"
-          type="datetime-local"
-          {...register("start-date", {
-            onChange(e) {
-              setValues({ startDate: e.target.value });
-            },
-          })}
-        />
-        <Input
-          classes="h-full"
-          label="Finish date"
-          type="datetime-local"
-          isError={!!errors["finish-date"]}
-          description={errors["finish-date"]?.message}
-          {...register("finish-date", {
-            onChange(e) {
-              setValues({ finishDate: e.target.value });
-            },
-          })}
-        />
-        <Input
-          containerClasses="flex-1"
+          containerClasses="flex-1 sm:flex-auto"
           labelClasses="text-xs"
           label="Value of each item"
           min={0}
@@ -343,7 +346,7 @@ function Inputs() {
           })}
         />
         <Input
-          containerClasses="flex-1"
+          containerClasses="flex-1 sm:flex-auto"
           label="Quantity"
           min={0}
           type="number"
