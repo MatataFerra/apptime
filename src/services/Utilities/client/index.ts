@@ -54,6 +54,10 @@ class Utilities {
   public static toBool(value: string): boolean {
     return value === "true";
   }
+
+  static delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
 }
 
 export default Utilities;
