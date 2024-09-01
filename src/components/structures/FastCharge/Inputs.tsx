@@ -348,6 +348,8 @@ function Inputs() {
             label="Name of your job"
             variant="outlined"
             type="name"
+            isError={!!errors["name"]}
+            description={errors["name"]?.message}
             onKeyDown={() => setIsWriting(true)}
             {...register("name", {
               onChange: (e: ChangeEvent<HTMLInputElement>) => {

@@ -19,7 +19,7 @@ function Submit() {
     isFormReady,
     setDialogState,
     setFormError,
-    values: { startDate, startTime, finishDate, finishTime },
+    values: { startDate, startTime, finishDate, finishTime, name },
   } = useFastChargeStore((state) => state);
 
   const { setError, setFocus, clearErrors } = useFormContext();
@@ -35,6 +35,7 @@ function Submit() {
   });
 
   function onSubmitAndCheckInputs() {
+    // check if finish date is before than start date
     if (isBefore(new Date(finishDate ?? ""), new Date(startDate ?? ""))) {
       setError("finish-date", {
         message: "Finish date must be after start date",
@@ -53,6 +54,7 @@ function Submit() {
       return;
     }
 
+    // check if both dates are same
     if (isEqual(new Date(formatEnd), new Date(formatStart))) {
       setError("finish-time", {
         message: "Finish time must be after start time",
@@ -71,6 +73,7 @@ function Submit() {
       return;
     }
 
+    // check if finish date is before than start date
     if (isBefore(new Date(formatEnd ?? ""), new Date(formatStart ?? ""))) {
       setError("finish-time", {
         message: "Finish date must be after start date",
@@ -89,6 +92,7 @@ function Submit() {
       return;
     }
 
+    // check if date is valid date
     if (!isValid(new Date(formatEnd))) {
       setError("finish-date", {
         message: "Finish date is invalid",
@@ -106,6 +110,20 @@ function Submit() {
         description: "An error occurred while creating the shift",
         duration: 1500,
       });
+
+      return;
+    }
+
+    const regexNameHasWhiteSpacesAtStart = /^\s+/;
+
+    // check if name field has white spaces at the beginning
+    if (name && regexNameHasWhiteSpacesAtStart.test(name)) {
+      setError("name", {
+        message: "Your title is not valid",
+      });
+      setFocus("name");
+
+      setFormError(true);
 
       return;
     }
