@@ -12,12 +12,15 @@ import type { SuccessApiResponse } from "@/types/api_response";
 import type { ProductionInputs } from "@/types/forms";
 
 import { observer } from "@/components/structures/SalaryItems/observer";
+import DatalistShiftNames from "@/components/structures/ShiftForms/Datalist";
+import { useDatalistStore } from "@/components/structures/ShiftForms/store/useDatalistStore";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
 import useGetUniqueSalaryItems from "@/hooks/useGetUniqueSalaryItems";
 import type { SalaryItems } from "@/hooks/useSalaryItems";
+import useShiftNames from "@/hooks/useShiftNames";
 import useUser from "@/hooks/useUser";
 
 import onCreateProductionShift from "@/server-actions/production-job";
@@ -29,10 +32,11 @@ function Inputs() {
     Custom hook to get the values from the form
   */
   const {
-    setValues,
-    reset: resetValues,
+    setValues: setStoreValues,
+    reset: resetStoreValues,
     setIsFormReady,
     setDialogState,
+    values: { name },
   } = useProductionForm((state) => state);
 
   /*
@@ -50,6 +54,7 @@ function Inputs() {
     register,
     watch,
     reset,
+    setValue,
     formState: { errors },
   } = useFormContext<ProductionInputs>();
 
@@ -60,6 +65,13 @@ function Inputs() {
 
   const queryClient = useQueryClient();
   const { data: user } = useUser();
+  const { names } = useShiftNames(user, watch("name"));
+
+  /*
+    set when user is typing to show datalist
+  */
+  const { setIsWriting } = useDatalistStore((state) => state);
+
   const { uniqueTaxes, uniqueContributions } = useGetUniqueSalaryItems({
     localTaxes: taxes,
     localContributions: contributions,
@@ -224,7 +236,7 @@ function Inputs() {
           duration: 3000,
         });
 
-        resetValues();
+        resetStoreValues();
         clearTaxes();
         clearContributions();
 
@@ -270,7 +282,7 @@ function Inputs() {
 
       setDialogState(false);
 
-      resetValues();
+      resetStoreValues();
       clearTaxes();
       clearContributions();
 
@@ -294,17 +306,23 @@ function Inputs() {
         wrap
         onSubmit={handleSubmit(onSubmit)}
       >
-        <Input
-          containerClasses="flex-grow"
-          variant="outlined"
-          label="Name of your job"
-          type="name"
-          {...register("name", {
-            onChange: (e) => {
-              setValues({ name: e.target.value });
-            },
-          })}
-        />
+        <Stack as="fieldset" orientation="vertical" classes="relative w-full">
+          <Input
+            containerClasses="flex-grow"
+            variant="outlined"
+            label="Name of your job"
+            type="name"
+            isError={!!errors["name"]}
+            description={errors["name"]?.message}
+            onKeyDown={() => setIsWriting(true)}
+            {...register("name", {
+              onChange: (e) => {
+                setStoreValues({ name: e.target.value });
+              },
+            })}
+          />
+          <DatalistShiftNames data={names} setValue={setValue} value={watch("name")} />
+        </Stack>
         <Stack grid cols={2} as="fieldset" classes="w-full">
           <Input
             classes="h-full"
@@ -312,7 +330,7 @@ function Inputs() {
             type="datetime-local"
             {...register("start-date", {
               onChange(e) {
-                setValues({ startDate: e.target.value });
+                setStoreValues({ startDate: e.target.value });
               },
             })}
           />
@@ -324,7 +342,7 @@ function Inputs() {
             description={errors["finish-date"]?.message}
             {...register("finish-date", {
               onChange(e) {
-                setValues({ finishDate: e.target.value });
+                setStoreValues({ finishDate: e.target.value });
               },
             })}
           />
@@ -341,7 +359,7 @@ function Inputs() {
           measurePlace="left"
           {...register("item-value", {
             onChange(e) {
-              setValues({ itemValue: e.target.value });
+              setStoreValues({ itemValue: e.target.value });
             },
           })}
         />
@@ -352,7 +370,7 @@ function Inputs() {
           type="number"
           {...register("item-quantity", {
             onChange(e) {
-              setValues({ itemQuantity: e.target.value });
+              setStoreValues({ itemQuantity: e.target.value });
             },
           })}
         />
@@ -364,7 +382,7 @@ function Inputs() {
               id="production-holiday"
               {...register("is-public-holiday", {
                 onChange(e) {
-                  setValues({ isPublicHoliday: e.target.checked });
+                  setStoreValues({ isPublicHoliday: e.target.checked });
                 },
               })}
             />
@@ -379,7 +397,7 @@ function Inputs() {
               id="production-worked"
               {...register("is-worked", {
                 onChange(e) {
-                  setValues({ publicHolidayWorked: e.target.checked });
+                  setStoreValues({ publicHolidayWorked: e.target.checked });
                 },
               })}
             />

@@ -33,7 +33,7 @@ function useUser() {
     staleTime: 2 * 60 * 1000,
   });
 
-  return { data: data?.user, isLoading, refetch, isFetched };
+  return { data: data?.user as UserType, isLoading, refetch, isFetched };
 }
 
 export default useUser;

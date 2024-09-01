@@ -8,6 +8,7 @@ import isEqual from "lodash/isEqual";
 import { useRouter } from "next/navigation";
 
 import Toast from "@/services/Toast";
+import ut from "@/services/Utilities/client";
 
 import type { HourlyType, UserType } from "@/types";
 
@@ -87,12 +88,14 @@ function TableDialogEditHourly({ shift, user }: Props) {
       return;
     }
 
-    onEditShift(shiftUpdated, taxesToDelete).then((res) => {
+    onEditShift(shiftUpdated, taxesToDelete).then(async (res) => {
       Toast({
         type: "info",
         message: "Shift is being updated",
         duration: Infinity,
       });
+
+      await ut.delay(1500);
 
       if (res) {
         Toast({

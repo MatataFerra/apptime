@@ -13,6 +13,8 @@ import type { SuccessApiResponse } from "@/types/api_response";
 import type { FastChargeInputs } from "@/types/forms";
 
 import { observer } from "@/components/structures/SalaryItems/observer";
+import DatalistShiftNames from "@/components/structures/ShiftForms/Datalist";
+import { useDatalistStore } from "@/components/structures/ShiftForms/store/useDatalistStore";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
@@ -20,6 +22,7 @@ import Text from "@/components/ui/Text";
 import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
 import useGetUniqueSalaryItems from "@/hooks/useGetUniqueSalaryItems";
 import type { SalaryItems } from "@/hooks/useSalaryItems";
+import useShiftNames from "@/hooks/useShiftNames";
 import useUser from "@/hooks/useUser";
 
 import onCreateHourlyShift from "@/server-actions/hourly-job";
@@ -31,9 +34,9 @@ function Inputs() {
     Custom hook to get the values from the form
   */
   const {
-    setValues,
-    reset: resetValues,
-    values: { startDate, finishDate, finishTime, startTime },
+    setValues: setStoreValue,
+    reset: resetStoreValues,
+    values: { startDate, finishDate, finishTime, startTime, name },
     setIsFormReady,
     setDialogState,
   } = useFastChargeStore((state) => state);
@@ -60,6 +63,12 @@ function Inputs() {
 
   const queryClient = useQueryClient();
   const { data: user } = useUser();
+  const { names } = useShiftNames(user, watch("name"));
+
+  /*
+    set when user is typing to show datalist
+  */
+  const { setIsWriting } = useDatalistStore((state) => state);
 
   const { uniqueTaxes, uniqueContributions } = useGetUniqueSalaryItems({
     localTaxes: taxes,
@@ -125,9 +134,9 @@ function Inputs() {
   useEffect(() => {
     if (startDate && !touchedFields["finish-date"]) {
       setValue("finish-date", startDate);
-      setValues({ finishDate: startDate });
+      setStoreValue({ finishDate: startDate });
     }
-  }, [startDate, setValue, touchedFields, setValues]);
+  }, [startDate, setValue, touchedFields, setStoreValue]);
 
   /*
     ================================================================================
@@ -260,7 +269,7 @@ function Inputs() {
           message: "Shift created successfully",
         });
 
-        resetValues();
+        resetStoreValues();
         clearTaxes();
         clearContributions();
 
@@ -307,7 +316,7 @@ function Inputs() {
 
       setDialogState(false);
 
-      resetValues();
+      resetStoreValues();
       clearTaxes();
       clearContributions();
 
@@ -334,16 +343,22 @@ function Inputs() {
         wrap
         onSubmit={handleSubmit(onSubmit)}
       >
-        <Input
-          label="Name of your job"
-          variant="outlined"
-          type="name"
-          {...register("name", {
-            onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              setValues({ name: e.target.value });
-            },
-          })}
-        />
+        <Stack as="fieldset" orientation="vertical" classes="relative w-full">
+          <Input
+            label="Name of your job"
+            variant="outlined"
+            type="name"
+            isError={!!errors["name"]}
+            description={errors["name"]?.message}
+            onKeyDown={() => setIsWriting(true)}
+            {...register("name", {
+              onChange: (e: ChangeEvent<HTMLInputElement>) => {
+                setStoreValue({ name: e.target.value });
+              },
+            })}
+          />
+          <DatalistShiftNames data={names} setValue={setValue} value={watch("name")} />
+        </Stack>
         <Input
           containerClasses="flex-1"
           classes="h-full"
@@ -354,7 +369,7 @@ function Inputs() {
           max={format(new Date(`${thisYear}-12-31`), "yyyy-MM-dd")}
           {...register("start-date", {
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              setValues({ startDate: e.target.value });
+              setStoreValue({ startDate: e.target.value });
             },
 
             required: true,
@@ -370,7 +385,7 @@ function Inputs() {
           max={format(new Date(`${thisYear}-12-31`), "yyyy-MM-dd")}
           {...register("finish-date", {
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              setValues({ finishDate: e.target.value });
+              setStoreValue({ finishDate: e.target.value });
             },
           })}
         />
@@ -382,7 +397,7 @@ function Inputs() {
           description={errors["start-time"]?.message}
           {...register("start-time", {
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              setValues({ startTime: e.target.value });
+              setStoreValue({ startTime: e.target.value });
             },
           })}
         />
@@ -394,7 +409,7 @@ function Inputs() {
           description={errors["finish-time"]?.message}
           {...register("finish-time", {
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              setValues({ finishTime: e.target.value });
+              setStoreValue({ finishTime: e.target.value });
             },
           })}
         />
@@ -407,7 +422,7 @@ function Inputs() {
           measurePlace="left"
           {...register("hour-value", {
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              setValues({ hourValue: e.target.value });
+              setStoreValue({ hourValue: e.target.value });
             },
           })}
         />
@@ -417,7 +432,7 @@ function Inputs() {
           type="number"
           {...register("unpaid-breaks", {
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              setValues({ unpaidBreaks: e.target.value });
+              setStoreValue({ unpaidBreaks: e.target.value });
             },
           })}
         />
@@ -429,7 +444,7 @@ function Inputs() {
               id="fast-is-public-holiday"
               {...register("is-public-holiday", {
                 onChange: (e: ChangeEvent<HTMLInputElement>) => {
-                  setValues({
+                  setStoreValue({
                     fastHoliday: e.target.checked as boolean,
                   });
                 },
@@ -446,7 +461,7 @@ function Inputs() {
               id="fast-is-public-holiday-worked"
               {...register("is-public-holiday-worked", {
                 onChange: (e: ChangeEvent<HTMLInputElement>) => {
-                  setValues({
+                  setStoreValue({
                     fastWorked: e.target.checked as boolean,
                   });
                 },
