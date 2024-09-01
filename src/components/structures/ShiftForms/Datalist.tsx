@@ -24,7 +24,6 @@ function DatalistShiftNames({
 
   useEffect(() => {
     if (!value) return setIsWriting(false);
-    if (value?.length <= 3) setIsWriting(false);
   }, [setIsWriting, value]);
 
   return (

@@ -348,12 +348,7 @@ function Inputs() {
             label="Name of your job"
             variant="outlined"
             type="name"
-            onKeyDown={() => {
-              if (!name) return;
-              if (name?.length <= 3) return;
-
-              setIsWriting(true);
-            }}
+            onKeyDown={() => setIsWriting(true)}
             {...register("name", {
               onChange: (e: ChangeEvent<HTMLInputElement>) => {
                 setStoreValue({ name: e.target.value });
