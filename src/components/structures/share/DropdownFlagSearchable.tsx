@@ -32,7 +32,7 @@ type Props = {
   setSelected?: (value: string) => void;
 };
 
-function DropdownSearchable({
+function DropdownFlagSearchable({
   data,
   staleTitle = "Select item",
   emptyTitle = "No item found",
@@ -88,4 +88,4 @@ function DropdownSearchable({
   );
 }
 
-export default DropdownSearchable;
+export default DropdownFlagSearchable;

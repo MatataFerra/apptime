@@ -307,8 +307,8 @@ module.exports = {
         "dissapear-up": "dissapear-up 0.5s ease-in-out forwards",
         "backdrop-blurry": "backdrop-blurry 0.5s ease-in-out forwards",
         ripple: "ripple .5s ease-in-out",
-        "fade-in": "fade-in .5s ease-out",
-        "fade-out": "fade-out .5s ease-out",
+        "fade-in": "fade-in 250ms ease-out",
+        "fade-out": "fade-out 250ms ease-out",
         "bg-gradient": "bg-gradient 5s ease-in-out infinite",
         "grow-in": "grow-in 150ms ease-out backwards"
       },
