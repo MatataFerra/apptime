@@ -32,10 +32,13 @@ export default async function HomeLayout({ children }: Props) {
     <>
       <main
         vaul-drawer-wrapper=""
-        className="grid h-full min-h-dvh grid-rows-[auto,1fr] gap-8 bg-white p-4"
+        className="grid h-full min-h-dvh grid-rows-[auto,1fr] bg-white [&>*]:p-4"
         data-testid="drawer-close"
       >
-        <Header position="between" classes="relative">
+        <Header
+          position="between"
+          classes="sticky top-0 z-10 bg-white bg-clip-text backdrop-blur-md backdrop-opacity-100 backdrop-filter"
+        >
           <SheetHamMenu>
             <UserInfo />
           </SheetHamMenu>
