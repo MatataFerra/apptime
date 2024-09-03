@@ -13,7 +13,7 @@ export function generateStaticParams() {
 }
 
 export const metadata = {
-  title: "App time!",
+  title: "CasualApp! The app for the casual worker",
   description: "Track your time, and get things done!",
 };
 
