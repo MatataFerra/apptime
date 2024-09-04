@@ -18,7 +18,7 @@ function Logo({ withText }: Props) {
     <Stack
       orientation="horizontal"
       alignItems="center"
-      classes="cursor-pointer"
+      classes="cursor-pointer transition-all active:scale-95 active:transform"
       onClick={() => router.push(PATH_NAMES.HOME)}
     >
       <Img
@@ -29,7 +29,11 @@ function Logo({ withText }: Props) {
         height={0}
       />
       {withText ? (
-        <Text as="h1" gradient="secondary" classes={`text-base font-bold`}>
+        <Text
+          as="h1"
+          gradient="secondary"
+          classes="select-none text-base font-bold active:animate-text active:duration-1000"
+        >
           Casual app
         </Text>
       ) : null}
