@@ -1,3 +1,5 @@
+"use client";
+
 import dynamic from "next/dynamic";
 
 import Dashboard from "@/services/Dashboard";
@@ -9,6 +11,8 @@ import { LocaleParams } from "@/types";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
+
+import useDashboard from "@/hooks/useDashboard";
 
 const Card = dynamic(() => import("@/components/ui/Card"), {
   ssr: false,
@@ -31,6 +35,7 @@ const CarouselItem = dynamic(
   () => import("@/components/ui/Carousel").then((mod) => mod.CarouselItem),
   {
     ssr: false,
+    loading: () => <Skeleton classes="basis-1/2 sm:basis-1/3 md:basis-1/5" />,
   }
 );
 
@@ -43,8 +48,8 @@ type DashboardData = {
   value: string | number;
 };
 
-async function CarouselDashboard({ params }: Props) {
-  const user = await UserService.getSessionUser();
+function CarouselDashboard({ params }: Props) {
+  const { user } = useDashboard();
   const defaultValues = {
     shiftsLen: 0,
     hoursWorked: 0,

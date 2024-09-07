@@ -4,7 +4,7 @@ import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
-const PickupDate = dynamic(() => import("@/components/structures/share/PickupDate"), {
+const PickupDate = dynamic(() => import("@/components/structures/Dashboard/Table/PickupDate"), {
   ssr: false,
   loading: () => <Skeleton classes="h-10 w-2/6" />,
 });

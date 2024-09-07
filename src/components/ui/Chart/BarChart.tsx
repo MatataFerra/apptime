@@ -46,7 +46,10 @@ export default function BarChartComponent({ data, legend, showDates, customLegen
     <Card>
       <CardHeader>
         <CardTitle>Earns per day</CardTitle>
-        <CardDescription>Between all shifts during: {new Date().getFullYear()}</CardDescription>
+        <CardDescription>
+          Shifts up to{" "}
+          <span className="border-b border-b-slate-400 font-bold">{`${data.at(-1).date}`}</span>
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>

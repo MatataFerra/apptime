@@ -1,3 +1,5 @@
+"use client";
+
 import dynamic from "next/dynamic";
 
 import Skeleton from "@/components/ui/Skeleton";
@@ -30,6 +32,6 @@ const Inputs = dynamic(() => import("@/components/structures/FastCharge/Inputs")
   ),
 });
 
-export default async function InputsPage() {
+export default function InputsPage() {
   return <Inputs />;
 }

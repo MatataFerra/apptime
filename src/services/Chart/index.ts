@@ -1,4 +1,5 @@
 import type { Hourly, Production, Shift } from "@prisma/client";
+import { isWithinInterval } from "date-fns";
 import groupBy from "lodash/groupBy";
 
 import DateHumanizer from "@/services/Date";
@@ -11,8 +12,8 @@ import { isProductionShift } from "@/utils/helpers/isProductionShift";
 
 type Shifts =
   | (Shift & {
-      hourly: Hourly[];
-      production: Production[];
+      hourly: Hourly[] | null;
+      production: Production[] | null;
     })
   | null
   | undefined;
@@ -61,6 +62,47 @@ class Chart {
 
   get groupByMonths() {
     return ShiftService.groupShiftsByMonths(this.shiftsByType);
+  }
+
+  /**
+   * @description perior function sets the edges for the shifts
+   * @param start Start date to set the period
+   * @param end End date to set the perior
+   */
+  period(start: Date, end: Date) {
+    const hourly = this.shifts?.hourly
+      ?.map((shift) => {
+        const isInInterval = isWithinInterval(new Date(shift.startDate), {
+          start,
+          end,
+        });
+        if (isInInterval) return shift;
+
+        return null;
+      })
+      .filter((s) => s !== null);
+
+    const production = this.shifts?.production
+      ?.map((shift) => {
+        const isInInterval = isWithinInterval(new Date(shift.startDate), {
+          start,
+          end,
+        });
+        if (isInInterval) return shift;
+
+        return null;
+      })
+      .filter((s) => s !== null);
+
+    if (this.shifts?.hourly && hourly) {
+      this.shifts.hourly = hourly;
+    }
+
+    if (this.shifts?.production && production) {
+      this.shifts.production = production;
+    }
+
+    return this;
   }
 
   earnsPerDay() {
