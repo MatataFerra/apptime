@@ -37,7 +37,7 @@ function DialogProduction({ children }: PropsWithChildren) {
 
   useEffect(() => {
     if (formError) return setDialogState(false);
-  }, [formError, setDialogState]);
+  }, [formError, setDialogState, dialog]);
 
   const calculateEarn = useMemo(() => {
     const prepareShift = {
