@@ -22,10 +22,12 @@ const Inputs = dynamic(() => import("@/components/structures/FastCharge/Inputs")
             <Skeleton classes="min-h-14 w-full" />
             <Skeleton classes="min-h-14 w-full" />
           </div>
+          <Skeleton classes="min-h-14 w-full" />
+          <Skeleton classes="min-h-14 w-full" />
         </Stack>
-        <Stack orientation="vertical" classes="min-h-10 w-full">
-          <Skeleton classes="h-8 w-3/4" />
-          <Skeleton classes="h-8 w-3/4" />
+        <Stack classes="min-h-10 w-full">
+          <Skeleton classes="h-8" />
+          <Skeleton classes="h-8" />
         </Stack>
       </Stack>
     </>
