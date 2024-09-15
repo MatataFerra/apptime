@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useState } from "react";
+import { type PropsWithChildren, useEffect, useState } from "react";
 
 import isEmpty from "lodash/isEmpty";
 import { create } from "zustand";
@@ -54,17 +54,17 @@ function Drawer({
   const [addMoreElements, setAddMoreElements] = useState(false);
   const { isOpen, setIsOpen } = useDrawerSalaryItemsFromDB((state) => state);
 
+  // useEffect(() => {
+  //   console.log("🚀 ~ isOpen:", isOpen);
+  // }, [isOpen]);
+
   return (
     <DrawerContainer shouldScaleBackground={false}>
       <DrawerTrigger asChild>{children}</DrawerTrigger>
       <DrawerContent className={cn(isOpen ? "!scale-90 !transform" : "scale-100 transform")}>
         <DrawerHeader className="text-left">
-          <DrawerTitle className="capitalize">
-            {type === "taxes" ? "taxes" : "contributions"}
-          </DrawerTitle>
-          <DrawerDescription>
-            Add new {type === "taxes" ? "taxes" : "contributions"} or use previous ones
-          </DrawerDescription>
+          <DrawerTitle className="capitalize">{type}</DrawerTitle>
+          <DrawerDescription>Add new {type} or use previous ones</DrawerDescription>
         </DrawerHeader>
         {addMoreElements || !isEmpty(salaryElement) ? (
           <>
@@ -74,7 +74,7 @@ function Drawer({
               classes="w-full animate-fade-in p-4 transition-all repeat-1"
             >
               <Text as="h2" classes="text-sm font-medium">
-                Add new {type === "taxes" ? "taxes" : "contributions"}
+                Add new {type}
               </Text>
               <InputSalaryItem add={add} type={type} />
             </Stack>
@@ -91,7 +91,7 @@ function Drawer({
               classes="m-4 flex h-20 w-full animate-fade-in items-center justify-center border border-dashed border-gray-300 bg-gradient-to-tl from-slate-200 via-slate-200/60 to-slate-300 p-4"
               onClick={() => setAddMoreElements(true)}
             >
-              Click to add more {type === "taxes" ? "taxes" : "contributions"}
+              Click to add more {type}
             </Button>
           </Stack>
         )}

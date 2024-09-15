@@ -3,7 +3,6 @@
 import type { Tax } from "@prisma/client";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import dynamic from "next/dynamic";
-import { create } from "zustand";
 
 import Button from "@/components/ui/Button";
 import {
@@ -57,11 +56,6 @@ export interface Observer {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }
-
-// export const useDrawerSalaryItemsFromDB = create<Observer>((set) => ({
-//   isOpen: false,
-//   setIsOpen: (isOpen) => set({ isOpen }),
-// }));
 
 function DrawerSalaryItemsFromDB({
   add,
