@@ -65,12 +65,14 @@ export async function GET(req: NextRequest) {
                 taxes: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
                 contributions: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
               },
+              take: -20,
             },
             production: {
               include: {
                 taxes: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
                 contributions: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
               },
+              take: -20,
             },
           },
         },
