@@ -13,8 +13,11 @@ import TableElement from "@/components/ui/TableElement";
 
 import useHumanizeDate from "@/hooks/useHumanizeDate";
 
+import { useDashProductionStore } from "@/store/useDashProductionStore";
+
 function ProductionRow({ shift }: { shift: Production }) {
   const shortDate = useHumanizeDate({ date: shift.startDate, typeFormat: "short" });
+  const { delete: deleteProduction, reset } = useDashProductionStore();
 
   const calculateEarnings = useCallback((shift: Production) => {
     return new ShiftService({
@@ -27,6 +30,8 @@ function ProductionRow({ shift }: { shift: Production }) {
   return (
     <Dialog
       title="Info about this shift"
+      delete={deleteProduction}
+      reset={reset}
       shift={shift}
       type="production"
       content={<Content shift={shift} />}

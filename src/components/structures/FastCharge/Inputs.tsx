@@ -8,7 +8,7 @@ import { format } from "date-fns";
 
 import Toast from "@/services/Toast";
 
-import { FastChargeFormCheckDataSchema, type UserType } from "@/types";
+import { FastChargeFormCheckDataSchema, HourlyType, type UserType } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 import type { FastChargeInputs } from "@/types/forms";
 
@@ -19,6 +19,7 @@ import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
+import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
 import useGetUniqueSalaryItems from "@/hooks/useGetUniqueSalaryItems";
 import type { SalaryItems } from "@/hooks/useSalaryItems";
@@ -36,7 +37,7 @@ function Inputs() {
   const {
     setValues: setStoreValue,
     reset: resetStoreValues,
-    values: { startDate, finishDate, finishTime, startTime, name },
+    values: { startDate, finishDate, finishTime, startTime },
     setIsFormReady,
     setDialogState,
   } = useFastChargeStore((state) => state);
@@ -165,17 +166,16 @@ function Inputs() {
       duration: Infinity,
     });
 
-    const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
-      "user",
-      user?.email,
+    const previousUserData = queryClient.getQueryData<SuccessApiResponse<HourlyType[]>>([
+      USE_QUERY_KEYS.HOURLY,
     ]);
 
     const previousSalaryItemsData = queryClient.getQueryData<SuccessApiResponse<SalaryItems>>([
-      "salary",
+      USE_QUERY_KEYS.SALARY,
     ]);
 
     //* Optimistic update
-    queryClient.cancelQueries({ queryKey: ["salary"] }).then(() => {
+    queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.SALARY] }).then(() => {
       const prevTaxes = previousSalaryItemsData?.salaryItems.taxes.map((taxes) => {
         return {
           ...taxes,
@@ -218,11 +218,11 @@ function Inputs() {
     });
 
     //* Optimistic update
-    queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
-      const lastId = previousUserData?.user?.shifts?.hourly?.at(-1)?.id ?? Math.random();
+    queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] }).then(() => {
+      const lastId = previousUserData?.hourly?.at(-1)?.id ?? Math.random();
 
       const newHourly = [
-        ...(previousUserData?.user?.shifts?.hourly ?? []),
+        ...(previousUserData?.hourly ?? []),
         {
           id: lastId + 1,
           startDate: parseData.startDate,
@@ -241,17 +241,10 @@ function Inputs() {
         },
       ];
 
-      queryClient.setQueryData(["user", user?.email], {
+      queryClient.setQueryData([USE_QUERY_KEYS.HOURLY], {
         ...previousUserData,
-        user: {
-          ...previousUserData?.user,
-          profile: {
-            ...previousUserData?.user.profile,
-          },
-          shifts: {
-            ...previousUserData?.user.shifts,
-            hourly: newHourly,
-          },
+        hourly: {
+          ...newHourly,
         },
       });
 
@@ -277,34 +270,31 @@ function Inputs() {
       }
 
       queryClient.invalidateQueries({
-        queryKey: ["user", user?.email],
+        queryKey: [USE_QUERY_KEYS.USER, user?.email],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["salary"],
+        queryKey: [USE_QUERY_KEYS.SALARY],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [USE_QUERY_KEYS.HOURLY],
       });
 
       // reset state if the shift was not created
-      queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
-        queryClient.setQueryData(["user", user?.email], {
+      queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] }).then(() => {
+        queryClient.setQueryData([USE_QUERY_KEYS.HOURLY], {
           ...previousUserData,
-          user: {
-            ...previousUserData?.user,
-            profile: {
-              ...previousUserData?.user.profile,
-            },
-            shifts: {
-              ...previousUserData?.user.shifts,
-              hourly: previousUserData?.user.shifts?.hourly,
-            },
+          hourly: {
+            ...previousUserData?.hourly,
           },
         });
 
         return { previousUserData };
       });
 
-      queryClient.cancelQueries({ queryKey: ["salary"] }).then(() => {
-        queryClient.setQueryData(["salary"], {
+      queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.SALARY] }).then(() => {
+        queryClient.setQueryData([USE_QUERY_KEYS.SALARY], {
           ...previousSalaryItemsData,
           salaryItems: {
             ...previousSalaryItemsData?.salaryItems,

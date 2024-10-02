@@ -8,7 +8,7 @@ import ShiftService from "@/services/Shift";
 
 import TableElement from "@/components/ui/TableElement";
 
-import useDashboard from "@/hooks/useDashboard";
+import { useDashHourlyStore } from "@/store/useDashHourlyStore";
 
 function getHours(shift: Hourly) {
   const getDiff = new ShiftService(shift).differenceInMinsBetweenStartAndEnd().build().amount;
@@ -16,20 +16,20 @@ function getHours(shift: Hourly) {
 }
 
 function FooterValues() {
-  const { user } = useDashboard();
+  const { hourly } = useDashHourlyStore();
   function calculateEarnings(shift: Hourly) {
     return new ShiftService(shift).calculateEarnings();
   }
 
   const totalEarnings = useMemo(() => {
-    return user?.shifts?.hourly.reduce((acc, shift) => acc + calculateEarnings(shift), 0);
-  }, [user?.shifts?.hourly]);
+    return hourly?.reduce((acc, shift) => acc + calculateEarnings(shift), 0);
+  }, [hourly]);
 
   const sumHours = useMemo(() => {
-    return user?.shifts?.hourly.reduce((acc, shift) => {
+    return hourly?.reduce((acc, shift) => {
       return acc + (getHours(shift) ?? 0);
     }, 0);
-  }, [user?.shifts?.hourly]);
+  }, [hourly]);
 
   return (
     <>

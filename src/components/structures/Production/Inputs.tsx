@@ -7,7 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import Toast from "@/services/Toast";
 
-import { ProductionJobFormCheckDataSchema, type UserType } from "@/types";
+import { ProductionJobFormCheckDataSchema, ProductionType, type UserType } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 import type { ProductionInputs } from "@/types/forms";
 
@@ -18,6 +18,7 @@ import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
+import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import useGetUniqueSalaryItems from "@/hooks/useGetUniqueSalaryItems";
 import type { SalaryItems } from "@/hooks/useSalaryItems";
 import useShiftNames from "@/hooks/useShiftNames";
@@ -132,20 +133,19 @@ function Inputs() {
       type: "info",
       message: "Your request is being processed",
       description: "Please wait a moment...",
-      duration: 1000,
+      duration: Infinity,
     });
 
-    const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
-      "user",
-      user?.email,
+    const previousUserData = queryClient.getQueryData<SuccessApiResponse<ProductionType[]>>([
+      USE_QUERY_KEYS.PRODUCTION,
     ]);
 
     const previousSalaryItemsData = queryClient.getQueryData<SuccessApiResponse<SalaryItems>>([
-      "salary",
+      USE_QUERY_KEYS.SALARY,
     ]);
 
     //* Optimistic update
-    queryClient.cancelQueries({ queryKey: ["salary"] }).then(() => {
+    queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.SALARY] }).then(() => {
       const prevTaxes = previousSalaryItemsData?.salaryItems.taxes.map((taxes) => {
         return {
           ...taxes,
@@ -188,10 +188,10 @@ function Inputs() {
     });
 
     //* Optimistic update
-    queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
-      const lastId = previousUserData?.user?.shifts?.production?.at(-1)?.id ?? Math.random();
+    queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.PRODUCTION] }).then(() => {
+      const lastId = previousUserData?.production?.at(-1)?.id ?? Math.random();
       const newProduction = [
-        ...(previousUserData?.user?.shifts?.production ?? []),
+        ...(previousUserData?.production ?? []),
         {
           id: lastId + 1,
           startDate: parseData.startDate,
@@ -210,14 +210,10 @@ function Inputs() {
         },
       ];
 
-      queryClient.setQueryData(["user", user?.email], {
+      queryClient.setQueryData([USE_QUERY_KEYS.PRODUCTION], {
         ...previousUserData,
-        user: {
-          ...previousUserData?.user,
-          shifts: {
-            ...previousUserData?.user.shifts,
-            production: newProduction,
-          },
+        production: {
+          ...newProduction,
         },
       });
 
@@ -244,33 +240,30 @@ function Inputs() {
       }
 
       queryClient.invalidateQueries({
-        queryKey: ["user", user?.email],
+        queryKey: [USE_QUERY_KEYS.USER, user?.email],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["salary"],
+        queryKey: [USE_QUERY_KEYS.SALARY],
       });
 
-      queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
-        queryClient.setQueryData(["user", user?.email], {
+      queryClient.invalidateQueries({
+        queryKey: [USE_QUERY_KEYS.PRODUCTION],
+      });
+
+      queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.PRODUCTION] }).then(() => {
+        queryClient.setQueryData([USE_QUERY_KEYS.PRODUCTION], {
           ...previousUserData,
-          user: {
-            ...previousUserData?.user,
-            profile: {
-              ...previousUserData?.user.profile,
-            },
-            shifts: {
-              ...previousUserData?.user.shifts,
-              production: previousUserData?.user.shifts?.production,
-            },
+          production: {
+            ...previousUserData?.production,
           },
         });
 
         return { previousUserData };
       });
 
-      queryClient.cancelQueries({ queryKey: ["salary"] }).then(() => {
-        queryClient.setQueryData(["salary"], {
+      queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.SALARY] }).then(() => {
+        queryClient.setQueryData([USE_QUERY_KEYS.SALARY], {
           ...previousSalaryItemsData,
           salaryItems: {
             ...previousSalaryItemsData?.salaryItems,

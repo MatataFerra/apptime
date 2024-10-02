@@ -6,10 +6,10 @@ import ShiftService from "@/services/Shift";
 
 import TableElement from "@/components/ui/TableElement";
 
-import useDashboard from "@/hooks/useDashboard";
+import { useDashProductionStore } from "@/store/useDashProductionStore";
 
 function FooterValues() {
-  const { user } = useDashboard();
+  const { productions } = useDashProductionStore();
   function calculateEarnings(shift: Production) {
     return new ShiftService({
       itemQuantity: shift?.itemQuantity ?? 0,
@@ -19,11 +19,11 @@ function FooterValues() {
   }
 
   function totalEarnings() {
-    return user?.shifts?.production?.reduce((acc, shift) => acc + calculateEarnings(shift), 0);
+    return productions?.reduce((acc, shift) => acc + calculateEarnings(shift), 0);
   }
 
   function sumProduction() {
-    return user?.shifts?.production?.reduce((acc, shift) => {
+    return productions?.reduce((acc, shift) => {
       return acc + (shift?.itemQuantity ? shift.itemQuantity : 0);
     }, 0);
   }

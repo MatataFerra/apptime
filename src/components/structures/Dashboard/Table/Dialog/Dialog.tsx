@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/Dialog";
 import Stack from "@/components/ui/Stack";
 
+import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import useDashboard from "@/hooks/useDashboard";
 
 import { useTableStore } from "@/store/useTableStore";
@@ -36,14 +37,25 @@ type Props = PropsWithChildren<{
   shift: Hourly | Production;
   content: ReactNode;
   type: "hourly" | "production";
+  delete: (id: number) => void;
+  reset: () => void;
 }>;
 
-function TableDialog({ title, content, shift, type, children }: Props) {
+function TableDialog({
+  title,
+  content,
+  shift,
+  type,
+  children,
+  delete: deleteShift,
+  reset: resetShifts,
+}: Props) {
   const { setStep, step } = useTableStore((state) => state);
-  const { user, update, deleteShift } = useDashboard();
+  const { user } = useDashboard();
   const { reset } = useTaxesHandlerDelete((state) => state);
   const queryClient = useQueryClient();
   const router = useRouter();
+
   const { mutate } = useMutation({
     mutationFn: (type === "hourly"
       ? api.deleteHourly.bind(api)
@@ -68,14 +80,18 @@ function TableDialog({ title, content, shift, type, children }: Props) {
     },
 
     onError: () => {
-      update({ shifts: user?.shifts });
+      //! update({ shifts: user?.shifts });
+
+      resetShifts();
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
+      queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.USER, user?.email] });
+      queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
       router.refresh();
     },
   });
+
   return (
     <>
       <Dialog
