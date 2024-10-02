@@ -2,10 +2,10 @@
 
 import ChartService from "@/services/Chart";
 
-import type { UserType } from "@/types";
-
 import AreaChartComponent from "@/components/ui/Chart/AreaChart";
-import Line from "@/components/ui/Chart/Line";
+
+import useHourlyShifts from "@/hooks/useHourlyShifts";
+import useProductionShifts from "@/hooks/useProductionShifts";
 
 // Override console.error
 // This is a hack to suppress the warning about missing defaultProps in recharts library as of version 2.12
@@ -18,12 +18,10 @@ console.error = (...args: any) => {
   error(...args);
 };
 
-type Props = {
-  user: UserType | null | undefined;
-};
-
-function CompareShifts({ user }: Props) {
-  const earnsPerType = new ChartService(user?.shifts).earnsPerType();
+function CompareShifts() {
+  const { data: hourlies } = useHourlyShifts();
+  const { data: productions } = useProductionShifts();
+  const earnsPerType = new ChartService(hourlies, productions).earnsPerType();
 
   return <AreaChartComponent data={earnsPerType} />;
 }

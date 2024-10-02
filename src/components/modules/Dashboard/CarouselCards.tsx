@@ -4,7 +4,6 @@ import dynamic from "next/dynamic";
 
 import Dashboard from "@/services/Dashboard";
 import DateHumanizer from "@/services/Date";
-import UserService from "@/services/User";
 
 import { LocaleParams } from "@/types";
 
@@ -12,7 +11,8 @@ import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
-import useDashboard from "@/hooks/useDashboard";
+import useHourlyShifts from "@/hooks/useHourlyShifts";
+import useProductionShifts from "@/hooks/useProductionShifts";
 
 const Card = dynamic(() => import("@/components/ui/Card"), {
   ssr: false,
@@ -49,7 +49,8 @@ type DashboardData = {
 };
 
 function CarouselDashboard({ params }: Props) {
-  const { user } = useDashboard();
+  const { data: hourlies } = useHourlyShifts();
+  const { data: productions } = useProductionShifts();
   const defaultValues = {
     shiftsLen: 0,
     hoursWorked: 0,
@@ -65,7 +66,7 @@ function CarouselDashboard({ params }: Props) {
     estimatedWeeklyEarnings,
     hourValue,
     hoursWorked,
-  } = !user ? defaultValues : new Dashboard(user).dashboardData();
+  } = !hourlies ? defaultValues : new Dashboard(hourlies, productions).dashboardData();
 
   const humanizedLastDayRegistered = !!new Date(lastDayRegistered).valueOf()
     ? new DateHumanizer("short").humanizeDate(new Date(lastDayRegistered), {
