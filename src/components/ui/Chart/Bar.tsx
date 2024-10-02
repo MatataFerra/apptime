@@ -51,9 +51,7 @@ function Chart(props: Props) {
         />
         <Tooltip
           cursor={{ fill: "#e6faffb2" }}
-          content={
-            <CustomChartTooltip legend={legend} customLegend={customLegend} showDates={showDates} />
-          }
+          content={<CustomChartTooltip legend={legend} customLegend={customLegend} />}
         />
         <Legend
           content={<ChartLegend legend={legend} color={ColorService.getColor(color)} />}

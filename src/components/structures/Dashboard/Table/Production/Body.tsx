@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import type { Production } from "@prisma/client";
 import isEmpty from "lodash/isEmpty";
@@ -11,13 +11,26 @@ import Row from "@/components/structures/Dashboard/Table/Production/Row";
 import TableBody from "@/components/ui/TableBody";
 
 import useDashboard from "@/hooks/useDashboard";
+import useProductionShifts from "@/hooks/useProductionShifts";
+
+import { useDashProductionStore } from "@/store/useDashProductionStore";
 
 function ProductionBody() {
-  const { user } = useDashboard();
+  const { setInitialProductions, productions } = useDashProductionStore();
+  const { isDateFiltered } = useDashboard();
+  const { data, isLoading } = useProductionShifts();
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (isEmpty(data)) return;
+    if (isDateFiltered) return;
+
+    setInitialProductions(data);
+  }, [data, isDateFiltered, isLoading, setInitialProductions]);
 
   const productionShifts = useMemo(() => {
-    return user?.shifts?.production;
-  }, [user?.shifts?.production]);
+    return productions ? productions : [];
+  }, [productions]);
 
   return (
     <TableBody>

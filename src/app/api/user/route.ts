@@ -58,24 +58,7 @@ export async function GET(req: NextRequest) {
         email: parsedSearchParams?.data?.email ?? "",
       },
       include: {
-        shifts: {
-          include: {
-            hourly: {
-              include: {
-                taxes: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
-                contributions: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
-              },
-              take: -20,
-            },
-            production: {
-              include: {
-                taxes: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
-                contributions: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
-              },
-              take: -20,
-            },
-          },
-        },
+        shifts: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
         profile: JSON.parse(parsedSearchParams.data.profile ?? "false"),
         config: JSON.parse(parsedSearchParams.data.config ?? "false"),
       },

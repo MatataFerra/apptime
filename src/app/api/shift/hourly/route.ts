@@ -1,5 +1,6 @@
-import { Hourly, Prisma } from "@prisma/client";
+import { type Hourly, Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
 import ErrorFactory from "@/services/Error/factory";
 import ShiftService from "@/services/Shift";
@@ -63,4 +64,63 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+export async function GET(req: NextRequest) {
+  const checkToken = await getToken({ req });
+
+  if (!checkToken) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const hourly = await prisma?.$transaction(async (ctx) => {
+    const email = checkToken?.email;
+
+    if (!email) {
+      return {
+        response: false,
+        message: "Email not found",
+      };
+    }
+
+    const user = await ctx?.user.findUnique({
+      where: {
+        email: email,
+      },
+      include: {
+        shifts: true,
+      },
+    });
+
+    if (!user) {
+      return {
+        response: false,
+        message: "User not found",
+      };
+    }
+
+    const hourlyShifts = await ctx?.hourly.findMany({
+      where: {
+        shiftId: user?.shifts?.id,
+      },
+      include: {
+        taxes: true,
+      },
+    });
+
+    return hourlyShifts;
+  });
+
+  if (!hourly) {
+    return NextResponse.json(hourly, { status: 400 });
+  }
+
+  return NextResponse.json(
+    {
+      message: "success",
+      response: true,
+      hourly,
+    },
+    { status: 200 }
+  );
 }

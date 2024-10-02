@@ -2,14 +2,17 @@
 
 import { type PropsWithChildren, useEffect } from "react";
 
-import useDashboard from "@/hooks/useDashboard";
+import { useDashHourlyStore } from "@/store/useDashHourlyStore";
+import { useDashProductionStore } from "@/store/useDashProductionStore";
 
 export default function Template({ children }: PropsWithChildren) {
-  const { resetShifts } = useDashboard();
+  const { reset: resetProduction } = useDashProductionStore();
+  const { reset: resetHourly } = useDashHourlyStore();
 
   useEffect(() => {
     return () => {
-      resetShifts();
+      resetProduction();
+      resetHourly();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -29,8 +29,16 @@ export async function GET(req: NextRequest) {
       include: {
         shifts: {
           include: {
-            hourly: true,
-            production: true,
+            hourly: {
+              include: {
+                taxes: true,
+              },
+            },
+            production: {
+              include: {
+                taxes: true,
+              },
+            },
           },
         },
         profile: true,
@@ -48,7 +56,19 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const dashboardService = new DashboardService(user);
+    if (!user.shifts?.hourly) {
+      return NextResponse.json(
+        {
+          error: ErrorFactory.createError("CustomError", {
+            message: "No shifts found",
+          }),
+          response: false,
+        },
+        { status: 404 }
+      );
+    }
+
+    const dashboardService = new DashboardService(user.shifts?.hourly, user.shifts?.production);
 
     return NextResponse.json({
       message: "success",

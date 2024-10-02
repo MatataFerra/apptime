@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import type { Hourly } from "@prisma/client";
 import isEmpty from "lodash/isEmpty";
@@ -11,17 +11,30 @@ import Row from "@/components/structures/Dashboard/Table/Hourly/Row";
 import TableBody from "@/components/ui/TableBody";
 
 import useDashboard from "@/hooks/useDashboard";
+import useHourlyShifts from "@/hooks/useHourlyShifts";
+
+import { useDashHourlyStore } from "@/store/useDashHourlyStore";
 
 function HourlyBody() {
-  const { user, isLoadingUserData } = useDashboard();
+  const { setInitialHourlies, hourly } = useDashHourlyStore();
+  const { data, isLoading } = useHourlyShifts();
+  const { isDateFiltered } = useDashboard();
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (isEmpty(data)) return;
+    if (isDateFiltered) return;
+
+    setInitialHourlies(data);
+  }, [data, isDateFiltered, isLoading, setInitialHourlies]);
 
   const hourlyWorkedShift = useMemo(() => {
-    return user?.shifts?.hourly;
-  }, [user?.shifts?.hourly]);
+    return hourly ? hourly : [];
+  }, [hourly]);
 
   return (
     <TableBody>
-      {isLoadingUserData ? (
+      {isLoading ? (
         <tr>
           <td colSpan={4} className="p-8 text-center">
             Waiting for data...

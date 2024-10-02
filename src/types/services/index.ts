@@ -61,23 +61,6 @@ export interface InterfaceConfig {
   };
 }
 
-export interface DashboardInterface {
-  user: UserType;
-  get shiftsLen(): number;
-  get hoursWorked(): number;
-  get averageHoursWorkedPerDay(): number;
-  get lastDayRegistered(): string;
-  estimatedWeeklyEarnings({ weekStartsOn }: { weekStartsOn?: keyof typeof DAYS }): number;
-  dashboardData(): {
-    shiftsLen: number;
-    hoursWorked: number;
-    averageHoursWorkedPerDay: number;
-    hourValue: number;
-    lastDayRegistered: string;
-    estimatedWeeklyEarnings: number;
-  };
-}
-
 // Days
 export const DAYS = {
   sunday: 0,
