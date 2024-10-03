@@ -7,6 +7,8 @@ import ShiftService from "@/services/Shift";
 
 import { HourlyCreateSchema } from "@/types";
 
+import prisma from "#/prisma/client";
+
 export async function POST(req: NextRequest) {
   const body: Hourly = await req.json();
   const parsedBody = HourlyCreateSchema.safeParse(body);
