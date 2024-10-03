@@ -10,7 +10,7 @@ function DatalistShiftNames({
   setValue,
   value,
 }: {
-  data: string[];
+  data: string[] | undefined;
   value: string | null;
   setValue: (name: string | any, value: string | boolean | null, config?: Object) => void;
 }) {

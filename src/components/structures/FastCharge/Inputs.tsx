@@ -8,7 +8,7 @@ import { format } from "date-fns";
 
 import Toast from "@/services/Toast";
 
-import { FastChargeFormCheckDataSchema, HourlyType, type UserType } from "@/types";
+import { FastChargeFormCheckDataSchema, type HourlyType } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 import type { FastChargeInputs } from "@/types/forms";
 
@@ -247,9 +247,7 @@ function Inputs() {
 
       queryClient.setQueryData([USE_QUERY_KEYS.HOURLY], {
         ...previousUserData,
-        hourly: {
-          ...newHourly,
-        },
+        hourly: [...newHourly],
       });
 
       return { previousUserData };
@@ -289,9 +287,7 @@ function Inputs() {
       queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] }).then(() => {
         queryClient.setQueryData([USE_QUERY_KEYS.HOURLY], {
           ...previousUserData,
-          hourly: {
-            ...previousUserData?.hourly,
-          },
+          hourly: previousUserData?.hourly,
         });
 
         return { previousUserData };

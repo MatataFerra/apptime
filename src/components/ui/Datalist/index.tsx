@@ -3,7 +3,7 @@ import { forwardRef, type LiHTMLAttributes, type Ref } from "react";
 import isEmpty from "lodash/isEmpty";
 
 interface DataListProps extends LiHTMLAttributes<HTMLLIElement> {
-  data: string[];
+  data: string[] | undefined;
 }
 
 function Datalist({ data, onClick, ...rest }: DataListProps, ref: Ref<HTMLUListElement>) {
