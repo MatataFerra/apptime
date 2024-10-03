@@ -7,6 +7,8 @@ import ShiftService from "@/services/Shift";
 
 import { ProductionCreateSchema } from "@/types";
 
+import prisma from "#/prisma/client";
+
 export async function POST(req: NextRequest) {
   const body: Production = await req.json();
   const parsedBody = ProductionCreateSchema.safeParse(body);
