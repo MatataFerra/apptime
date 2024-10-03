@@ -126,7 +126,7 @@ function DialogHourly({ children }: PropsWithChildren) {
           <DialogValue content="Pay details">
             <Text classes="text-sm">Public holiday: {fastHoliday ? "Yes" : "No"}</Text>
             <Text classes="text-sm">Public holiday worked: {fastWorked ? "Yes" : "No"}</Text>
-            {unpaidBreaks ? <Text classes="text-sm">Unpaid time ${unpaidBreaks}min.</Text> : null}
+            {unpaidBreaks ? <Text classes="text-sm">Unpaid time: {unpaidBreaks}min.</Text> : null}
             <Stack>
               <Text classes="rounded-md bg-gradient-to-tl from-lime-400/60 via-green-400 to-teal-500/60 px-2 py-1 text-sm font-bold">
                 You will earn: ${calculateEarn.sharp.toFixed(2)}
