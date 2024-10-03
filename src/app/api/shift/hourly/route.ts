@@ -79,7 +79,6 @@ export async function GET(req: NextRequest) {
     if (!email) {
       return {
         response: false,
-        message: "Email not found",
       };
     }
 
@@ -95,7 +94,6 @@ export async function GET(req: NextRequest) {
     if (!user) {
       return {
         response: false,
-        message: "User not found",
       };
     }
 
@@ -112,7 +110,7 @@ export async function GET(req: NextRequest) {
   });
 
   if (!hourly) {
-    return NextResponse.json(hourly, { status: 400 });
+    return NextResponse.json({ message: "Something went wrong", hourly }, { status: 400 });
   }
 
   return NextResponse.json(

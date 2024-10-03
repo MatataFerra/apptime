@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 
+import isArray from "lodash/isArray";
+
 import type { HourlyType, ProductionType } from "@/types";
 
 type Shifts = {

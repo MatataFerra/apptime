@@ -7,7 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import Toast from "@/services/Toast";
 
-import { ProductionJobFormCheckDataSchema, ProductionType, type UserType } from "@/types";
+import { ProductionJobFormCheckDataSchema, type ProductionType } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 import type { ProductionInputs } from "@/types/forms";
 
@@ -216,9 +216,7 @@ function Inputs() {
 
       queryClient.setQueryData([USE_QUERY_KEYS.PRODUCTION], {
         ...previousUserData,
-        production: {
-          ...newProduction,
-        },
+        production: [...newProduction],
       });
 
       return { previousUserData };
@@ -258,9 +256,7 @@ function Inputs() {
       queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.PRODUCTION] }).then(() => {
         queryClient.setQueryData([USE_QUERY_KEYS.PRODUCTION], {
           ...previousUserData,
-          production: {
-            ...previousUserData?.production,
-          },
+          production: previousUserData?.production,
         });
 
         return { previousUserData };
