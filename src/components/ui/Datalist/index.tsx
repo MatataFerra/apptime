@@ -15,7 +15,7 @@ function Datalist({ data, onClick, ...rest }: DataListProps, ref: Ref<HTMLUListE
           ref={ref}
           className="absolute top-full z-10 w-full animate-fade-in space-y-2 border border-t-0 border-slate-300 bg-white py-2 text-slate-500/80 shadow-md"
         >
-          {data.map((name) => (
+          {data?.map((name) => (
             <li
               role="listitem"
               onClick={onClick}

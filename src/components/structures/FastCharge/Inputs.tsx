@@ -22,6 +22,8 @@ import Text from "@/components/ui/Text";
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
 import useGetUniqueSalaryItems from "@/hooks/useGetUniqueSalaryItems";
+import useHourlyShifts from "@/hooks/useHourlyShifts";
+import useProductionShifts from "@/hooks/useProductionShifts";
 import type { SalaryItems } from "@/hooks/useSalaryItems";
 import useShiftNames from "@/hooks/useShiftNames";
 import useUser from "@/hooks/useUser";
@@ -64,7 +66,9 @@ function Inputs() {
 
   const queryClient = useQueryClient();
   const { data: user } = useUser();
-  const { names } = useShiftNames(user, watch("name"));
+  const { data: hourly } = useHourlyShifts();
+  const { data: production } = useProductionShifts();
+  const { names } = useShiftNames({ hourly, production }, watch("name"));
 
   /*
     set when user is typing to show datalist
