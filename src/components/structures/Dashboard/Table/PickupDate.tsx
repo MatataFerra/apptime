@@ -11,14 +11,18 @@ import Stack from "@/components/ui/Stack";
 import useDashboard from "@/hooks/useDashboard";
 import useDelayed from "@/hooks/useDelayed";
 
+import { useDashHourlyStore } from "@/store/useDashHourlyStore";
+import { useDashProductionStore } from "@/store/useDashProductionStore";
 import { useRangeSelected } from "@/store/useRangeSelected";
 
 function PickupDate() {
   const { isRangeSelected, setDate, setIsRangeSelected, resetRange } = useRangeSelected(
     (state) => state
   );
+  const { setIsDateFiltered } = useDashboard();
   const isRangeSelectedDelayed = useDelayed(isRangeSelected, 500);
-  const { filterByDate, resetShifts } = useDashboard();
+  const { filterByDate: filterHourlies, reset: resetHourlies } = useDashHourlyStore();
+  const { filterByDate: filterProductions, reset: resetProductions } = useDashProductionStore();
 
   useEffect(() => {
     resetRange();
@@ -26,7 +30,9 @@ function PickupDate() {
   }, [resetRange, setIsRangeSelected]);
 
   function onFilterByDate(date: DateRange | undefined) {
-    filterByDate(date);
+    filterHourlies(date);
+    filterProductions(date);
+    setIsDateFiltered(true);
   }
 
   return (
@@ -38,7 +44,9 @@ function PickupDate() {
           onClick={() => {
             setDate(undefined);
             setIsRangeSelected(false);
-            resetShifts();
+            setIsDateFiltered(false);
+            resetHourlies();
+            resetProductions();
           }}
         >
           <Icon.cancel width="100%" height="100%" viewBox="0 0 20 18" />

@@ -205,7 +205,7 @@ class ShiftService implements ShiftServiceInterface {
   }
 
   static sortAllShifts(
-    shifts: (Production | Hourly)[] | undefined,
+    shifts: ((Production | Hourly) & { type: "hourly" | "production" })[] | undefined,
     { desc = true }: { desc?: boolean } = {}
   ) {
     if (!shifts) return null;

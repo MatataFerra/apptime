@@ -14,6 +14,8 @@ import TableElement from "@/components/ui/TableElement";
 
 import useHumanizeDate from "@/hooks/useHumanizeDate";
 
+import { useDashHourlyStore } from "@/store/useDashHourlyStore";
+
 const TableDialog = dynamic(() => import("@/components/structures/Dashboard/Table/Dialog/Dialog"), {
   ssr: false,
   loading: () => (
@@ -34,6 +36,8 @@ const TableDialogContent = dynamic(
 );
 
 function HourlyRow({ shift }: { shift: Hourly }) {
+  const { delete: deleteHourly, reset } = useDashHourlyStore();
+
   const shortDate = useHumanizeDate({ date: shift.startDate, typeFormat: "short" });
 
   const calculateEarnings = useCallback((shift: Hourly) => {
@@ -49,6 +53,8 @@ function HourlyRow({ shift }: { shift: Hourly }) {
       title="Info about this shift"
       shift={shift}
       type="hourly"
+      delete={deleteHourly}
+      reset={reset}
       content={<TableDialogContent shift={shift} />}
     >
       <TableElement as="tr" type="tr">

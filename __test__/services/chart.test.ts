@@ -36,7 +36,7 @@ describe("ChartService", () => {
   });
 
   test("Should grouped shifts by date", () => {
-    const chartService = new ChartService(SHIFTS, "hourly");
+    const chartService = new ChartService(SHIFTS.hourly, SHIFTS.production, "hourly");
     const groupedShifts = chartService.groupByDays;
     expect(groupedShifts).toEqual({
       "1_de_sept_de_2021": [
@@ -61,7 +61,7 @@ describe("ChartService", () => {
   });
 
   test("Should calculate earnPerDay Chart", () => {
-    const chartService = new ChartService(SHIFTS, "hourly");
+    const chartService = new ChartService(SHIFTS.hourly, SHIFTS.production, "hourly");
     const earnsPerDay = chartService.earnsPerDay();
     expect(earnsPerDay).toEqual([
       {

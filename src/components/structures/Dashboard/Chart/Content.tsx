@@ -4,56 +4,29 @@ import dynamic from "next/dynamic";
 
 import Skeleton from "@/components/ui/Skeleton";
 
-import useDashboard from "@/hooks/useDashboard";
+import useHourlyShifts from "@/hooks/useHourlyShifts";
+import useProductionShifts from "@/hooks/useProductionShifts";
 
 const EarnsPerDay = dynamic(() => import("@/components/structures/Dashboard/Chart/EarnsPerDay"), {
   ssr: false,
   loading: () => <Skeleton classes="h-72 w-full" />,
 });
 
-const CompareShifts = dynamic(
-  () => import("@/components/structures/Dashboard/Chart/CompareShifts"),
-  {
-    ssr: false,
-    loading: () => <Skeleton classes="h-72 w-full" />,
-  }
-);
-
 const ChartEmpty = dynamic(() => import("@/components/structures/Dashboard/Chart/Empty"), {
   ssr: false,
   loading: () => <Skeleton classes="h-72 w-full" />,
 });
 
-const CarouselContent = dynamic(
-  () => import("@/components/ui/Carousel").then((mod) => mod.CarouselContent),
-  {
-    ssr: false,
-  }
-);
-
-const CarouselItem = dynamic(
-  () => import("@/components/ui/Carousel").then((mod) => mod.CarouselItem),
-  {
-    ssr: false,
-  }
-);
-
 function Content() {
-  const { user } = useDashboard();
+  const { data: production } = useProductionShifts();
+  const { data: hourly } = useHourlyShifts();
+
+  const merge = [...(hourly ?? []), ...(production ?? [])];
 
   return (
-    <CarouselContent className="h-auto">
-      <ChartEmpty data={user?.shifts}>
-        <CarouselItem>
-          <EarnsPerDay user={user} />
-        </CarouselItem>
-      </ChartEmpty>
-      <ChartEmpty data={user?.shifts}>
-        <CarouselItem>
-          <CompareShifts user={user} />
-        </CarouselItem>
-      </ChartEmpty>
-    </CarouselContent>
+    <ChartEmpty data={merge}>
+      <EarnsPerDay />
+    </ChartEmpty>
   );
 }
 

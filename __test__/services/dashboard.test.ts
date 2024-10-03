@@ -386,7 +386,10 @@ const user: UserType = {
 
 describe("Dashboard Service", () => {
   test("1. should return the number of shifts", () => {
-    const dashboard = new DashboardService(userMocked);
+    const dashboard = new DashboardService(
+      userMocked.shifts!.hourly,
+      userMocked.shifts!.production
+    );
 
     expect(dashboard.shiftsLen).toBe(18);
   });
@@ -398,7 +401,10 @@ describe("Dashboard Service", () => {
   });
 
   test("3. Should calculate the amount of paid for hours worked in the current week", () => {
-    const dashboard = new DashboardService(userMocked);
+    const dashboard = new DashboardService(
+      userMocked.shifts!.hourly,
+      userMocked.shifts!.production
+    );
 
     const hourlyPaid =
       userMocked.shifts?.hourly.reduce((acc, shift) => {
@@ -426,7 +432,10 @@ describe("Dashboard Service", () => {
   });
 
   test("4. Should return the amount of hours worked", () => {
-    const dashboard = new DashboardService(userMocked);
+    const dashboard = new DashboardService(
+      userMocked.shifts!.hourly,
+      userMocked.shifts!.production
+    );
     const production =
       userMocked.shifts?.production.reduce((acc, shift) => {
         const amount = shift?.amount ?? 0;
@@ -448,14 +457,20 @@ describe("Dashboard Service", () => {
   });
 
   test("5. Should return the average of hours worked per day", () => {
-    const dashboard = new DashboardService(userMocked);
+    const dashboard = new DashboardService(
+      userMocked.shifts!.hourly,
+      userMocked.shifts!.production
+    );
     const expectedAverage = dashboard.hoursWorked / dashboard.shiftsLen;
 
     expect(dashboard.averageHoursWorkedPerDay).toBe(expectedAverage);
   });
 
   test("6. Should return the last day registered", () => {
-    const dashboard = new DashboardService(user);
+    const dashboard = new DashboardService(
+      userMocked.shifts!.hourly,
+      userMocked.shifts!.production
+    );
 
     if (isEmpty(user.shifts?.production)) {
       const expectedLastHourlyShift = max(
