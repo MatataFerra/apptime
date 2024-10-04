@@ -1,5 +1,6 @@
 import { isWithinInterval } from "date-fns";
 import groupBy from "lodash/groupBy";
+import isEmpty from "lodash/isEmpty";
 
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
@@ -35,14 +36,16 @@ class Chart {
   }
 
   format(shifts: HourlyType[] | ProductionType[], type: "hourly" | "production") {
-    return shifts.map((shift) => ({
+    if (isEmpty(shifts)) return [];
+
+    return shifts?.map((shift) => ({
       ...shift,
       type,
     }));
   }
 
   get merge() {
-    return [...this.format(this.hourly, "hourly"), ...this.format(this.production, "production")];
+    return [...this.format(this?.hourly, "hourly"), ...this.format(this.production, "production")];
   }
 
   get groupByDays() {
