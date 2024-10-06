@@ -39,7 +39,6 @@ function Inputs() {
     reset: resetStoreValues,
     setIsFormReady,
     setDialogState,
-    values: { name },
   } = useProductionForm((state) => state);
 
   /*
@@ -194,6 +193,7 @@ function Inputs() {
     //* Optimistic update
     queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.PRODUCTION] }).then(() => {
       const lastId = previousUserData?.production?.at(-1)?.id ?? Math.random();
+
       const newProduction = [
         ...(previousUserData?.production ?? []),
         {

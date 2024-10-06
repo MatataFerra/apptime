@@ -1,0 +1,32 @@
+// backup es.json messages
+
+/*
+
+{
+  "no-mobile": {
+    "navigation": {},
+    "subscription": {
+      "notify_message": "¿Quieres que te avisemos cuando la versión de escritorio esté disponible?",
+      "success_message": "¡Gracias por suscribirte!"
+    }
+  },
+  "login": {
+    "wrong_password": "Usuario o contraseña incorrectos",
+    "account": {
+      "has_account": "No tienes una cuenta?",
+      "register": "registro"
+    }
+  },
+  "register": {
+    "invalid_body": "Un error ocurrió durante el registro. Por favor intente nuevamente",
+    "user_already_exist": "El usuario ya existe",
+    "successful": "Usuario creado con éxito, serás redireccionado a la página principal",
+    "unexpected_error_after_register": "Algo ocurrió durante la redirección, por favor intente logearse de nuevo",
+    "max_attemps_to_register": "Has intentado demasiadas veces, por favor esperá hasta intentar de nuevo"
+  },
+  "home": {
+    "popover": "Cuando el estado es offline, significa que el usuario no inició ningún turno todavía"
+  }
+}
+
+*/
