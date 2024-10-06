@@ -1,9 +1,28 @@
 import { isThisWeek, isValid, max } from "date-fns";
+import isEmpty from "lodash/isEmpty";
 import isLodashNan from "lodash/isNaN";
 
 import ShiftService from "@/services/Shift";
 
-import { type DashboardInterface, DAYS, type UserType } from "@/types/services";
+import { DAYS, HourlyType, ProductionType } from "@/types/services";
+
+interface DashboardInterface {
+  hourly: HourlyType[];
+  production: ProductionType[];
+  get shiftsLen(): number;
+  get hoursWorked(): number;
+  get averageHoursWorkedPerDay(): number;
+  get lastDayRegistered(): string;
+  estimatedWeeklyEarnings({ weekStartsOn }: { weekStartsOn?: keyof typeof DAYS }): number;
+  dashboardData(): {
+    shiftsLen: number;
+    hoursWorked: number;
+    averageHoursWorkedPerDay: number;
+    hourValue: number;
+    lastDayRegistered: string;
+    estimatedWeeklyEarnings: number;
+  };
+}
 
 /**
   @description
@@ -21,27 +40,32 @@ import { type DashboardInterface, DAYS, type UserType } from "@/types/services";
 */
 
 class Dashboard implements DashboardInterface {
-  user: UserType;
-  constructor(user: UserType) {
-    this.user = user;
+  hourly: HourlyType[];
+  production: ProductionType[];
+  constructor(hourly: HourlyType[], production: ProductionType[]) {
+    this.hourly = hourly;
+    this.production = production;
+  }
+
+  get merge() {
+    return [...(this?.hourly ?? []), ...(this?.production ?? [])];
   }
 
   get shiftsLen() {
-    if (!this.user.shifts) return 0;
-    const production = this.user.shifts.production.length;
-    const hourly = this.user.shifts.hourly.length;
-    return production + hourly;
+    if (!this.merge) return 0;
+
+    return this.merge.length;
   }
 
   get hoursWorked() {
-    if (!this.user.shifts) return 0;
+    if (!this.merge) return 0;
 
-    const production = this.user.shifts.production.reduce((acc, shift) => {
+    const production = this.production?.reduce((acc, shift) => {
       const amount = shift?.amount ?? 0;
       return acc + amount;
     }, 0);
 
-    const hourly = this.user.shifts.hourly.reduce((acc, shift) => {
+    const hourly = this.hourly?.reduce((acc, shift) => {
       const amount = shift?.amount ?? 0;
       return acc + amount;
     }, 0);
@@ -60,18 +84,19 @@ class Dashboard implements DashboardInterface {
   }
 
   get lastProductionShift() {
-    if (!this.user?.shifts) return null;
-    return max(this.user.shifts.production.map((shift) => new Date(shift.startDate)));
+    if (isEmpty(this.merge)) return null;
+    if (isEmpty(this.production)) return null;
+    return max(this.production.map((shift) => new Date(shift.startDate)));
   }
 
   get lastHourlyShift() {
-    if (!this.user?.shifts) return null;
+    if (!this.merge) return null;
 
-    return max(this.user?.shifts?.hourly.map((shift) => new Date(shift.startDate)));
+    return max(this.hourly?.map((shift) => new Date(shift.startDate)));
   }
 
   get lastDayRegistered() {
-    if (!this.user?.shifts) return "There is no data";
+    if (!this.merge) return "There is no data";
     if (!this.lastProductionShift && !this.lastHourlyShift) return "There is no data";
     if (!isValid(this.lastProductionShift) && isValid(this.lastHourlyShift))
       return this.lastHourlyShift!.toString();
@@ -83,9 +108,9 @@ class Dashboard implements DashboardInterface {
   }
 
   estimatedWeeklyEarnings({ weekStartsOn = "monday" }: { weekStartsOn?: keyof typeof DAYS } = {}) {
-    if (!this.user.shifts) return 0;
+    if (!this.merge) return 0;
 
-    const production = this.user.shifts?.production.reduce((acc, shift) => {
+    const production = this.production?.reduce((acc, shift) => {
       const earnings = new ShiftService(shift).calculateEarnings();
 
       if (
@@ -99,7 +124,7 @@ class Dashboard implements DashboardInterface {
       return acc;
     }, 0);
 
-    const hourly = this.user.shifts?.hourly?.reduce((acc, shift) => {
+    const hourly = this.hourly?.reduce((acc, shift) => {
       const earnings = new ShiftService(shift).calculateEarnings();
 
       if (

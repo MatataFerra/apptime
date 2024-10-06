@@ -23,6 +23,7 @@ export default async function onCreateHourlyShift(data: FastChargeInputsParsed) 
   const shift = new ShiftService({
     startDate: data.startDate,
     endDate: data.endDate,
+    name: data.name?.trim(),
     isPublicHoliday: data.isPublicHoliday,
     publicHolidayWorked: data.isWorked,
     hourValue: data.hourValue,

@@ -1,4 +1,4 @@
-import type { HTMLInputTypeAttribute, Ref } from "react";
+import type { HTMLInputTypeAttribute } from "react";
 
 import { z } from "zod";
 
@@ -55,8 +55,9 @@ export interface InputMeasureProps extends InputProps {
 export type FastChargeInputs = z.infer<typeof FastChargeFormSchema>;
 export type FastChargeInputsParsed = {
   startDate: string;
-  hourValue: number;
   endDate: string;
+  hourValue: number;
+  name: string | null;
   isPublicHoliday: boolean;
   isWorked: boolean;
   unpaidBreaks: number;
@@ -69,6 +70,7 @@ export type ProductionInputs = z.infer<typeof ProductionJobFormSchema>;
 export type ProductionInputsParsed = {
   startDate: string;
   endDate: string;
+  name: string | null;
   itemValue: number;
   itemQuantity: number;
   isPublicHoliday: boolean;

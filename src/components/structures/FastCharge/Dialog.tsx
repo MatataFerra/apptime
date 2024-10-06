@@ -7,6 +7,7 @@ import { differenceInMinutes } from "date-fns";
 import isEmpty from "lodash/isEmpty";
 
 import DateHumanizer from "@/services/Date";
+import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
 
 import DialogValue from "@/components/structures/share/DialogValue";
@@ -54,7 +55,7 @@ function DialogHourly({ children }: PropsWithChildren) {
 
   useEffect(() => {
     if (formError) return setDialogState(false);
-  }, [formError, setDialogState]);
+  }, [dialog, formError, setDialogState]);
 
   const formatStart = useFormatAndAddTime({
     date: startDate ?? "",
@@ -84,12 +85,7 @@ function DialogHourly({ children }: PropsWithChildren) {
     };
 
     const earnings = new ShiftService(prepareShift).checkPublicHoliday().calculateEarnings();
-
-    const getTaxesDiscount = taxes?.reduce((acc, tax) => {
-      const value = Number(tax.value);
-      const prepareTax = (earnings * value) / 100;
-      return (acc -= prepareTax);
-    }, earnings);
+    const getTaxesDiscount = Pay.afterTax(earnings, taxes);
 
     return {
       sharp: isNaN(earnings) ? 0 : earnings,
@@ -130,6 +126,7 @@ function DialogHourly({ children }: PropsWithChildren) {
           <DialogValue content="Pay details">
             <Text classes="text-sm">Public holiday: {fastHoliday ? "Yes" : "No"}</Text>
             <Text classes="text-sm">Public holiday worked: {fastWorked ? "Yes" : "No"}</Text>
+            {unpaidBreaks ? <Text classes="text-sm">Unpaid time: {unpaidBreaks}min.</Text> : null}
             <Stack>
               <Text classes="rounded-md bg-gradient-to-tl from-lime-400/60 via-green-400 to-teal-500/60 px-2 py-1 text-sm font-bold">
                 You will earn: ${calculateEarn.sharp.toFixed(2)}

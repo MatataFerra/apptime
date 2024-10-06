@@ -8,6 +8,7 @@ import isEqual from "lodash/isEqual";
 import { useRouter } from "next/navigation";
 
 import Toast from "@/services/Toast";
+import ut from "@/services/Utilities/client";
 
 import type { HourlyType, UserType } from "@/types";
 
@@ -32,6 +33,7 @@ type EditShiftHourlyForm = {
   hourValue: number;
   isPublicHoliday: boolean;
   publicHolidayWorked: boolean;
+  name: string;
 };
 
 function TableDialogEditHourly({ shift, user }: Props) {
@@ -47,7 +49,7 @@ function TableDialogEditHourly({ shift, user }: Props) {
   const { taxesToDelete, reset } = useTaxesHandlerDelete((state) => state);
 
   function onHandleEdit(data: EditShiftHourlyForm) {
-    const { startDate, endDate, hourValue, isPublicHoliday, publicHolidayWorked } = data;
+    const { startDate, endDate, hourValue, isPublicHoliday, publicHolidayWorked, name } = data;
 
     if (isBefore(new Date(endDate), new Date(startDate))) {
       setError("endDate", {
@@ -70,6 +72,7 @@ function TableDialogEditHourly({ shift, user }: Props) {
       hourValue: Number(hourValue),
       isPublicHoliday,
       publicHolidayWorked,
+      name,
     };
 
     // Check if user made any changes
@@ -85,7 +88,15 @@ function TableDialogEditHourly({ shift, user }: Props) {
       return;
     }
 
-    onEditShift(shiftUpdated, taxesToDelete).then((res) => {
+    onEditShift(shiftUpdated, taxesToDelete).then(async (res) => {
+      Toast({
+        type: "info",
+        message: "Shift is being updated",
+        duration: Infinity,
+      });
+
+      await ut.delay(1500);
+
       if (res) {
         Toast({
           type: "success",
@@ -93,14 +104,16 @@ function TableDialogEditHourly({ shift, user }: Props) {
           duration: 2000,
         });
 
-        queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
+        queryClient.refetchQueries({ queryKey: ["user", user?.email] });
+
         setStep("info");
         reset();
+
         router.refresh();
       } else {
         Toast({
           type: "error",
-          message: "Error updating shift, please try again.",
+          message: "Error updating shift, please reload the page and try again.",
           duration: 2000,
         });
       }
@@ -109,6 +122,8 @@ function TableDialogEditHourly({ shift, user }: Props) {
 
   return (
     <Stack as="form" orientation="horizontal" wrap onSubmit={handleSubmit(onHandleEdit)}>
+      <Input type="text" label="Job name" {...register("name", { value: shift?.name ?? "" })} />
+
       <Input
         type="datetime-local"
         label="Start Date"
@@ -126,6 +141,8 @@ function TableDialogEditHourly({ shift, user }: Props) {
       <Input
         type="number"
         label="Hour Value"
+        step="0.01"
+        min={0}
         placeholder={shift.hourValue.toString()}
         {...register("hourValue", {
           value: shift.hourValue,

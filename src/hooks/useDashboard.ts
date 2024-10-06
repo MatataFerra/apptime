@@ -7,46 +7,31 @@ import useUser from "@/hooks/useUser";
 import { useDashboardStore } from "@/store/useDashboardStore_v2";
 
 function useDashboard() {
-  const { data, isLoading } = useUser();
-  const {
-    setUser,
-    deleteShift,
-    filterByDate,
-    initialShifts,
-    resetShifts,
-    update,
-    user,
-    isUserLoaded,
-    setIsUserLoaded,
-    setInitialShifts,
-    isDateFiltered,
-  } = useDashboardStore((state) => state);
+  const { data, isLoading, ...rest } = useUser();
+  const { setUser, initialShifts, update, user, isUserLoaded, setIsUserLoaded, ...store } =
+    useDashboardStore((state) => state);
 
   useEffect(() => {
     if (isLoading) return;
     if (isEmpty(data)) return;
-    if (isDateFiltered) return;
 
     setUser(data);
-  }, [data, isLoading, user, setUser, isDateFiltered]);
+  }, [data, isLoading, user, setUser]);
 
   useEffect(() => {
     if (isLoading) return;
     if (isEmpty(data)) return;
 
-    setInitialShifts(data?.shifts);
-
     setIsUserLoaded(true);
-  }, [isLoading, data, isUserLoaded, setIsUserLoaded, setInitialShifts]);
+  }, [isLoading, data, isUserLoaded, setIsUserLoaded]);
 
   return {
-    deleteShift,
-    filterByDate,
     initialShifts,
-    resetShifts,
     update,
     user,
     isLoadingUserData: isLoading,
+    ...store,
+    ...rest,
   };
 }
 

@@ -27,7 +27,7 @@ const TableHistory = dynamic(() => import("@/components/modules/Dashboard/TableH
   ),
 });
 
-const PickupDate = dynamic(() => import("@/components/structures/share/PickupDate"), {
+const PickupDate = dynamic(() => import("@/components/structures/Dashboard/Table/PickupDate"), {
   ssr: false,
   loading: () => (
     <Stack as="nav" alignItems="center">

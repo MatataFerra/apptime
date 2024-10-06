@@ -1,14 +1,18 @@
+"use client";
+
 import dynamic from "next/dynamic";
 
 import Dashboard from "@/services/Dashboard";
 import DateHumanizer from "@/services/Date";
-import UserService from "@/services/User";
 
 import { LocaleParams } from "@/types";
 
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
+
+import useHourlyShifts from "@/hooks/useHourlyShifts";
+import useProductionShifts from "@/hooks/useProductionShifts";
 
 const Card = dynamic(() => import("@/components/ui/Card"), {
   ssr: false,
@@ -31,6 +35,7 @@ const CarouselItem = dynamic(
   () => import("@/components/ui/Carousel").then((mod) => mod.CarouselItem),
   {
     ssr: false,
+    loading: () => <Skeleton classes="basis-1/2 sm:basis-1/3 md:basis-1/5" />,
   }
 );
 
@@ -43,8 +48,9 @@ type DashboardData = {
   value: string | number;
 };
 
-async function CarouselDashboard({ params }: Props) {
-  const user = await UserService.getSessionUser();
+function CarouselDashboard({ params }: Props) {
+  const { data: hourlies } = useHourlyShifts();
+  const { data: productions } = useProductionShifts();
   const defaultValues = {
     shiftsLen: 0,
     hoursWorked: 0,
@@ -60,7 +66,7 @@ async function CarouselDashboard({ params }: Props) {
     estimatedWeeklyEarnings,
     hourValue,
     hoursWorked,
-  } = !user ? defaultValues : new Dashboard(user).dashboardData();
+  } = !hourlies ? defaultValues : new Dashboard(hourlies, productions).dashboardData();
 
   const humanizedLastDayRegistered = !!new Date(lastDayRegistered).valueOf()
     ? new DateHumanizer("short").humanizeDate(new Date(lastDayRegistered), {

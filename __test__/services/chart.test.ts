@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 
 import ChartService from "@/services/Chart";
 
-import { UserType } from "@/types";
+import type { UserType } from "@/types";
 
 const start = "2021-09-01T00:00:00.000Z";
 const end = "2021-09-01T08:00:00.000Z";
@@ -17,6 +17,7 @@ const SHIFTS: UserType["shifts"] = {
       amount: 15,
       startDate: new Date(start).toString(),
       endDate: addHours(new Date(end), 8).toString(),
+      name: "Permanent work in factory",
       id: 15,
       hourValue: 27,
       isClosed: true,
@@ -35,7 +36,7 @@ describe("ChartService", () => {
   });
 
   test("Should grouped shifts by date", () => {
-    const chartService = new ChartService(SHIFTS, "hourly");
+    const chartService = new ChartService(SHIFTS.hourly, SHIFTS.production, "hourly");
     const groupedShifts = chartService.groupByDays;
     expect(groupedShifts).toEqual({
       "1_de_sept_de_2021": [
@@ -60,7 +61,7 @@ describe("ChartService", () => {
   });
 
   test("Should calculate earnPerDay Chart", () => {
-    const chartService = new ChartService(SHIFTS, "hourly");
+    const chartService = new ChartService(SHIFTS.hourly, SHIFTS.production, "hourly");
     const earnsPerDay = chartService.earnsPerDay();
     expect(earnsPerDay).toEqual([
       {

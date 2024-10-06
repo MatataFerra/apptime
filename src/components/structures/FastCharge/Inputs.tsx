@@ -8,18 +8,24 @@ import { format } from "date-fns";
 
 import Toast from "@/services/Toast";
 
-import { FastChargeFormCheckDataSchema, type UserType } from "@/types";
+import { FastChargeFormCheckDataSchema, type HourlyType } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 import type { FastChargeInputs } from "@/types/forms";
 
 import { observer } from "@/components/structures/SalaryItems/observer";
+import DatalistShiftNames from "@/components/structures/ShiftForms/Datalist";
+import { useDatalistStore } from "@/components/structures/ShiftForms/store/useDatalistStore";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
+import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
 import useGetUniqueSalaryItems from "@/hooks/useGetUniqueSalaryItems";
+import useHourlyShifts from "@/hooks/useHourlyShifts";
+import useProductionShifts from "@/hooks/useProductionShifts";
 import type { SalaryItems } from "@/hooks/useSalaryItems";
+import useShiftNames from "@/hooks/useShiftNames";
 import useUser from "@/hooks/useUser";
 
 import onCreateHourlyShift from "@/server-actions/hourly-job";
@@ -31,8 +37,8 @@ function Inputs() {
     Custom hook to get the values from the form
   */
   const {
-    setValues,
-    reset: resetValues,
+    setValues: setStoreValue,
+    reset: resetStoreValues,
     values: { startDate, finishDate, finishTime, startTime },
     setIsFormReady,
     setDialogState,
@@ -60,6 +66,14 @@ function Inputs() {
 
   const queryClient = useQueryClient();
   const { data: user } = useUser();
+  const { data: hourly } = useHourlyShifts();
+  const { data: production } = useProductionShifts();
+  const { names } = useShiftNames({ hourly, production }, watch("name"));
+
+  /*
+    set when user is typing to show datalist
+  */
+  const { setIsWriting } = useDatalistStore((state) => state);
 
   const { uniqueTaxes, uniqueContributions } = useGetUniqueSalaryItems({
     localTaxes: taxes,
@@ -125,9 +139,9 @@ function Inputs() {
   useEffect(() => {
     if (startDate && !touchedFields["finish-date"]) {
       setValue("finish-date", startDate);
-      setValues({ finishDate: startDate });
+      setStoreValue({ finishDate: startDate });
     }
-  }, [startDate, setValue, touchedFields, setValues]);
+  }, [startDate, setValue, touchedFields, setStoreValue]);
 
   /*
     ================================================================================
@@ -141,6 +155,7 @@ function Inputs() {
       isPublicHoliday: formData["is-public-holiday"] ?? false,
       isWorked: formData["is-public-holiday-worked"] ?? false,
       hourValue: isNaN(Number(formData["hour-value"])) ? 0 : Number(formData["hour-value"]),
+      name: formData["name"],
       unpaidBreaks: isNaN(Number(formData["unpaid-breaks"]))
         ? 0
         : Number(formData["unpaid-breaks"]),
@@ -152,20 +167,19 @@ function Inputs() {
       type: "info",
       message: "Your request is being processed",
       description: "Please wait a moment...",
-      duration: 1000,
+      duration: 2500,
     });
 
-    const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
-      "user",
-      user?.email,
+    const previousUserData = queryClient.getQueryData<SuccessApiResponse<HourlyType[]>>([
+      USE_QUERY_KEYS.HOURLY,
     ]);
 
     const previousSalaryItemsData = queryClient.getQueryData<SuccessApiResponse<SalaryItems>>([
-      "salary",
+      USE_QUERY_KEYS.SALARY,
     ]);
 
     //* Optimistic update
-    queryClient.cancelQueries({ queryKey: ["salary"] }).then(() => {
+    queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.SALARY] }).then(() => {
       const prevTaxes = previousSalaryItemsData?.salaryItems.taxes.map((taxes) => {
         return {
           ...taxes,
@@ -208,15 +222,16 @@ function Inputs() {
     });
 
     //* Optimistic update
-    queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
-      const lastId = previousUserData?.user?.shifts?.hourly?.at(-1)?.id ?? Math.random();
+    queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] }).then(() => {
+      const lastId = previousUserData?.hourly?.at(-1)?.id ?? Math.random();
 
       const newHourly = [
-        ...(previousUserData?.user?.shifts?.hourly ?? []),
+        ...(previousUserData?.hourly ?? []),
         {
           id: lastId + 1,
           startDate: parseData.startDate,
           endDate: parseData.endDate,
+          name: parseData.name,
           hourValue: parseData.hourValue,
           isPublicHoliday: parseData.isPublicHoliday,
           publicHolidayWorked: parseData.isWorked,
@@ -230,18 +245,9 @@ function Inputs() {
         },
       ];
 
-      queryClient.setQueryData(["user", user?.email], {
+      queryClient.setQueryData([USE_QUERY_KEYS.HOURLY], {
         ...previousUserData,
-        user: {
-          ...previousUserData?.user,
-          profile: {
-            ...previousUserData?.user.profile,
-          },
-          shifts: {
-            ...previousUserData?.user.shifts,
-            hourly: newHourly,
-          },
-        },
+        hourly: [...newHourly],
       });
 
       return { previousUserData };
@@ -258,7 +264,7 @@ function Inputs() {
           message: "Shift created successfully",
         });
 
-        resetValues();
+        resetStoreValues();
         clearTaxes();
         clearContributions();
 
@@ -266,34 +272,29 @@ function Inputs() {
       }
 
       queryClient.invalidateQueries({
-        queryKey: ["user", user?.email],
+        queryKey: [USE_QUERY_KEYS.USER, user?.email],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["salary"],
+        queryKey: [USE_QUERY_KEYS.SALARY],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [USE_QUERY_KEYS.HOURLY],
       });
 
       // reset state if the shift was not created
-      queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
-        queryClient.setQueryData(["user", user?.email], {
+      queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] }).then(() => {
+        queryClient.setQueryData([USE_QUERY_KEYS.HOURLY], {
           ...previousUserData,
-          user: {
-            ...previousUserData?.user,
-            profile: {
-              ...previousUserData?.user.profile,
-            },
-            shifts: {
-              ...previousUserData?.user.shifts,
-              hourly: previousUserData?.user.shifts?.hourly,
-            },
-          },
+          hourly: previousUserData?.hourly,
         });
 
         return { previousUserData };
       });
 
-      queryClient.cancelQueries({ queryKey: ["salary"] }).then(() => {
-        queryClient.setQueryData(["salary"], {
+      queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.SALARY] }).then(() => {
+        queryClient.setQueryData([USE_QUERY_KEYS.SALARY], {
           ...previousSalaryItemsData,
           salaryItems: {
             ...previousSalaryItemsData?.salaryItems,
@@ -305,7 +306,7 @@ function Inputs() {
 
       setDialogState(false);
 
-      resetValues();
+      resetStoreValues();
       clearTaxes();
       clearContributions();
 
@@ -332,6 +333,22 @@ function Inputs() {
         wrap
         onSubmit={handleSubmit(onSubmit)}
       >
+        <Stack as="fieldset" orientation="vertical" classes="relative w-full">
+          <Input
+            label="Name of your job"
+            variant="outlined"
+            type="name"
+            isError={!!errors["name"]}
+            description={errors["name"]?.message}
+            onKeyDown={() => setIsWriting(true)}
+            {...register("name", {
+              onChange: (e: ChangeEvent<HTMLInputElement>) => {
+                setStoreValue({ name: e.target.value });
+              },
+            })}
+          />
+          <DatalistShiftNames data={names} setValue={setValue} value={watch("name")} />
+        </Stack>
         <Input
           containerClasses="flex-1"
           classes="h-full"
@@ -342,7 +359,7 @@ function Inputs() {
           max={format(new Date(`${thisYear}-12-31`), "yyyy-MM-dd")}
           {...register("start-date", {
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              setValues({ startDate: e.target.value });
+              setStoreValue({ startDate: e.target.value });
             },
 
             required: true,
@@ -358,7 +375,7 @@ function Inputs() {
           max={format(new Date(`${thisYear}-12-31`), "yyyy-MM-dd")}
           {...register("finish-date", {
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              setValues({ finishDate: e.target.value });
+              setStoreValue({ finishDate: e.target.value });
             },
           })}
         />
@@ -370,7 +387,7 @@ function Inputs() {
           description={errors["start-time"]?.message}
           {...register("start-time", {
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              setValues({ startTime: e.target.value });
+              setStoreValue({ startTime: e.target.value });
             },
           })}
         />
@@ -382,27 +399,30 @@ function Inputs() {
           description={errors["finish-time"]?.message}
           {...register("finish-time", {
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              setValues({ finishTime: e.target.value });
+              setStoreValue({ finishTime: e.target.value });
             },
           })}
         />
         <Input
           label="Hour value"
           type="number"
+          step="0.01"
+          min={0}
           measure="$"
           measurePlace="left"
           {...register("hour-value", {
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              setValues({ hourValue: e.target.value });
+              setStoreValue({ hourValue: e.target.value });
             },
           })}
         />
         <Input
           label="Unpaid breaks"
+          measure="min."
           type="number"
           {...register("unpaid-breaks", {
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              setValues({ unpaidBreaks: e.target.value });
+              setStoreValue({ unpaidBreaks: e.target.value });
             },
           })}
         />
@@ -414,7 +434,7 @@ function Inputs() {
               id="fast-is-public-holiday"
               {...register("is-public-holiday", {
                 onChange: (e: ChangeEvent<HTMLInputElement>) => {
-                  setValues({
+                  setStoreValue({
                     fastHoliday: e.target.checked as boolean,
                   });
                 },
@@ -431,7 +451,7 @@ function Inputs() {
               id="fast-is-public-holiday-worked"
               {...register("is-public-holiday-worked", {
                 onChange: (e: ChangeEvent<HTMLInputElement>) => {
-                  setValues({
+                  setStoreValue({
                     fastWorked: e.target.checked as boolean,
                   });
                 },

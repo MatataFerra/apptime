@@ -6,8 +6,8 @@ import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import isEmpty from "lodash/isEmpty";
 
 import DateHumanizer from "@/services/Date";
+import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
-import ProductionService from "@/services/Shift/Production";
 
 import DialogValue from "@/components/structures/share/DialogValue";
 import Button from "@/components/ui/Button";
@@ -28,9 +28,7 @@ import Text from "@/components/ui/Text";
 import { useProductionForm } from "@/store/useProductionForm";
 import { useProductionTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
 
-type Props = {};
-
-function DialogProduction({ children }: PropsWithChildren<Props>) {
+function DialogProduction({ children }: PropsWithChildren) {
   const { values, dialog, setDialogState, formError } = useProductionForm((state) => state);
   const {
     taxesModule: { salaryElement: taxes },
@@ -39,34 +37,21 @@ function DialogProduction({ children }: PropsWithChildren<Props>) {
 
   useEffect(() => {
     if (formError) return setDialogState(false);
-  }, [formError, setDialogState]);
+  }, [formError, setDialogState, dialog]);
 
   const calculateEarn = useMemo(() => {
     const prepareShift = {
       itemValue: Number(values.itemValue ?? 0),
       itemQuantity: Number(values.itemQuantity),
-      holidayPayRate: Number(values.holidayPayRate),
-      publicHolidayWorked: !!values.publicHolidayWorked,
     };
     const earnings = new ShiftService(prepareShift).checkPublicHoliday().calculateEarnings();
-
-    const getTaxesDiscount = taxes?.reduce((acc, tax) => {
-      const value = Number(tax.value);
-      const prepareTax = (earnings * value) / 100;
-      return (acc -= prepareTax);
-    }, earnings);
+    const getTaxesDiscount = Pay.afterTax(earnings, taxes);
 
     return {
       sharp: isNaN(earnings) ? 0 : earnings,
       afterTaxes: isNaN(getTaxesDiscount) ? 0 : getTaxesDiscount,
     };
-  }, [
-    taxes,
-    values.holidayPayRate,
-    values.itemQuantity,
-    values.itemValue,
-    values.publicHolidayWorked,
-  ]);
+  }, [taxes, values.itemQuantity, values.itemValue]);
 
   return (
     <Dialog open={dialog} onOpenChange={setDialogState}>

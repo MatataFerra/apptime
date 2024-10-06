@@ -65,6 +65,11 @@ export const MONTHS = [
   "Dec",
 ];
 
+export const CHART_MONTH = {
+  en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"],
+  es: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sept", "Oct", "Nov", "Dic"],
+} as const;
+
 export const FULL_MONTHS_NAMES = [
   "January",
   "February",

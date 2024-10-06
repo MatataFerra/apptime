@@ -7,17 +7,23 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import Toast from "@/services/Toast";
 
-import { ProductionJobFormCheckDataSchema, type UserType } from "@/types";
+import { ProductionJobFormCheckDataSchema, type ProductionType } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 import type { ProductionInputs } from "@/types/forms";
 
 import { observer } from "@/components/structures/SalaryItems/observer";
+import DatalistShiftNames from "@/components/structures/ShiftForms/Datalist";
+import { useDatalistStore } from "@/components/structures/ShiftForms/store/useDatalistStore";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
+import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import useGetUniqueSalaryItems from "@/hooks/useGetUniqueSalaryItems";
+import useHourlyShifts from "@/hooks/useHourlyShifts";
+import useProductionShifts from "@/hooks/useProductionShifts";
 import type { SalaryItems } from "@/hooks/useSalaryItems";
+import useShiftNames from "@/hooks/useShiftNames";
 import useUser from "@/hooks/useUser";
 
 import onCreateProductionShift from "@/server-actions/production-job";
@@ -29,8 +35,8 @@ function Inputs() {
     Custom hook to get the values from the form
   */
   const {
-    setValues,
-    reset: resetValues,
+    setValues: setStoreValues,
+    reset: resetStoreValues,
     setIsFormReady,
     setDialogState,
   } = useProductionForm((state) => state);
@@ -50,6 +56,7 @@ function Inputs() {
     register,
     watch,
     reset,
+    setValue,
     formState: { errors },
   } = useFormContext<ProductionInputs>();
 
@@ -60,6 +67,15 @@ function Inputs() {
 
   const queryClient = useQueryClient();
   const { data: user } = useUser();
+  const { data: hourly } = useHourlyShifts();
+  const { data: production } = useProductionShifts();
+  const { names } = useShiftNames({ hourly, production }, watch("name"));
+
+  /*
+    set when user is typing to show datalist
+  */
+  const { setIsWriting } = useDatalistStore((state) => state);
+
   const { uniqueTaxes, uniqueContributions } = useGetUniqueSalaryItems({
     localTaxes: taxes,
     localContributions: contributions,
@@ -111,6 +127,7 @@ function Inputs() {
       itemQuantity: parseFloat(formData["item-quantity"]),
       isPublicHoliday: formData["is-public-holiday"],
       publicHolidayWorked: formData["is-worked"],
+      name: formData["name"],
       taxes,
       contributions,
     };
@@ -119,20 +136,19 @@ function Inputs() {
       type: "info",
       message: "Your request is being processed",
       description: "Please wait a moment...",
-      duration: 1000,
+      duration: Infinity,
     });
 
-    const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
-      "user",
-      user?.email,
+    const previousUserData = queryClient.getQueryData<SuccessApiResponse<ProductionType[]>>([
+      USE_QUERY_KEYS.PRODUCTION,
     ]);
 
     const previousSalaryItemsData = queryClient.getQueryData<SuccessApiResponse<SalaryItems>>([
-      "salary",
+      USE_QUERY_KEYS.SALARY,
     ]);
 
     //* Optimistic update
-    queryClient.cancelQueries({ queryKey: ["salary"] }).then(() => {
+    queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.SALARY] }).then(() => {
       const prevTaxes = previousSalaryItemsData?.salaryItems.taxes.map((taxes) => {
         return {
           ...taxes,
@@ -175,36 +191,32 @@ function Inputs() {
     });
 
     //* Optimistic update
-    queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
-      const lastId = previousUserData?.user?.shifts?.production?.at(-1)?.id ?? Math.random();
+    queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.PRODUCTION] }).then(() => {
+      const lastId = previousUserData?.production?.at(-1)?.id ?? Math.random();
+
       const newProduction = [
-        ...(previousUserData?.user?.shifts?.production ?? []),
+        ...(previousUserData?.production ?? []),
         {
           id: lastId + 1,
           startDate: parseData.startDate,
           endDate: parseData.endDate,
-          itemValue: parseData.itemValue,
-          itemQuantity: parseData.itemQuantity,
-          isPublicHoliday: parseData.isPublicHoliday,
-          publicHolidayWorked: parseData.publicHolidayWorked,
+          name: parseData.name,
           amount: 0,
           isClosed: true,
           notes: "",
+          itemValue: parseData.itemValue,
+          itemQuantity: parseData.itemQuantity,
           shiftId: user?.shifts?.id,
+          isPublicHoliday: parseData.isPublicHoliday,
+          publicHolidayWorked: parseData.publicHolidayWorked,
           taxes: parseData.taxes,
           contributions: parseData.contributions,
         },
       ];
 
-      queryClient.setQueryData(["user", user?.email], {
+      queryClient.setQueryData([USE_QUERY_KEYS.PRODUCTION], {
         ...previousUserData,
-        user: {
-          ...previousUserData?.user,
-          shifts: {
-            ...previousUserData?.user.shifts,
-            production: newProduction,
-          },
-        },
+        production: [...newProduction],
       });
 
       return { previousUserData };
@@ -222,7 +234,7 @@ function Inputs() {
           duration: 3000,
         });
 
-        resetValues();
+        resetStoreValues();
         clearTaxes();
         clearContributions();
 
@@ -230,33 +242,28 @@ function Inputs() {
       }
 
       queryClient.invalidateQueries({
-        queryKey: ["user", user?.email],
+        queryKey: [USE_QUERY_KEYS.USER, user?.email],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["salary"],
+        queryKey: [USE_QUERY_KEYS.SALARY],
       });
 
-      queryClient.cancelQueries({ queryKey: ["user", user?.email] }).then(() => {
-        queryClient.setQueryData(["user", user?.email], {
+      queryClient.invalidateQueries({
+        queryKey: [USE_QUERY_KEYS.PRODUCTION],
+      });
+
+      queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.PRODUCTION] }).then(() => {
+        queryClient.setQueryData([USE_QUERY_KEYS.PRODUCTION], {
           ...previousUserData,
-          user: {
-            ...previousUserData?.user,
-            profile: {
-              ...previousUserData?.user.profile,
-            },
-            shifts: {
-              ...previousUserData?.user.shifts,
-              production: previousUserData?.user.shifts?.production,
-            },
-          },
+          production: previousUserData?.production,
         });
 
         return { previousUserData };
       });
 
-      queryClient.cancelQueries({ queryKey: ["salary"] }).then(() => {
-        queryClient.setQueryData(["salary"], {
+      queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.SALARY] }).then(() => {
+        queryClient.setQueryData([USE_QUERY_KEYS.SALARY], {
           ...previousSalaryItemsData,
           salaryItems: {
             ...previousSalaryItemsData?.salaryItems,
@@ -268,7 +275,7 @@ function Inputs() {
 
       setDialogState(false);
 
-      resetValues();
+      resetStoreValues();
       clearTaxes();
       clearContributions();
 
@@ -292,30 +299,49 @@ function Inputs() {
         wrap
         onSubmit={handleSubmit(onSubmit)}
       >
+        <Stack as="fieldset" orientation="vertical" classes="relative w-full">
+          <Input
+            containerClasses="flex-grow"
+            variant="outlined"
+            label="Name of your job"
+            type="name"
+            isError={!!errors["name"]}
+            description={errors["name"]?.message}
+            onKeyDown={() => setIsWriting(true)}
+            {...register("name", {
+              onChange: (e) => {
+                setStoreValues({ name: e.target.value });
+              },
+            })}
+          />
+          <DatalistShiftNames data={names} setValue={setValue} value={watch("name")} />
+        </Stack>
+        <Stack grid cols={2} as="fieldset" classes="w-full">
+          <Input
+            classes="h-full"
+            label="Start date"
+            type="datetime-local"
+            {...register("start-date", {
+              onChange(e) {
+                setStoreValues({ startDate: e.target.value });
+              },
+            })}
+          />
+          <Input
+            classes="h-full"
+            label="Finish date"
+            type="datetime-local"
+            isError={!!errors["finish-date"]}
+            description={errors["finish-date"]?.message}
+            {...register("finish-date", {
+              onChange(e) {
+                setStoreValues({ finishDate: e.target.value });
+              },
+            })}
+          />
+        </Stack>
         <Input
-          classes="h-full"
-          label="Start date"
-          type="datetime-local"
-          {...register("start-date", {
-            onChange(e) {
-              setValues({ startDate: e.target.value });
-            },
-          })}
-        />
-        <Input
-          classes="h-full"
-          label="Finish date"
-          type="datetime-local"
-          isError={!!errors["finish-date"]}
-          description={errors["finish-date"]?.message}
-          {...register("finish-date", {
-            onChange(e) {
-              setValues({ finishDate: e.target.value });
-            },
-          })}
-        />
-        <Input
-          containerClasses="flex-1"
+          containerClasses="flex-1 sm:flex-auto"
           labelClasses="text-xs"
           label="Value of each item"
           min={0}
@@ -326,18 +352,18 @@ function Inputs() {
           measurePlace="left"
           {...register("item-value", {
             onChange(e) {
-              setValues({ itemValue: e.target.value });
+              setStoreValues({ itemValue: e.target.value });
             },
           })}
         />
         <Input
-          containerClasses="flex-1"
+          containerClasses="flex-1 sm:flex-auto"
           label="Quantity"
           min={0}
           type="number"
           {...register("item-quantity", {
             onChange(e) {
-              setValues({ itemQuantity: e.target.value });
+              setStoreValues({ itemQuantity: e.target.value });
             },
           })}
         />
@@ -349,7 +375,7 @@ function Inputs() {
               id="production-holiday"
               {...register("is-public-holiday", {
                 onChange(e) {
-                  setValues({ isPublicHoliday: e.target.checked });
+                  setStoreValues({ isPublicHoliday: e.target.checked });
                 },
               })}
             />
@@ -364,7 +390,7 @@ function Inputs() {
               id="production-worked"
               {...register("is-worked", {
                 onChange(e) {
-                  setValues({ publicHolidayWorked: e.target.checked });
+                  setStoreValues({ publicHolidayWorked: e.target.checked });
                 },
               })}
             />

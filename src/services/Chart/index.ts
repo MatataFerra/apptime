@@ -1,21 +1,14 @@
-import type { Hourly, Production, Shift } from "@prisma/client";
+import { isWithinInterval } from "date-fns";
 import groupBy from "lodash/groupBy";
+import isEmpty from "lodash/isEmpty";
 
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
 
-import type { EarnsMonthData } from "@/types";
+import type { EarnsMonthData, HourlyType, ProductionType } from "@/types";
 
 import { MONTHS } from "@/utils/constants";
 import { isProductionShift } from "@/utils/helpers/isProductionShift";
-
-type Shifts =
-  | (Shift & {
-      hourly: Hourly[];
-      production: Production[];
-    })
-  | null
-  | undefined;
 
 /**
  * @class Chart
@@ -28,16 +21,31 @@ type Shifts =
  */
 
 class Chart {
-  shifts: Shifts;
+  hourly: HourlyType[];
+  production: ProductionType[];
   type: "hourly" | "production" = "hourly";
 
-  constructor(shifts: Shifts, type: "hourly" | "production" = "hourly") {
-    this.shifts = shifts;
+  constructor(
+    hourly: HourlyType[],
+    production: ProductionType[],
+    type: "hourly" | "production" = "hourly"
+  ) {
+    this.hourly = hourly;
+    this.production = production;
     this.type = type;
   }
 
+  format(shifts: HourlyType[] | ProductionType[], type: "hourly" | "production") {
+    if (isEmpty(shifts)) return [];
+
+    return shifts?.map((shift) => ({
+      ...shift,
+      type,
+    }));
+  }
+
   get merge() {
-    return [...(this.shifts?.hourly ?? []), ...(this.shifts?.production ?? [])].flat();
+    return [...this.format(this?.hourly, "hourly"), ...this.format(this.production, "production")];
   }
 
   get groupByDays() {
@@ -47,12 +55,15 @@ class Chart {
         .humanizeDate(new Date(shift.startDate))
         .split(" ")
         .join("_"),
+      type: shift.type,
     }));
-    return groupBy(shortDates, "shortDate");
+
+    const group = groupBy(shortDates, "shortDate");
+    return group;
   }
 
   get shiftsByType() {
-    return this.shifts?.[this.type] ?? [];
+    return this[this.type] ?? [];
   }
 
   get sortShifts() {
@@ -63,16 +74,69 @@ class Chart {
     return ShiftService.groupShiftsByMonths(this.shiftsByType);
   }
 
+  /**
+   * @description perior function sets the edges for the shifts
+   * @param start Start date to set the period
+   * @param end End date to set the perior
+   */
+  period(start: Date, end: Date) {
+    const hourly = this?.hourly
+      ?.map((shift) => {
+        const isInInterval = isWithinInterval(new Date(shift.startDate), {
+          start,
+          end,
+        });
+        if (isInInterval) return shift;
+
+        return null;
+      })
+      .filter((s) => s !== null);
+
+    const production = this?.production
+      ?.map((shift) => {
+        const isInInterval = isWithinInterval(new Date(shift.startDate), {
+          start,
+          end,
+        });
+        if (isInInterval) return shift;
+
+        return null;
+      })
+      .filter((s) => s !== null);
+
+    if (this?.hourly && hourly) {
+      this.hourly = hourly;
+    }
+
+    if (this?.production && production) {
+      this.production = production;
+    }
+
+    return this;
+  }
+
   earnsPerDay() {
     const data = this.groupByDays
       ? Object.keys(this.groupByDays).map((day) => {
-          const earnings = this.groupByDays[day]?.reduce((acc, shift) => {
-            return acc + new ShiftService(shift).calculateEarnings();
-          }, 0);
+          const { hourly, production } = this.groupByDays[day].reduce(
+            (acc, shift) => {
+              const earnings = new ShiftService(shift).calculateEarnings();
+
+              if (isProductionShift(shift)) {
+                acc.production += earnings; // Sumar a producción
+              } else {
+                acc.hourly += earnings; // Sumar a hourly
+              }
+
+              return acc;
+            },
+            { hourly: 0, production: 0 } // Inicializar acumuladores
+          );
 
           return {
             date: day.replace(/_/g, " "),
-            earnings,
+            hourly: hourly.toFixed(2), // Formatear a dos decimales
+            production: production.toFixed(2), // Formatear a dos decimales
           };
         })
       : [];

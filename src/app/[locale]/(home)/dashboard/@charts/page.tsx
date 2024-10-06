@@ -13,9 +13,5 @@ const CarouselChart = dynamic(() => import("@/components/modules/Dashboard/Carou
 });
 
 export default async function Chart() {
-  return (
-    <>
-      <CarouselChart />
-    </>
-  );
+  return <CarouselChart />;
 }

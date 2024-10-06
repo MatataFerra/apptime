@@ -25,10 +25,12 @@ export type ShiftType = ProductionType | HourlyType;
 
 export type ProductionType = Production & {
   taxes?: Tax[] | null;
+  contributions?: Contribution[] | null;
 };
 
 export type HourlyType = Hourly & {
   taxes?: Tax[] | null;
+  contributions?: Contribution[] | null;
 };
 
 export type Shifts = Shift & {
@@ -56,23 +58,6 @@ export interface InterfaceConfig {
     message: string;
     cause?: string;
     type_error: HandleErrorType;
-  };
-}
-
-export interface DashboardInterface {
-  user: UserType;
-  get shiftsLen(): number;
-  get hoursWorked(): number;
-  get averageHoursWorkedPerDay(): number;
-  get lastDayRegistered(): string;
-  estimatedWeeklyEarnings({ weekStartsOn }: { weekStartsOn?: keyof typeof DAYS }): number;
-  dashboardData(): {
-    shiftsLen: number;
-    hoursWorked: number;
-    averageHoursWorkedPerDay: number;
-    hourValue: number;
-    lastDayRegistered: string;
-    estimatedWeeklyEarnings: number;
   };
 }
 

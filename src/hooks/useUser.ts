@@ -23,16 +23,17 @@ function useUser() {
     }) as unknown as SuccessApiResponse<UserType>;
   }, [email]);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch, isFetched } = useQuery({
     queryKey: ["user", email],
     queryFn: fetchUser,
     enabled: !!email,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-    refetchInterval: 3600 * 1000,
+    refetchInterval: 60 * 60 * 1000,
+    staleTime: 2 * 60 * 1000,
   });
 
-  return { data: data?.user, isLoading };
+  return { data: data?.user as UserType, isLoading, refetch, isFetched };
 }
 
 export default useUser;

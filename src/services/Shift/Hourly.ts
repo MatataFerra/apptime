@@ -96,8 +96,11 @@ class HourlyService implements HourlyInterface {
         data: {
           ...this.shift,
           taxes: {
-            deleteMany: { id: { in: this.getTaxesIds(deleteTaxes ?? []) } },
+            disconnect: deleteTaxes?.map((tax) => ({
+              id: tax.id,
+            })),
           },
+          contributions: {},
         },
       });
 
@@ -183,14 +186,13 @@ class HourlyService implements HourlyInterface {
   }
 
   calculateEarnings() {
-    const MIN_MINUTES_WORKED = this.shift?.unpaidBreaks ? this.shift?.unpaidBreaks * 30 : 30;
+    const MIN_MINUTES_WORKED = this.shift?.unpaidBreaks ? this.shift?.unpaidBreaks : 0;
     let amount = 0;
     let amountHolidayPayable = 0;
     let totalTime = 0;
 
     const hourJobValue = this.shift?.hourValue || 0;
     const unpaidBreaksValue = this.shift?.unpaidBreaks || 0;
-    const minutesUnpaids = unpaidBreaksValue * 30;
     const minuteRate = hourJobValue / 60;
 
     const start = this.shift?.startDate ? new Date(this.shift.startDate) : null;
@@ -216,7 +218,8 @@ class HourlyService implements HourlyInterface {
     if (totalAmount < MIN_MINUTES_WORKED) {
       totalTime = amount + amountHolidayPayable * publicHolidayRate;
     } else {
-      totalTime = amount + amountHolidayPayable * publicHolidayRate - minutesUnpaids;
+      const regularAmount = amount - unpaidBreaksValue;
+      totalTime = regularAmount + amountHolidayPayable * publicHolidayRate;
     }
 
     const earnings = totalTime * minuteRate;
@@ -296,8 +299,6 @@ class HourlyService implements HourlyInterface {
     Private methods
     ============================================================
   */
-
-  private async add() {}
 
   private getTaxesIds(taxes: Tax[]): number[] {
     const idTaxes = taxes.reduce((acc: number[], curr) => {

@@ -1,4 +1,4 @@
-import DropdownSearchable from "@/components/structures/share/DropdownSearchable";
+import DropdownFlagSearchable from "@/components/structures/share/DropdownFlagSearchable";
 
 import { COUNTRIES } from "@/utils/constants/countries";
 import getCountryData from "@/utils/helpers/getCountryData";
@@ -16,7 +16,7 @@ function Dropdown({ ...props }: Props) {
     value: country.name,
     id: country.id,
   }));
-  return <DropdownSearchable data={parseData} {...props} />;
+  return <DropdownFlagSearchable data={parseData} {...props} />;
 }
 
 export default Dropdown;
