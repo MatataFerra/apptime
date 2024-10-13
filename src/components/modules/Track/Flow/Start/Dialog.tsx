@@ -26,15 +26,9 @@ type Props = {
 
 function StartDialog({ triggerStatus }: Props) {
   const { step, setData, setStep, setErrors } = useShiftData((state) => state);
-  const { user } = useTrack();
-  const hasConfig = useMemo(
-    () => !isEmpty(ShiftService.getLastConfigShift(user?.shifts?.hourly)),
-    [user?.shifts]
-  );
-  const last = useMemo(
-    () => ShiftService.getLastConfigShift(user?.shifts?.hourly),
-    [user?.shifts?.hourly]
-  ) as {
+  const { shifts } = useTrack();
+  const hasConfig = useMemo(() => !isEmpty(ShiftService.getLastConfigShift(shifts)), [shifts]);
+  const last = useMemo(() => ShiftService.getLastConfigShift(shifts), [shifts]) as {
     unpaidBreaks: number;
     hourValue: number;
   };

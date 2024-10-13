@@ -2,6 +2,7 @@ import type { Contribution, Hourly, Tax } from "@prisma/client";
 import { differenceInMinutes, endOfDay, isSameDay, startOfDay } from "date-fns";
 
 import ContributionService from "@/services/Contribution";
+import ShiftService from "@/services/Shift";
 import TaxService from "@/services/Tax";
 
 import type { HourlyType } from "@/types";
@@ -256,6 +257,20 @@ class HourlyService implements HourlyInterface {
     };
 
     return config;
+  }
+
+  static getLatestShift(shifts: HourlyType[] | undefined | null) {
+    if (!shifts) return null;
+
+    const hourly = ShiftService.shiftsSorted(shifts);
+
+    if (!hourly) return null;
+
+    const lastHourly = hourly?.find((shift) => shift.endDate !== null);
+
+    if (!lastHourly) return null;
+
+    return lastHourly;
   }
 
   static groupShiftsByMonths(shifts: Hourly[]) {
