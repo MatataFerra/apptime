@@ -12,11 +12,11 @@ import useTrack from "@/hooks/useTrack";
 
 function ShiftTrackInfo() {
   const {
-    user: getUser,
+    shifts,
     shiftUnclosed: { isLoading },
   } = useTrack();
 
-  const lastShift = useMemo(() => getUser?.shifts?.hourly.at(-1), [getUser?.shifts?.hourly]);
+  const lastShift = useMemo(() => shifts?.at(-1), [shifts]);
 
   const dateHumanized = useMemo(
     () => new DateHumanizer("long").humanizeDate(new Date(lastShift?.startDate ?? "")),
@@ -25,19 +25,19 @@ function ShiftTrackInfo() {
 
   const earnings = useMemo(
     () =>
-      getUser?.shifts?.hourly.reduce((acc, shift) => {
-        if (shift.isClosed) {
+      shifts?.reduce((acc, shift) => {
+        if (shift?.isClosed) {
           acc += new ShiftService(shift).calculateEarnings();
         }
 
         return acc;
       }, 0),
-    [getUser?.shifts?.hourly]
+    [shifts]
   );
 
   return (
     <>
-      {getUser?.shifts?.hourly.length === 0 ? (
+      {shifts?.length === 0 ? (
         <Text classes="mx-0 my-auto block text-center text-xl text-red-700">
           {"You haven't started your shift yet! Please press the 'Start Shift' button."}
         </Text>

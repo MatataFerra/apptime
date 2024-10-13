@@ -4,10 +4,10 @@ import type { PropsWithChildren } from "react";
 
 import HydrateStore from "@/components/structures/Track/HydrateStore";
 
-import useUser from "@/hooks/useUser";
+import useHourlyShifts from "@/hooks/useHourlyShifts";
 
 export default function Template({ children }: PropsWithChildren) {
-  const { data: user } = useUser();
+  const { data: shifts } = useHourlyShifts();
 
-  return <HydrateStore data={{ user }}>{children}</HydrateStore>;
+  return <HydrateStore data={{ shifts }}>{children}</HydrateStore>;
 }

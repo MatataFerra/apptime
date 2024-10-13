@@ -72,7 +72,7 @@ function ShiftStartHasConfigStep() {
                 d="M1 5.917 5.724 10.5 15 1.5"
               />
             </svg>
-            <span>Unpaid breaks: {data.unpaidBreaks}</span>
+            <span>Unpaid breaks: {data.unpaidBreaks}min</span>
           </li>
         </ul>
       </Stack>

@@ -7,7 +7,9 @@ import Toast from "@/services/Toast";
 import Button from "@/components/ui/Button";
 import Loader from "@/components/ui/Loader";
 
+import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import useTrack from "@/hooks/useTrack";
+import useUser from "@/hooks/useUser";
 
 import onUpdateTrackJob from "@/server-actions/update-track";
 import { useNotes } from "@/store/useNotesStore";
@@ -25,13 +27,14 @@ function FinishButton({ buttonStatus }: Props) {
   const queryClient = useQueryClient();
   const { removelocalNote } = useNotes();
   const { data } = useShiftData((state) => state);
+  const { data: user } = useUser();
+
   const {
     taxesModule: { salaryElement: taxes },
     contributionsModule: { salaryElement: contributions },
   } = useTrackTaxesOrContributionsStore();
 
   const {
-    user,
     updateShiftsInfo,
     updateShiftStatus,
     updateShiftUnclosed,
@@ -96,7 +99,7 @@ function FinishButton({ buttonStatus }: Props) {
           duration: 1000,
         });
 
-        queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
+        queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
 
         return;
       }
@@ -116,7 +119,7 @@ function FinishButton({ buttonStatus }: Props) {
         duration: 1000,
       });
 
-      queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
+      queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
     });
   }
 
