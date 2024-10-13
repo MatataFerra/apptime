@@ -2,6 +2,7 @@
 
 import type { Hourly } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 import Toast from "@/services/Toast";
 
@@ -21,6 +22,7 @@ type Props = {
 
 function ShiftStartButton({ title = "Save config & start" }: Props) {
   const { data, errors } = useShiftData((state) => state);
+  const router = useRouter();
   const { data: user } = useUser();
   const queryClient = useQueryClient();
   const { updateShiftsInfo, updateShiftStatus, createShift, updateShiftUnclosed, setIsClosing } =
@@ -53,7 +55,7 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
           type: "success",
         });
 
-        queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.USER, user?.email] });
+        queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
 
         const prepareShift: Hourly = {
           ...data,
@@ -71,6 +73,8 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
         updateShiftsInfo();
         updateShiftUnclosed();
         setIsClosing(false);
+
+        router.refresh();
 
         return;
       }

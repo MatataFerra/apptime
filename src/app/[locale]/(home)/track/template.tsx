@@ -1,6 +1,6 @@
 "use client";
 
-import type { PropsWithChildren } from "react";
+import { type PropsWithChildren } from "react";
 
 import HydrateStore from "@/components/structures/Track/HydrateStore";
 
