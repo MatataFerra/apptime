@@ -30,7 +30,7 @@ function ShiftStartInputs() {
     resolver: zodResolver(InputsSchema),
     defaultValues: {
       hourValue: "",
-      unpaidBreaks: "1",
+      unpaidBreaks: "30",
     },
   });
 
@@ -62,15 +62,17 @@ function ShiftStartInputs() {
           type="number"
           required
           min={0}
-          {...register("hourValue", {})}
+          {...register("hourValue")}
         />
         <Input
           description="Unpaid Breaks"
+          measure="min."
+          measurePlace="right"
           type="number"
           min={0}
           max={5}
           required
-          {...register("unpaidBreaks", {})}
+          {...register("unpaidBreaks")}
         />
       </Stack>
       <Stack orientation="vertical" classes="h-20">

@@ -255,7 +255,9 @@ class ShiftService implements ShiftServiceInterface {
     );
   }
 
-  static getLastConfigShift(shifts: Production[] | Hourly[] | undefined) {
+  static getLastConfigShift(
+    shifts: Production[] | Hourly[] | HourlyType[] | (HourlyType | undefined)[] | undefined | null
+  ) {
     const lastShift = shifts?.at(-1);
 
     if (!lastShift) return null;

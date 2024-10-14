@@ -9,10 +9,10 @@ import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
 import HourlyService from "@/services/Shift/Hourly";
 
-import type { UserType } from "@/types";
+import type { HourlyType, UserType } from "@/types";
 
 interface ShiftStateProps {
-  user: UserType | Partial<UserType> | null;
+  shifts: HourlyType[] | Partial<HourlyType[]> | null;
   shiftUnclosed: { shift: Partial<Hourly> | null; isLoading: boolean };
   isClosing: boolean;
   isShiftActive: boolean;
@@ -42,10 +42,10 @@ interface ShiftStateProps {
 }
 
 export interface ShiftState extends ShiftStateProps {
-  setUser: (user: UserType | undefined | null) => void;
+  setShifts: (shifts: HourlyType[] | undefined | null) => void;
   getShift: (id: number | undefined) => Hourly | undefined;
   setButtonClicked: (button: Partial<ShiftStateProps["buttonClicked"]>) => void;
-  updateShift: (shift: Partial<Hourly>) => void;
+  updateShift: (shift: Partial<HourlyType>) => void;
   setClickOnSave: (state: boolean) => void;
   createShift: (shift: Hourly) => void;
   deleteShift: (id: number) => void;
@@ -60,7 +60,7 @@ export interface ShiftState extends ShiftStateProps {
 
 export const useTrackStore = create(
   devtools<ShiftState>((set, get) => ({
-    user: null,
+    shifts: null,
     shiftUnclosed: {
       shift: null,
       isLoading: true,
@@ -90,12 +90,12 @@ export const useTrackStore = create(
     isClosing: false,
     inputsDisabled: true,
     differenceBetweenStartAndEnd: "",
-    setUser: (user: UserType | null | undefined) => {
+    setShifts: (shifts: HourlyType[] | null | undefined) => {
       set(
         (state) => {
           return {
             ...state,
-            user,
+            shifts,
           };
         },
         false,
@@ -111,33 +111,26 @@ export const useTrackStore = create(
     getShift: (id: number | undefined) => {
       if (!id) return undefined;
 
-      const hourly = get()?.user?.shifts?.hourly;
+      const hourly = get()?.shifts;
 
-      return hourly?.find((h) => h.id === id);
+      return hourly?.find((h) => h?.id === id);
     },
-    updateShift: (shift: Partial<Hourly>) => {
+    updateShift: (shift: Partial<HourlyType>) => {
       set(
         (state) => {
+          const updatedShifts = state?.shifts
+            ?.filter((shiftItem) => shiftItem !== undefined)
+            .map((h) => {
+              if (h && h.id === shift.id) return { ...h, ...shift };
+              return h;
+            });
+
           return {
             ...state,
-            user: {
-              ...state.user,
-
-              shifts: {
-                id: state.user?.shifts?.id as number,
-                userId: state.user?.shifts?.userId as string,
-                hourly:
-                  state.user?.shifts?.hourly?.map((h) => {
-                    if (h.id === shift.id) return { ...h, ...shift };
-                    return h;
-                  }) || [],
-                production: state.user?.shifts?.production || [],
-              },
-            },
+            shifts: updatedShifts,
             shiftsInfo: {
               ...state.shiftsInfo,
-              isEmpty:
-                !state.user?.shifts?.hourly?.length && !state.user?.shifts?.production?.length,
+              isEmpty: !updatedShifts?.length, // Verificamos el array actualizado
             },
           };
         },
@@ -145,20 +138,12 @@ export const useTrackStore = create(
         "UPDATE_SHIFT"
       );
     },
-    createShift: (shift: Hourly) => {
+    createShift: (shift: HourlyType) => {
       set(
         (state) => {
           return {
             ...state,
-            user: {
-              ...state.user,
-              shifts: {
-                id: state.user?.shifts?.id as number,
-                userId: state.user?.shifts?.userId as string,
-                hourly: state.user?.shifts?.hourly?.concat(shift) || [],
-                production: state.user?.shifts?.production || [],
-              },
-            },
+            shifts: state.shifts?.concat(shift) || [],
           };
         },
         false,
@@ -170,19 +155,10 @@ export const useTrackStore = create(
         (state) => {
           return {
             ...state,
-            user: {
-              ...state.user,
-              shifts: {
-                id: state.user?.shifts?.id as number,
-                userId: state.user?.shifts?.userId as string,
-                hourly: state.user?.shifts?.hourly?.filter((h) => h.id !== id) || [],
-                production: state.user?.shifts?.production || [],
-              },
-            },
+            shifts: state.shifts?.filter((h) => h?.id !== id) || [],
             shiftsInfo: {
               ...state.shiftsInfo,
-              isEmpty:
-                !state.user?.shifts?.hourly?.length && !state.user?.shifts?.production?.length,
+              isEmpty: !state.shifts?.length,
             },
           };
         },
@@ -222,9 +198,11 @@ export const useTrackStore = create(
         (state) => {
           state.shiftsInfo.isLoading = true;
 
-          const getter = get()?.user;
+          const getter = get()?.shifts;
 
-          const lastShiftClosed = ShiftService.getLatestShift(getter?.shifts);
+          if (isEmpty(getter)) return state;
+
+          const lastShiftClosed = HourlyService.getLatestShift(getter as HourlyType[]);
 
           if (!lastShiftClosed)
             return {
@@ -232,7 +210,7 @@ export const useTrackStore = create(
               shiftsInfo: {
                 ...state.shiftsInfo,
                 isLoading: false,
-                isEmpty: !getter?.shifts?.hourly?.length && !getter?.shifts?.production?.length,
+                isEmpty: !getter?.length,
               },
             };
 
@@ -245,12 +223,8 @@ export const useTrackStore = create(
             new Date(lastShiftClosed?.endDate ?? "")
           );
 
-          const hourlyEarnings = getter?.shifts?.hourly?.reduce((acc, curr) => {
-            return acc + new ShiftService(curr).calculateEarnings();
-          }, 0);
-
-          const productionEarnings = getter?.shifts?.production?.reduce((acc, curr) => {
-            return acc + new ShiftService(curr).calculateEarnings();
+          const hourlyEarnings = getter?.reduce((acc, curr) => {
+            return acc + new HourlyService(curr as HourlyType).calculateEarnings();
           }, 0);
 
           return {
@@ -258,10 +232,10 @@ export const useTrackStore = create(
             shiftsInfo: {
               ...state.shiftsInfo,
               date: humanizeDateLastShiftClosed,
-              earns: (hourlyEarnings ?? 0) + (productionEarnings ?? 0),
+              earns: hourlyEarnings ?? 0,
               text: distanceLastShiftClosed?.text ?? "",
               isLoading: false,
-              isEmpty: !getter?.shifts?.hourly?.length && !getter?.shifts?.production?.length,
+              isEmpty: !getter?.length,
             },
           };
         },
@@ -285,8 +259,8 @@ export const useTrackStore = create(
       set(
         (state) => {
           state.shiftUnclosed.isLoading = true;
-          const getter = get()?.user;
-          const lastShift = HourlyService.findUnClosedShift(getter?.shifts?.hourly);
+          const getter = get()?.shifts;
+          const lastShift = HourlyService.findUnClosedShift(getter as HourlyType[]);
 
           return {
             ...state,
@@ -345,24 +319,24 @@ export const useTrackStore = create(
 );
 
 function useTrack() {
-  const { user, setUser, updateShiftsInfo, updateShiftUnclosed, ...methods } = useTrackStore(
+  const { shifts, setShifts, updateShiftsInfo, updateShiftUnclosed, ...methods } = useTrackStore(
     (state) => state
   );
 
   useEffect(() => {
-    if (isEmpty(user)) return;
+    if (isEmpty(shifts)) return;
 
     updateShiftsInfo();
-  }, [updateShiftsInfo, user]);
+  }, [updateShiftsInfo, shifts]);
 
   useEffect(() => {
-    if (isEmpty(user)) return;
+    if (isEmpty(shifts)) return;
     updateShiftUnclosed();
-  }, [updateShiftUnclosed, user]);
+  }, [updateShiftUnclosed, shifts]);
 
   return {
-    user,
-    setUser,
+    shifts,
+    setShifts,
     updateShiftUnclosed,
     updateShiftsInfo,
     ...methods,
