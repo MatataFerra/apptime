@@ -1,10 +1,12 @@
 "use client";
 
-import type { Hourly } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 import Toast from "@/services/Toast";
+
+import type { HourlyType } from "@/types";
+import type { SuccessApiResponse } from "@/types/api_response";
 
 import Button from "@/components/ui/Button";
 import { DialogClose } from "@/components/ui/Dialog";
@@ -36,6 +38,35 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
 
     updateShiftStatus(true);
 
+    const previousHourliesShifts = queryClient.getQueryData<SuccessApiResponse<HourlyType[]>>([
+      USE_QUERY_KEYS.HOURLY,
+    ]);
+
+    const last = previousHourliesShifts?.hourly?.at(-1);
+
+    const prepareShift: HourlyType = {
+      ...data,
+      startDate: new Date().toString(),
+      id: last?.id ?? Math.random() + 1,
+      endDate: null,
+      isClosed: false,
+      shiftId: last?.shiftId ?? null,
+    };
+
+    //* optimistic update
+
+    queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] }).then(() => {
+      queryClient.setQueryData(
+        [USE_QUERY_KEYS.HOURLY],
+        (old: SuccessApiResponse<HourlyType[]>) => ({
+          ...old,
+          hourly: [...old.hourly, { ...prepareShift }],
+        })
+      );
+
+      return { previousHourliesShifts };
+    });
+
     onCreateTrackJob({
       startDate: new Date().toString(),
       endDate: null,
@@ -57,7 +88,7 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
 
         queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
 
-        const prepareShift: Hourly = {
+        const prepareShift: HourlyType = {
           ...data,
           startDate: new Date().toString(),
           id: response.shift?.id!,
@@ -82,6 +113,21 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
       Toast({
         message: "Error creating shift, please try again",
         type: "error",
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [USE_QUERY_KEYS.HOURLY],
+      });
+
+      queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] }).then(() => {
+        queryClient.setQueryData(
+          [USE_QUERY_KEYS.HOURLY],
+          (old: SuccessApiResponse<HourlyType[]>) => ({
+            ...previousHourliesShifts,
+          })
+        );
+
+        return { previousHourliesShifts };
       });
 
       updateShiftStatus(false);
