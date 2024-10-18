@@ -4,6 +4,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import ShiftService from "@/services/Shift";
 import Toast from "@/services/Toast";
 
+import type { HourlyType } from "@/types";
+import type { SuccessApiResponse } from "@/types/api_response";
+
 import Button from "@/components/ui/Button";
 import Loader from "@/components/ui/Loader";
 
@@ -31,7 +34,6 @@ function FinishButton({ buttonStatus }: Props) {
 
   const {
     taxesModule: { salaryElement: taxes },
-    contributionsModule: { salaryElement: contributions },
   } = useTrackTaxesOrContributionsStore();
 
   const {
@@ -46,11 +48,16 @@ function FinishButton({ buttonStatus }: Props) {
 
   function onFinishShift() {
     const currentShift = getShift(shift?.id);
+    const previousHourliesShifts = queryClient.getQueryData<SuccessApiResponse<HourlyType[]>>([
+      USE_QUERY_KEYS.HOURLY,
+    ]);
+
     const prepareShift = {
       ...currentShift,
       name: data.name,
       shiftId: user?.shifts?.id,
     };
+
     const updateTrackedShift = new ShiftService({ ...prepareShift, isClosed: true })
       .closeShift()
       .differenceInMinsBetweenStartAndEnd()
@@ -66,8 +73,23 @@ function FinishButton({ buttonStatus }: Props) {
     const prepareShiftToBeUpdated = {
       ...updateTrackedShift,
       taxes,
-      contributions,
     };
+
+    queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
+
+    queryClient.setQueryData([USE_QUERY_KEYS.HOURLY], (old: SuccessApiResponse<HourlyType[]>) => ({
+      ...old,
+      hourly: old.hourly.map((shift) => {
+        if (shift.id === updateTrackedShift.id) {
+          return {
+            ...shift,
+            ...prepareShiftToBeUpdated,
+          };
+        }
+
+        return shift;
+      }),
+    }));
 
     /*
       server action
@@ -120,6 +142,12 @@ function FinishButton({ buttonStatus }: Props) {
       });
 
       queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
+
+      queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
+
+      queryClient.setQueryData([USE_QUERY_KEYS.HOURLY], () => ({
+        ...previousHourliesShifts,
+      }));
     });
   }
 

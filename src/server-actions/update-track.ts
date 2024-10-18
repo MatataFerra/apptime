@@ -14,7 +14,7 @@ import type { ContributionElement, TaxElement } from "@/store/useTaxOrContributi
 
 type UpdateTrackData = Partial<TrackInputs> & {
   taxes: TaxElement[];
-  contributions: ContributionElement[];
+  contributions?: ContributionElement[];
 };
 
 export default async function onUpdateTrackJob(data: UpdateTrackData, shiftId: number | undefined) {
@@ -52,14 +52,16 @@ export default async function onUpdateTrackJob(data: UpdateTrackData, shiftId: n
     });
 
   const contributionsFromLocal = data.contributions
-    .filter((contrib) => contrib.name && contrib.value)
-    .map((contrib) => {
-      return {
-        name: contrib.name,
-        value: contrib.value,
-        description: contrib.description,
-      };
-    });
+    ? data?.contributions
+        .filter((contrib) => contrib.name && contrib.value)
+        .map((contrib) => {
+          return {
+            name: contrib.name,
+            value: contrib.value,
+            description: contrib.description,
+          };
+        })
+    : [];
 
   try {
     if (isEmpty(data)) return null;
