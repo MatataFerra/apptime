@@ -7,20 +7,18 @@ import ut from "@/services/Utilities/client";
 import PopoverHome from "@/components/structures/Home/Popover";
 import Text from "@/components/ui/Text";
 
-import useTrack from "@/hooks/useTrack";
+import useHourlyShifts from "@/hooks/useHourlyShifts";
 
 function ShiftTextState() {
-  const {
-    shiftUnclosed: { shift },
-  } = useTrack();
+  const { shiftUnclosed } = useHourlyShifts();
 
   const checkCloseShift = useCallback(() => {
-    if (typeof shift?.isClosed === "undefined") {
+    if (typeof shiftUnclosed?.isClosed === "undefined") {
       return false;
     }
 
-    return ut.isFalsyValue(shift?.isClosed);
-  }, [shift?.isClosed]);
+    return ut.isFalsyValue(shiftUnclosed?.isClosed);
+  }, [shiftUnclosed?.isClosed]);
 
   return (
     <Text as="h2" classes="flex gap-1 text-lg">

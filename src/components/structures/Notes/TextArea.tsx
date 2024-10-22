@@ -6,9 +6,7 @@ import Textarea from "@/components/ui/Textarea";
 
 import { useNotes } from "@/store/useNotesStore";
 
-type Props = {};
-
-function NotesTextarea(props: Props) {
+function NotesTextarea() {
   const { error, setError, notes, setNotes } = useNotes();
   const id = useId();
 
@@ -22,7 +20,6 @@ function NotesTextarea(props: Props) {
 
         return setNotes(e.target.value);
       }}
-      {...props}
     />
   );
 }

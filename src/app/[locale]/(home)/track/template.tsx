@@ -1,13 +1,13 @@
-"use client";
-
 import { type PropsWithChildren } from "react";
+
+import HourlyService from "@/services/Shift/Hourly";
 
 import HydrateStore from "@/components/structures/Track/HydrateStore";
 
-import useHourlyShifts from "@/hooks/useHourlyShifts";
+export const revalidate = 30;
 
-export default function Template({ children }: PropsWithChildren) {
-  const { data: shifts } = useHourlyShifts();
+export default async function Template({ children }: PropsWithChildren) {
+  const shifts = await HourlyService.getHourlyShifts();
 
   return <HydrateStore data={{ shifts }}>{children}</HydrateStore>;
 }
