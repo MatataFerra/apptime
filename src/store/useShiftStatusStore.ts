@@ -40,7 +40,6 @@ interface ShiftStateProps {
 
 interface ShiftState extends ShiftStateProps {
   setUser: (user: UserType | null | undefined) => void;
-  getShift: (id: number | undefined) => Hourly | undefined;
   setButtonClicked: (button: Partial<ShiftStateProps["buttonClicked"]>) => void;
   updateShift: (shift: Partial<Hourly>) => void;
   setClickOnSave: (state: boolean) => void;
@@ -101,13 +100,6 @@ export function createShiftStatusStore(initProps?: Partial<ShiftStateProps>) {
           user,
         };
       });
-    },
-    getShift: (id: number | undefined) => {
-      if (!id) return undefined;
-
-      const hourly = get()?.user?.shifts?.hourly;
-
-      return hourly?.find((h) => h.id === id);
     },
     updateShift: (shift: Partial<Hourly>) => {
       set((state) => {
