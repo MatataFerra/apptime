@@ -40,7 +40,8 @@
               ["^.+\\.s?css$"]
             ]
           }
-        ]
+        ],
+        "no-warning-comments": ["warn", {"terms": ["FIX"]}]
       }
     }
   ]
