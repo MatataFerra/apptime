@@ -4,8 +4,6 @@ import HourlyService from "@/services/Shift/Hourly";
 
 import HydrateStore from "@/components/structures/Track/HydrateStore";
 
-export const revalidate = 30;
-
 export default async function Template({ children }: PropsWithChildren) {
   const shifts = await HourlyService.getHourlyShifts();
 
