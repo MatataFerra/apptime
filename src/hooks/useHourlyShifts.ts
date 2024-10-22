@@ -1,8 +1,9 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 
 import apiHourly from "@/services/Api/Hourly";
+import HourlyService from "@/services/Shift/Hourly";
 
 import type { HourlyType } from "@/types";
 
@@ -22,7 +23,19 @@ function useHourlyShifts() {
     staleTime: 2 * 60 * 1000,
   });
 
-  return { data: data?.hourly as HourlyType[], isLoading, refetch, isFetched };
+  const shiftUnclosed = useMemo(() => {
+    if (!data?.hourly) return null;
+
+    return HourlyService.findUnClosedShift(data.hourly);
+  }, [data]);
+
+  return {
+    data: data?.hourly as HourlyType[],
+    isLoading,
+    refetch,
+    isFetched,
+    shiftUnclosed,
+  };
 }
 
 export default useHourlyShifts;
