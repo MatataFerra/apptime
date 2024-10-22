@@ -11,6 +11,7 @@ import Button from "@/components/ui/Button";
 import Loader from "@/components/ui/Loader";
 
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
+import useHourlyShifts from "@/hooks/useHourlyShifts";
 import useTrack from "@/hooks/useTrack";
 import useUser from "@/hooks/useUser";
 
@@ -28,32 +29,25 @@ type Props = {
 
 function FinishButton({ buttonStatus }: Props) {
   const queryClient = useQueryClient();
-  const { removelocalNote } = useNotes();
-  const { data } = useShiftData((state) => state);
+  const { removelocalNote, resetStoreNotes } = useNotes();
+  const { data, resetShiftData } = useShiftData((state) => state);
   const { data: user } = useUser();
 
   const {
-    taxesModule: { salaryElement: taxes },
+    taxesModule: { salaryElement: taxes, clear: clearTaxes },
   } = useTrackTaxesOrContributionsStore();
 
-  const {
-    updateShiftsInfo,
-    updateShiftStatus,
-    updateShiftUnclosed,
-    updateShift,
-    getShift,
-    setIsClosing,
-    shiftUnclosed: { shift },
-  } = useTrack();
+  const { updateShiftStatus, setIsClosing } = useTrack();
+
+  const { shiftUnclosed } = useHourlyShifts();
 
   function onFinishShift() {
-    const currentShift = getShift(shift?.id);
     const previousHourliesShifts = queryClient.getQueryData<SuccessApiResponse<HourlyType[]>>([
       USE_QUERY_KEYS.HOURLY,
     ]);
 
     const prepareShift = {
-      ...currentShift,
+      ...shiftUnclosed,
       name: data.name,
       shiftId: user?.shifts?.id,
     };
@@ -67,8 +61,6 @@ function FinishButton({ buttonStatus }: Props) {
     /*
      * Optimistic update
      */
-
-    updateShift({ ...updateTrackedShift });
 
     const prepareShiftToBeUpdated = {
       ...updateTrackedShift,
@@ -95,7 +87,7 @@ function FinishButton({ buttonStatus }: Props) {
       server action
     */
 
-    onUpdateTrackJob({ ...prepareShiftToBeUpdated }, shift?.id).then((response) => {
+    onUpdateTrackJob({ ...prepareShiftToBeUpdated }, shiftUnclosed?.id).then((response) => {
       Toast({
         message: "Closing shift",
         type: "plain",
@@ -106,12 +98,12 @@ function FinishButton({ buttonStatus }: Props) {
 
       // set closing to true
       setIsClosing(true);
-      updateShiftsInfo();
-      updateShiftUnclosed();
-      updateShiftStatus(false);
 
       if (response) {
         removelocalNote();
+        resetStoreNotes();
+        resetShiftData();
+        clearTaxes();
 
         Toast({
           message: "Shift updated",
@@ -126,10 +118,7 @@ function FinishButton({ buttonStatus }: Props) {
         return;
       }
 
-      updateShiftsInfo();
-      updateShiftUnclosed();
       updateShiftStatus(true);
-      updateShift({ ...prepareShift });
       // set closing to false
       setIsClosing(false);
 

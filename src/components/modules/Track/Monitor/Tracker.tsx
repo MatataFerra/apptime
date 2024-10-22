@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import Image from "@/components/ui/Image";
 import Skeleton from "@/components/ui/Skeleton";
 
+import useHourlyShifts from "@/hooks/useHourlyShifts";
 import useTrack from "@/hooks/useTrack";
 
 const ShiftState = dynamic(() => import("@/components/structures/Track/Monitor/ShiftState"), {
@@ -17,11 +18,8 @@ const ShiftInfo = dynamic(() => import("@/components/structures/Track/Monitor/Sh
 });
 
 function Tracker() {
-  const {
-    isShiftActive,
-    isClosing,
-    shiftUnclosed: { isLoading },
-  } = useTrack();
+  const { isLoading } = useHourlyShifts();
+  const { isShiftActive, isClosing } = useTrack();
 
   return (
     <>

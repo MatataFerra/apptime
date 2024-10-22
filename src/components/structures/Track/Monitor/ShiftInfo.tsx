@@ -8,13 +8,10 @@ import ShiftService from "@/services/Shift";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
-import useTrack from "@/hooks/useTrack";
+import useHourlyShifts from "@/hooks/useHourlyShifts";
 
 function ShiftTrackInfo() {
-  const {
-    shifts,
-    shiftUnclosed: { isLoading },
-  } = useTrack();
+  const { data: shifts, isLoading } = useHourlyShifts();
 
   const lastShift = useMemo(() => shifts?.at(-1), [shifts]);
 
