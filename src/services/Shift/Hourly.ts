@@ -8,6 +8,7 @@ import TaxService from "@/services/Tax";
 import type { HourlyType } from "@/types";
 
 import prisma from "../../../prisma/client";
+import UserService from "../User";
 
 type HourlyOptions = {
   deleteTaxes?: Tax[];
@@ -59,6 +60,23 @@ class HourlyService implements HourlyInterface {
     CRUD methods
     ============================================================
   */
+
+  /*
+    ===========================
+    -----------Read----------
+    ===========================
+  */
+
+  static async getHourlyShifts() {
+    const getUser = await UserService.getSessionUser();
+    const getAll = await prisma.hourly.findMany({
+      where: {
+        shiftId: getUser?.shifts?.id,
+      },
+    });
+
+    return getAll;
+  }
 
   /*
     ===========================
