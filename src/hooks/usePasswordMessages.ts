@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { FieldErrors } from "react-hook-form";
+import type { FieldErrors } from "react-hook-form";
 
 import { PassedErrors } from "@/types";
 
