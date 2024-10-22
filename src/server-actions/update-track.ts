@@ -65,13 +65,14 @@ export default async function onUpdateTrackJob(data: UpdateTrackData, shiftId: n
 
   try {
     if (isEmpty(data)) return null;
+    if (!data.id) return null;
 
     const hourlyService = new HourlyService(shift);
 
     await hourlyService.addContributions(contributionsFromLocal);
     await hourlyService.addtaxes(taxesFromLocal);
 
-    const response = await hourlyService.update(data.id!);
+    const response = await hourlyService.update(data.id);
 
     revalidatePath("/dashboard", "page");
     revalidatePath("/[locale]/(home)/dashboard/@table/@history/page", "page");
