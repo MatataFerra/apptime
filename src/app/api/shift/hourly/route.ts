@@ -106,6 +106,7 @@ export async function GET(req: NextRequest) {
       include: {
         taxes: true,
       },
+      take: -30,
     });
 
     return hourlyShifts;

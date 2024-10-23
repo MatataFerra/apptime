@@ -2,6 +2,7 @@ import type { Hourly } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
 
 import ShiftService from "@/services/Shift";
+import HourlyService from "@/services/Shift/Hourly";
 import Toast from "@/services/Toast";
 
 import type { HourlyType } from "@/types";
@@ -11,8 +12,8 @@ import Button from "@/components/ui/Button";
 import Loader from "@/components/ui/Loader";
 
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
-import useHourlyShifts from "@/hooks/useHourlyShifts";
 import useTrack from "@/hooks/useTrack";
+import useTrackShift from "@/hooks/useTrackShift";
 import useUser from "@/hooks/useUser";
 
 import onUpdateTrackJob from "@/server-actions/update-track";
@@ -27,11 +28,18 @@ type Props = {
   };
 };
 
+type Response = {
+  shift: HourlyType;
+  last: HourlyType[];
+  earnings: number;
+};
+
 function FinishButton({ buttonStatus }: Props) {
   const queryClient = useQueryClient();
   const { removelocalNote, resetStoreNotes } = useNotes();
   const { data, resetShiftData } = useShiftData((state) => state);
   const { data: user } = useUser();
+  const { data: track } = useTrackShift();
 
   const {
     taxesModule: { salaryElement: taxes, clear: clearTaxes },
@@ -39,15 +47,13 @@ function FinishButton({ buttonStatus }: Props) {
 
   const { updateShiftStatus, setIsClosing } = useTrack();
 
-  const { shiftUnclosed } = useHourlyShifts();
-
   function onFinishShift() {
-    const previousHourliesShifts = queryClient.getQueryData<SuccessApiResponse<HourlyType[]>>([
-      USE_QUERY_KEYS.HOURLY,
+    const previousTrack = queryClient.getQueryData<SuccessApiResponse<Response>>([
+      USE_QUERY_KEYS.TRACK,
     ]);
 
     const prepareShift = {
-      ...shiftUnclosed,
+      ...track.shift,
       name: data.name,
       shiftId: user?.shifts?.id,
     };
@@ -67,27 +73,24 @@ function FinishButton({ buttonStatus }: Props) {
       taxes,
     };
 
-    queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
+    queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.TRACK] });
 
-    queryClient.setQueryData([USE_QUERY_KEYS.HOURLY], (old: SuccessApiResponse<HourlyType[]>) => ({
+    const calculateEarnings = new HourlyService(updateTrackedShift).calculateEarnings();
+
+    queryClient.setQueryData([USE_QUERY_KEYS.TRACK], (old: SuccessApiResponse<Response>) => ({
       ...old,
-      hourly: old.hourly.map((shift) => {
-        if (shift.id === updateTrackedShift.id) {
-          return {
-            ...shift,
-            ...prepareShiftToBeUpdated,
-          };
-        }
-
-        return shift;
-      }),
+      track: {
+        shift: null,
+        last: [{ ...prepareShiftToBeUpdated }],
+        earnings: old.track.earnings + calculateEarnings,
+      },
     }));
 
     /*
       server action
     */
 
-    onUpdateTrackJob({ ...prepareShiftToBeUpdated }, shiftUnclosed?.id).then((response) => {
+    onUpdateTrackJob({ ...prepareShiftToBeUpdated }, track.shift?.id).then((response) => {
       Toast({
         message: "Closing shift",
         type: "plain",
@@ -113,6 +116,7 @@ function FinishButton({ buttonStatus }: Props) {
           duration: 1000,
         });
 
+        queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.TRACK] });
         queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
 
         return;
@@ -130,12 +134,11 @@ function FinishButton({ buttonStatus }: Props) {
         duration: 1000,
       });
 
-      queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
+      queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.TRACK] });
+      queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.TRACK] });
 
-      queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
-
-      queryClient.setQueryData([USE_QUERY_KEYS.HOURLY], () => ({
-        ...previousHourliesShifts,
+      queryClient.setQueryData([USE_QUERY_KEYS.TRACK], () => ({
+        ...previousTrack,
       }));
     });
   }
