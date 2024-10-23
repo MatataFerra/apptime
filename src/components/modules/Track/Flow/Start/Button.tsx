@@ -2,30 +2,34 @@
 
 import { useCallback, useEffect } from "react";
 
+import isEmpty from "lodash/isEmpty";
+
 import ut from "@/services/Utilities/client";
 
 import StartDialog from "@/components/modules/Track/Flow/Start/Dialog";
 
 import useButtonStatus from "@/hooks/useButtonStatus";
-import useHourlyShifts from "@/hooks/useHourlyShifts";
 import useTrack from "@/hooks/useTrack";
+import useTrackShift from "@/hooks/useTrackShift";
 
 export default function ButtonsStart() {
-  const { isShiftActive, updateShiftStatus } = useTrack();
-  const { shiftUnclosed } = useHourlyShifts();
+  const { updateShiftStatus } = useTrack();
+  const { data: track } = useTrackShift();
   const buttonStatus = useButtonStatus();
 
   const checkCloseShift = useCallback(() => {
-    if (typeof shiftUnclosed?.isClosed === "undefined") {
+    if (typeof track?.shift?.isClosed === "undefined") {
       return false;
     }
 
-    return ut.isFalsyValue(shiftUnclosed?.isClosed);
-  }, [shiftUnclosed?.isClosed]);
+    return ut.isFalsyValue(track?.shift?.isClosed);
+  }, [track?.shift?.isClosed]);
 
   useEffect(() => {
     updateShiftStatus(checkCloseShift());
   }, [checkCloseShift, updateShiftStatus]);
 
-  return <>{!isShiftActive ? <StartDialog triggerStatus={buttonStatus?.startButton} /> : null}</>;
+  return (
+    <>{isEmpty(track?.shift) ? <StartDialog triggerStatus={buttonStatus?.startButton} /> : null}</>
+  );
 }

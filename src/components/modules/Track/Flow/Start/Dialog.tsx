@@ -4,14 +4,14 @@ import { useMemo } from "react";
 
 import isEmpty from "lodash/isEmpty";
 
-import ShiftService from "@/services/Shift";
+import HourlyService from "@/services/Shift/Hourly";
 
 import HasConfig from "@/components/structures/Track/Flow/Start/Dialog/HasConfig";
 import SetShift from "@/components/structures/Track/Flow/Start/Dialog/SetShift";
 import Trigger from "@/components/structures/Track/Trigger";
 import { Dialog, DialogContent } from "@/components/ui/Dialog";
 
-import useHourlyShifts from "@/hooks/useHourlyShifts";
+import useTrackShift from "@/hooks/useTrackShift";
 
 import { useShiftData } from "@/store/useShiftData";
 
@@ -26,12 +26,17 @@ type Props = {
 
 function StartDialog({ triggerStatus }: Props) {
   const { step, setData, setStep, setErrors } = useShiftData((state) => state);
-  const { data: shifts } = useHourlyShifts();
-  const hasConfig = useMemo(() => !isEmpty(ShiftService.getLastConfigShift(shifts)), [shifts]);
-  const last = useMemo(() => ShiftService.getLastConfigShift(shifts), [shifts]) as {
-    unpaidBreaks: number;
-    hourValue: number;
-  };
+  const { data: track, isLoading } = useTrackShift();
+  const hasConfig = useMemo(() => {
+    if (isLoading) return null;
+
+    return !isEmpty(new HourlyService(track?.last).getConfig());
+  }, [isLoading, track?.last]);
+  const last = useMemo(() => {
+    if (isLoading) return null;
+
+    return new HourlyService(track?.last).getConfig();
+  }, [isLoading, track?.last]);
 
   function resetData() {
     setStep("HasConfig");

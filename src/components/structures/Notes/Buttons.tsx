@@ -2,7 +2,6 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import Toast from "@/services/Toast";
 
-import type { HourlyType } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 
 import Button from "@/components/ui/Button";
@@ -10,32 +9,32 @@ import { SheetClose } from "@/components/ui/Sheet";
 import Stack from "@/components/ui/Stack";
 
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
-import useHourlyShifts from "@/hooks/useHourlyShifts";
+import useTrackShift, { type TrackShiftResponseType } from "@/hooks/useTrackShift";
 
 import { useNotes } from "@/store/useNotesStore";
 
 function Buttons() {
   const queryClient = useQueryClient();
-  const { shiftUnclosed } = useHourlyShifts();
+  const { data } = useTrackShift();
   const { notes, setlocalNote, setError, setOpen } = useNotes();
 
   async function onSaveNotes() {
     if (notes.length <= 3) return setError();
-    if (!shiftUnclosed) return;
+    if (!data.shift) return;
 
-    queryClient.setQueryData([USE_QUERY_KEYS.HOURLY], (old: SuccessApiResponse<HourlyType[]>) => ({
-      ...old,
-      hourly: old.hourly.map((shift) => {
-        if (shift.id === shiftUnclosed.id) {
-          return {
-            ...shift,
+    queryClient.setQueryData(
+      [USE_QUERY_KEYS.TRACK],
+      (old: SuccessApiResponse<TrackShiftResponseType>) => ({
+        ...old,
+        track: {
+          ...old.track,
+          shift: {
+            ...old.track.shift,
             notes,
-          };
-        }
-
-        return shift;
-      }),
-    }));
+          },
+        },
+      })
+    );
 
     setlocalNote(notes);
     setOpen(false);

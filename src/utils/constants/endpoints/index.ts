@@ -8,6 +8,7 @@ export const API_ENDPOINTS = {
   SHIFT: `/api/shift`,
   HOURLY: `/api/shift/hourly`,
   PRODUCTION: `/api/shift/production`,
+  TRACK: `/api/shift/track`,
   TAX: `/api/tax`,
   CONTRIBUTIONS: `/api/contributions`,
   SALARY_ITEMS: `/api/salary-items`,
