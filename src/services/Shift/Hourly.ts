@@ -248,8 +248,8 @@ class HourlyService implements HourlyInterface {
 
   getConfig() {
     return {
-      hourValue: this.shift.hourValue,
-      unpaidBreaks: this.shift.unpaidBreaks,
+      hourValue: this.shift?.hourValue ?? 0,
+      unpaidBreaks: this.shift?.unpaidBreaks ?? 0,
     };
   }
 
