@@ -2,8 +2,6 @@ import isEmpty from "lodash/isEmpty";
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-import ShiftService from "@/services/Shift";
-
 import prisma from "#/prisma/client";
 
 export async function GET(req: NextRequest) {
@@ -22,54 +20,19 @@ export async function GET(req: NextRequest) {
       };
     }
 
-    const user = await ctx?.user.findUnique({
-      where: {
-        email: email,
-      },
-      include: {
-        shifts: true,
-      },
-    });
-
-    if (!user) {
-      return {
-        response: false,
-      };
-    }
-
     const hourlies = await ctx?.hourly.findMany({
       where: {
-        shiftId: user?.shifts?.id,
+        shift: {
+          user: {
+            email,
+          },
+        },
       },
-      include: {
-        taxes: true,
-      },
+
+      take: -10,
     });
 
-    const trackShift = hourlies.find((shift) => shift.endDate === null) ?? null;
-
-    const orderShifts = ShiftService.sortAllShifts(
-      hourlies.map((s) => ({ ...s, type: "hourly" })),
-      {
-        desc: false,
-      }
-    );
-
-    const last = orderShifts?.filter((shift) => shift.endDate !== null).at(-1);
-
-    const earnings = hourlies.reduce((acc, shift) => {
-      if (shift?.isClosed) {
-        acc += new ShiftService(shift).calculateEarnings();
-      }
-
-      return acc;
-    }, 0);
-
-    return {
-      shift: trackShift,
-      last,
-      earnings,
-    };
+    return hourlies;
   });
 
   return NextResponse.json(

@@ -4,7 +4,6 @@ import type { HourlyType } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 
 import { API_ENDPOINTS } from "@/utils/constants/endpoints";
-import type { TrackShiftResponseType } from "@/hooks/useTrackShift";
 
 class ApiHourly extends ApiBase {
   constructor() {
@@ -19,7 +18,7 @@ class ApiHourly extends ApiBase {
     return hourlies;
   }
 
-  static async getTrack(): Promise<SuccessApiResponse<TrackShiftResponseType>> {
+  static async getTrack(): Promise<SuccessApiResponse<HourlyType[]>> {
     const track = await this.get({
       endpoint: `${API_ENDPOINTS.TRACK}`,
     });
