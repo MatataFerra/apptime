@@ -22,24 +22,13 @@ export async function GET(req: NextRequest) {
       };
     }
 
-    const user = await ctx?.user.findUnique({
-      where: {
-        email: email,
-      },
-      include: {
-        shifts: true,
-      },
-    });
-
-    if (!user) {
-      return {
-        response: false,
-      };
-    }
-
     const hourlies = await ctx?.hourly.findMany({
       where: {
-        shiftId: user?.shifts?.id,
+        shift: {
+          user: {
+            email,
+          },
+        },
       },
       include: {
         taxes: true,
@@ -71,6 +60,8 @@ export async function GET(req: NextRequest) {
       earnings,
     };
   });
+
+  console.log("🚀 ~ GET ~ track:", track);
 
   return NextResponse.json(
     {
