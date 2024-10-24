@@ -2,11 +2,7 @@ import isEmpty from "lodash/isEmpty";
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-import ShiftService from "@/services/Shift";
-
 import prisma from "#/prisma/client";
-
-export const maxDuration = 15;
 
 export async function GET(req: NextRequest) {
   const checkToken = await getToken({ req });
@@ -32,9 +28,8 @@ export async function GET(req: NextRequest) {
           },
         },
       },
-      include: {
-        taxes: true,
-      },
+
+      take: -10,
     });
 
     return hourlies;

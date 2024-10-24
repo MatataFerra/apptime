@@ -9,7 +9,6 @@ import type { HourlyType } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 
 import Button from "@/components/ui/Button";
-import Loader from "@/components/ui/Loader";
 
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import useTrack from "@/hooks/useTrack";
