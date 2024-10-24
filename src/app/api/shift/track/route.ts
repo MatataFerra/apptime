@@ -6,6 +6,8 @@ import ShiftService from "@/services/Shift";
 
 import prisma from "#/prisma/client";
 
+export const maxDuration = 15;
+
 export async function GET(req: NextRequest) {
   const checkToken = await getToken({ req });
 
@@ -35,33 +37,8 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    const trackShift = hourlies.find((shift) => shift.endDate === null) ?? null;
-
-    const orderShifts = ShiftService.sortAllShifts(
-      hourlies.map((s) => ({ ...s, type: "hourly" })),
-      {
-        desc: false,
-      }
-    );
-
-    const last = orderShifts?.filter((shift) => shift.endDate !== null).at(-1);
-
-    const earnings = hourlies.reduce((acc, shift) => {
-      if (shift?.isClosed) {
-        acc += new ShiftService(shift).calculateEarnings();
-      }
-
-      return acc;
-    }, 0);
-
-    return {
-      shift: trackShift,
-      last,
-      earnings,
-    };
+    return hourlies;
   });
-
-  console.log("🚀 ~ GET ~ track:", track);
 
   return NextResponse.json(
     {

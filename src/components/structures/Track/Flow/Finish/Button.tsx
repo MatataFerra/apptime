@@ -48,6 +48,13 @@ function FinishButton({ buttonStatus }: Props) {
   const { updateShiftStatus, setIsClosing } = useTrack();
 
   function onFinishShift() {
+    Toast({
+      message: "Closing shift",
+      type: "plain",
+      description: "Updating status, please wait...",
+      duration: 2000,
+    });
+
     const previousTrack = queryClient.getQueryData<SuccessApiResponse<Response>>([
       USE_QUERY_KEYS.TRACK,
     ]);
@@ -91,14 +98,6 @@ function FinishButton({ buttonStatus }: Props) {
     */
 
     onUpdateTrackJob({ ...prepareShiftToBeUpdated }, track.shift?.id).then((response) => {
-      Toast({
-        message: "Closing shift",
-        type: "plain",
-        description: "Updating status, please wait...",
-        action: <Loader.spinner bg="text-black" spinColor="fill-slate-100" />,
-        duration: 2000,
-      });
-
       // set closing to true
       setIsClosing(true);
 
@@ -112,7 +111,6 @@ function FinishButton({ buttonStatus }: Props) {
           message: "Shift updated",
           type: "success",
           description: "Your shift has been updated successfully",
-          action: <Loader.spinner bg="text-black" spinColor="fill-gray-50" />,
           duration: 1000,
         });
 
@@ -130,7 +128,6 @@ function FinishButton({ buttonStatus }: Props) {
         message: "Error",
         type: "error",
         description: "An error occurred while updating your shift",
-        action: <Loader.spinner bg="text-black" spinColor="fill-gray-50" />,
         duration: 1000,
       });
 

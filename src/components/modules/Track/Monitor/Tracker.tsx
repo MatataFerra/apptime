@@ -19,7 +19,6 @@ const ShiftInfo = dynamic(() => import("@/components/structures/Track/Monitor/Sh
 
 function Tracker() {
   const { data } = useTrackShift();
-  console.log("🚀 ~ Tracker ~ data:", data);
 
   return (
     <>
