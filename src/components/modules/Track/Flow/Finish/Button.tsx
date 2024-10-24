@@ -1,13 +1,17 @@
 "use client";
 
+import isEmpty from "lodash/isEmpty";
+
 import FinishButton from "@/components/structures/Track/Flow/Finish/Button";
 
 import useButtonStatus from "@/hooks/useButtonStatus";
-import useTrack from "@/hooks/useTrack";
+import useTrackShift from "@/hooks/useTrackShift";
 
 export default function ButtonFinish() {
-  const { isShiftActive } = useTrack();
+  const { data } = useTrackShift();
   const buttonStatus = useButtonStatus();
 
-  return <>{isShiftActive ? <FinishButton buttonStatus={buttonStatus.finishButton} /> : null}</>;
+  return (
+    <>{!isEmpty(data?.shift) ? <FinishButton buttonStatus={buttonStatus.finishButton} /> : null}</>
+  );
 }

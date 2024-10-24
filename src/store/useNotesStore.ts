@@ -11,6 +11,7 @@ type NotesStore = {
   setError: () => void;
   setNotes: (note: string) => void;
   setOpen: (value: boolean) => void;
+  resetStoreNotes: () => void;
 };
 
 export const useNotesStore = create(
@@ -27,6 +28,9 @@ export const useNotesStore = create(
       },
       setOpen: (value) => {
         set({ open: value });
+      },
+      resetStoreNotes: () => {
+        set({ notes: "" });
       },
     }),
     {

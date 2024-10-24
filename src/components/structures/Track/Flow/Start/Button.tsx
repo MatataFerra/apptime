@@ -27,8 +27,7 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
   const router = useRouter();
   const { data: user } = useUser();
   const queryClient = useQueryClient();
-  const { updateShiftsInfo, updateShiftStatus, createShift, updateShiftUnclosed, setIsClosing } =
-    useTrack();
+  const { updateShiftStatus, setIsClosing } = useTrack();
 
   function onStartShift() {
     Toast({
@@ -38,34 +37,32 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
 
     updateShiftStatus(true);
 
-    const previousHourliesShifts = queryClient.getQueryData<SuccessApiResponse<HourlyType[]>>([
-      USE_QUERY_KEYS.HOURLY,
+    const previousHourliesShifts = queryClient.getQueryData<SuccessApiResponse<HourlyType>>([
+      USE_QUERY_KEYS.TRACK,
     ]);
 
-    const last = previousHourliesShifts?.hourly?.at(-1);
-
-    const prepareShift: HourlyType = {
+    const prepareShift = {
       ...data,
       startDate: new Date().toString(),
-      id: last?.id ?? Math.random() + 1,
       endDate: null,
       isClosed: false,
-      shiftId: last?.shiftId ?? null,
+      shiftId: user?.shifts?.id ?? null,
     };
 
     //* optimistic update
 
-    queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] }).then(() => {
-      queryClient.setQueryData(
-        [USE_QUERY_KEYS.HOURLY],
-        (old: SuccessApiResponse<HourlyType[]>) => ({
-          ...old,
-          hourly: [...old.hourly, { ...prepareShift }],
-        })
-      );
+    queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.TRACK] });
+    queryClient.setQueryData([USE_QUERY_KEYS.TRACK], (old: SuccessApiResponse<HourlyType>) => ({
+      ...old,
+      track: {
+        ...old.track,
+        shift: {
+          ...prepareShift,
+        },
+      },
+    }));
 
-      return { previousHourliesShifts };
-    });
+    setIsClosing(false);
 
     onCreateTrackJob({
       startDate: new Date().toString(),
@@ -86,24 +83,7 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
           type: "success",
         });
 
-        queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
-
-        const prepareShift: HourlyType = {
-          ...data,
-          startDate: new Date().toString(),
-          id: response.shift?.id!,
-          endDate: null,
-          isClosed: false,
-        };
-
-        // success response
-        createShift({
-          ...prepareShift,
-        });
-
-        updateShiftsInfo();
-        updateShiftUnclosed();
-        setIsClosing(false);
+        queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.TRACK] });
 
         router.refresh();
 
@@ -115,20 +95,12 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
         type: "error",
       });
 
-      queryClient.invalidateQueries({
-        queryKey: [USE_QUERY_KEYS.HOURLY],
-      });
+      queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.TRACK] });
 
-      queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] }).then(() => {
-        queryClient.setQueryData(
-          [USE_QUERY_KEYS.HOURLY],
-          (old: SuccessApiResponse<HourlyType[]>) => ({
-            ...previousHourliesShifts,
-          })
-        );
-
-        return { previousHourliesShifts };
-      });
+      queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.TRACK] });
+      queryClient.setQueryData([USE_QUERY_KEYS.TRACK], () => ({
+        ...previousHourliesShifts,
+      }));
 
       updateShiftStatus(false);
       setIsClosing(true);

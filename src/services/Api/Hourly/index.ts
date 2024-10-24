@@ -17,6 +17,30 @@ class ApiHourly extends ApiBase {
 
     return hourlies;
   }
+
+  static async getTrack(): Promise<SuccessApiResponse<HourlyType[]>> {
+    const track = await this.get({
+      endpoint: `${API_ENDPOINTS.TRACK}`,
+    });
+
+    return track;
+  }
+
+  static async getLast(): Promise<SuccessApiResponse<{ last: HourlyType[] }>> {
+    const track = await this.get({
+      endpoint: `${API_ENDPOINTS.TRACK}/last`,
+    });
+
+    return track;
+  }
+
+  static async getEarnings(): Promise<SuccessApiResponse<{ earnings: number }>> {
+    const track = await this.get({
+      endpoint: `${API_ENDPOINTS.TRACK}/earns`,
+    });
+
+    return track;
+  }
 }
 
 export default ApiHourly;

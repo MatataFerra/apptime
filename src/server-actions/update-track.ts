@@ -24,10 +24,6 @@ export default async function onUpdateTrackJob(data: UpdateTrackData, shiftId: n
     return null;
   }
 
-  if (currentUser.shifts?.id === null) {
-    return null;
-  }
-
   if (!shiftId) return null;
 
   const prepareShift = {
@@ -51,30 +47,17 @@ export default async function onUpdateTrackJob(data: UpdateTrackData, shiftId: n
       };
     });
 
-  const contributionsFromLocal = data.contributions
-    ? data?.contributions
-        .filter((contrib) => contrib.name && contrib.value)
-        .map((contrib) => {
-          return {
-            name: contrib.name,
-            value: contrib.value,
-            description: contrib.description,
-          };
-        })
-    : [];
-
   try {
     if (isEmpty(data)) return null;
+    if (!data.id) return null;
 
     const hourlyService = new HourlyService(shift);
 
-    await hourlyService.addContributions(contributionsFromLocal);
     await hourlyService.addtaxes(taxesFromLocal);
 
-    const response = await hourlyService.update(data.id!);
+    const response = await hourlyService.update(data.id);
 
     revalidatePath("/dashboard", "page");
-    revalidatePath("/[locale]/(home)/dashboard/@table/@history/page", "page");
 
     return {
       response: typeof response !== "string",

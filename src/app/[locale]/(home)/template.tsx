@@ -7,10 +7,11 @@ import { usePathname } from "next/navigation";
 import { useLocale } from "next-intl";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
+import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import useUser from "@/hooks/useUser";
 
 export default function Template({ children }: PropsWithChildren) {
-  const qC = useQueryClient();
+  const queryClient = useQueryClient();
   const pathname = usePathname();
   const locale = useLocale();
   const { data } = useUser();
@@ -21,8 +22,8 @@ export default function Template({ children }: PropsWithChildren) {
     if (pathname === `/${locale}${PATH_NAMES.DASHBOARD}`) {
       if (!refresh) return;
 
-      qC.invalidateQueries({
-        queryKey: ["user", data?.email],
+      queryClient.invalidateQueries({
+        queryKey: [USE_QUERY_KEYS.USER, data?.email],
       });
 
       refresh = false;
@@ -31,7 +32,7 @@ export default function Template({ children }: PropsWithChildren) {
         refresh = true;
       };
     }
-  }, [data?.email, locale, pathname, qC]);
+  }, [data?.email, locale, pathname, queryClient]);
 
   return <>{children}</>;
 }

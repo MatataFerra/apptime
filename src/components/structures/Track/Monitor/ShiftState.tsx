@@ -9,29 +9,24 @@ import ShiftService from "@/services/Shift";
 
 import Text from "@/components/ui/Text";
 
-import useTrack from "@/hooks/useTrack";
+import useTrackShift from "@/hooks/useTrackShift";
 
 function ShiftState() {
-  const { shiftUnclosed, isShiftActive } = useTrack();
+  const { data, isLoading } = useTrackShift();
   const [shiftTime, setShiftTime] = useState("loading...");
 
   useEffect(() => {
     const { text } = ShiftService.differenceInHHmm(
-      shiftUnclosed.shift?.startDate ?? "",
-      shiftUnclosed.shift?.endDate ?? ""
+      data?.shift?.startDate ?? "",
+      data?.shift?.endDate ?? ""
     );
     setShiftTime(text);
-  }, [shiftUnclosed.shift?.endDate, shiftUnclosed.shift?.startDate]);
+  }, [data?.shift?.endDate, data?.shift?.startDate]);
 
   function updateShiftTime() {
-    if (!isShiftActive) {
-      setShiftTime("0h 0m");
-
-      return null;
-    }
     const { text } = ShiftService.differenceInHHmm(
-      shiftUnclosed.shift?.startDate ?? "",
-      shiftUnclosed.shift?.endDate ?? ""
+      data?.shift?.startDate ?? "",
+      data?.shift?.endDate ?? ""
     );
     setShiftTime(text);
   }
@@ -40,9 +35,9 @@ function ShiftState() {
 
   return (
     <>
-      {shiftUnclosed.isLoading ? (
+      {isLoading ? (
         <Text classes="block text-2xl">loading...</Text>
-      ) : !isEmpty(shiftUnclosed.shift) ? (
+      ) : !isEmpty(data?.shift) ? (
         <>
           <Text classes="text-2xl">shift opened {` (${shiftTime})`}</Text>
         </>

@@ -22,7 +22,12 @@ function useHourlyShifts() {
     staleTime: 2 * 60 * 1000,
   });
 
-  return { data: data?.hourly as HourlyType[], isLoading, refetch, isFetched };
+  return {
+    data: data?.hourly as HourlyType[],
+    isLoading,
+    refetch,
+    isFetched,
+  };
 }
 
 export default useHourlyShifts;
