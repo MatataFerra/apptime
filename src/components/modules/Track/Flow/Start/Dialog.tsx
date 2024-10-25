@@ -32,6 +32,7 @@ function StartDialog({ triggerStatus }: Props) {
 
     return !isEmpty(new HourlyService(track?.last).getConfig());
   }, [isLoading, track?.last]);
+
   const last = useMemo(() => {
     if (isLoading) return null;
 
