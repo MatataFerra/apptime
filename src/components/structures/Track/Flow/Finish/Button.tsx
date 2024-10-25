@@ -1,5 +1,6 @@
 import type { Hourly } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
+import isEmpty from "lodash/isEmpty";
 
 import ShiftService from "@/services/Shift";
 import HourlyService from "@/services/Shift/Hourly";
@@ -58,6 +59,10 @@ function FinishButton({ buttonStatus }: Props) {
       USE_QUERY_KEYS.TRACK,
     ]);
 
+    const previousHourlies = queryClient.getQueryData<SuccessApiResponse<HourlyType[]>>([
+      USE_QUERY_KEYS.HOURLY,
+    ]);
+
     const prepareShift = {
       ...track.shift,
       name: data.name,
@@ -80,6 +85,7 @@ function FinishButton({ buttonStatus }: Props) {
     };
 
     queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.TRACK] });
+    queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
 
     const calculateEarnings = new HourlyService(updateTrackedShift).calculateEarnings();
 
@@ -91,6 +97,24 @@ function FinishButton({ buttonStatus }: Props) {
         earnings: old.track.earnings + calculateEarnings,
       },
     }));
+
+    if (!isEmpty(previousHourlies)) {
+      queryClient.setQueryData(
+        [USE_QUERY_KEYS.HOURLY],
+        (old: SuccessApiResponse<HourlyType[]>) => ({
+          ...old,
+          hourly: old?.hourly?.map((shift) => {
+            if (shift.id === updateTrackedShift.id) {
+              return {
+                ...shift,
+                ...prepareShiftToBeUpdated,
+              };
+            }
+            return shift;
+          }),
+        })
+      );
+    }
 
     /*
       server action
@@ -136,6 +160,15 @@ function FinishButton({ buttonStatus }: Props) {
       queryClient.setQueryData([USE_QUERY_KEYS.TRACK], () => ({
         ...previousTrack,
       }));
+
+      if (!isEmpty(previousHourlies)) {
+        queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
+        queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
+
+        queryClient.setQueryData([USE_QUERY_KEYS.HOURLY], () => ({
+          ...previousHourlies,
+        }));
+      }
     });
   }
 
