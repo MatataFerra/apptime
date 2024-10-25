@@ -1,6 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
+import isEmpty from "lodash/isEmpty";
 import { useRouter } from "next/navigation";
 
 import Toast from "@/services/Toast";
@@ -37,8 +38,12 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
 
     updateShiftStatus(true);
 
-    const previousHourliesShifts = queryClient.getQueryData<SuccessApiResponse<HourlyType>>([
+    const previousTrack = queryClient.getQueryData<SuccessApiResponse<HourlyType>>([
       USE_QUERY_KEYS.TRACK,
+    ]);
+
+    const previousHourlies = queryClient.getQueryData<SuccessApiResponse<HourlyType[]>>([
+      USE_QUERY_KEYS.HOURLY,
     ]);
 
     const prepareShift = {
@@ -52,6 +57,7 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
     //* optimistic update
 
     queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.TRACK] });
+
     queryClient.setQueryData([USE_QUERY_KEYS.TRACK], (old: SuccessApiResponse<HourlyType>) => ({
       ...old,
       track: {
@@ -85,6 +91,20 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
 
         queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.TRACK] });
 
+        queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
+
+        if (!isEmpty(previousHourlies)) {
+          queryClient.setQueryData(
+            [USE_QUERY_KEYS.HOURLY],
+            (old: SuccessApiResponse<HourlyType[]>) => ({
+              ...old,
+              hourly: [...old.hourly, { ...response.shift }],
+            })
+          );
+        }
+
+        queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
+
         router.refresh();
 
         return;
@@ -99,8 +119,17 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
 
       queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.TRACK] });
       queryClient.setQueryData([USE_QUERY_KEYS.TRACK], () => ({
-        ...previousHourliesShifts,
+        ...previousTrack,
       }));
+
+      if (!isEmpty(previousHourlies)) {
+        queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
+        queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
+
+        queryClient.setQueryData([USE_QUERY_KEYS.HOURLY], () => ({
+          ...previousHourlies,
+        }));
+      }
 
       updateShiftStatus(false);
       setIsClosing(true);
