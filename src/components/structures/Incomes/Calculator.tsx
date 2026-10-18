@@ -75,15 +75,18 @@ function Calculator() {
         <Input type="number" label="How many days?" min={1} {...register("times")} />
         <Input type="number" label="Unpaid breaks" min={1} {...register("unpaid-breaks")} />
       </Stack>
-      <Stack orientation="vertical">
-        <Text classes="text-base font-bold">You are going to earn:</Text>
-        <Text classes="text-base font-bold">
-          {calculate
-            ? `${new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: "USD",
-              }).format(calculate)} 🤑`
-            : "$0.0 💸"}
+      <Stack
+        orientation="vertical"
+        spacing={1}
+        classes="rounded-xl bg-surface-inverse p-5 text-ink-inverse"
+        aria-live="polite"
+      >
+        <Text classes="text-sm text-ink-inverse/70">You are going to earn:</Text>
+        <Text classes={`figure text-figure ${calculate ? "text-live" : "text-ink-inverse/30"}`}>
+          {new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+          }).format(calculate || 0)}
         </Text>
       </Stack>
     </>

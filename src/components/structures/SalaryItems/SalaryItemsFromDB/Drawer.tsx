@@ -76,7 +76,7 @@ function DrawerSalaryItemsFromDB({
           type="button"
           variant="white"
           size="md"
-          classes={`w-full animate-pulse border-none bg-linear-to-tr from-sky-300/30 to-blue-400/40 font-medium transition-all duration-700 repeat-[3] hover:from-sky-300/40 hover:to-blue-400/50 active:shadow-button-inner`}
+          classes="w-full border-dashed bg-accent-soft font-medium text-accent hover:bg-accent-soft/70"
         >
           Click to use previous
         </Button>
@@ -91,7 +91,7 @@ function DrawerSalaryItemsFromDB({
             </VisuallyHidden.Root>
           </DrawerDescription>
         </DrawerHeader>
-        <article className="mx-auto my-0 h-full w-11/12 border border-border-strong/20 p-4 shadow-md">
+        <article className="mx-auto my-0 h-full w-11/12 rounded-lg border border-border bg-surface p-4">
           <SalaryItemsFromDB add={add} type={type} />
         </article>
         <DrawerFooter>

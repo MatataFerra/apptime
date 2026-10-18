@@ -24,7 +24,7 @@ function Ripple({ classes, children }: Props) {
     <div
       onClick={() => handleRipple()}
       className={cn(
-        "relative w-fit translate-x-0 translate-y-0 rounded-full after:absolute after:inset-0 after:-z-10 after:rounded-full after:bg-light-blue after:opacity-0",
+        "relative w-fit translate-x-0 translate-y-0 rounded-full after:absolute after:inset-0 after:-z-10 after:rounded-full after:bg-accent-soft after:opacity-0",
         isRippled ? "after:animate-ripple" : "",
         classes
       )}

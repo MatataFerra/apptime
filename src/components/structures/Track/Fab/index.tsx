@@ -2,12 +2,12 @@
 
 import { useRef, useState } from "react";
 
+import { Plus, Receipt, StickyNote } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useOnClickOutside } from "usehooks-ts";
 
 import { useDrawerTaxFromDB, useTaxDialog } from "@/components/structures/Track/Tax";
 import FloatingActionButton from "@/components/ui/Fab";
-import Icon from "@/components/ui/Icons";
 
 import useDelayed from "@/hooks/useDelayed";
 import useStatus from "@/hooks/useStatus";
@@ -52,9 +52,16 @@ function FabNotes() {
         <>
           <FloatingActionButton
             ref={menuRef}
-            classes="absolute bottom-24 right-2 z-50 size-16 animate-fade-in border-none bg-linear-to-br from-green-400 to-blue-500 active:shadow-button-inner"
+            aria-label={show ? "Close shift tools" : "Open shift tools"}
+            aria-expanded={show}
+            classes="absolute bottom-24 right-2 z-50 size-14 animate-fade-in border-none bg-primary text-primary-foreground shadow-float hover:bg-primary"
             onClick={onShowMenu}
-            icon={<Icon.plus />}
+            icon={
+              <Plus
+                className={`size-6 transition-transform duration-200 ${show ? "rotate-45" : ""}`}
+                aria-hidden="true"
+              />
+            }
           />
           {showDelayed ? (
             <>
@@ -62,7 +69,8 @@ function FabNotes() {
                 <FloatingActionButton
                   ref={notesRef}
                   disabled={!status}
-                  classes={`absolute bottom-42 right-4 z-10 size-12 border-none bg-linear-to-br from-amber-200 to-yellow-300 transition-all [&>span]:text-xs ${!status ? "bg-linear-to-br from-gray-300 to-stone-500" : "active:shadow-button-inner"} ${show ? "show_up" : "show_down"}`}
+                  classes={`absolute bottom-40 right-3 z-10 size-12 gap-0 border border-border bg-surface p-0 text-ink shadow-float [&>span]:text-[0.625rem] ${show ? "show_up" : "show_down"}`}
+                  icon={<StickyNote className="size-4" aria-hidden="true" />}
                   text="Notes"
                 />
               </Notes>
@@ -70,7 +78,8 @@ function FabNotes() {
                 <FloatingActionButton
                   ref={taxesRef}
                   disabled={!status}
-                  classes={`absolute bottom-56 right-4 z-0 size-12 border-none bg-linear-to-br from-red-200 to-violet-300 transition-all [&>span]:text-xs ${!status ? "bg-linear-to-br from-gray-300 to-stone-500" : "active:shadow-button-inner"} ${show ? "show_up_dialog" : "show_down_dialog"}`}
+                  classes={`absolute bottom-56 right-3 z-0 size-12 gap-0 border border-border bg-surface p-0 text-ink shadow-float [&>span]:text-[0.625rem] ${show ? "show_up_dialog" : "show_down_dialog"}`}
+                  icon={<Receipt className="size-4" aria-hidden="true" />}
                   text="Taxes"
                 />
               </TaxDialog>

@@ -1,30 +1,26 @@
 import dynamic from "next/dynamic";
 
 import Skeleton from "@/components/ui/Skeleton";
-import Stack from "@/components/ui/Stack";
 
 const Tracker = dynamic(() => import("@/components/modules/Track/Monitor/Tracker"), {
   ssr: false,
   loading: () => (
-    <Stack orientation="vertical" classes="h-full w-full" spacing={8}>
-      <Skeleton classes="h-10 w-3/4" />
-      <Skeleton classes="h-full w-full" />
-    </Stack>
+    <div className="flex size-full flex-col justify-between">
+      <Skeleton classes="h-5 w-28 bg-ink-inverse/10" />
+      <Skeleton classes="h-16 w-48 bg-ink-inverse/10" />
+      <Skeleton classes="h-12 w-full bg-ink-inverse/10" />
+    </div>
   ),
 });
 
+/**
+ * The tracker monitor: the one dark, high-contrast surface in the app.
+ */
 async function Screen() {
   return (
-    <Stack
-      as="article"
-      orientation="vertical"
-      alignItems="start"
-      classes="h-monitor relative w-full bg-linear-to-br from-white via-slate-100 to-slate-300 p-4 shadow-input"
-      spacing={6}
-      justifyContent="between"
-    >
+    <article className="h-monitor relative flex w-full flex-col justify-between overflow-hidden rounded-xl bg-surface-inverse p-5 text-ink-inverse">
       <Tracker />
-    </Stack>
+    </article>
   );
 }
 

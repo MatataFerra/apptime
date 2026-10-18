@@ -64,7 +64,7 @@ function HourlyRow({ shift }: { shift: Hourly }) {
         </TableElement>
         <TableElement>${String(calculateEarnings(shift))}</TableElement>
         <TableElement align="center">
-          {shift?.isPublicHoliday ? <Icon.star style={{ color: "#00f5d4" }} /> : null}
+          {shift?.isPublicHoliday ? <Icon.star className="text-accent" /> : null}
         </TableElement>
       </TableElement>
     </TableDialog>

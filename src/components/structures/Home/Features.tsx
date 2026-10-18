@@ -11,7 +11,7 @@ const HomeCardOption = dynamic(() => import("@/components/ui/OptionCard"), {
 
 function Features() {
   return (
-    <div className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-surface">
+    <div className="w-full divide-y divide-border overflow-hidden rounded-lg border border-border bg-surface">
       <HomeCardOption
         title="Track"
         description="Run the clock on an hourly shift"

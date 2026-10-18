@@ -15,7 +15,7 @@ function Drawer() {
   return (
     <Stack classes="my-4 w-full">
       <SalaryDrawer>
-        <Button variant="black" classes="w-full">
+        <Button variant="outline" classes="w-full">
           Advanced options
         </Button>
       </SalaryDrawer>

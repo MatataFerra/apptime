@@ -12,7 +12,7 @@ function Card({ children }: Props) {
       grid
       rows={2}
       orientation="vertical"
-      classes="h-40 min-h-40 rounded-lg border border-border bg-surface p-3"
+      classes="h-32 min-h-32 rounded-lg border border-border bg-surface p-4"
     >
       {children}
     </Stack>

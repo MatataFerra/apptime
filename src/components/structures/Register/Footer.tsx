@@ -4,7 +4,7 @@ import NextLink from "next/link";
 
 import { CSSClassNames } from "@/types";
 
-import Button from "@/components/ui/Button";
+import Button, { buttonVariants } from "@/components/ui/Button";
 import Footer from "@/components/ui/Footer";
 
 import { usePasswordValid } from "@/providers/PasswordValidProvider";
@@ -24,7 +24,7 @@ function RegisterFooter({ classes, idForm }: Props) {
       <Button
         type="submit"
         variant="black"
-        classes={cn("w-full text-lg", isButtonBloqued && "bg-gray-400 text-ink-muted")}
+        classes="w-full text-base"
         disabled={isButtonBloqued}
         form={idForm}
       >
@@ -32,12 +32,9 @@ function RegisterFooter({ classes, idForm }: Props) {
       </Button>
       <NextLink
         href={PATH_NAMES.LOGIN}
-        className={cn(
-          "h-12 w-full cursor-pointer rounded-lg border border-border-strong bg-surface p-3 text-center text-lg text-ink transition-all hover:bg-surface-sunken"
-        )}
+        className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full text-base")}
         role="button"
       >
-        {" "}
         Login
       </NextLink>
     </Footer>

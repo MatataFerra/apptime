@@ -91,10 +91,10 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
   return (
     <DialogClose asChild>
       <Button
-        variant="black"
+        variant="accent"
         disabled={errors}
         type="submit"
-        classes="w-full border border-transparent p-2 text-sm"
+        classes="w-full text-sm"
         onClick={onStartShift}
       >
         {title}

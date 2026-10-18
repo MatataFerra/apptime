@@ -163,9 +163,15 @@ function RegisterForm() {
         autoComplete="off"
         onSubmit={handleSubmit(onSubmit)}
       >
+        <header className="flex flex-col gap-1">
+          <h1 className="font-display text-3xl font-semibold tracking-tight text-ink">
+            Create your account
+          </h1>
+          <p className="text-sm text-ink-muted">Start logging shifts in under a minute.</p>
+        </header>
         <Stack spacing={4} orientation="vertical">
-          <Input basis="basis-0" type="email" label="email" {...register("email")} />
-          <Input basis="basis-0" type="password" label="password" {...register("password")} />
+          <Input basis="basis-0" type="email" label="Email" {...register("email")} />
+          <Input basis="basis-0" type="password" label="Password" {...register("password")} />
         </Stack>
         <List errors={passedErrors} password={passwordWatched} />
       </Form>

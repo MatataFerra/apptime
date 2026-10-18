@@ -12,7 +12,7 @@ const PickupDate = dynamic(() => import("@/components/structures/Dashboard/Table
 export default async function Table() {
   return (
     <Stack orientation="horizontal" alignItems="center" justifyContent="between" classes="w-full">
-      <Text gradient="title" classes={`line-clamp-1 text-2xl font-bold`}>
+      <Text as="h2" variant="subtitle" classes="line-clamp-1">
         History Shifts
       </Text>
       <PickupDate />

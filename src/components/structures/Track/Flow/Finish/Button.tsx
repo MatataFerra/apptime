@@ -123,8 +123,8 @@ function FinishButton({ buttonStatus }: Props) {
   return (
     <>
       <Button
-        variant="danger"
-        classes="w-full animate-fade-up shadow-button transition-all active:shadow-button-inner"
+        variant="primary"
+        classes="h-14 w-full animate-fade-up rounded-lg text-base font-semibold"
         disabled={buttonStatus.disabled}
         onClick={onFinishShift}
       >

@@ -57,7 +57,7 @@ export default function BarChartComponent({ data }: Props) {
         <CardTitle>Earns per day</CardTitle>
         <CardDescription>
           Shifts up to{" "}
-          <span className="border-b border-b-slate-400 font-bold">{`${data.at(-1).date}`}</span>
+          <span className="border-b border-b-border font-bold">{`${data.at(-1).date}`}</span>
         </CardDescription>
       </CardHeader>
       <CardContent>

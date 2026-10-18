@@ -22,11 +22,22 @@ function ShiftTextState() {
     return ut.isFalsyValue(shift?.isClosed);
   }, [shift?.isClosed]);
 
+  const online = checkCloseShift();
+
   return (
-    <Text as="h2" classes="flex gap-1 text-lg">
-      State:{" "}
-      <Text as="span" classes={`${checkCloseShift() ? "text-accent" : "text-destructive"} text-lg`}>
-        {checkCloseShift() ? "online" : "offline"}
+    <Text as="h2" classes="flex items-center gap-2 text-sm text-ink-muted">
+      Status
+      <Text
+        as="span"
+        classes={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-sm font-medium ${
+          online ? "bg-accent-soft text-accent" : "bg-surface-sunken text-ink-muted"
+        }`}
+      >
+        <span
+          aria-hidden="true"
+          className={`size-1.5 rounded-full ${online ? "bg-accent" : "bg-ink-subtle"}`}
+        />
+        {online ? "online" : "offline"}
       </Text>
       <PopoverHome />
     </Text>

@@ -41,7 +41,7 @@ function ProductionRow({ shift }: { shift: Production }) {
         <TableElement>{shift?.itemQuantity ? shift.itemQuantity : "..."}</TableElement>
         <TableElement>${calculateEarnings(shift).toFixed(2)}</TableElement>
         <TableElement align="center">
-          {shift?.isPublicHoliday ? <Icon.star style={{ color: "#00f5d4" }} /> : null}
+          {shift?.isPublicHoliday ? <Icon.star className="text-accent" /> : null}
         </TableElement>
       </TableElement>
     </Dialog>

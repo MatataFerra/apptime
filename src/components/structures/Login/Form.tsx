@@ -82,39 +82,42 @@ export default function FormLogin() {
         onSubmit={handleSubmit(onSubmit)}
         id="formLogin"
       >
-        <section className="grid grid-rows-[1fr_2rem_auto] gap-4 self-center">
+        <section className="flex flex-col gap-6 self-center">
+          <header className="flex flex-col gap-1">
+            <h1 className="font-display text-3xl font-semibold tracking-tight text-ink">Log in</h1>
+            <p className="text-sm text-ink-muted">Your hours and pay, right where you left them.</p>
+          </header>
           <fieldset className="flex flex-col gap-4">
             <Input
               variant="default"
               type="email"
-              label="email"
+              label="Email"
               basis="basis-0"
               isError={!!errors.password?.message?.trim()}
               {...register("email")}
             />
             <Input
               type="password"
-              label="password"
+              label="Password"
               basis="basis-0"
               isError={!!errors.password?.message?.trim()}
               description={errors.password?.message}
               {...register("password")}
             />
           </fieldset>
-          <div className="flex items-center justify-between text-base">
-            <p>
-              <Link
-                className="font-bold text-ink underline"
-                href={`/${locale}${PATH_NAMES.REGISTER}`}
-              >
-                register new account
-              </Link>
-            </p>
-            <p>
-              <Link className="text-ink underline" href={`/${locale}${PATH_NAMES.RESET_PASSWORD}`}>
-                forgotten password?
-              </Link>
-            </p>
+          <div className="flex items-center justify-between text-sm">
+            <Link
+              className="font-medium text-accent underline-offset-4 hover:underline"
+              href={`/${locale}${PATH_NAMES.REGISTER}`}
+            >
+              Register an account
+            </Link>
+            <Link
+              className="text-ink-muted underline-offset-4 hover:underline"
+              href={`/${locale}${PATH_NAMES.RESET_PASSWORD}`}
+            >
+              Forgot password?
+            </Link>
           </div>
         </section>
       </Form>

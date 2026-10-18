@@ -53,7 +53,7 @@ function Searcher() {
         />
       ) : null}
       <div
-        className="z-10 flex size-8 cursor-pointer items-center justify-center self-end rounded-full bg-linear-to-tr from-slate-100 to-slate-200 p-1 transition-all"
+        className="z-10 flex size-8 cursor-pointer items-center justify-center self-end rounded-full bg-surface-sunken p-1 text-ink transition-colors hover:bg-border"
         onClick={() => toggleSearcher()}
       >
         {iconClick ? (

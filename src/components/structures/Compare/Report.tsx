@@ -63,11 +63,11 @@ function Report() {
     <Stack
       orientation="vertical"
       spacing={2}
-      classes="h-full min-h-10 w-full px-1 py-2 shadow-input transition-all"
+      classes="h-full min-h-10 w-full rounded-lg border border-border bg-surface p-4"
     >
       {isComparing && compareWages?.hasResult ? (
         <Stack orientation="vertical" classes="h-full w-full animate-fade-in transition-all">
-          <Text variant="subtitle" classes="text-base underline">
+          <Text variant="subtitle" classes="text-base">
             Comparison result
           </Text>
           {isLoading ? (
@@ -95,7 +95,7 @@ function Report() {
                   {!compareWages.better ? (
                     <Text classes="text-xs">
                       You will earn{" "}
-                      <Text as="span" color="text-ocean" classes="font-bold underline">
+                      <Text as="span" color="text-accent" classes="font-semibold">
                         {`$${(compareWages.productionWage / Number(hourToDecimal)).toFixed(2)}`}{" "}
                       </Text>
                       <Text as="span" classes="underline">
@@ -106,7 +106,7 @@ function Report() {
                   ) : (
                     <Text classes="text-xs">
                       You will earn{" "}
-                      <Text as="span" color="text-ocean" classes="font-bold underline">
+                      <Text as="span" color="text-accent" classes="font-semibold">
                         {`$${(compareWages.hourlyWage - compareWages.productionWage).toFixed(2)}`}{" "}
                       </Text>
                       more than production wage

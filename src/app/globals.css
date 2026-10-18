@@ -134,25 +134,6 @@
 }
 
 @theme {
-  /*
-   * Legacy brand colours. Kept only so screens not yet migrated keep
-   * rendering; each one now points at the closest new token.
-   * Remove once nothing references them.
-   */
-  --color-aquatic: var(--accent);
-  --color-poison: var(--accent);
-  --color-ocean: var(--accent);
-  --color-lake: var(--foreground);
-  --color-salmon: var(--destructive);
-  --color-wine: var(--destructive);
-  --color-rose: var(--destructive);
-  --color-slate-blue: var(--chart-5);
-  --color-light-gold: var(--warning-soft);
-  --color-post-it-button: var(--warning);
-  --color-hard-pink: var(--accent);
-  --color-common-orange: var(--foreground);
-  --color-light-blue: var(--accent-soft);
-
   /* radius scale: controls < cards < sheets */
   --radius-sm: 0.375rem;
   --radius-md: 0.625rem;
@@ -469,6 +450,12 @@
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
+  }
+
+  input[type="checkbox"] {
+    accent-color: var(--color-accent);
+    width: 1.125em;
+    height: 1.125em;
   }
 
   input[type="radio"] {

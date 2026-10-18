@@ -12,7 +12,7 @@ function CompareForm() {
   return (
     <Stack orientation="vertical">
       <Stack as="form" spacing={1} orientation="vertical">
-        <Text variant="subtitle" classes="text-base underline">
+        <Text variant="subtitle" classes="text-base">
           Production
         </Text>
         <Stack as="fieldset" classes="w-full">
@@ -35,7 +35,7 @@ function CompareForm() {
         </Stack>
       </Stack>
       <Stack as="form" spacing={1} orientation="vertical">
-        <Text variant="subtitle" classes="text-base underline">
+        <Text variant="subtitle" classes="text-base">
           Hourly
         </Text>
         <Stack as="fieldset" classes="w-full">

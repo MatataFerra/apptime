@@ -38,8 +38,8 @@ function ChartLine({ data }: Props) {
         />
         <Tooltip />
         <Legend />
-        <Line type="monotone" dataKey="hourly" stroke="#8884d8" activeDot={{ r: 8 }} />
-        <Line type="monotone" dataKey="production" stroke="#82ca9d" />
+        <Line type="monotone" dataKey="hourly" stroke="var(--chart-1)" activeDot={{ r: 8 }} />
+        <Line type="monotone" dataKey="production" stroke="var(--chart-2)" />
       </LineChart>
     </ResponsiveContainer>
   );

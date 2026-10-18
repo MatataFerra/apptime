@@ -37,7 +37,10 @@ describe("IncomesCalculator", () => {
 
     const expectedResult = hours * value * times + (hours * value * times * holidayPay) / 100;
 
-    const expectedIncome = `$${expectedResult.toFixed(2)} 🤑`;
+    const expectedIncome = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(expectedResult);
     const incomeText = screen.getByText("You are going to earn:");
     expect(incomeText.nextSibling?.textContent).toBe(expectedIncome);
   });

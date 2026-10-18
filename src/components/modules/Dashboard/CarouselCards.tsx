@@ -16,7 +16,7 @@ import useProductionShifts from "@/hooks/useProductionShifts";
 
 const Card = dynamic(() => import("@/components/ui/Card"), {
   ssr: false,
-  loading: () => <Skeleton classes="h-40 w-full" />,
+  loading: () => <Skeleton classes="h-32 w-full" />,
 });
 
 const Carousel = dynamic(() => import("@/components/ui/Carousel").then((mod) => mod.Carousel), {
@@ -128,11 +128,11 @@ function CarouselDashboard({ params }: Props) {
             {Object.keys(CARDS_CONTENT).map((key, index) => (
               <CarouselItem key={index} className="basis-1/2 sm:basis-1/3 md:basis-1/5">
                 <Card>
-                  <Text classes="text-pretty text-sm">
+                  <Text classes="text-sm text-pretty text-ink-muted">
                     {CARDS_CONTENT[key as keyof typeof CARDS_CONTENT].title}
                   </Text>
                   <Text
-                    classes={`text-wrap text-2xl font-bold ${key === "estimatedWeeklyEarnings" && "text-base"}`}
+                    classes={`figure self-end text-2xl leading-tight font-semibold text-wrap ${key === "lastDayRegistered" ? "text-lg" : ""}`}
                   >
                     {String(CARDS_CONTENT[key as keyof typeof CARDS_CONTENT].value)}
                   </Text>

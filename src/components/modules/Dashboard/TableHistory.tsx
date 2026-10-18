@@ -84,7 +84,7 @@ function TableHistory() {
       <TabsContent className="m-0 rounded-lg shadow-input" value="perHour">
         <Table classes="h-full min-h-[25dvh] w-full table-fixed">
           <TableHead
-            classes="border-b border-b-gray-900 text-left text-xs"
+            classes="border-b border-b-border-strong text-left text-xs"
             columnTitle={COLUMNS}
             elementClasses="p-4"
           />
@@ -95,7 +95,7 @@ function TableHistory() {
       <TabsContent className="m-0 rounded-lg shadow-input" value="perProduction">
         <Table classes="h-full w-full table-fixed">
           <TableHead
-            classes="border border-l-0 border-r-0 border-t-0 border-b-gray-900 text-left text-xs"
+            classes="border border-l-0 border-r-0 border-t-0 border-b-border-strong text-left text-xs"
             columnTitle={COLUMNS_PER_PRODUCTION}
             elementClasses="p-4"
           />
