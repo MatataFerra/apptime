@@ -7,9 +7,11 @@ import { JWTDecodedType } from "@/types";
 
 import { NEXT_AUTH_SESSION_TOKEN } from "@/utils/constants";
 
+type CookieSource = { get(name: string): { value: string } | undefined };
+
 interface TokenServiceInterface {
   cookie: string;
-  decodedCookieData(): Promise<JWTDecodedType | null>;
+  decodedCookieData(source?: CookieSource): Promise<JWTDecodedType | null>;
 }
 
 /**
@@ -27,25 +29,26 @@ class TokenService implements TokenServiceInterface {
   constructor(cookie: string) {
     this.cookie = cookie;
   }
-  async decodedCookieData(): Promise<JWTDecodedType | null> {
+  /**
+   * Decodes the session cookie. Pass `req.cookies` from the proxy;
+   * elsewhere it reads the request cookies from `next/headers`.
+   */
+  async decodedCookieData(source?: CookieSource): Promise<JWTDecodedType | null> {
     if (!this.cookie) return null;
 
-    const cookie = this.getCookie();
+    const cookie = await this.getCookie(source);
 
     const result = (await decode({
       token: cookie?.value ?? "",
-      secret: process.env.NEXTAUTH_SECRET,
+      secret: process.env.NEXTAUTH_SECRET as string,
     })) as JWTDecodedType;
 
     return result;
   }
 
-  getCookie() {
-    const cookie = cookieStore().get(this.cookie);
-
-    if (!cookie) return cookieStore().get(NEXT_AUTH_SESSION_TOKEN);
-
-    return cookie;
+  async getCookie(source?: CookieSource) {
+    const store = source ?? (await cookieStore());
+    return store.get(this.cookie) ?? store.get(NEXT_AUTH_SESSION_TOKEN);
   }
 
   static async createToken(data: { email: string; name: string; picture: string; sub: string }) {
@@ -53,7 +56,7 @@ class TokenService implements TokenServiceInterface {
       token: {
         ...data,
       },
-      secret: process.env.NEXTAUTH_SECRET,
+      secret: process.env.NEXTAUTH_SECRET as string,
     });
 
     return token;

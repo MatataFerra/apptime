@@ -5,7 +5,7 @@ import ApiGateway from "@/services/Api/Gateway";
 
 export const runtime = "nodejs";
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
   const user = (await req.json()) as User;
   const searchParams = req.nextUrl.searchParams;
   const token = searchParams.get("token") ?? "";

@@ -10,6 +10,7 @@ import { ProductionUpdateSchema, RouteParams } from "@/types";
 import prisma from "#/prisma/client";
 
 export async function PUT(req: NextRequest, { params }: RouteParams) {
+  const { id } = await params;
   const body: Production = await req.json();
   const parsedBody = ProductionUpdateSchema.safeParse(body);
 
@@ -34,7 +35,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
 
     const updatedShift: Production = await prisma.production.update({
       where: {
-        id: Number(params.id),
+        id: Number(id),
       },
       data: buildShift,
     });
@@ -80,10 +81,11 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
 }
 
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
+  const { id } = await params;
   try {
     const deletedShift: Production = await prisma.production.delete({
       where: {
-        id: Number(params.id),
+        id: Number(id),
       },
     });
 

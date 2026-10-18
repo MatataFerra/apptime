@@ -4,7 +4,7 @@ import { ReactNode, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { SessionProvider } from "next-auth/react";
-import { NextIntlClientProvider, useLocale } from "next-intl";
+import { NextIntlClientProvider } from "next-intl";
 
 import ut from "@/services/Utilities/client";
 
@@ -19,7 +19,7 @@ type Props = {
 const queryClient = new QueryClient();
 
 function Providers({ children, i18n }: Props) {
-  const locale = useLocale();
+  const { locale } = i18n;
   useEffect(() => {
     if (locale) {
       document.documentElement.setAttribute("lang", locale);

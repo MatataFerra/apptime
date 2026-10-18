@@ -1,6 +1,5 @@
 import { match as matchLocale } from "@formatjs/intl-localematcher";
 import Negotiator from "negotiator";
-import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 
 import { Locale } from "@/types";
@@ -44,27 +43,6 @@ class i18n {
     let languages = new Negotiator({ headers: negotiatorHeaders }).languages(this.locales);
 
     const locale = matchLocale(languages, this.locales, this.defaultLocale) as Locale;
-
-    return locale;
-  }
-
-  static getHeaders() {
-    const listHeaders = new Headers(headers());
-    return listHeaders;
-  }
-
-  static getLocaleFromHeaders(defaultLocale: Locale) {
-    const listHeaders = i18n.getHeaders();
-    // Negotiator expects plain object so we need to transform headers
-    const negotiatorHeaders: Record<string, string> = {};
-    Object.entries(listHeaders).forEach(([key, value]) => (negotiatorHeaders[key] = value));
-
-    // Use negotiator and intl-localematcher to get best locale
-    let languages = new Negotiator({ headers: negotiatorHeaders }).languages([
-      ...SUPPORTED_LOCALES,
-    ]);
-
-    const locale = matchLocale(languages, [...SUPPORTED_LOCALES], defaultLocale);
 
     return locale;
   }

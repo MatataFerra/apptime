@@ -8,7 +8,7 @@ import dynamic from "next/dynamic";
 import ShiftService from "@/services/Shift";
 import { formatMoney } from "@/services/Summary";
 
-import { COLUMNS } from "@/components/modules/Dashboard/TableHistory";
+import { COLUMNS } from "@/components/modules/Dashboard/TableHistory.lazy";
 import Skeleton from "@/components/ui/Skeleton";
 import TableElement from "@/components/ui/TableElement";
 

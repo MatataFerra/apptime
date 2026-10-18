@@ -1,9 +1,9 @@
-import { ReactElement } from "react";
+import type { ReactNode } from "react";
 
 import Header from "@/components/ui/Header";
 
 interface Props {
-  children: ReactElement;
+  children: ReactNode;
 }
 
 function LayoutMobile({ children }: Props) {

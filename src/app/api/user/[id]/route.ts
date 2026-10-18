@@ -14,6 +14,7 @@ function parseEmailFromParams(token: JWT | null, email: string | null) {
 }
 
 export async function PUT(req: NextRequest, { params }: RouteParams) {
+  const { id } = await params;
   const body: User = await req.json();
   const parsedBody = UserUpdateSchema.safeParse(body);
 
@@ -32,7 +33,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
   try {
     const user = await prisma.user.findUnique({
       where: {
-        id: params.id,
+        id: id,
       },
     });
 

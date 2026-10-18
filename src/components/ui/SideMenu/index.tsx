@@ -1,6 +1,6 @@
 "use client";
 
-import { type HTMLAttributes, type ReactNode, useRef } from "react";
+import { type HTMLAttributes, type ReactNode, type RefObject, useRef } from "react";
 
 import { useOnClickOutside } from "usehooks-ts";
 
@@ -20,7 +20,7 @@ function SideMenu({ children, isOpen, handleOutsideClick, classes, ...rest }: Pr
   //delay the animation of the drawer
   const delayOpen = useDelayed(isOpen, 100);
   const ref = useRef<HTMLDivElement>(null);
-  useOnClickOutside([ref], () => {
+  useOnClickOutside([ref as RefObject<HTMLElement>], () => {
     isOpen && handleOutsideClick && handleOutsideClick();
   });
 

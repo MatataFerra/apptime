@@ -9,7 +9,7 @@ import prisma from "#/prisma/client";
 
 export const runtime = "nodejs";
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const user = await req.json();
   const token = searchParams.get("token") ?? "";

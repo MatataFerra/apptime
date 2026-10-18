@@ -19,14 +19,14 @@ const PRIVATES_ROUTES = [
 
 const LOGGED_ROUTES = ["/forgot-password", "/reset", "/success"];
 
-export default async function middleware(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
   const nextPathName = req.nextUrl.pathname;
   const I18N = new i18n("en");
   const locale = I18N.getLocale(req) ?? "en";
   const routeLocale = Router.addLocale(nextPathName, locale);
   const router = new Router(PRIVATES_ROUTES).addLocalesToRoutes();
   const loggedRoutes = new Router(LOGGED_ROUTES).addLocalesToRoutes();
-  const token = await new TokenService(NEXT_AUTH_SESSION_TOKEN).decodedCookieData();
+  const token = await new TokenService(NEXT_AUTH_SESSION_TOKEN).decodedCookieData(req.cookies);
 
   const pathnameIsMissingLocale = Router.isMissingLocale(nextPathName);
 

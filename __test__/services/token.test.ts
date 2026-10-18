@@ -1,5 +1,7 @@
 import { describe, expect, test, vi } from "vitest";
 
+import { NEXT_AUTH_SESSION_TOKEN } from "@/utils/constants";
+
 import TokenService from "../../src/services/Token";
 
 describe("TokenService", () => {
@@ -33,15 +35,18 @@ describe("TokenService", () => {
   });
 
   describe("getCookie", () => {
-    test("should return the cookie value", () => {
-      // Mock the cookieStore().get function
-      vi.spyOn(TokenService.prototype, "getCookie").mockReturnValueOnce({
-        name: "test-cookie",
-        value: "test-cookie-value",
-      });
+    test("reads the named cookie from the given source", async () => {
+      const jar = new Map([["test-cookie", { name: "test-cookie", value: "test-cookie-value" }]]);
+      const result = await new TokenService("test-cookie").getCookie({ get: (n) => jar.get(n) });
+      expect(result).toEqual({ name: "test-cookie", value: "test-cookie-value" });
+    });
 
-      const result = tokenService.getCookie();
-      expect(result).toEqual({ value: "test-cookie-value", name: "test-cookie" });
+    test("falls back to the next-auth session cookie", async () => {
+      const jar = new Map([
+        [NEXT_AUTH_SESSION_TOKEN, { name: NEXT_AUTH_SESSION_TOKEN, value: "session" }],
+      ]);
+      const result = await new TokenService("missing").getCookie({ get: (n) => jar.get(n) });
+      expect(result?.value).toBe("session");
     });
   });
 
