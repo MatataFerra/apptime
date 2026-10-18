@@ -2,6 +2,7 @@ import type { ReactElement } from "react";
 
 import dynamic from "next/dynamic";
 
+import ModuleShell from "@/components/Layout/ModuleShell";
 import Skeleton from "@/components/ui/Skeleton";
 import Stack from "@/components/ui/Stack";
 
@@ -29,22 +30,19 @@ interface Props {
 
 export default async function HomeLayout({ children }: Props) {
   return (
-    <>
-      <main
-        vaul-drawer-wrapper=""
-        className="grid h-full min-h-dvh grid-rows-[auto_1fr] bg-background *:px-4 *:pb-4"
-        data-testid="drawer-close"
-      >
+    <ModuleShell
+      header={
         <Header
           position="between"
-          classes="sticky top-0 z-10 h-16 bg-background/85 pb-0! backdrop-blur-md"
+          classes="sticky top-0 z-10 h-16 bg-(--band) pb-0! transition-colors"
         >
           <SheetHamMenu>
             <UserInfo />
           </SheetHamMenu>
         </Header>
-        {children}
-      </main>
-    </>
+      }
+    >
+      {children}
+    </ModuleShell>
   );
 }

@@ -6,25 +6,25 @@ import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 const HomeCardOption = dynamic(() => import("@/components/ui/OptionCard"), {
   ssr: false,
-  loading: () => <Skeleton classes="m-3 h-14" />,
+  loading: () => <Skeleton classes="m-3 h-10" />,
+});
+
+const MonthEarned = dynamic(() => import("@/components/structures/Home/MonthEarned"), {
+  ssr: false,
 });
 
 function Options() {
   return (
-    <div className="w-full divide-y divide-border overflow-hidden rounded-lg border border-border bg-surface">
+    <div className="w-full divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
+      <HomeCardOption title="Dashboard" path={PATH_NAMES.DASHBOARD} meta={<MonthEarned />} />
       <HomeCardOption
-        title="Dashboard"
-        description="Hours and earnings over time"
-        path={PATH_NAMES.DASHBOARD}
-      />
-      <HomeCardOption
-        title="Incomes"
-        description="What you take home after tax"
+        title="Estimate"
+        description="What a stretch of work pays"
         path={PATH_NAMES.INCOMES}
       />
       <HomeCardOption
         title="Compare"
-        description="Put two shifts side by side"
+        description="Per piece or per hour"
         path={PATH_NAMES.COMPARE}
       />
     </div>

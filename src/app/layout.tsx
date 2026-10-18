@@ -7,20 +7,20 @@ import { cn } from "@/utils/helpers/styleMerger";
 
 import "@/app/globals.css";
 
-import { bricolage, figtree } from "./fonts";
+import { bricolage, figtree, schibsted } from "./fonts";
 
 export function generateStaticParams() {
   return [{ locale: "en" }, { locale: "de" }];
 }
 
 export const metadata = {
-  title: "CasualApp! The app for the casual worker",
-  description: "Track your time, and get things done!",
+  title: "CasualApp",
+  description: "Track your hours and see what you earn, shift by shift.",
 };
 
 async function Layout({ children }: { children: ReactNode }) {
   return (
-    <html className={cn(figtree.variable, bricolage.variable)}>
+    <html className={cn(figtree.variable, bricolage.variable, schibsted.variable)}>
       <body className="font-sans">
         {children}
         <Analytics />

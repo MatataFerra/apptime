@@ -44,9 +44,25 @@
 
   --ring: #0e7a57;
 
+  /* one colour per module: strong (fills), soft (tints), ink (text on soft) */
+  --track: #0e7a57;
+  --track-soft: #dcf1e8;
+  --track-ink: #0b5c41;
+  --fast: #c98a1b;
+  --fast-soft: #f6ead3;
+  --fast-ink: #7a4f0b;
+  --fast-bright: #e3a23b;
+  --production: #9d3d6b;
+  --production-soft: #f5e1ea;
+  --production-ink: #7d2f55;
+  --production-bright: #e48fb5;
+  --insight: #3a5fcd;
+  --insight-soft: #e2e8fa;
+  --insight-ink: #2b4aa8;
+
   /* charts */
   --chart-1: #0e7a57;
-  --chart-2: #14211c;
+  --chart-2: #9d3d6b;
   --chart-3: #8fb3a4;
   --chart-4: #c98a2b;
   --chart-5: #6b7fd7;
@@ -79,8 +95,23 @@
 
   --ring: #3ccf96;
 
+  --track: #3ccf96;
+  --track-soft: #173a2d;
+  --track-ink: #8fe6c2;
+  --fast: #e3a23b;
+  --fast-soft: #3a2c14;
+  --fast-ink: #f2c879;
+  --fast-bright: #f0b552;
+  --production: #e48fb5;
+  --production-soft: #3d1f2e;
+  --production-ink: #f1b9d2;
+  --production-bright: #f0a7c7;
+  --insight: #8d9ef0;
+  --insight-soft: #1f2747;
+  --insight-ink: #c2cbf7;
+
   --chart-1: #3ccf96;
-  --chart-2: #e8eeeb;
+  --chart-2: #e48fb5;
   --chart-3: #5f8a78;
   --chart-4: #e3a74a;
   --chart-5: #8d9ef0;
@@ -125,6 +156,23 @@
   --color-secondary-foreground: var(--foreground);
   --color-muted: var(--surface-sunken);
   --color-muted-foreground: var(--foreground-muted);
+
+  --color-track: var(--track);
+  --color-track-soft: var(--track-soft);
+  --color-track-ink: var(--track-ink);
+  --color-fast: var(--fast);
+  --color-fast-soft: var(--fast-soft);
+  --color-fast-ink: var(--fast-ink);
+  --color-fast-bright: var(--fast-bright);
+  --color-production: var(--production);
+  --color-production-soft: var(--production-soft);
+  --color-production-ink: var(--production-ink);
+  --color-production-bright: var(--production-bright);
+  --color-insight: var(--insight);
+  --color-insight-soft: var(--insight-soft);
+  --color-insight-ink: var(--insight-ink);
+
+  --font-logo: var(--font-schibsted), var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -409,9 +457,20 @@
 /* figures that change while you look at them (clock, money) */
 @utility figure {
   font-family: var(--font-display);
+  font-variation-settings: "wdth" 75, "opsz" 96;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
+}
+
+/* condensed display titles */
+@utility display-title {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 75, "opsz" 96;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 0.9;
 }
 
 @layer base {
