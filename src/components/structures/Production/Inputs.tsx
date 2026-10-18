@@ -301,7 +301,7 @@ function Inputs() {
       >
         <Stack as="fieldset" orientation="vertical" classes="relative w-full">
           <Input
-            containerClasses="flex-grow"
+            containerClasses="grow"
             variant="outlined"
             label="Name of your job"
             type="name"

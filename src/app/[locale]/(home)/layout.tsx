@@ -32,7 +32,7 @@ export default async function HomeLayout({ children }: Props) {
     <>
       <main
         vaul-drawer-wrapper=""
-        className="grid h-full min-h-dvh grid-rows-[auto,1fr] bg-white [&>*]:p-4"
+        className="grid h-full min-h-dvh grid-rows-[auto_1fr] bg-white *:p-4"
         data-testid="drawer-close"
       >
         <Header

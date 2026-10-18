@@ -14,7 +14,7 @@ function Title() {
       >
         <Text
           variant="subtitle"
-          classes="-translate-x-[300%] transform animate-show-left text-lg uppercase text-wine transition-all delay-700"
+          classes="translate-x-[-300%] transform animate-show-left text-lg uppercase text-wine transition-all delay-700"
         >
           Production
         </Text>

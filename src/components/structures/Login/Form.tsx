@@ -77,12 +77,12 @@ export default function FormLogin() {
       />
 
       <Form
-        classes="grid h-full grid-rows-[1fr,auto]"
+        classes="grid h-full grid-rows-[1fr_auto]"
         autoComplete="off"
         onSubmit={handleSubmit(onSubmit)}
         id="formLogin"
       >
-        <section className="grid grid-rows-[1fr,2rem,auto] gap-4 self-center">
+        <section className="grid grid-rows-[1fr_2rem_auto] gap-4 self-center">
           <fieldset className="flex flex-col gap-4">
             <Input
               variant="default"

@@ -76,7 +76,7 @@ function DrawerSalaryItemsFromDB({
           type="button"
           variant="white"
           size="md"
-          classes={`w-full animate-pulse border-none bg-gradient-to-tr from-sky-300/30 to-blue-400/40 font-medium transition-all duration-700 repeat-[3] hover:from-sky-300/40 hover:to-blue-400/50 active:shadow-button-inner`}
+          classes={`w-full animate-pulse border-none bg-linear-to-tr from-sky-300/30 to-blue-400/40 font-medium transition-all duration-700 repeat-[3] hover:from-sky-300/40 hover:to-blue-400/50 active:shadow-button-inner`}
         >
           Click to use previous
         </Button>

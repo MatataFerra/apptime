@@ -10,7 +10,7 @@ type Props = {
 };
 
 function Line({ color = "bg-stone-500", classes }: Props) {
-  return <div className={cn("flex h-[1px] w-full", `${color}`, classes)} />;
+  return <div className={cn("flex h-px w-full", `${color}`, classes)} />;
 }
 
 export default Line;

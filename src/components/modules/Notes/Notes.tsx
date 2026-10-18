@@ -29,7 +29,7 @@ function Notes({ children }: PropsWithChildren) {
           <SheetTitle>
             <Header />
           </SheetTitle>
-          <SheetDescription className="!m-0">
+          <SheetDescription className="m-0!">
             <VisuallyHidden.Root>Add notes to this shift</VisuallyHidden.Root>
           </SheetDescription>
         </SheetHeader>

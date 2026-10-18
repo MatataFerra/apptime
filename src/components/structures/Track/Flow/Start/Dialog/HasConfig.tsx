@@ -40,7 +40,7 @@ function ShiftStartHasConfigStep() {
         <ul className="grid w-full grid-cols-1 gap-2 text-left text-sm text-gray-500 dark:text-gray-400">
           <li className="flex items-center space-x-1">
             <svg
-              className="h-3.5 w-3.5 flex-shrink-0 text-green-500 dark:text-green-400"
+              className="h-3.5 w-3.5 shrink-0 text-green-500 dark:text-green-400"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -58,7 +58,7 @@ function ShiftStartHasConfigStep() {
           </li>
           <li className="flex items-center space-x-1">
             <svg
-              className="h-3.5 w-3.5 flex-shrink-0 text-green-500 dark:text-green-400"
+              className="h-3.5 w-3.5 shrink-0 text-green-500 dark:text-green-400"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

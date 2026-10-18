@@ -15,7 +15,7 @@ function NotesTextarea(props: Props) {
   return (
     <Textarea
       id={id}
-      classes={`h-full w-[97%] resize-none rounded-sm bg-transparent p-2 text-lg shadow-sm outline-none ${error ? "ring-2 ring-red-700" : "ring-2 ring-transparent"}`}
+      classes={`h-full w-[97%] resize-none rounded-sm bg-transparent p-2 text-lg shadow-xs outline-hidden ${error ? "ring-2 ring-red-700" : "ring-2 ring-transparent"}`}
       value={notes}
       onChange={(e) => {
         if (error) setError();

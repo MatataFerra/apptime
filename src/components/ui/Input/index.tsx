@@ -91,7 +91,7 @@ const input = forwardRef(function Input(
             variant === "underline"
               ? "border-b-2 border-b-slate-200 transition-colors hover:border-b-slate-400/60 focus:border-b-blue-600"
               : "border-none",
-            "h-full w-full outline-none",
+            "h-full w-full outline-hidden",
             measurePlace === "left" ? "order-2" : "order-1"
           )}
           {...props}

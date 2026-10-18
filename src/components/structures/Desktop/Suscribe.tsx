@@ -51,7 +51,7 @@ function Suscribe() {
   }
 
   return (
-    <article className="h-44 space-y-4 rounded-lg bg-black bg-opacity-80 bg-clip-padding px-8 py-4 backdrop-blur-sm backdrop-filter">
+    <article className="h-44 space-y-4 rounded-lg bg-black bg-opacity-80 bg-clip-padding px-8 py-4 backdrop-blur-xs backdrop-filter">
       <Text classes="text-lg text-white">{t("subscription.notify_message")}</Text>
 
       <Stack
@@ -63,7 +63,7 @@ function Suscribe() {
       >
         <Input
           placeholder="username@email.com"
-          classes="h-full w-full text-sm shadow-sm"
+          classes="h-full w-full text-sm shadow-xs"
           type="text"
           {...register("email")}
         />

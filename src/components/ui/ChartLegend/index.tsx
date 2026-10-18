@@ -24,7 +24,7 @@ function ChartLegend({ legend, color }: Props) {
                 "size-4 rounded-full",
                 color
                   ? colorService.checkTypeColor(color)
-                    ? `bg-gradient-to-r ${color?.from} ${color?.to}`
+                    ? `bg-linear-to-r ${color?.from} ${color?.to}`
                     : color
                   : null
               )}

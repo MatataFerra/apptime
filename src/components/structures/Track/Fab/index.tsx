@@ -52,7 +52,7 @@ function FabNotes() {
         <>
           <FloatingActionButton
             ref={menuRef}
-            classes="absolute bottom-24 right-2 z-50 size-16 animate-fade-in border-none bg-gradient-to-br from-green-400 to-blue-500 active:shadow-button-inner"
+            classes="absolute bottom-24 right-2 z-50 size-16 animate-fade-in border-none bg-linear-to-br from-green-400 to-blue-500 active:shadow-button-inner"
             onClick={onShowMenu}
             icon={<Icon.plus />}
           />
@@ -62,7 +62,7 @@ function FabNotes() {
                 <FloatingActionButton
                   ref={notesRef}
                   disabled={!status}
-                  classes={`absolute bottom-[10.5rem] right-4 z-10 size-12 border-none bg-gradient-to-br from-amber-200 to-yellow-300 transition-all [&>span]:text-xs ${!status ? "bg-gradient-to-br from-gray-300 to-stone-500" : "active:shadow-button-inner"} ${show ? "show_up" : "show_down"}`}
+                  classes={`absolute bottom-42 right-4 z-10 size-12 border-none bg-linear-to-br from-amber-200 to-yellow-300 transition-all [&>span]:text-xs ${!status ? "bg-linear-to-br from-gray-300 to-stone-500" : "active:shadow-button-inner"} ${show ? "show_up" : "show_down"}`}
                   text="Notes"
                 />
               </Notes>
@@ -70,7 +70,7 @@ function FabNotes() {
                 <FloatingActionButton
                   ref={taxesRef}
                   disabled={!status}
-                  classes={`absolute bottom-[14rem] right-4 z-0 size-12 border-none bg-gradient-to-br from-red-200 to-violet-300 transition-all [&>span]:text-xs ${!status ? "bg-gradient-to-br from-gray-300 to-stone-500" : "active:shadow-button-inner"} ${show ? "show_up_dialog" : "show_down_dialog"}`}
+                  classes={`absolute bottom-56 right-4 z-0 size-12 border-none bg-linear-to-br from-red-200 to-violet-300 transition-all [&>span]:text-xs ${!status ? "bg-linear-to-br from-gray-300 to-stone-500" : "active:shadow-button-inner"} ${show ? "show_up_dialog" : "show_down_dialog"}`}
                   text="Taxes"
                 />
               </TaxDialog>

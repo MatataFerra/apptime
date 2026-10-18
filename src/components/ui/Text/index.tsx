@@ -57,7 +57,7 @@ function Text<E extends ValidElement = typeof TextDefaultAsType>({
     <Component
       className={cn(
         TEXT_VARIANTS[variant],
-        gradient ? `bg-gradient-to-r bg-clip-text text-transparent ${GRADIENTS[gradient]}` : "",
+        gradient ? `bg-linear-to-r bg-clip-text text-transparent ${GRADIENTS[gradient]}` : "",
         classes,
         color
       )}

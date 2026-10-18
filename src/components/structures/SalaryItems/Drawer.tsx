@@ -61,7 +61,7 @@ function Drawer({
   return (
     <DrawerContainer shouldScaleBackground={false}>
       <DrawerTrigger asChild>{children}</DrawerTrigger>
-      <DrawerContent className={cn(isOpen ? "!scale-90 !transform" : "scale-100 transform")}>
+      <DrawerContent className={cn(isOpen ? "scale-90! transform!" : "scale-100 transform")}>
         <DrawerHeader className="text-left">
           <DrawerTitle className="capitalize">{type}</DrawerTitle>
           <DrawerDescription>Add new {type} or use previous ones</DrawerDescription>
@@ -88,7 +88,7 @@ function Drawer({
               type="button"
               variant="outlined"
               size="sm"
-              classes="m-4 flex h-20 w-full animate-fade-in items-center justify-center border border-dashed border-gray-300 bg-gradient-to-tl from-slate-200 via-slate-200/60 to-slate-300 p-4"
+              classes="m-4 flex h-20 w-full animate-fade-in items-center justify-center border border-dashed border-gray-300 bg-linear-to-tl from-slate-200 via-slate-200/60 to-slate-300 p-4"
               onClick={() => setAddMoreElements(true)}
             >
               Click to add more {type}

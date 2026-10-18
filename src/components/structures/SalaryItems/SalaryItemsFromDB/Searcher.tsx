@@ -49,11 +49,11 @@ function Searcher() {
           variant="underline"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          classes="min-h-5 w-full animate-grow-in rounded-md p-1 shadow-sm transition-all focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+          classes="min-h-5 w-full animate-grow-in rounded-md p-1 shadow-xs transition-all focus:border-transparent focus:outline-hidden focus:ring-2 focus:ring-primary"
         />
       ) : null}
       <div
-        className="z-10 flex size-8 cursor-pointer items-center justify-center self-end rounded-full bg-gradient-to-tr from-slate-100 to-slate-200 p-1 transition-all"
+        className="z-10 flex size-8 cursor-pointer items-center justify-center self-end rounded-full bg-linear-to-tr from-slate-100 to-slate-200 p-1 transition-all"
         onClick={() => toggleSearcher()}
       >
         {iconClick ? (

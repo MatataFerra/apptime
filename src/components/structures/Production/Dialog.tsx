@@ -92,11 +92,11 @@ function DialogProduction({ children }: PropsWithChildren) {
               Public holiday worked: {values.publicHolidayWorked ? "Yes" : "No"}
             </Text>
             <Stack>
-              <Text classes="rounded-md bg-gradient-to-tl from-lime-400/60 via-green-400 to-teal-500/60 px-2 py-1 text-sm font-bold">
+              <Text classes="rounded-md bg-linear-to-tl from-lime-400/60 via-green-400 to-teal-500/60 px-2 py-1 text-sm font-bold">
                 You will earn: ${calculateEarn.sharp.toFixed(2)}
               </Text>
               {!isEmpty(taxes) && calculateEarn.afterTaxes > 0 ? (
-                <Text classes="animate-fade-in rounded-md bg-gradient-to-tl from-red-400/60 to-violet-500/60 px-2 py-1 text-sm font-bold repeat-[2]">
+                <Text classes="animate-fade-in rounded-md bg-linear-to-tl from-red-400/60 to-violet-500/60 px-2 py-1 text-sm font-bold repeat-[2]">
                   After Taxes: ${calculateEarn.afterTaxes.toFixed(2)}
                 </Text>
               ) : null}
