@@ -14,8 +14,8 @@ function CompareButton() {
       <Button
         disabled={isComparing}
         size="md"
-        variant="gradient_secondary"
-        classes="order-2 shadow-button active:shadow-button-inner"
+        variant="primary"
+        classes="order-2"
         onClick={() => {
           setIsComparing(true);
           setIsLoading(true);
@@ -30,8 +30,9 @@ function CompareButton() {
       {isComparing ? (
         <Button
           size="sm"
-          variant="white"
-          classes="order-1 size-8 animate-show-left shadow-button active:shadow-button-inner"
+          variant="outline"
+          aria-label="Reset comparison"
+          classes="order-1 size-9 p-0"
           onClick={() => reset()}
         >
           <Icon.reset width={"100%"} height="100%" className="scale-50 transform" />

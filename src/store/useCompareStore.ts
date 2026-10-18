@@ -7,14 +7,16 @@ interface Compare {
   };
   hourly: {
     hourlyWage?: string;
+    /** whole hours worked */
     hoursWorked: string;
+    minutesWorked?: string;
   };
   isComparing: boolean;
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
   setIsComparing: (isComparing: boolean) => void;
   setProduction: (data: { itemValue?: string; itemQuantity?: string }) => void;
-  setHourly: (data: { hourlyWage?: string; hoursWorked?: string }) => void;
+  setHourly: (data: { hourlyWage?: string; hoursWorked?: string; minutesWorked?: string }) => void;
   reset: () => void;
 }
 
@@ -26,6 +28,7 @@ export const useCompareStore = create<Compare>((set) => ({
   hourly: {
     hourlyWage: "",
     hoursWorked: "",
+    minutesWorked: "",
   },
   isComparing: false,
   isLoading: false,
@@ -42,6 +45,7 @@ export const useCompareStore = create<Compare>((set) => ({
       hourly: {
         hourlyWage: "",
         hoursWorked: "",
+        minutesWorked: "",
       },
       isComparing: false,
       isLoading: false,

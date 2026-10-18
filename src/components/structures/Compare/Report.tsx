@@ -31,11 +31,10 @@ function Report() {
 
   const hourToDecimal = useMemo(() => {
     if (!isComparing) return;
-    const [hours, minutes] = hourly.hoursWorked.split(":");
-    const getMinutes = Number(hours) * 60 + Number(minutes);
-    const toDecimal = ShiftService.convertAmountInDecimal(getMinutes);
-    return toDecimal;
-  }, [hourly.hoursWorked, isComparing]);
+    const getMinutes =
+      (Number(hourly.hoursWorked) || 0) * 60 + (Number(hourly.minutesWorked) || 0);
+    return ShiftService.convertAmountInDecimal(getMinutes);
+  }, [hourly.hoursWorked, hourly.minutesWorked, isComparing]);
 
   const compareWages = useMemo(() => {
     if (!isComparing) return;

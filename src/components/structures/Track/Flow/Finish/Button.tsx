@@ -7,6 +7,7 @@ import Toast from "@/services/Toast";
 import Button from "@/components/ui/Button";
 import Loader from "@/components/ui/Loader";
 
+import { invalidateShiftQueries } from "@/utils/helpers/invalidateShiftQueries";
 import useTrack from "@/hooks/useTrack";
 
 import onUpdateTrackJob from "@/server-actions/update-track";
@@ -96,7 +97,7 @@ function FinishButton({ buttonStatus }: Props) {
           duration: 1000,
         });
 
-        queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
+        invalidateShiftQueries(queryClient);
 
         return;
       }
@@ -116,7 +117,7 @@ function FinishButton({ buttonStatus }: Props) {
         duration: 1000,
       });
 
-      queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
+      invalidateShiftQueries(queryClient);
     });
   }
 

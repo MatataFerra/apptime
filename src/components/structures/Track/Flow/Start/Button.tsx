@@ -8,6 +8,7 @@ import Toast from "@/services/Toast";
 import Button from "@/components/ui/Button";
 import { DialogClose } from "@/components/ui/Dialog";
 
+import { invalidateShiftQueries } from "@/utils/helpers/invalidateShiftQueries";
 import useTrack from "@/hooks/useTrack";
 
 import onCreateTrackJob from "@/server-actions/create-track";
@@ -56,7 +57,7 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
           type: "success",
         });
 
-        queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
+        invalidateShiftQueries(queryClient);
 
         const prepareShift: Hourly = {
           ...data,

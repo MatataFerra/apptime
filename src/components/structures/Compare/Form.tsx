@@ -48,13 +48,28 @@ function CompareForm() {
             value={hourly.hourlyWage}
             onChange={(e) => setHourly({ hourlyWage: e.target.value })}
           />
+        </Stack>
+        <Stack as="fieldset" classes="w-full">
           <Input
-            type="time"
+            type="number"
+            inputMode="numeric"
             name="hoursWorked"
             label="Hours worked"
-            measure="h."
+            measure="h"
+            min={0}
             value={hourly?.hoursWorked}
             onChange={(e) => setHourly({ hoursWorked: e.target.value })}
+          />
+          <Input
+            type="number"
+            inputMode="numeric"
+            name="minutesWorked"
+            label="Minutes"
+            measure="min"
+            min={0}
+            max={59}
+            value={hourly?.minutesWorked ?? ""}
+            onChange={(e) => setHourly({ minutesWorked: e.target.value })}
           />
         </Stack>
       </Stack>

@@ -18,6 +18,8 @@ type IncomesInputs = {
   "unpaid-breaks": number;
 };
 
+const DEFAULT_HOLIDAY_PAY_RATE = 8;
+
 function Calculator() {
   const { register, watch } = useForm<IncomesInputs>();
 
@@ -40,8 +42,14 @@ function Calculator() {
   }, [hours, minutes]);
 
   const calculate = useMemo(() => {
+    // An empty field means the default rate shown in the hint, not 0%.
+    const holidayPayRate =
+      holidayPay === undefined || String(holidayPay).trim() === ""
+        ? DEFAULT_HOLIDAY_PAY_RATE
+        : Number(holidayPay);
+
     const total = ShiftService.calculateEarnings({
-      holidayPayRate: holidayPay,
+      holidayPayRate,
       hoursWorked: hoursMemo,
       hourValue: value,
       unpaidBreaks,
@@ -87,8 +95,10 @@ function Calculator() {
         <Input
           type="number"
           label="Holiday pay"
-          description="by default is 8%"
-          defaultValue={8}
+          description={`Leave empty for the default ${DEFAULT_HOLIDAY_PAY_RATE}%`}
+          measure="%"
+          placeholder={String(DEFAULT_HOLIDAY_PAY_RATE)}
+          defaultValue={DEFAULT_HOLIDAY_PAY_RATE}
           min={0}
           {...register("holiday-pay")}
         />
