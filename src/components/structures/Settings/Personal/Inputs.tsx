@@ -23,7 +23,7 @@ function Inputs() {
   }
 
   return (
-    <AccordionItemSettings value="personal" trigger="Personal Details">
+    <AccordionItemSettings value="personal" trigger="About you">
       <Input
         name={SETTINGS_FIELDS.personal.city.toLowerCase()}
         id={SETTINGS_FIELDS.personal.city.toLowerCase()}

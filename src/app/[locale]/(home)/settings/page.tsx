@@ -1,5 +1,9 @@
 import Submit from "@/components/structures/Settings/Submit";
 
 export default async function Settings() {
-  return <Submit />;
+  return (
+    <div className="pt-2">
+      <Submit />
+    </div>
+  );
 }

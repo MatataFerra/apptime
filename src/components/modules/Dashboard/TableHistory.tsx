@@ -75,16 +75,26 @@ const TabsTrigger = dynamic(() => import("@/components/ui/Tabs").then((mod) => m
 function TableHistory() {
   return (
     <Tabs className="p-2" defaultValue="perHour">
-      <Stack classes="p-3" alignItems="center" justifyContent="center">
-        <TabsList>
-          <TabsTrigger value="perHour">Earns per hour</TabsTrigger>
-          <TabsTrigger value="perProduction">Earns per production</TabsTrigger>
+      <Stack classes="p-2 pb-3" alignItems="center" justifyContent="center">
+        <TabsList className="h-10 rounded-full">
+          <TabsTrigger
+            value="perHour"
+            className="h-8 rounded-full px-3.5 data-[state=active]:bg-track-soft data-[state=active]:text-track-ink"
+          >
+            Earns per hour
+          </TabsTrigger>
+          <TabsTrigger
+            value="perProduction"
+            className="h-8 rounded-full px-3.5 data-[state=active]:bg-production-soft data-[state=active]:text-production-ink"
+          >
+            Earns per production
+          </TabsTrigger>
         </TabsList>
       </Stack>
-      <TabsContent className="m-0 rounded-lg shadow-input" value="perHour">
+      <TabsContent className="m-0 overflow-hidden rounded-xl border border-border" value="perHour">
         <Table classes="h-full min-h-[25dvh] w-full table-fixed">
           <TableHead
-            classes="border-b border-b-border-strong text-left text-xs"
+            classes="border-b border-b-border bg-surface-sunken text-left text-xs text-ink-muted"
             columnTitle={COLUMNS}
             elementClasses="p-4"
           />
@@ -92,10 +102,13 @@ function TableHistory() {
           <HourlyFooter colsNumber={COLUMNS.length} />
         </Table>
       </TabsContent>
-      <TabsContent className="m-0 rounded-lg shadow-input" value="perProduction">
+      <TabsContent
+        className="m-0 overflow-hidden rounded-xl border border-border"
+        value="perProduction"
+      >
         <Table classes="h-full w-full table-fixed">
           <TableHead
-            classes="border border-l-0 border-r-0 border-t-0 border-b-border-strong text-left text-xs"
+            classes="border-b border-b-border bg-surface-sunken text-left text-xs text-ink-muted"
             columnTitle={COLUMNS_PER_PRODUCTION}
             elementClasses="p-4"
           />

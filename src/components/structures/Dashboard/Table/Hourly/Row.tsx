@@ -6,9 +6,9 @@ import type { Hourly } from "@prisma/client";
 import dynamic from "next/dynamic";
 
 import ShiftService from "@/services/Shift";
+import { formatMoney } from "@/services/Summary";
 
 import { COLUMNS } from "@/components/modules/Dashboard/TableHistory";
-import Icon from "@/components/ui/Icons";
 import Skeleton from "@/components/ui/Skeleton";
 import TableElement from "@/components/ui/TableElement";
 
@@ -62,9 +62,13 @@ function HourlyRow({ shift }: { shift: Hourly }) {
         <TableElement>
           {getTimeDifference.diff ? `${String(getTimeDifference.text)}` : "..."}
         </TableElement>
-        <TableElement>${String(calculateEarnings(shift))}</TableElement>
+        <TableElement>{formatMoney(calculateEarnings(shift))}</TableElement>
         <TableElement align="center">
-          {shift?.isPublicHoliday ? <Icon.star className="text-accent" /> : null}
+          {shift?.isPublicHoliday ? (
+            <span className="inline-flex rounded-full bg-fast-soft px-2 py-0.5 text-xs font-semibold text-fast-ink">
+              Holiday
+            </span>
+          ) : null}
         </TableElement>
       </TableElement>
     </TableDialog>

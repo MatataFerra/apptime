@@ -27,9 +27,7 @@ function TableDialogContent({ shift }: Props) {
   return (
     <Stack grid cols={2}>
       {shift.name ? (
-        <Text classes="col-span-2 border-b border-b-border text-lg text-ink">
-          {shift.name}
-        </Text>
+        <Text classes="col-span-2 border-b border-b-border text-lg text-ink">{shift.name}</Text>
       ) : null}
       <Text>
         <Text as="span" classes="font-bold">

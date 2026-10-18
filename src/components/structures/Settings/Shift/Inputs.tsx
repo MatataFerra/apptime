@@ -3,7 +3,7 @@ import Dropdown from "@/components/structures/Settings/Shift/Dropdown";
 
 function Inputs() {
   return (
-    <AccordionItemSettings value="shift" trigger="Shift configuration">
+    <AccordionItemSettings value="shift" trigger="Your shifts">
       <Dropdown />
     </AccordionItemSettings>
   );

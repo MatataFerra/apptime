@@ -8,7 +8,6 @@ import ShiftService from "@/services/Shift";
 
 import Content from "@/components/structures/Dashboard/Table/Dialog/Content";
 import Dialog from "@/components/structures/Dashboard/Table/Dialog/Dialog";
-import Icon from "@/components/ui/Icons";
 import TableElement from "@/components/ui/TableElement";
 
 import useHumanizeDate from "@/hooks/useHumanizeDate";
@@ -41,7 +40,11 @@ function ProductionRow({ shift }: { shift: Production }) {
         <TableElement>{shift?.itemQuantity ? shift.itemQuantity : "..."}</TableElement>
         <TableElement>${calculateEarnings(shift).toFixed(2)}</TableElement>
         <TableElement align="center">
-          {shift?.isPublicHoliday ? <Icon.star className="text-accent" /> : null}
+          {shift?.isPublicHoliday ? (
+            <span className="inline-flex rounded-full bg-fast-soft px-2 py-0.5 text-xs font-semibold text-fast-ink">
+              Holiday
+            </span>
+          ) : null}
         </TableElement>
       </TableElement>
     </Dialog>
