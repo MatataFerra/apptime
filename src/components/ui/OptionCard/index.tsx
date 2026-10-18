@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import {
   ArrowLeftRight,
   ChartColumn,
@@ -10,12 +8,12 @@ import {
   Timer,
   Zap,
 } from "lucide-react";
+import Link from "next/link";
 
 import { type CSSClassNames } from "@/types";
 
-import { cn } from "@/utils/helpers/styleMerger";
-
 import { PATH_NAMES } from "@/utils/constants/pathnames";
+import { cn } from "@/utils/helpers/styleMerger";
 
 type Props = {
   title?: string;

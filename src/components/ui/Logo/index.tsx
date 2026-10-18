@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 
-import { cn } from "@/utils/helpers/styleMerger";
-
 import { PATH_NAMES } from "@/utils/constants/pathnames";
+import { cn } from "@/utils/helpers/styleMerger";
 
 interface Props {
   withText?: boolean;
