@@ -48,7 +48,9 @@ function ModuleTitle({ title, subtitle, module, theme, aside }: Props) {
         <div className="flex min-w-0 flex-col gap-1.5">
           <h1 className="display-title text-5xl text-ink">{title}</h1>
           {subtitle ? (
-            <p className={cn("text-[0.9375rem] text-pretty", banded ? colors.ink : "text-ink-muted")}>
+            <p
+              className={cn("text-[0.9375rem] text-pretty", banded ? colors.ink : "text-ink-muted")}
+            >
               {subtitle}
             </p>
           ) : null}

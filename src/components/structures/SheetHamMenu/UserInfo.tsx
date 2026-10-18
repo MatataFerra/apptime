@@ -1,39 +1,44 @@
 import UserService from "@/services/User";
 
 import Image from "@/components/ui/Image";
-import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
 
-import { shortEmail } from "@/utils/helpers/shortEmail";
+function initials(name?: string | null, email?: string | null) {
+  const source = (name ?? "").trim() || (email ?? "").split("@")[0];
+  const parts = source.split(/[\s._-]+/).filter(Boolean);
+  return (parts.length > 1 ? parts[0][0] + parts[1][0] : source.slice(0, 2)).toUpperCase();
+}
 
+/** Who is signed in, at the top of the side menu. */
 async function UserInfo() {
   // The menu header is decorative: if the user can't be loaded, show the
   // default header instead of breaking the whole page.
   const user = await UserService.getSessionUser().catch(() => null);
 
+  if (!user) {
+    return <span className="text-[0.9375rem] font-semibold text-ink">Menu</span>;
+  }
+
   return (
-    <>
-      <Stack spacing={4} alignItems="center" classes="p-4">
-        {user?.image ? (
-          <Image classes="rounded-full" src={user.image} alt="logo" width={50} height={50} />
-        ) : (
-          <Image
-            classes="rounded-full"
-            src="/assets/avatar.svg"
-            alt="logo"
-            width={50}
-            height={50}
-          />
-        )}
-        <Stack orientation="vertical" spacing={0}>
-          {!user?.name ? (
-            <Text classes="text-sm font-medium">Main menu</Text>
-          ) : (
-            <Text classes="text-sm font-medium">{shortEmail({ user })}</Text>
-          )}
-        </Stack>
-      </Stack>
-    </>
+    <span className="flex items-center gap-3 rounded-2xl bg-surface-inverse p-3 text-left text-ink-inverse">
+      {user.image ? (
+        <Image classes="size-11 rounded-full" src={user.image} alt="" width={44} height={44} />
+      ) : (
+        <span
+          className="flex size-11 shrink-0 items-center justify-center rounded-full bg-live display-title text-lg leading-none text-ink"
+          aria-hidden="true"
+        >
+          {initials(user.name, user.email)}
+        </span>
+      )}
+      <span className="flex min-w-0 flex-col">
+        <span className="truncate text-[0.9375rem] font-semibold">
+          {user.name || "Your account"}
+        </span>
+        <span className="truncate text-[0.8125rem] font-normal text-ink-inverse/70">
+          {user.email}
+        </span>
+      </span>
+    </span>
   );
 }
 

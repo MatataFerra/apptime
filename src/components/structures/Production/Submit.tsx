@@ -56,14 +56,15 @@ function Submit() {
 
   return (
     <Dialog>
-      <Box classes="ml-auto w-fit">
+      <Box classes="w-full">
         <Button
           type="button"
-          variant="gradient_secondary"
+          variant="primary"
+          classes="h-14 w-full rounded-2xl text-base font-semibold"
           disabled={!isFormReady}
           onClick={() => onOpenDialogAndCheckInputs()}
         >
-          Next
+          Review shift
         </Button>
       </Box>
     </Dialog>

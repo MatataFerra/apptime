@@ -11,9 +11,9 @@ import { useLocale } from "next-intl";
 import Login from "@/components/structures/Auth/Login";
 import Logout from "@/components/structures/Auth/Logout";
 import Options from "@/components/structures/SheetHamMenu/Options";
+import { LogoMark } from "@/components/ui/Logo";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -50,16 +50,23 @@ function SheetHamMenu({ children }: PropsWithChildren<Props>) {
   }
   return (
     <Sheet>
-      <SheetTrigger>
+      <SheetTrigger data-testid="ham" className="-ml-2 rounded-md">
         <Ham />
       </SheetTrigger>
       <SheetContent
-        aria-describedby={"main menu"}
         side="left"
-        className="isolate bg-surface/90 shadow-2xl backdrop-blur-md"
+        className="flex w-[86%] flex-col gap-6 overflow-y-auto rounded-r-[28px] border-r-0 bg-surface px-4 pt-5 pb-6 sm:max-w-sm"
       >
-        <SheetHeader>
-          <SheetTitle>{children}</SheetTitle>
+        <SheetHeader className="gap-5 space-y-0 text-left">
+          <span className="flex items-center gap-1.5 text-ink" aria-hidden="true">
+            <LogoMark className="size-7" />
+            <span className="font-logo text-[1.375rem] leading-none font-extrabold tracking-[-0.03em]">
+              casualapp
+            </span>
+          </span>
+          <SheetTitle asChild>
+            <div>{children}</div>
+          </SheetTitle>
           <SheetDescription>
             <VisuallyHidden.Root>
               This is the main menu, you can navigate to different sections of the app.
@@ -67,16 +74,12 @@ function SheetHamMenu({ children }: PropsWithChildren<Props>) {
           </SheetDescription>
         </SheetHeader>
         <Options />
-        <SheetFooter>
-          <SheetClose asChild>
-            <>
-              {status === "authenticated" ? (
-                <Logout handleLogout={handleLogout} />
-              ) : (
-                <Login handleLogin={handleLogin} />
-              )}
-            </>
-          </SheetClose>
+        <SheetFooter className="mt-auto flex-col sm:flex-col sm:space-x-0">
+          {status === "authenticated" ? (
+            <Logout handleLogout={handleLogout} />
+          ) : (
+            <Login handleLogin={handleLogin} />
+          )}
         </SheetFooter>
       </SheetContent>
     </Sheet>

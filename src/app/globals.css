@@ -605,10 +605,6 @@ div[data-radio-state="false"] .animate_fade_out {
   @apply shrink grow-2 basis-[120px];
 }
 
-.drawer-option {
-  @apply relative w-full rounded-md px-4 py-2 text-left text-sm transition-colors hover:bg-surface-sunken active:bg-surface-sunken;
-}
-
 /* FAB stack show / hide */
 .show_up {
   animation: show_up 180ms var(--ease-out-quint) backwards;

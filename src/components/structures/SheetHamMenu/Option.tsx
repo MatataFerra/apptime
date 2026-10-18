@@ -1,17 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTrigger,
-} from "@/components/ui/Sheet";
-import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
+import { SheetClose } from "@/components/ui/Sheet";
+
+import { MODULE_THEMES, MODULES } from "@/utils/constants/modules";
+import { cn } from "@/utils/helpers/styleMerger";
 
 type Option = {
   id: string;
@@ -25,22 +20,39 @@ type Props = {
 };
 
 function Option({ option }: Props) {
-  const router = useRouter();
+  const pathname = usePathname();
+  const mod = MODULES[option.url];
+  const colors = MODULE_THEMES[mod?.theme ?? "neutral"];
+  const Icon = mod?.icon;
+  const active = pathname?.split("/").includes(option.url.replace("/", ""));
 
   return (
     <SheetClose asChild>
-      <Stack
-        key={option.id}
+      <Link
+        href={option.url}
         data-testid={option.dataTestId}
-        as="button"
-        alignItems="center"
-        classes="drawer-option"
-        onClick={() => {
-          router.push(option.url);
-        }}
+        aria-current={active ? "page" : undefined}
+        className={cn(
+          "flex min-h-12 items-center gap-3 rounded-xl px-2 py-1.5 text-[0.9375rem] font-medium text-ink transition-colors",
+          active ? "bg-surface-sunken" : "hover:bg-surface-sunken/70"
+        )}
       >
-        <Text classes="select-none font-medium">{option.label}</Text>
-      </Stack>
+        {Icon ? (
+          <span
+            className={cn(
+              "flex size-9 shrink-0 items-center justify-center rounded-[10px]",
+              colors.soft,
+              colors.ink
+            )}
+          >
+            <Icon className="size-4.5" strokeWidth={2} aria-hidden="true" />
+          </span>
+        ) : null}
+        <span className="flex-1">{option.label}</span>
+        {active ? (
+          <span className={cn("size-1.5 rounded-full", colors.strong)} aria-hidden="true" />
+        ) : null}
+      </Link>
     </SheetClose>
   );
 }

@@ -2,142 +2,77 @@
 
 import { type PropsWithChildren, useEffect, useMemo } from "react";
 
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import isEmpty from "lodash/isEmpty";
+import { format } from "date-fns";
 
-import DateHumanizer from "@/services/Date";
 import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
+import { formatMoney } from "@/services/Summary";
 
-import DialogValue from "@/components/structures/share/DialogValue";
-import Button from "@/components/ui/Button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/Dialog";
-import Image from "@/components/ui/Image";
-import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
+import ShiftReviewDialog from "@/components/structures/share/ShiftReviewDialog";
 
 import { useProductionForm } from "@/store/useProductionForm";
 import { useProductionTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
+
+function humanize(date?: string | null) {
+  if (!date) return "–";
+  const d = new Date(date);
+  return isNaN(d.valueOf()) ? "–" : format(d, "MMM d, h:mm a");
+}
 
 function DialogProduction({ children }: PropsWithChildren) {
   const { values, dialog, setDialogState, formError } = useProductionForm((state) => state);
   const {
     taxesModule: { salaryElement: taxes },
-    contributionsModule: { salaryElement: contributions },
   } = useProductionTaxesOrContributionsStore((state) => state);
 
   useEffect(() => {
     if (formError) return setDialogState(false);
   }, [formError, setDialogState, dialog]);
 
-  const calculateEarn = useMemo(() => {
+  const earnings = useMemo(() => {
     const prepareShift = {
       itemValue: Number(values.itemValue ?? 0),
       itemQuantity: Number(values.itemQuantity),
     };
-    const earnings = new ShiftService(prepareShift).checkPublicHoliday().calculateEarnings();
-    const getTaxesDiscount = Pay.afterTax(earnings, taxes);
+    const gross = new ShiftService(prepareShift).checkPublicHoliday().calculateEarnings();
+    const afterTaxes = Pay.afterTax(gross, taxes);
 
     return {
-      sharp: isNaN(earnings) ? 0 : earnings,
-      afterTaxes: isNaN(getTaxesDiscount) ? 0 : getTaxesDiscount,
+      gross: isNaN(gross) ? 0 : gross,
+      afterTaxes: isNaN(afterTaxes) ? 0 : afterTaxes,
     };
   }, [taxes, values.itemQuantity, values.itemValue]);
 
-  return (
-    <Dialog open={dialog} onOpenChange={setDialogState}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="h-[90dvh] overflow-y-scroll">
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-center gap-2">
-            <Image src="/assets/marks/question_mark.svg" alt="Production" width={50} height={50} />
-            <Text variant="subtitle" classes="text-left">
-              New Shift will be created with the following details. Please confirm.
-            </Text>
-          </DialogTitle>
-          <DialogDescription>
-            <VisuallyHidden.Root>
-              Please check the data and submit if everything is ok
-            </VisuallyHidden.Root>
-          </DialogDescription>
-        </DialogHeader>
-        <Stack orientation="vertical" classes="mt-4" spacing={4}>
-          <DialogValue content="Time details">
-            <Text classes="text-sm">
-              Start: {new DateHumanizer("short").humanizeDate(new Date(values.startDate!))}
-            </Text>
-            <Text classes="text-sm">
-              Finish: {new DateHumanizer("short").humanizeDate(new Date(values.finishDate!))}
-            </Text>
-          </DialogValue>
-          <DialogValue content="Item details">
-            <Text classes="text-sm">Item value: ${values.itemValue}</Text>
-            <Text classes="text-sm">Item quantity: {values.itemQuantity}</Text>
-          </DialogValue>
-          <DialogValue content="Pay details">
-            {values.holidayPayRate && (
-              <Text classes="text-sm">Holday pay rate: {values.holidayPayRate}%</Text>
-            )}
-            <Text classes="text-sm">Public holiday: {values.isPublicHoliday ? "Yes" : "No"}</Text>
-            <Text classes="text-sm">
-              Public holiday worked: {values.publicHolidayWorked ? "Yes" : "No"}
-            </Text>
-            <Stack>
-              <Text classes="figure rounded-md bg-accent-soft px-2 py-1 text-sm font-semibold text-accent">
-                You will earn: ${calculateEarn.sharp.toFixed(2)}
-              </Text>
-              {!isEmpty(taxes) && calculateEarn.afterTaxes > 0 ? (
-                <Text classes="animate-fade-in figure rounded-md bg-destructive-soft px-2 py-1 text-sm font-semibold text-destructive repeat-[2]">
-                  After Taxes: ${calculateEarn.afterTaxes.toFixed(2)}
-                </Text>
-              ) : null}
-            </Stack>
-          </DialogValue>
+  const tags = [
+    values.isPublicHoliday ? "Public holiday" : null,
+    values.isPublicHoliday && values.publicHolidayWorked ? "Worked the holiday" : null,
+  ].filter(Boolean) as string[];
 
-          {!isEmpty(taxes) ? (
-            <DialogValue content="Taxes">
-              <Stack grid cols={3}>
-                {taxes?.map((tax) => (
-                  <Text key={tax.name} classes="text-sm">
-                    {tax.name}: {tax.value}%
-                  </Text>
-                ))}
-              </Stack>
-            </DialogValue>
-          ) : null}
-          {!isEmpty(contributions) ? (
-            <DialogValue content="Contributions">
-              <Stack grid cols={3}>
-                {contributions?.map((contribution) => (
-                  <Text key={contribution.name} classes="text-sm">
-                    {contribution.name}: {contribution.value}%
-                  </Text>
-                ))}
-              </Stack>
-            </DialogValue>
-          ) : null}
-        </Stack>
-        <DialogFooter className="flex flex-row justify-end gap-4">
-          <DialogClose asChild>
-            <Button size="md" variant="black">
-              Close
-            </Button>
-          </DialogClose>
-          <Button type="submit" size="md" variant="primary" form="production-job">
-            Submit
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+  return (
+    <ShiftReviewDialog
+      open={dialog}
+      onOpenChange={setDialogState}
+      formId="production-job"
+      theme="production"
+      gross={earnings.gross}
+      afterTaxes={earnings.afterTaxes}
+      taxes={taxes}
+      tags={tags}
+      rows={[
+        ...(values.name ? [{ label: "Job", value: values.name }] : []),
+        { label: "Start", value: humanize(values.startDate) },
+        { label: "Finish", value: humanize(values.finishDate) },
+        {
+          label: "Pieces",
+          value: `${values.itemQuantity ?? 0} × ${formatMoney(Number(values.itemValue ?? 0))}`,
+        },
+        ...(values.holidayPayRate
+          ? [{ label: "Holiday pay", value: `${values.holidayPayRate}%` }]
+          : []),
+      ]}
+    >
+      {children}
+    </ShiftReviewDialog>
   );
 }
 

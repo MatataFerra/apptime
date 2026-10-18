@@ -37,7 +37,7 @@ test("user can fill up the form and submit", async ({ page }) => {
   await page.getByRole("textbox", { name: /Unpaid breaks/ }).fill("1");
   await page.getByRole("textbox", { name: /Holidaypay rate/ }).fill("8");
 
-  await page.getByRole("button", { name: /Submit/ }).click();
+  await page.getByRole("button", { name: /Save shift/ }).click();
 
   const toast = await page
     .getByText(/successfully/)

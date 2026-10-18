@@ -6,8 +6,14 @@ type Props = {
 
 function Login({ handleLogin }: Props) {
   return (
-    <Button as="button" size="sm" variant="black" classes="cursor-pointer" onClick={handleLogin}>
-      Login
+    <Button
+      type="button"
+      variant="primary"
+      size="lg"
+      classes="w-full rounded-2xl"
+      onClick={handleLogin}
+    >
+      Log in
     </Button>
   );
 }

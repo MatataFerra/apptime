@@ -2,34 +2,24 @@
 
 import { type PropsWithChildren, useEffect, useMemo } from "react";
 
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import { differenceInMinutes } from "date-fns";
-import isEmpty from "lodash/isEmpty";
+import { differenceInMinutes, format } from "date-fns";
 
-import DateHumanizer from "@/services/Date";
 import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
+import { formatMoney } from "@/services/Summary";
 
-import DialogValue from "@/components/structures/share/DialogValue";
-import Button from "@/components/ui/Button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/Dialog";
-import Image from "@/components/ui/Image";
-import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
+import ShiftReviewDialog from "@/components/structures/share/ShiftReviewDialog";
 
 import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
 
 import { useFastChargeStore } from "@/store/useFastChargeStore";
 import { useHourlyTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
+
+function humanize(date?: string | Date | null) {
+  if (!date) return "–";
+  const d = new Date(date);
+  return isNaN(d.valueOf()) ? "–" : format(d, "MMM d, h:mm a");
+}
 
 function DialogHourly({ children }: PropsWithChildren) {
   const {
@@ -50,7 +40,6 @@ function DialogHourly({ children }: PropsWithChildren) {
 
   const {
     taxesModule: { salaryElement: taxes },
-    contributionsModule: { salaryElement: contributions },
   } = useHourlyTaxesOrContributionsStore((state) => state);
 
   useEffect(() => {
@@ -93,86 +82,31 @@ function DialogHourly({ children }: PropsWithChildren) {
     };
   }, [fastHoliday, fastWorked, formatEnd, formatStart, hourValue, taxes, unpaidBreaks]);
 
+  const tags = [
+    fastHoliday ? "Public holiday" : null,
+    fastHoliday && fastWorked ? "Worked the holiday" : null,
+  ].filter(Boolean) as string[];
+
   return (
-    <Dialog open={dialog} onOpenChange={setDialogState}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="h-[90dvh] overflow-y-scroll">
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-center gap-2">
-            <Image src="/assets/marks/question_mark.svg" alt="Production" width={50} height={50} />
-            <Text variant="subtitle" classes="text-left">
-              New Shift will be created with the following details. Please confirm.
-            </Text>
-          </DialogTitle>
-          <DialogDescription>
-            <VisuallyHidden.Root>
-              Please check the data and submit if everything is ok
-            </VisuallyHidden.Root>
-          </DialogDescription>
-        </DialogHeader>
-        <Stack orientation="vertical" classes="mt-4" spacing={4}>
-          <DialogValue content="Time details">
-            <Text classes="text-sm">
-              Start: {new DateHumanizer("short").humanizeDate(new Date(formatStart!))}
-            </Text>
-            <Text classes="text-sm">
-              Finish: {new DateHumanizer("short").humanizeDate(new Date(formatEnd!))}
-            </Text>
-            <Text classes="text-sm">Total time worked: {totalTimeWorked}</Text>
-          </DialogValue>
-          <DialogValue content="Job details">
-            <Text classes="text-sm">Hour value: ${hourValue}</Text>
-          </DialogValue>
-          <DialogValue content="Pay details">
-            <Text classes="text-sm">Public holiday: {fastHoliday ? "Yes" : "No"}</Text>
-            <Text classes="text-sm">Public holiday worked: {fastWorked ? "Yes" : "No"}</Text>
-            {unpaidBreaks ? <Text classes="text-sm">Unpaid time: {unpaidBreaks}min.</Text> : null}
-            <Stack>
-              <Text classes="figure rounded-md bg-accent-soft px-2 py-1 text-sm font-semibold text-accent">
-                You will earn: ${calculateEarn.sharp.toFixed(2)}
-              </Text>
-              {!isEmpty(taxes) && calculateEarn.afterTaxes > 0 ? (
-                <Text classes="animate-fade-in figure rounded-md bg-destructive-soft px-2 py-1 text-sm font-semibold text-destructive repeat-[2]">
-                  After Taxes: ${calculateEarn.afterTaxes.toFixed(2)}
-                </Text>
-              ) : null}
-            </Stack>
-          </DialogValue>
-          {!isEmpty(taxes) ? (
-            <DialogValue content="Taxes">
-              <Stack grid cols={3}>
-                {taxes?.map((tax) => (
-                  <Text key={tax.name} classes="text-sm">
-                    {tax.name}: {tax.value}%
-                  </Text>
-                ))}
-              </Stack>
-            </DialogValue>
-          ) : null}
-          {!isEmpty(contributions) ? (
-            <DialogValue content="Contributions">
-              <Stack grid cols={3}>
-                {contributions?.map((contribution) => (
-                  <Text key={contribution.name} classes="text-sm">
-                    {contribution.name}: {contribution.value}%
-                  </Text>
-                ))}
-              </Stack>
-            </DialogValue>
-          ) : null}
-        </Stack>
-        <DialogFooter className="flex flex-row justify-end gap-4">
-          <DialogClose asChild>
-            <Button size="md" variant="black">
-              Close
-            </Button>
-          </DialogClose>
-          <Button type="submit" size="md" variant="primary" form="fast-charge">
-            Submit
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <ShiftReviewDialog
+      open={dialog}
+      onOpenChange={setDialogState}
+      formId="fast-charge"
+      theme="fast"
+      gross={calculateEarn.sharp}
+      afterTaxes={calculateEarn.afterTaxes}
+      taxes={taxes}
+      tags={tags}
+      rows={[
+        { label: "Start", value: humanize(formatStart) },
+        { label: "Finish", value: humanize(formatEnd) },
+        { label: "Time worked", value: totalTimeWorked },
+        { label: "Hourly rate", value: formatMoney(Number(hourValue) || 0) },
+        ...(unpaidBreaks ? [{ label: "Unpaid breaks", value: `${unpaidBreaks} min` }] : []),
+      ]}
+    >
+      {children}
+    </ShiftReviewDialog>
   );
 }
 
