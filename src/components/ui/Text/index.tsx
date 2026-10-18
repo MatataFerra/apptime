@@ -19,6 +19,7 @@ type TextOwnProps<E extends ValidElement> = {
   classes?: CSSClassNames;
   variant?: Variants;
   color?: TAILWIND_COLOR;
+  /** @deprecated gradients were removed from the visual identity; this prop is ignored. */
   gradient?: Gradients;
   children: React.ReactNode;
 };
@@ -48,7 +49,7 @@ function Text<E extends ValidElement = typeof TextDefaultAsType>({
   classes,
   variant = "default",
   color,
-  gradient,
+  gradient: _gradient,
   ...props
 }: TextProps<E>): ReactElement {
   const Component = as || TextDefaultAsType;
@@ -57,7 +58,6 @@ function Text<E extends ValidElement = typeof TextDefaultAsType>({
     <Component
       className={cn(
         TEXT_VARIANTS[variant],
-        gradient ? `bg-linear-to-r bg-clip-text text-transparent ${GRADIENTS[gradient]}` : "",
         classes,
         color
       )}

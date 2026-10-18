@@ -3,22 +3,15 @@ import { describe, expect, test, vi } from "vitest";
 
 import GoogleButton from "@/components/ui/Button/Google";
 
-import { BUTTON_VARIANTS } from "@/utils/constants/tailwind";
-import { cm } from "@/utils/helpers/styleMerger";
-
-import Button from "./";
-
-const DEFAULT_STYLES = "w-40 cursor-pointer rounded-lg text-center";
+import Button, { buttonVariants, resolveButtonVariant } from "./";
 
 describe("Button", () => {
   test("renders with default props", () => {
     render(<Button>Send</Button>);
     const buttonElement = screen.getByText("Send");
     expect(buttonElement).toBeInTheDocument();
-
-    const merger = cm(DEFAULT_STYLES, BUTTON_VARIANTS.primary);
-
-    expect(buttonElement).toHaveClass(merger);
+    expect(buttonElement.className).toContain(buttonVariants({ variant: "primary", size: "lg" }));
+    expect(buttonElement).toHaveClass("w-40");
   });
 
   test("renders with custom props", () => {
@@ -28,12 +21,15 @@ describe("Button", () => {
       </Button>
     );
 
-    const merger = cm(DEFAULT_STYLES, BUTTON_VARIANTS.secondary, "text-red-500");
-
     const buttonElement = screen.getByText("Click me");
     expect(buttonElement).toBeInTheDocument();
+    expect(buttonElement).toHaveClass("bg-surface-sunken", "text-red-500");
+  });
 
-    expect(buttonElement).toHaveClass(merger);
+  test("maps legacy variant names to the new set", () => {
+    expect(resolveButtonVariant("black")).toBe("primary");
+    expect(resolveButtonVariant("outlined")).toBe("outline");
+    expect(resolveButtonVariant("danger")).toBe("danger");
   });
 });
 
@@ -44,13 +40,6 @@ describe("Google Button", () => {
     const buttonElement = screen.getByRole("button");
 
     expect(buttonElement).toBeInTheDocument();
-
-    const merger = cm(
-      BUTTON_VARIANTS.google,
-      DEFAULT_STYLES,
-      "mx-0 my-auto grid w-full grid-cols-1 items-center"
-    );
-
-    expect(buttonElement).toHaveClass(merger);
+    expect(buttonElement).toHaveClass("border-border-strong", "bg-surface", "w-full");
   });
 });

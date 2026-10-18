@@ -18,7 +18,7 @@ function ChartLine({ data }: Props) {
     <ResponsiveContainer
       width="100%"
       height={500}
-      className="rounded-lg border border-gray-200 p-4 shadow-input"
+      className="rounded-lg border border-border bg-surface p-4"
     >
       <LineChart
         width={150}

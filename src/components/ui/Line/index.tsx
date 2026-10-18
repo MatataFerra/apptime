@@ -9,7 +9,7 @@ type Props = {
   classes?: string;
 };
 
-function Line({ color = "bg-stone-500", classes }: Props) {
+function Line({ color = "bg-border", classes }: Props) {
   return <div className={cn("flex h-px w-full", `${color}`, classes)} />;
 }
 

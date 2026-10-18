@@ -42,11 +42,11 @@ function OptionCard({ title, path, classes }: Props) {
         as="figure"
         justifyContent="center"
         alignItems="center"
-        classes={`size-14 cursor-pointer rounded-lg p-2 shadow-input active:shadow-inner ${classes}`}
+        classes={`size-14 cursor-pointer rounded-lg border border-border bg-surface p-3 text-ink transition-colors active:bg-surface-sunken ${classes}`}
       >
         <div className={`size-fit`}>{ICONS[(path as keyof typeof ICONS) ?? "default"]}</div>
       </Stack>
-      {title ? <Text classes="text-xs font-medium">{title}</Text> : null}
+      {title ? <Text classes="mt-1.5 text-xs font-medium text-ink-muted">{title}</Text> : null}
     </Stack>
   );
 }

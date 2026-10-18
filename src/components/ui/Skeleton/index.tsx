@@ -5,7 +5,7 @@ export interface SkeletonProps extends Omit<React.HTMLAttributes<HTMLDivElement>
 }
 
 function Skeleton({ classes, ...props }: SkeletonProps) {
-  return <div className={cn("animate-pulse rounded-md bg-primary/10", classes)} {...props} />;
+  return <div className={cn("animate-pulse rounded-md bg-surface-sunken", classes)} {...props} />;
 }
 
 export default Skeleton;
