@@ -13,7 +13,8 @@ function ShiftTrackInfo() {
     shiftUnclosed: { isLoading },
   } = useTrack();
 
-  const lastShift = useMemo(() => getUser?.shifts?.hourly.at(-1), [getUser?.shifts?.hourly]);
+  const hourly = useMemo(() => getUser?.shifts?.hourly ?? [], [getUser?.shifts?.hourly]);
+  const lastShift = hourly.at(-1);
 
   const dateHumanized = useMemo(
     () => new DateHumanizer("long").humanizeDate(new Date(lastShift?.startDate ?? "")),
@@ -22,17 +23,17 @@ function ShiftTrackInfo() {
 
   const earnings = useMemo(
     () =>
-      getUser?.shifts?.hourly.reduce((acc, shift) => {
+      hourly.reduce((acc, shift) => {
         if (shift.isClosed) {
           acc += new ShiftService(shift).calculateEarnings();
         }
 
         return acc;
       }, 0),
-    [getUser?.shifts?.hourly]
+    [hourly]
   );
 
-  if (getUser?.shifts?.hourly.length === 0) return null;
+  if (hourly.length === 0) return null;
 
   return (
     <dl className="grid grid-cols-2 gap-4 border-t border-ink-inverse/15 pt-4">
