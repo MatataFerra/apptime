@@ -1,56 +1,102 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+
+import { useInterval } from "usehooks-ts";
 
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
-
-import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
+import {
+  formatHours,
+  formatMoney,
+  runningShiftEarnings,
+  usualShiftMinutes,
+} from "@/services/Summary";
 
 import useTrack from "@/hooks/useTrack";
 
+/**
+ * Bottom of the monitor. While a shift runs: progress against the usual
+ * shift length and what this shift has earned so far. Otherwise: the last
+ * shift and the usual length.
+ */
 function ShiftTrackInfo() {
-  const {
-    user: getUser,
-    shiftUnclosed: { isLoading },
-  } = useTrack();
+  const { user, isShiftActive, isClosing, shiftUnclosed } = useTrack();
+  const [now, setNow] = useState(() => new Date());
+  const running = isShiftActive && !isClosing && !!shiftUnclosed.shift?.startDate;
 
-  const lastShift = useMemo(() => getUser?.shifts?.hourly.at(-1), [getUser?.shifts?.hourly]);
+  useInterval(() => setNow(new Date()), running ? 5000 : null);
 
-  const dateHumanized = useMemo(
-    () => new DateHumanizer("long").humanizeDate(new Date(lastShift?.startDate ?? "")),
-    [lastShift?.startDate]
-  );
-
-  const earnings = useMemo(
+  const hourly = useMemo(() => user?.shifts?.hourly ?? [], [user?.shifts?.hourly]);
+  const usual = useMemo(() => usualShiftMinutes(hourly), [hourly]);
+  const lastClosed = useMemo(
     () =>
-      getUser?.shifts?.hourly.reduce((acc, shift) => {
-        if (shift.isClosed) {
-          acc += new ShiftService(shift).calculateEarnings();
-        }
-
-        return acc;
-      }, 0),
-    [getUser?.shifts?.hourly]
+      hourly
+        .filter((s) => s.isClosed)
+        .sort((a, b) => new Date(a.startDate).valueOf() - new Date(b.startDate).valueOf())
+        .at(-1),
+    [hourly]
   );
+
+  const lastLabel = useMemo(
+    () =>
+      lastClosed?.startDate
+        ? new DateHumanizer("long").humanizeDate(new Date(lastClosed.startDate))
+        : "None yet",
+    [lastClosed?.startDate]
+  );
+
+  if (running) {
+    const elapsed = ShiftService.differenceInHHmm(shiftUnclosed.shift?.startDate ?? "", "").diff;
+    const progress = usual ? Math.min(100, Math.round((elapsed / usual) * 100)) : null;
+    const earned = runningShiftEarnings(shiftUnclosed.shift, now);
+
+    return (
+      <div className="flex flex-col gap-4">
+        {progress !== null ? (
+          <div
+            className="h-2 overflow-hidden rounded-full bg-ink-inverse/12"
+            role="progressbar"
+            aria-label="Shift length compared with your usual shift"
+            aria-valuenow={progress}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            <div
+              className="h-full rounded-full bg-live transition-[width] duration-700"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        ) : null}
+        <dl className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-0.5">
+            <dt className="text-xs text-ink-inverse/60">This shift so far</dt>
+            <dd className="figure text-[1.625rem] leading-tight text-live">
+              {formatMoney(earned)}
+            </dd>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <dt className="text-xs text-ink-inverse/60">Usual shift</dt>
+            <dd className="figure text-[1.625rem] leading-tight">
+              {usual ? formatHours(usual) : "–"}
+            </dd>
+          </div>
+        </dl>
+      </div>
+    );
+  }
 
   return (
-    <>
-      {getUser?.shifts?.hourly.length === 0 ? (
-        <Text classes="mx-0 my-auto block text-center text-xl text-red-700">
-          {"You haven't started your shift yet! Please press the 'Start Shift' button."}
-        </Text>
-      ) : (
-        <Stack as="div" orientation="vertical">
-          <Text classes="text-xl">{`Last shift tracked: ${isLoading ? "waiting for data..." : dateHumanized ?? "no date available"}`}</Text>
-          <Text classes="text-xl">
-            Money earn at the moment:{" "}
-            {isLoading ? "waiting for data..." : `${earnings?.toFixed(2)}`}$
-          </Text>
-        </Stack>
-      )}
-    </>
+    <dl className="grid grid-cols-2 gap-3 border-t border-ink-inverse/15 pt-4">
+      <div className="flex flex-col gap-0.5">
+        <dt className="text-xs text-ink-inverse/60">Last shift</dt>
+        <dd className="text-sm font-medium">{lastLabel}</dd>
+      </div>
+      <div className="flex flex-col gap-0.5">
+        <dt className="text-xs text-ink-inverse/60">Usual shift</dt>
+        <dd className="text-sm font-medium">{usual ? formatHours(usual) : "After 3 shifts"}</dd>
+      </div>
+    </dl>
   );
 }
 

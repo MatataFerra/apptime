@@ -23,7 +23,7 @@ function ShiftStartPublicHolidayDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="h-9 w-full flex-shrink-[1] flex-grow-[2] basis-[120px] self-baseline px-2 py-1 text-xs shadow-input">
+      <DropdownMenuTrigger className="h-9 w-full shrink grow-2 basis-[120px] self-baseline px-2 py-1 text-xs shadow-input">
         Is a public holiday?
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-full">

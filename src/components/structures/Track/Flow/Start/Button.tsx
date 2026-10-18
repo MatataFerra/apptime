@@ -8,6 +8,7 @@ import Toast from "@/services/Toast";
 import Button from "@/components/ui/Button";
 import { DialogClose } from "@/components/ui/Dialog";
 
+import { invalidateShiftQueries } from "@/utils/helpers/invalidateShiftQueries";
 import useTrack from "@/hooks/useTrack";
 
 import onCreateTrackJob from "@/server-actions/create-track";
@@ -32,7 +33,7 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
   function onStartShift() {
     Toast({
       message: "Shift is being created",
-      type: "info",
+      type: "loading",
     });
 
     updateShiftStatus(true);
@@ -56,7 +57,7 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
           type: "success",
         });
 
-        queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
+        invalidateShiftQueries(queryClient);
 
         const prepareShift: Hourly = {
           ...data,
@@ -91,10 +92,10 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
   return (
     <DialogClose asChild>
       <Button
-        variant="black"
+        variant="accent"
         disabled={errors}
         type="submit"
-        classes="w-full border border-transparent p-2 text-sm"
+        classes="w-full text-sm"
         onClick={onStartShift}
       >
         {title}

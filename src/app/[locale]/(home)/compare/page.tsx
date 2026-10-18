@@ -6,7 +6,7 @@ export const dynamic = "force-static";
 export default async function Compare() {
   return (
     <>
-      <Stack orientation="vertical" classes="h-fit w-full overflow-hidden" spacing={8}>
+      <Stack orientation="vertical" classes="h-fit w-full" spacing={5}>
         <Content />
       </Stack>
     </>

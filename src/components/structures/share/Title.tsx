@@ -1,33 +1,33 @@
+"use client";
+
 import { UserType } from "@/types";
 
 import Text from "@/components/ui/Text";
 
 import { shortEmail } from "@/utils/helpers/shortEmail";
+import useUser from "@/hooks/useUser";
 
 interface Props {
   user?: UserType | null;
 }
 
-function WelcomeTitle({ user }: Props) {
+function WelcomeTitle({ user: userProp }: Props) {
+  const { data } = useUser();
+  const user = userProp ?? data;
+  const name = user?.name
+    ? user.name.split(" ")[0].trim()
+    : user?.email
+      ? shortEmail({ user })
+      : null;
+
   return (
     <div className="flex flex-col gap-1">
-      <Text variant="title" classes="text-5xl">
-        Welcome
+      <Text as="p" variant="small">
+        {name ? "Welcome back" : "Welcome"}
       </Text>
-
-      {user?.name ? (
-        <Text gradient="title" classes="balance_text text-3xl font-bold">
-          {user.name.split(" ")[0].trim()}
-        </Text>
-      ) : user?.email ? (
-        <Text gradient="title" classes="balance_text text-3xl font-bold">
-          {shortEmail({ user })}
-        </Text>
-      ) : (
-        <Text gradient="title" classes="balance_text animate-text text-base font-bold">
-          Manage your work
-        </Text>
-      )}
+      <Text as="h1" variant="title" classes="balance_text text-4xl">
+        {name ?? "Your work, in numbers"}
+      </Text>
     </div>
   );
 }

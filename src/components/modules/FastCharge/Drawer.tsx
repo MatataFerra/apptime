@@ -2,24 +2,23 @@
 
 import dynamic from "next/dynamic";
 
-import Button from "@/components/ui/Button";
 import Skeleton from "@/components/ui/Skeleton";
-import Stack from "@/components/ui/Stack";
 
-const SalaryDrawer = dynamic(() => import("@/components/modules/FastCharge/SalaryDrawer"), {
+import { useHourlyTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
+
+const TaxPicker = dynamic(() => import("@/components/structures/SalaryItems/TaxPicker"), {
   ssr: false,
-  loading: () => <Skeleton classes="h-12 w-full" />,
+  loading: () => <Skeleton classes="h-40 w-full rounded-[20px]" />,
 });
 
+/** Taxes for this shift, inline in the form (no nested drawers). */
 function Drawer() {
+  const { taxesModule } = useHourlyTaxesOrContributionsStore((state) => state);
+
   return (
-    <Stack classes="my-4 w-full">
-      <SalaryDrawer>
-        <Button variant="black" classes="w-full">
-          Advanced options
-        </Button>
-      </SalaryDrawer>
-    </Stack>
+    <div className="my-2 w-full">
+      <TaxPicker store={taxesModule} theme="fast" />
+    </div>
   );
 }
 

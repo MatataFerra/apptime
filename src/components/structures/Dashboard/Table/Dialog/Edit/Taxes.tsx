@@ -30,68 +30,62 @@ function Taxes({ shift }: Props) {
   );
 
   return (
-    <div className="grid grid-cols-1 gap-y-2">
-      {shift?.taxes?.map((tax) => (
-        <div
-          key={tax.id}
-          className={cn(
-            "flex items-center justify-between gap-x-2 transition-all",
-            isTaxAdded(tax.id) ? "text-red-600/80" : "text-gray-800"
-          )}
-        >
-          <article className="flex gap-1 text-balance text-xs">
-            <p>
-              {tax.name} {tax.value}%
-            </p>
-            {!!tax.description ? <p className="line-clamp-1">({tax.description})</p> : null}
-          </article>
-          {isTaxAdded(tax.id) ? (
-            <Button
-              type="button"
-              variant="outlined"
-              size="xs"
-              classes={cn(
-                "border px-2 transition-colors",
-                "cursor-pointer border-green-400 bg-green-100 text-gray-900 active:bg-green-300 active:shadow-button-inner"
-              )}
-              onClick={() => {
-                restoreTax(tax.id);
-                Toast({
-                  type: "plain",
-                  message: "Tax restored",
-                  duration: 1500,
-                  classes: "text-gray-500",
-                });
-              }}
-            >
-              restore
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              variant="outlined"
-              size="xs"
-              classes={cn(
-                "border px-2 transition-colors",
-                "cursor-pointer border-red-400 text-gray-900 active:bg-red-200 active:shadow-button-inner"
-              )}
-              onClick={() => {
-                addTaxToDelete(tax);
-                Toast({
-                  type: "plain",
-                  message: "Tax will be deleted",
-                  description: "Please press save to delete it",
-                  duration: 1500,
-                  classes: "text-red-600",
-                });
-              }}
-            >
-              delete
-            </Button>
-          )}
-        </div>
-      ))}
-    </div>
+    <ul className="flex flex-col gap-2">
+      {shift?.taxes?.map((tax) => {
+        const removing = isTaxAdded(tax.id);
+
+        return (
+          <li
+            key={tax.id}
+            className={cn(
+              "flex min-h-12 items-center justify-between gap-3 rounded-xl border px-3.5 py-2 transition-colors",
+              removing ? "border-destructive/40 bg-destructive-soft" : "border-border bg-surface"
+            )}
+          >
+            <span className={cn("flex min-w-0 flex-col", removing && "text-destructive")}>
+              <span className={cn("text-sm font-medium", removing && "line-through")}>
+                {tax.name} <span className="tabular-nums">{tax.value}%</span>
+              </span>
+              {tax.description ? (
+                <span className="truncate text-xs text-ink-muted">{tax.description}</span>
+              ) : null}
+            </span>
+            {removing ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                classes="w-auto"
+                onClick={() => {
+                  restoreTax(tax.id);
+                  Toast({ type: "plain", message: "Tax kept", duration: 1500 });
+                }}
+              >
+                Undo
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                classes="w-auto text-destructive"
+                onClick={() => {
+                  addTaxToDelete(tax);
+                  Toast({
+                    type: "plain",
+                    message: "Tax will be removed",
+                    description: "Save changes to apply it.",
+                    duration: 1500,
+                  });
+                }}
+              >
+                Remove
+              </Button>
+            )}
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 

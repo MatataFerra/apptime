@@ -15,9 +15,11 @@ import type { HourlyType, UserType } from "@/types";
 import Footer from "@/components/structures/Dashboard/Table/Dialog/Edit/Footer";
 import Taxes from "@/components/structures/Dashboard/Table/Dialog/Edit/Taxes";
 import { useTaxesHandlerDelete } from "@/components/structures/Dashboard/Table/Dialog/store/taxesHandlerDelete";
+import HolidayChoice, {
+  fromHolidayValue,
+  toHolidayValue,
+} from "@/components/structures/ShiftForms/HolidayChoice";
 import Input from "@/components/ui/Input";
-import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
 
 import onEditShift from "@/server-actions/edit-shift";
 import { useTableStore } from "@/store/useTableStore";
@@ -39,6 +41,8 @@ type EditShiftHourlyForm = {
 function TableDialogEditHourly({ shift, user }: Props) {
   const {
     register,
+    watch,
+    setValue,
     handleSubmit,
     setError,
     formState: { errors },
@@ -90,7 +94,7 @@ function TableDialogEditHourly({ shift, user }: Props) {
 
     onEditShift(shiftUpdated, taxesToDelete).then(async (res) => {
       Toast({
-        type: "info",
+        type: "loading",
         message: "Shift is being updated",
         duration: Infinity,
       });
@@ -121,17 +125,17 @@ function TableDialogEditHourly({ shift, user }: Props) {
   }
 
   return (
-    <Stack as="form" orientation="horizontal" wrap onSubmit={handleSubmit(onHandleEdit)}>
+    <form className="flex w-full flex-col gap-4" onSubmit={handleSubmit(onHandleEdit)}>
       <Input type="text" label="Job name" {...register("name", { value: shift?.name ?? "" })} />
 
       <Input
         type="datetime-local"
-        label="Start Date"
+        label="Start"
         {...register("startDate", { value: format(shift.startDate, "yyyy-MM-dd'T'HH:mm") })}
       />
       <Input
         type="datetime-local"
-        label="End Date"
+        label="Finish"
         isError={!!errors["endDate"]}
         description={errors["endDate"]?.message}
         {...register("endDate", {
@@ -140,7 +144,7 @@ function TableDialogEditHourly({ shift, user }: Props) {
       />
       <Input
         type="number"
-        label="Hour Value"
+        label="Hourly rate"
         step="0.01"
         min={0}
         placeholder={shift.hourValue.toString()}
@@ -148,40 +152,32 @@ function TableDialogEditHourly({ shift, user }: Props) {
           value: shift.hourValue,
         })}
       />
-      <Stack orientation="horizontal" wrap>
-        <Stack alignItems="center">
-          <input
-            className="size-4"
-            type="checkbox"
-            id="isPublicHoliday"
-            {...register("isPublicHoliday", { value: shift.isPublicHoliday })}
-          />
-          <Text as="label" htmlFor="isPublicHoliday">
-            is it a public holiday?
-          </Text>
-        </Stack>
-        <Stack alignItems="center">
-          <input
-            className="size-4"
-            type="checkbox"
-            id="publicHolidayWorked"
-            {...register("publicHolidayWorked", { value: shift.publicHolidayWorked })}
-          />
-          <Text as="label" htmlFor="publicHolidayWorked">
-            Have you worked it?
-          </Text>
-        </Stack>
-        <Stack
-          orientation="vertical"
-          classes="h-40 w-full overflow-y-scroll rounded-md p-2 shadow-md"
-          spacing={4}
-        >
-          <Text classes="font-semibold">Remove wrong taxes:</Text>
+      <input
+        type="checkbox"
+        hidden
+        {...register("isPublicHoliday", { value: shift.isPublicHoliday })}
+      />
+      <input
+        type="checkbox"
+        hidden
+        {...register("publicHolidayWorked", { value: shift.publicHolidayWorked })}
+      />
+      <HolidayChoice
+        value={toHolidayValue(watch("isPublicHoliday"), watch("publicHolidayWorked"))}
+        onChange={(next) => {
+          const { isPublicHoliday, publicHolidayWorked } = fromHolidayValue(next);
+          setValue("isPublicHoliday", isPublicHoliday, { shouldDirty: true });
+          setValue("publicHolidayWorked", publicHolidayWorked, { shouldDirty: true });
+        }}
+      />
+      {shift.taxes?.length ? (
+        <div className="flex w-full flex-col gap-2">
+          <h3 className="text-sm font-medium text-ink">Taxes</h3>
           <Taxes shift={shift} />
-        </Stack>
-      </Stack>
+        </div>
+      ) : null}
       <Footer />
-    </Stack>
+    </form>
   );
 }
 

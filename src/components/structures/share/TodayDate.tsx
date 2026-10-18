@@ -21,7 +21,7 @@ function TodayDate({ humanize = "today", date = new Date(), classes, locale }: P
   };
 
   return (
-    <Text variant="default" classes={cn("text-xs", classes)}>
+    <Text variant="small" classes={cn(classes)}>
       {TODAY_TRANSLATIONS[locale ?? "en"]}: {dateHumanized}
     </Text>
   );

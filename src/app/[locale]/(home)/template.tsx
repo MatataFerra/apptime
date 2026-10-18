@@ -7,31 +7,20 @@ import { usePathname } from "next/navigation";
 import { useLocale } from "next-intl";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
-import useUser from "@/hooks/useUser";
+import { invalidateShiftQueries } from "@/utils/helpers/invalidateShiftQueries";
 
 export default function Template({ children }: PropsWithChildren) {
   const qC = useQueryClient();
   const pathname = usePathname();
   const locale = useLocale();
-  const { data } = useUser();
 
+  // Entering the dashboard always shows fresh shifts, whatever happened
+  // elsewhere in the app since the lists were cached.
   useEffect(() => {
-    let refresh = true;
-
     if (pathname === `/${locale}${PATH_NAMES.DASHBOARD}`) {
-      if (!refresh) return;
-
-      qC.invalidateQueries({
-        queryKey: ["user", data?.email],
-      });
-
-      refresh = false;
-
-      return () => {
-        refresh = true;
-      };
+      invalidateShiftQueries(qC);
     }
-  }, [data?.email, locale, pathname, qC]);
+  }, [locale, pathname, qC]);
 
   return <>{children}</>;
 }

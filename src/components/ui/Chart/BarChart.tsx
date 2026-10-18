@@ -27,11 +27,11 @@ import { CHART_MONTH } from "@/utils/constants";
 const chartConfig = {
   hourly: {
     label: "Hourly",
-    color: "hsl(var(--chart-1))",
+    color: "var(--chart-1)",
   },
   production: {
     label: "Production",
-    color: "hsl(var(--chart-2))",
+    color: "var(--chart-2)",
   },
 } satisfies ChartConfig;
 
@@ -57,7 +57,7 @@ export default function BarChartComponent({ data }: Props) {
         <CardTitle>Earns per day</CardTitle>
         <CardDescription>
           Shifts up to{" "}
-          <span className="border-b border-b-slate-400 font-bold">{`${data.at(-1).date}`}</span>
+          <span className="border-b border-b-border font-bold">{`${data.at(-1).date}`}</span>
         </CardDescription>
       </CardHeader>
       <CardContent>

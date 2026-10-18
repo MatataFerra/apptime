@@ -1,19 +1,14 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { forwardRef } from "react";
 
+import { Receipt, StickyNote } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useOnClickOutside } from "usehooks-ts";
 
-import { useDrawerTaxFromDB, useTaxDialog } from "@/components/structures/Track/Tax";
-import FloatingActionButton from "@/components/ui/Fab";
-import Icon from "@/components/ui/Icons";
+import { buttonVariants } from "@/components/ui/Button";
 
-import useDelayed from "@/hooks/useDelayed";
-import useStatus from "@/hooks/useStatus";
+import { cn } from "@/utils/helpers/styleMerger";
 import useTrack from "@/hooks/useTrack";
-
-import { useNotes } from "@/store/useNotesStore";
 
 const TaxDialog = dynamic(() => import("@/components/structures/Track/Tax"), {
   ssr: false,
@@ -23,63 +18,52 @@ const Notes = dynamic(() => import("@/components/modules/Notes/Notes"), {
   ssr: false,
 });
 
-const FAB_MS_STAGER = 300;
+const ToolButton = forwardRef<
+  HTMLButtonElement,
+  React.ButtonHTMLAttributes<HTMLButtonElement> & { icon: React.ReactNode }
+>(function ToolButton({ icon, children, className, ...props }, ref) {
+  return (
+    <button
+      ref={ref}
+      type="button"
+      className={cn(
+        buttonVariants({ variant: "outline", size: "lg" }),
+        "h-13 w-full rounded-2xl text-[0.9375rem] font-semibold",
+        className
+      )}
+      {...props}
+    >
+      {icon}
+      {children}
+    </button>
+  );
+});
 
-function FabNotes() {
-  const menuRef = useRef<HTMLButtonElement>(null);
-  const notesRef = useRef<HTMLButtonElement>(null);
-  const taxesRef = useRef<HTMLButtonElement>(null);
-  const { isShiftActive } = useTrack();
-  const { open } = useNotes();
-  const { isOpen: isTaxDialogOpen } = useTaxDialog();
-  const { isOpen: isDrawerTaxOpen } = useDrawerTaxFromDB((state) => state);
-  const status = useStatus(isShiftActive);
-  const [show, setShow] = useState(false);
-  const showDelayed = useDelayed(show, FAB_MS_STAGER);
+/**
+ * Notes and taxes for the running shift, as two plain buttons under the
+ * monitor (they used to hide behind a floating + menu).
+ */
+function ShiftTools() {
+  const { isShiftActive, isClosing } = useTrack();
 
-  useOnClickOutside([menuRef, notesRef, taxesRef], () => {
-    if (open || isDrawerTaxOpen || isTaxDialogOpen) return;
-    setShow(false);
-  });
-
-  function onShowMenu() {
-    setShow((prev) => !prev);
-  }
+  if (!isShiftActive || isClosing) return null;
 
   return (
-    <>
-      {isShiftActive ? (
-        <>
-          <FloatingActionButton
-            ref={menuRef}
-            classes="absolute bottom-24 right-2 z-50 size-16 animate-fade-in border-none bg-gradient-to-br from-green-400 to-blue-500 active:shadow-button-inner"
-            onClick={onShowMenu}
-            icon={<Icon.plus />}
-          />
-          {showDelayed ? (
-            <>
-              <Notes>
-                <FloatingActionButton
-                  ref={notesRef}
-                  disabled={!status}
-                  classes={`absolute bottom-[10.5rem] right-4 z-10 size-12 border-none bg-gradient-to-br from-amber-200 to-yellow-300 transition-all [&>span]:text-xs ${!status ? "bg-gradient-to-br from-gray-300 to-stone-500" : "active:shadow-button-inner"} ${show ? "show_up" : "show_down"}`}
-                  text="Notes"
-                />
-              </Notes>
-              <TaxDialog>
-                <FloatingActionButton
-                  ref={taxesRef}
-                  disabled={!status}
-                  classes={`absolute bottom-[14rem] right-4 z-0 size-12 border-none bg-gradient-to-br from-red-200 to-violet-300 transition-all [&>span]:text-xs ${!status ? "bg-gradient-to-br from-gray-300 to-stone-500" : "active:shadow-button-inner"} ${show ? "show_up_dialog" : "show_down_dialog"}`}
-                  text="Taxes"
-                />
-              </TaxDialog>
-            </>
-          ) : null}
-        </>
-      ) : null}
-    </>
+    <div className="grid w-full grid-cols-2 gap-2.5">
+      <Notes>
+        <ToolButton
+          icon={<StickyNote className="size-4.5" strokeWidth={1.75} aria-hidden="true" />}
+        >
+          Notes
+        </ToolButton>
+      </Notes>
+      <TaxDialog>
+        <ToolButton icon={<Receipt className="size-4.5" strokeWidth={1.75} aria-hidden="true" />}>
+          Taxes
+        </ToolButton>
+      </TaxDialog>
+    </div>
   );
 }
 
-export default FabNotes;
+export default ShiftTools;

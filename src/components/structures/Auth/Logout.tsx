@@ -1,5 +1,6 @@
-import Icon from "@/components/ui/Icons";
-import Stack from "@/components/ui/Stack";
+import { LogOut } from "lucide-react";
+
+import Button from "@/components/ui/Button";
 
 type Props = {
   handleLogout: () => void;
@@ -7,9 +8,16 @@ type Props = {
 
 function Logout({ handleLogout }: Props) {
   return (
-    <Stack as="button" classes="cursor-pointer" onClick={handleLogout}>
-      <Icon.logout className="size-10 justify-self-center" />
-    </Stack>
+    <Button
+      type="button"
+      variant="outline"
+      size="lg"
+      classes="w-full rounded-2xl text-destructive"
+      onClick={handleLogout}
+    >
+      <LogOut className="size-4.5" aria-hidden="true" />
+      Log out
+    </Button>
   );
 }
 

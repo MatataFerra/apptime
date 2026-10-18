@@ -1,5 +1,8 @@
-# Salary component
+# Salary items
 
-This component is responsable so far managing taxes and contributions, it can be extended to another implementations who involves add elements into the shift.
+Taxes for a shift are picked with `TaxPicker`: saved taxes are toggle chips and new
+ones are written inline. It works with any `taxesModule` from
+`useTaxOrContributionStore` (production, fast charge, track); new taxes are created
+with the shift and come back as saved ones through `useSalaryItems()`.
 
-It has a type which represents what kind of responsability it has, and then it's neccesary to extend the `useTaxOrContributionsStore()` and add the new handler.
+`observer` signals the forms that a submit finished.

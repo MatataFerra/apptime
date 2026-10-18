@@ -5,8 +5,8 @@ import ShiftService from "@/services/Shift";
 import Toast from "@/services/Toast";
 
 import Button from "@/components/ui/Button";
-import Loader from "@/components/ui/Loader";
 
+import { invalidateShiftQueries } from "@/utils/helpers/invalidateShiftQueries";
 import useTrack from "@/hooks/useTrack";
 
 import onUpdateTrackJob from "@/server-actions/update-track";
@@ -73,9 +73,8 @@ function FinishButton({ buttonStatus }: Props) {
     onUpdateTrackJob({ ...prepareShiftToBeUpdated }, shift?.id).then((response) => {
       Toast({
         message: "Closing shift",
-        type: "plain",
+        type: "loading",
         description: "Updating status, please wait...",
-        action: <Loader.spinner bg="text-black" spinColor="fill-slate-100" />,
         duration: 2000,
       });
 
@@ -92,11 +91,10 @@ function FinishButton({ buttonStatus }: Props) {
           message: "Shift updated",
           type: "success",
           description: "Your shift has been updated successfully",
-          action: <Loader.spinner bg="text-black" spinColor="fill-gray-50" />,
           duration: 1000,
         });
 
-        queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
+        invalidateShiftQueries(queryClient);
 
         return;
       }
@@ -112,19 +110,18 @@ function FinishButton({ buttonStatus }: Props) {
         message: "Error",
         type: "error",
         description: "An error occurred while updating your shift",
-        action: <Loader.spinner bg="text-black" spinColor="fill-gray-50" />,
         duration: 1000,
       });
 
-      queryClient.invalidateQueries({ queryKey: ["user", user?.email] });
+      invalidateShiftQueries(queryClient);
     });
   }
 
   return (
     <>
       <Button
-        variant="danger"
-        classes="w-full animate-fade-up shadow-button transition-all active:shadow-button-inner"
+        variant="primary"
+        classes="h-14 w-full animate-fade-up rounded-lg text-base font-semibold"
         disabled={buttonStatus.disabled}
         onClick={onFinishShift}
       >

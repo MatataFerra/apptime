@@ -79,13 +79,13 @@ function InputForm({
           )
         ) : (
           <Stack as="div" orientation="horizontal" alignItems="center" classes="px-4 text-xs">
-            <Text as="span" classes="font-semibold" color="text-slate-600">
+            <Text as="span" classes="font-semibold" color="text-ink-muted">
               {`${label}: `}
             </Text>
             {loading ? (
               fallback
             ) : (
-              <Text as="span" color="text-slate-600" classes={id === "week" ? "capitalize" : ""}>
+              <Text as="span" color="text-ink-muted" classes={id === "week" ? "capitalize" : ""}>
                 {!!data ? data : !!fallbackData ? fallbackData : "N/A"}
               </Text>
             )}
@@ -96,7 +96,7 @@ function InputForm({
             type="button"
             size="xs"
             variant="info"
-            classes="invisible ml-auto animate-fade-out justify-self-end transition-all active:shadow-button-inner group-hover:visible group-hover:animate-fade-in"
+            classes="invisible ml-auto animate-fade-out justify-self-end transition-all group-hover:visible group-hover:animate-fade-in active:shadow-button-inner"
             onClick={() => {
               setOnHover(!hover);
               setCurrentInput(id);
@@ -109,7 +109,7 @@ function InputForm({
             type="button"
             size="xs"
             variant="success"
-            classes="invisible ml-auto animate-fade-out justify-self-end transition-all active:shadow-button-inner group-hover:visible group-hover:animate-fade-in"
+            classes="invisible ml-auto animate-fade-out justify-self-end transition-all group-hover:visible group-hover:animate-fade-in active:shadow-button-inner"
             onClick={() => setOnHover(!hover)}
           >
             Save

@@ -18,7 +18,7 @@ function ChartEmpty({ data, children }: PropsWithChildren<Props>) {
         <Stack
           justifyContent="center"
           alignItems="center"
-          classes="flex h-72 w-full rounded-lg border border-gray-200 p-4 shadow-input"
+          classes="flex h-72 w-full rounded-lg border border-border p-4"
         >
           <Text>No data</Text>
         </Stack>

@@ -10,7 +10,7 @@ const MIN_COLS = 3;
 
 function HourlyFooter({ colsNumber }: Props) {
   return (
-    <TableFoot classes="bg-gray-100">
+    <TableFoot classes="bg-surface-sunken">
       <TableElement as="th" classes="text-left">
         Totals
       </TableElement>

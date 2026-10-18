@@ -11,9 +11,9 @@ function Submit() {
     <Button
       disabled={isDirty === false}
       type="submit"
-      variant="black"
-      size="md"
-      classes="justify-self-end"
+      variant="primary"
+      size="lg"
+      classes="w-full rounded-2xl"
       form="settings"
     >
       Save

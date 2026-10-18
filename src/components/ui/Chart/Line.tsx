@@ -18,7 +18,7 @@ function ChartLine({ data }: Props) {
     <ResponsiveContainer
       width="100%"
       height={500}
-      className="rounded-lg border border-gray-200 p-4 shadow-input"
+      className="rounded-lg border border-border bg-surface p-4"
     >
       <LineChart
         width={150}
@@ -38,8 +38,8 @@ function ChartLine({ data }: Props) {
         />
         <Tooltip />
         <Legend />
-        <Line type="monotone" dataKey="hourly" stroke="#8884d8" activeDot={{ r: 8 }} />
-        <Line type="monotone" dataKey="production" stroke="#82ca9d" />
+        <Line type="monotone" dataKey="hourly" stroke="var(--chart-1)" activeDot={{ r: 8 }} />
+        <Line type="monotone" dataKey="production" stroke="var(--chart-2)" />
       </LineChart>
     </ResponsiveContainer>
   );

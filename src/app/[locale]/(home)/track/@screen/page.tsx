@@ -4,19 +4,18 @@ import Skeleton from "@/components/ui/Skeleton";
 
 const MonitorScreen = dynamic(() => import("@/components/modules/Track/Monitor/Screen"), {
   ssr: false,
-  loading: () => <Skeleton classes="h-monitor w-full" />,
+  loading: () => <Skeleton classes="h-monitor w-full rounded-3xl" />,
 });
 
-const FabMenu = dynamic(() => import("@/components/structures/Track/Fab"), {
+const ShiftTools = dynamic(() => import("@/components/structures/Track/Fab"), {
   ssr: false,
-  loading: () => <Skeleton classes="absolute bottom-24 right-2 z-50 size-16 rounded-full p-2" />,
 });
 
 export default async function MonitorPage() {
   return (
     <>
       <MonitorScreen />
-      <FabMenu />
+      <ShiftTools />
     </>
   );
 }

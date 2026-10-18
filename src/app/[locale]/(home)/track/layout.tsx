@@ -17,9 +17,9 @@ type Props = {
 
 export default async function Layout({ children, start, screen }: PropsWithChildren<Props>) {
   return (
-    <Stack orientation="vertical" spacing={8}>
+    <Stack orientation="vertical" spacing={6}>
       {children}
-      <Stack orientation="vertical" classes="h-[65dvh] w-full" spacing={8}>
+      <Stack orientation="vertical" classes="w-full" spacing={4}>
         <State />
         {screen}
         {start}

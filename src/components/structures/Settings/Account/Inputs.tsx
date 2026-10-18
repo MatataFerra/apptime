@@ -20,7 +20,7 @@ function Inputs() {
   }
 
   return (
-    <AccordionItemSettings value="account" trigger="Account Details">
+    <AccordionItemSettings value="account" trigger="Account">
       <Input
         name={SETTINGS_FIELDS.account.name.toLowerCase()}
         id={SETTINGS_FIELDS.account.name.toLowerCase()}

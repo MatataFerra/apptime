@@ -1,43 +1,57 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
-import Img from "@/components/ui/Image";
-import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
+import Link from "next/link";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
+import { cn } from "@/utils/helpers/styleMerger";
 
 interface Props {
   withText?: boolean;
+  classes?: string;
 }
 
-function Logo({ withText }: Props) {
-  const router = useRouter();
+/**
+ * Brand mark: an open clock that reads as the "c" of casual.
+ * The ring follows the current text colour; the hands use the accent.
+ */
+export function LogoMark({ className }: { className?: string }) {
   return (
-    <Stack
-      orientation="horizontal"
-      alignItems="center"
-      classes="cursor-pointer transition-all active:scale-95 active:transform"
-      onClick={() => router.push(PATH_NAMES.HOME)}
-    >
-      <Img
-        src="/assets/apptime-logo.svg"
-        alt="Casual app logo"
-        classes="size-8"
-        width={0}
-        height={0}
+    <svg viewBox="0 0 32 32" aria-hidden="true" className={cn("size-6", className)}>
+      <path
+        d="M26.4 10 A12 12 0 1 0 26.4 22"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+        fill="none"
       />
+      <path
+        d="M16 16 L16 9.5 M16 16 L20 18.5"
+        stroke="var(--color-accent)"
+        strokeWidth="3"
+        strokeLinecap="round"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
+function Logo({ withText, classes }: Props) {
+  return (
+    <Link
+      href={PATH_NAMES.HOME}
+      aria-label="CasualApp, home"
+      className={cn(
+        "flex items-center gap-1.5 rounded-md text-ink transition-transform select-none active:scale-95",
+        classes
+      )}
+    >
+      <LogoMark className="size-7" />
       {withText ? (
-        <Text
-          as="h1"
-          gradient="secondary"
-          classes="select-none text-base font-bold active:animate-text active:duration-1000"
-        >
-          Casual app
-        </Text>
+        <span className="font-logo text-[1.375rem] leading-none font-extrabold tracking-[-0.03em]">
+          casualapp
+        </span>
       ) : null}
-    </Stack>
+    </Link>
   );
 }
 

@@ -26,15 +26,14 @@ function FloatingActionButton(
       variant="outlined"
       disabled={disabled}
       classes={cn(
-        "flex size-20 flex-col items-center justify-center rounded-full border p-2 transition-all",
-        disabled ? "cursor-not-allowed" : "cursor-pointer",
+        "flex size-20 flex-col items-center justify-center rounded-full border p-2",
         classes ? classes : ""
       )}
       {...props}
     >
       {icon ? icon : null}
       {text ? (
-        <Text as="span" classes="text-base">
+        <Text as="span" classes="text-base leading-tight text-current">
           {text}
         </Text>
       ) : null}

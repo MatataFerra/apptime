@@ -63,7 +63,7 @@ const input = forwardRef(function Input(
       {label && (
         <label
           htmlFor={props.name}
-          className={cn("text-sm text-slate-600 dark:text-gray-100", labelClasses)}
+          className={cn("mb-1.5 block text-sm font-medium text-ink", labelClasses)}
         >
           {label}
         </label>
@@ -71,12 +71,12 @@ const input = forwardRef(function Input(
 
       <div
         className={cn(
-          "group flex w-full items-center justify-between rounded-lg bg-transparent px-2 py-2",
+          "group flex w-full items-center justify-between rounded-md bg-transparent px-3 py-2",
           type === "radio" || type === "checkbox"
             ? INPUT_VARIANTS["radio"]
             : INPUT_VARIANTS[variant],
-          variant === "underline" ? "border-none" : "border border-gray-200",
-          isError ? "border-2 border-red-600 focus:ring-red-600" : "",
+          variant === "underline" && "border-none",
+          isError && "border-destructive focus-within:border-destructive focus-within:ring-destructive/15",
           "h-fit min-h-12",
           "gap-2",
           classes
@@ -89,9 +89,9 @@ const input = forwardRef(function Input(
           autoComplete="off"
           className={cn(
             variant === "underline"
-              ? "border-b-2 border-b-slate-200 transition-colors hover:border-b-slate-400/60 focus:border-b-blue-600"
+              ? "border-b-2 border-b-border transition-colors hover:border-b-border-strong focus:border-b-accent"
               : "border-none",
-            "h-full w-full outline-none",
+            "h-full w-full bg-transparent text-ink outline-hidden placeholder:text-ink-subtle",
             measurePlace === "left" ? "order-2" : "order-1"
           )}
           {...props}
@@ -99,7 +99,7 @@ const input = forwardRef(function Input(
         {measure && (
           <span
             className={cn(
-              "text-sm text-slate-600 dark:text-gray-100",
+              "text-sm text-ink-muted",
               measurePlace === "left" ? "order-1" : "order-2"
             )}
           >
@@ -108,7 +108,7 @@ const input = forwardRef(function Input(
         )}
         {showPassword ? (
           <>
-            <label htmlFor={"eye-" + props.name} className="order-2">
+            <label htmlFor={"eye-" + props.name} className="order-2 cursor-pointer text-ink-muted">
               <input
                 hidden
                 type="checkbox"
@@ -125,8 +125,8 @@ const input = forwardRef(function Input(
       {description && (
         <small
           className={cn(
-            "mt-0 block text-xs",
-            isError ? "font-normal text-red-500" : "font-normal text-slate-600"
+            "mt-1 block text-xs",
+            isError ? "text-destructive" : "text-ink-muted"
           )}
         >
           {description}

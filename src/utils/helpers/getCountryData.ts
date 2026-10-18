@@ -5,7 +5,7 @@ function getCountryData(country: Country["name"]) {
   const countryId = COUNTRIES.find((c) => c.name === country)?.id ?? "";
   const flag = [...countryId]
     .map((char) => String.fromCodePoint(127397 + char.charCodeAt(0))) // Pass the char argument to String.fromCodePoint()
-    ?.reduce((a, b) => `${a}${b}`);
+    .join("");
   return {
     flag,
     countryId,

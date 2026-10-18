@@ -39,8 +39,8 @@ export function createDashboardStore(initProps?: Partial<DashboardStateProps>) {
       set({ ...get(), ...props });
     },
     deleteShift: (id) => {
-      const hourly = get().user?.shifts?.hourly.filter((shift) => shift.id !== id);
-      const production = get().user?.shifts?.production.filter((shift) => shift.id !== id);
+      const hourly = get().user?.shifts?.hourly?.filter((shift) => shift.id !== id);
+      const production = get().user?.shifts?.production?.filter((shift) => shift.id !== id);
 
       if (get().user) {
         set({

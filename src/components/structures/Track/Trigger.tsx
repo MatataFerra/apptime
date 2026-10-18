@@ -1,6 +1,6 @@
+import { buttonVariants } from "@/components/ui/Button";
 import { DialogTrigger } from "@/components/ui/Dialog";
 
-import { BUTTON_VARIANTS } from "@/utils/constants/tailwind";
 import { cn } from "@/utils/helpers/styleMerger";
 
 type Props = {
@@ -14,31 +14,21 @@ type Props = {
 };
 
 function Trigger({ status, triggerText = "Start Shift" }: Props) {
-  const checkVariant = /Start/.test(triggerText);
+  const isStart = /start/i.test(triggerText);
+  const variant = status?.apply_variant ? (isStart ? "accent" : "danger") : "secondary";
 
   return (
-    <>
-      <DialogTrigger
-        className={cn(
-          "rounded-lg text-center",
-          `remove_button_highlight w-full cursor-pointer shadow-button ${
-            status?.apply_variant ? "active:shadow-button-inner" : ""
-          }`,
-          `${
-            status?.apply_variant
-              ? checkVariant
-                ? BUTTON_VARIANTS.black
-                : BUTTON_VARIANTS.danger
-              : BUTTON_VARIANTS.disabled
-          }`,
-          `${triggerText.toLowerCase().includes("start") ? "animate-fade-up transition-all" : ""}`
-        )}
-        disabled={status?.disabled}
-        aria-disabled={status?.disabled}
-      >
-        {triggerText}
-      </DialogTrigger>
-    </>
+    <DialogTrigger
+      className={cn(
+        buttonVariants({ variant, size: "lg" }),
+        "remove_button_highlight h-14 w-full rounded-lg text-base font-semibold",
+        isStart && "animate-fade-up"
+      )}
+      disabled={status?.disabled}
+      aria-disabled={status?.disabled}
+    >
+      {triggerText}
+    </DialogTrigger>
   );
 }
 

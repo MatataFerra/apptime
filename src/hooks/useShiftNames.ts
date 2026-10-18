@@ -1,7 +1,5 @@
 import { useMemo } from "react";
 
-import isArray from "lodash/isArray";
-
 import type { HourlyType, ProductionType } from "@/types";
 
 type Shifts = {
@@ -9,29 +7,26 @@ type Shifts = {
   production: ProductionType[];
 };
 
+/**
+ * Job names used before that match what's being typed. Matching ignores
+ * case, but names come back as they were first written ("Box Maker").
+ */
 function useShiftNames({ hourly, production }: Shifts, searchValue: string | null) {
-  const getShiftsNames = useMemo(() => {
-    const getHourlyShiftNames =
-      hourly?.map((shift) => shift.name?.toLowerCase() ?? "").filter((shift) => shift !== null) ??
-      [];
+  const names = useMemo(() => {
+    const search = searchValue?.trim().toLowerCase() ?? "";
+    const byKey = new Map<string, string>();
 
-    const getProductionShiftNames =
-      production
-        ?.map((shift) => shift.name?.toLowerCase() ?? "")
-        .filter((shift) => shift !== null) ?? [];
+    for (const shift of [...(production ?? []), ...(hourly ?? [])]) {
+      const name = shift.name?.trim();
+      if (!name) continue;
+      const key = name.toLowerCase();
+      if (!byKey.has(key) && key.includes(search) && key !== search) byKey.set(key, name);
+    }
 
-    const allValues = [...getProductionShiftNames, ...getHourlyShiftNames].filter((value) =>
-      value?.toLowerCase().includes(searchValue?.toLowerCase() ?? "")
-    );
-
-    const uniqueNames = new Set(allValues);
-
-    return Array.from(uniqueNames);
+    return Array.from(byKey.values());
   }, [searchValue, hourly, production]);
 
-  return {
-    names: getShiftsNames,
-  };
+  return { names };
 }
 
 export default useShiftNames;

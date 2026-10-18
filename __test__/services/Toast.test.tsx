@@ -1,5 +1,5 @@
-import { act, render, screen } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
+import { act, cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, test } from "vitest";
 
 import Toaster from "@/components/ui/Toast/toaster";
 
@@ -8,116 +8,54 @@ import showToast, { type ToastOptions } from "../../src/services/Toast";
 function MockComponent({ options }: { options: ToastOptions }) {
   return (
     <main>
-      <button onClick={() => showToast(options)}></button>
+      <button type="button" data-testid="trigger" onClick={() => showToast(options)} />
       <Toaster />
     </main>
   );
 }
+
+function show(options: ToastOptions) {
+  render(<MockComponent options={options} />);
+  act(() => {
+    screen.getByTestId("trigger").click();
+  });
+  return document.querySelector<HTMLElement>("[data-type]");
+}
+
 describe("Toast", () => {
-  test("should render toast", () => {
-    const options: ToastOptions = {
-      type: "success",
-      message: "Test message",
-    };
+  afterEach(() => cleanup());
 
-    render(<MockComponent options={options} />);
-    act(() => {
-      screen.getByRole("button").click();
-    });
-
-    const toastElement = screen.getByRole("region");
-    expect(toastElement).toBeInTheDocument();
+  test("renders inside the notifications region", () => {
+    show({ type: "success", message: "Test message" });
+    expect(screen.getByRole("region")).toBeInTheDocument();
   });
 
-  test("should render toast with correct message", () => {
-    const options: ToastOptions = {
-      type: "success",
-      message: "Test message",
-    };
-
-    render(<MockComponent options={options} />);
-    act(() => {
-      screen.getByRole("button").click();
-    });
-
-    const toastElement = screen.getByText("Test message");
-    expect(toastElement).toBeInTheDocument();
+  test("shows the message and description", () => {
+    show({ type: "success", message: "Test message", description: "More detail" });
+    expect(screen.getByText("Test message")).toBeInTheDocument();
+    expect(screen.getByText("More detail")).toBeInTheDocument();
   });
 
-  test("should render toast with correct success type", () => {
-    const options: ToastOptions = {
-      type: "success",
-      message: "Test message",
-    };
+  test.each(["success", "error", "warning", "info", "loading", "plain"] as const)(
+    "uses the %s type as the toast variant",
+    (type) => {
+      const toast = show({ type, message: "Test message" });
+      expect(toast).toHaveAttribute("data-type", type);
+    }
+  );
 
-    render(<MockComponent options={options} />);
-    act(() => {
-      screen.getByRole("button").click();
-    });
-
-    const toastElement = screen.queryAllByRole("status")[0];
-    expect(toastElement).toHaveClass("bg-green-500");
+  test("errors are announced as alerts", () => {
+    const toast = show({ type: "error", message: "Test message" });
+    expect(toast).toHaveAttribute("role", "alert");
   });
 
-  test("should render toast with correct error type", () => {
-    const options: ToastOptions = {
-      type: "error",
-      message: "Test message",
-    };
-
-    render(<MockComponent options={options} />);
-    act(() => {
-      screen.getByRole("button").click();
-    });
-
-    const toastElement = screen.queryAllByRole("status")[0];
-    expect(toastElement).toHaveClass("bg-red-500");
+  test("renders a custom action", () => {
+    show({ type: "info", message: "Test message", action: <p>Loading...</p> });
+    expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
-  test("should render toast with correct warning type", () => {
-    const options: ToastOptions = {
-      type: "warning",
-      message: "Test message",
-    };
-
-    render(<MockComponent options={options} />);
-    act(() => {
-      screen.getByRole("button").click();
-    });
-
-    const toastElement = screen.queryAllByRole("status")[0];
-    expect(toastElement).toHaveClass("bg-yellow-500");
-  });
-
-  test("should render toast with correct info type", () => {
-    const options: ToastOptions = {
-      type: "info",
-      message: "Test message",
-    };
-
-    render(<MockComponent options={options} />);
-    act(() => {
-      screen.getByRole("button").click();
-    });
-
-    const toastElement = screen.queryAllByRole("status")[0];
-    expect(toastElement).toHaveClass("bg-sky-500");
-  });
-
-  test("should render toast with action and match snap", () => {
-    const options: ToastOptions = {
-      type: "info",
-      message: "Test message",
-      action: <p>Loading...</p>,
-    };
-
-    render(<MockComponent options={options} />);
-    act(() => {
-      screen.getByRole("button").click();
-    });
-
-    const toastElement = screen.queryAllByRole("status")[0];
-
-    expect(toastElement).toMatchSnapshot();
+  test("can be dismissed", () => {
+    show({ type: "info", message: "Test message" });
+    expect(screen.getByRole("button", { name: "Dismiss" })).toBeInTheDocument();
   });
 });

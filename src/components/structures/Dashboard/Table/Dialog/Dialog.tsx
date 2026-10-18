@@ -1,10 +1,10 @@
 "use client";
 
-import type { PropsWithChildren, ReactNode } from "react";
+import { type PropsWithChildren, type ReactNode, useState } from "react";
 
 import type { Hourly, Production } from "@prisma/client";
-import * as VisualyHidden from "@radix-ui/react-visually-hidden";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 
 import api from "@/services/Api/Shift";
@@ -25,7 +25,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/Dialog";
-import Stack from "@/components/ui/Stack";
 
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import useDashboard from "@/hooks/useDashboard";
@@ -51,6 +50,7 @@ function TableDialog({
   reset: resetShifts,
 }: Props) {
   const { setStep, step } = useTableStore((state) => state);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const { user } = useDashboard();
   const { reset } = useTaxesHandlerDelete((state) => state);
   const queryClient = useQueryClient();
@@ -65,7 +65,7 @@ function TableDialog({
 
     onMutate: () => {
       Toast({
-        type: "info",
+        type: "loading",
         message: "Deleting shift...",
         duration: Infinity,
       });
@@ -98,6 +98,7 @@ function TableDialog({
         onOpenChange={(open) => {
           if (!open) {
             reset();
+            setConfirmDelete(false);
             setTimeout(() => {
               setStep("info");
             }, 100);
@@ -105,47 +106,69 @@ function TableDialog({
         }}
       >
         <DialogTrigger asChild>{children}</DialogTrigger>
-        <DialogContent>
+        <DialogContent className="max-h-[90dvh] gap-5 overflow-y-auto p-5">
           {step === "info" ? (
             <>
-              <DialogHeader>
-                <DialogTitle className="py-2 text-left text-xl text-slate-800">{title}</DialogTitle>
+              <DialogHeader className="text-left">
+                <DialogTitle>{shift.name || title}</DialogTitle>
                 <DialogDescription>
-                  <VisualyHidden.Root>
-                    Take a quick view about your job, edit it if you need
-                  </VisualyHidden.Root>
+                  {format(new Date(shift.startDate), "EEEE d MMMM yyyy")}
                 </DialogDescription>
               </DialogHeader>
               {content}
-              <DialogFooter>
-                <Stack orientation="horizontal" spacing={4} justifyContent="end">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="white"
-                    classes="active:shadow-button-inner"
-                    onClick={() => setStep("edit")}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="danger"
-                    onClick={() => {
-                      deleteShift(shift.id);
-                      mutate({ id: shift.id });
-                    }}
-                  >
-                    Delete
-                  </Button>
-                </Stack>
+              <DialogFooter className="grid grid-cols-2 gap-2.5 sm:space-x-0">
+                {confirmDelete ? (
+                  <>
+                    <Button
+                      type="button"
+                      size="lg"
+                      variant="outline"
+                      classes="w-full"
+                      onClick={() => setConfirmDelete(false)}
+                    >
+                      Keep it
+                    </Button>
+                    <Button
+                      type="button"
+                      size="lg"
+                      variant="danger"
+                      classes="w-full"
+                      onClick={() => {
+                        deleteShift(shift.id);
+                        mutate({ id: shift.id });
+                      }}
+                    >
+                      Delete shift
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      type="button"
+                      size="lg"
+                      variant="ghost"
+                      classes="w-full text-destructive"
+                      onClick={() => setConfirmDelete(true)}
+                    >
+                      Delete
+                    </Button>
+                    <Button
+                      type="button"
+                      size="lg"
+                      variant="primary"
+                      classes="w-full"
+                      onClick={() => setStep("edit")}
+                    >
+                      Edit
+                    </Button>
+                  </>
+                )}
               </DialogFooter>
             </>
           ) : (
             <>
               <DialogHeader className="text-left">
-                <DialogTitle className="py-2">Edit shift</DialogTitle>
+                <DialogTitle>Edit shift</DialogTitle>
                 <DialogDescription>You can edit the shift details here.</DialogDescription>
               </DialogHeader>
               <TableDialogEditShift shift={shift} user={user} />

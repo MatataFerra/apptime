@@ -1,55 +1,54 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import isEmpty from "lodash/isEmpty";
 import { useInterval } from "usehooks-ts";
 
 import ShiftService from "@/services/Shift";
 
-import Text from "@/components/ui/Text";
-
 import useTrack from "@/hooks/useTrack";
 
+function elapsedMinutes(start?: string | null) {
+  if (!start) return 0;
+  return ShiftService.differenceInHHmm(start, "").diff;
+}
+
+/** Elapsed time of the running shift, as the monitor's headline. */
 function ShiftState() {
-  const { shiftUnclosed, isShiftActive } = useTrack();
-  const [shiftTime, setShiftTime] = useState("loading...");
+  const { shiftUnclosed } = useTrack();
+  const start = shiftUnclosed.shift?.startDate;
+  const [minutes, setMinutes] = useState(() => elapsedMinutes(start));
 
-  useEffect(() => {
-    const { text } = ShiftService.differenceInHHmm(
-      shiftUnclosed.shift?.startDate ?? "",
-      shiftUnclosed.shift?.endDate ?? ""
-    );
-    setShiftTime(text);
-  }, [shiftUnclosed.shift?.endDate, shiftUnclosed.shift?.startDate]);
+  useInterval(() => setMinutes(elapsedMinutes(start)), 5000);
 
-  function updateShiftTime() {
-    if (!isShiftActive) {
-      setShiftTime("0h 0m");
-
-      return null;
-    }
-    const { text } = ShiftService.differenceInHHmm(
-      shiftUnclosed.shift?.startDate ?? "",
-      shiftUnclosed.shift?.endDate ?? ""
-    );
-    setShiftTime(text);
+  if (shiftUnclosed.isLoading) {
+    return <p className="figure text-[5.25rem] leading-[0.9] text-ink-inverse/25">–</p>;
   }
 
-  useInterval(updateShiftTime, 5000);
+  if (isEmpty(shiftUnclosed.shift)) {
+    return <p className="text-lg text-ink-inverse/70">No shift is being tracked</p>;
+  }
+
+  const current = elapsedMinutes(start) || minutes;
+  const hours = Math.floor(current / 60);
+  const mins = current % 60;
 
   return (
-    <>
-      {shiftUnclosed.isLoading ? (
-        <Text classes="block text-2xl">loading...</Text>
-      ) : !isEmpty(shiftUnclosed.shift) ? (
-        <>
-          <Text classes="text-2xl">shift opened {` (${shiftTime})`}</Text>
-        </>
-      ) : (
-        <Text classes="block text-2xl underline">No shift is being tracked</Text>
-      )}
-    </>
+    <div className="flex flex-col gap-1.5">
+      <span className="truncate text-sm text-ink-inverse/70">
+        {shiftUnclosed.shift?.name || "Hourly shift"}
+      </span>
+      <p
+        className="figure text-[5.25rem] leading-[0.9] text-ink-inverse"
+        aria-label={`${hours} hours ${mins} minutes`}
+      >
+        {hours}
+        <span className="mr-[0.2em] text-[0.48em] text-ink-inverse/55">h</span>
+        {String(mins).padStart(2, "0")}
+        <span className="text-[0.48em] text-ink-inverse/55">m</span>
+      </p>
+    </div>
   );
 }
 

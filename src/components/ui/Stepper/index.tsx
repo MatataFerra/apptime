@@ -43,7 +43,7 @@ function Stepper({ steps = ARRAY, currentStep }: Props) {
               <RoundBadge index={index} id={id} title={title} />
             </Stack>
             {index !== steps.length - 1 && (
-              <Line color={`${id === currentStep ? "bg-black" : "bg-stone-200"}`} />
+              <Line color={`${id === currentStep ? "bg-primary" : "bg-border"}`} />
             )}
           </Fragment>
         ))}

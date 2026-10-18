@@ -29,7 +29,7 @@ function LoginFooter({ classes, idForm = "form" }: Props) {
       <Button
         type="submit"
         variant="black"
-        classes={"flex w-full items-center justify-center text-lg active:shadow-inner"}
+        classes="w-full text-base"
         form={idForm}
       >
         Login

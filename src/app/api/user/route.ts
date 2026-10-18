@@ -58,7 +58,11 @@ export async function GET(req: NextRequest) {
         email: parsedSearchParams?.data?.email ?? "",
       },
       include: {
-        shifts: JSON.parse(parsedSearchParams.data.shifts ?? "false"),
+        // The client expects user.shifts.hourly / user.shifts.production (UserType),
+        // so include the shift lists, not just the Shifts row.
+        shifts: JSON.parse(parsedSearchParams.data.shifts ?? "false")
+          ? { include: { hourly: true, production: true } }
+          : false,
         profile: JSON.parse(parsedSearchParams.data.profile ?? "false"),
         config: JSON.parse(parsedSearchParams.data.config ?? "false"),
       },

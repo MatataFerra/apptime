@@ -24,7 +24,7 @@ function Dropdown() {
         <div>
           <ButtonShadCn
             variant="ghost"
-            className="w-full justify-between text-sm capitalize text-stone-600"
+            className="w-full justify-between text-sm text-ink-muted capitalize"
           >
             <Text as="span" classes="line-clamp-1 text-xs">
               {!!values.configs.weekStartsOn ? `${values.configs.weekStartsOn}` : "Select day"}

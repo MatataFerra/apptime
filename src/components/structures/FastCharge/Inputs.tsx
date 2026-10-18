@@ -14,6 +14,10 @@ import type { FastChargeInputs } from "@/types/forms";
 
 import { observer } from "@/components/structures/SalaryItems/observer";
 import DatalistShiftNames from "@/components/structures/ShiftForms/Datalist";
+import HolidayChoice, {
+  fromHolidayValue,
+  toHolidayValue,
+} from "@/components/structures/ShiftForms/HolidayChoice";
 import { useDatalistStore } from "@/components/structures/ShiftForms/store/useDatalistStore";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
@@ -60,6 +64,7 @@ function Inputs() {
     watch,
     register,
     setValue,
+    getValues,
     handleSubmit,
     formState: { touchedFields, errors },
   } = useFormContext<FastChargeInputs>();
@@ -164,7 +169,7 @@ function Inputs() {
     };
 
     Toast({
-      type: "info",
+      type: "loading",
       message: "Your request is being processed",
       description: "Please wait a moment...",
       duration: 2500,
@@ -347,7 +352,14 @@ function Inputs() {
               },
             })}
           />
-          <DatalistShiftNames data={names} setValue={setValue} value={watch("name")} />
+          <DatalistShiftNames
+            data={names}
+            value={watch("name")}
+            onSelect={(name) => {
+              setValue("name", name, { shouldValidate: true, shouldDirty: true });
+              setStoreValue({ name });
+            }}
+          />
         </Stack>
         <Input
           containerClasses="flex-1"
@@ -359,7 +371,15 @@ function Inputs() {
           max={format(new Date(`${thisYear}-12-31`), "yyyy-MM-dd")}
           {...register("start-date", {
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              setStoreValue({ startDate: e.target.value });
+              const start = e.target.value;
+              setStoreValue({ startDate: start });
+
+              // A shift rarely spans days: the finish defaults to the same day.
+              const finish = getValues("finish-date");
+              if (start && (!finish || finish < start || finish !== start)) {
+                setValue("finish-date", start, { shouldValidate: true });
+                setStoreValue({ finishDate: start });
+              }
             },
 
             required: true,
@@ -426,42 +446,19 @@ function Inputs() {
             },
           })}
         />
-        <Stack orientation="horizontal" wrap classes="mt-4">
-          <Stack alignItems="center">
-            <input
-              className="size-4"
-              type="checkbox"
-              id="fast-is-public-holiday"
-              {...register("is-public-holiday", {
-                onChange: (e: ChangeEvent<HTMLInputElement>) => {
-                  setStoreValue({
-                    fastHoliday: e.target.checked as boolean,
-                  });
-                },
-              })}
-            />
-            <Text as="label" htmlFor="fast-is-public-holiday">
-              is it a public holiday?
-            </Text>
-          </Stack>
-          <Stack alignItems="center">
-            <input
-              className="size-4"
-              type="checkbox"
-              id="fast-is-public-holiday-worked"
-              {...register("is-public-holiday-worked", {
-                onChange: (e: ChangeEvent<HTMLInputElement>) => {
-                  setStoreValue({
-                    fastWorked: e.target.checked as boolean,
-                  });
-                },
-              })}
-            />
-            <Text as="label" htmlFor="fast-is-public-holiday-worked">
-              did you work it?
-            </Text>
-          </Stack>
-        </Stack>
+        <input type="checkbox" hidden {...register("is-public-holiday")} />
+        <input type="checkbox" hidden {...register("is-public-holiday-worked")} />
+        <div className="mt-2 w-full">
+          <HolidayChoice
+            value={toHolidayValue(watch("is-public-holiday"), watch("is-public-holiday-worked"))}
+            onChange={(next) => {
+              const { isPublicHoliday, publicHolidayWorked } = fromHolidayValue(next);
+              setValue("is-public-holiday", isPublicHoliday);
+              setValue("is-public-holiday-worked", publicHolidayWorked);
+              setStoreValue({ fastHoliday: isPublicHoliday, fastWorked: publicHolidayWorked });
+            }}
+          />
+        </div>
       </Stack>
     </>
   );

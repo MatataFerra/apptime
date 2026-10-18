@@ -13,26 +13,26 @@ function Footer() {
   const { reset } = useTaxesHandlerDelete((state) => state);
 
   return (
-    <DialogFooter className="flex w-full flex-row items-center justify-end gap-4">
+    <DialogFooter className="grid w-full grid-cols-2 gap-2.5 sm:space-x-0">
       <Button
         type="button"
-        size="sm"
-        variant="white"
-        classes="active:shadow-button-inner"
+        size="lg"
+        variant="outline"
+        classes="w-full"
         onClick={() => {
           Toast({
             type: "warning",
-            message: "Changes have not been saved",
+            message: "Changes not saved",
             duration: 2000,
           });
           reset();
           setStep("info");
         }}
       >
-        back
+        Back
       </Button>
-      <Button type="submit" size="sm" variant="success">
-        Save
+      <Button type="submit" size="lg" variant="primary" classes="w-full">
+        Save changes
       </Button>
     </DialogFooter>
   );

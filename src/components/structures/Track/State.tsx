@@ -22,14 +22,35 @@ function ShiftTextState() {
     return ut.isFalsyValue(shift?.isClosed);
   }, [shift?.isClosed]);
 
+  const online = checkCloseShift();
+  const startedAt = shift?.startDate ? new Date(shift.startDate) : null;
+
   return (
-    <Text as="h2" classes="flex gap-1 text-lg">
-      State:{" "}
-      <Text as="span" classes={`${checkCloseShift() ? "text-green-500" : "text-red-500"} text-lg`}>
-        {checkCloseShift() ? "online" : "offline"}
+    <div className="flex w-full items-center justify-between gap-3">
+      <Text as="h2" classes="flex items-center gap-2 text-sm text-ink-muted">
+        <span className="sr-only">Status</span>
+        <Text
+          as="span"
+          classes={`inline-flex h-8 items-center gap-2 rounded-full border px-3 text-sm font-semibold ${
+            online
+              ? "border-track/25 bg-surface text-track"
+              : "border-border bg-surface text-ink-muted"
+          }`}
+        >
+          <span
+            aria-hidden="true"
+            className={`size-1.5 rounded-full ${online ? "bg-accent" : "bg-ink-subtle"}`}
+          />
+          {online ? "On the clock" : "Off the clock"}
+        </Text>
+        <PopoverHome />
       </Text>
-      <PopoverHome />
-    </Text>
+      {online && startedAt && !isNaN(startedAt.valueOf()) ? (
+        <span className="text-sm text-ink-muted">
+          Started {startedAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+        </span>
+      ) : null}
+    </div>
   );
 }
 

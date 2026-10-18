@@ -44,7 +44,7 @@ function RadioWithInput(
               </Text>
             )}
             {!!popoverContent && (
-              <PopoverBase triggerClasses="absolute -right-[20%]" content={popoverContent} />
+              <PopoverBase triggerClasses="absolute right-[-20%]" content={popoverContent} />
             )}
           </Text>
           <RadioGroup radioGroupName={props?.name as any} />

@@ -1,12 +1,12 @@
 "use client";
 
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import { History } from "lucide-react";
 
 import StartButton from "@/components/structures/Track/Flow/Start/Button";
 import Dropdown from "@/components/structures/Track/Flow/Start/Dialog/Dropdown";
 import Button from "@/components/ui/Button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
-import Image from "@/components/ui/Image";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
@@ -19,15 +19,13 @@ function ShiftStartHasConfigStep() {
     <>
       <DialogHeader className="text-left">
         <DialogTitle>
-          <Stack orientation="horizontal" alignItems="center">
-            <Image
-              src="/assets/marks/question_mark.svg"
-              alt="Do you want to use your previous config?"
-              classes="object-contain"
-              height={50}
-              width={50}
-            />
-            <Text>A previous shift configuration was found</Text>
+          <Stack orientation="horizontal" alignItems="center" spacing={3}>
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent">
+              <History className="size-5" strokeWidth={1.75} aria-hidden="true" />
+            </span>
+            <Text as="span" classes="font-display text-lg leading-tight font-semibold">
+              Use your last shift settings?
+            </Text>
           </Stack>
         </DialogTitle>
         <DialogDescription>
@@ -37,10 +35,10 @@ function ShiftStartHasConfigStep() {
         </DialogDescription>
       </DialogHeader>
       <Stack orientation="vertical" alignItems="center">
-        <ul className="grid w-full grid-cols-1 gap-2 text-left text-sm text-gray-500 dark:text-gray-400">
+        <ul className="grid w-full grid-cols-1 gap-2 text-left text-sm text-ink-muted">
           <li className="flex items-center space-x-1">
             <svg
-              className="h-3.5 w-3.5 flex-shrink-0 text-green-500 dark:text-green-400"
+              className="h-3.5 w-3.5 shrink-0 text-accent"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -58,7 +56,7 @@ function ShiftStartHasConfigStep() {
           </li>
           <li className="flex items-center space-x-1">
             <svg
-              className="h-3.5 w-3.5 flex-shrink-0 text-green-500 dark:text-green-400"
+              className="h-3.5 w-3.5 shrink-0 text-accent"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

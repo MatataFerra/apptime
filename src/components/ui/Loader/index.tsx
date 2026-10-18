@@ -23,7 +23,7 @@ function Loader({ loaderClasses, loading, loaderContainerClasses, type }: Loader
   return (
     <>
       {loading ? (
-        <div className="absolute inset-0 bg-slate-500 bg-opacity-50">
+        <div className="absolute inset-0 bg-ink/30 backdrop-blur-[2px]">
           {type === "spinner" && (
             <Loader.spinner classes={loaderClasses} containerClasses={loaderContainerClasses} />
           )}
@@ -41,15 +41,15 @@ function Loader({ loaderClasses, loading, loaderContainerClasses, type }: Loader
 Loader.spinner = ({
   classes,
   containerClasses,
-  bg = "text-gray-200",
-  spinColor = "fill-gray-600",
+  bg = "text-border",
+  spinColor = "fill-ink",
 }: Spinner) => {
   return (
     <div className={containerClasses} role="status">
       <svg
         aria-hidden="true"
         className={cn(
-          "mr-2 inline h-4 w-4 animate-spin dark:text-gray-600",
+          "mr-2 inline h-4 w-4 animate-spin",
           bg,
           spinColor,
           classes
@@ -74,8 +74,8 @@ Loader.spinner = ({
 Loader.progress = function () {
   return (
     <div className="w-full">
-      <div className="h-1.5 w-full overflow-hidden bg-pink-100">
-        <div className="h-full w-full origin-left-right animate-progress bg-pink-500"></div>
+      <div className="h-1.5 w-full overflow-hidden bg-accent-soft">
+        <div className="h-full w-full origin-left-right animate-progress bg-accent"></div>
       </div>
     </div>
   );

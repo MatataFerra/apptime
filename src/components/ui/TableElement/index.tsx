@@ -27,7 +27,7 @@ function TableElement<E extends ValidTableElement = typeof TableElementDefaultAs
   const isTr = as === "tr";
   const Element = as || "td";
   const defaultStyles = !isTr
-    ? "p-4 text-xs text-gray-800 dark:text-gray-100 group-hover:bg-sky-50"
+    ? "p-4 text-xs text-ink group-hover:bg-surface-sunken"
     : "group cursor-pointer";
   const classesStyles = classes ? classes : "";
 

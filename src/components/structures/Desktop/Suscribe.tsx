@@ -10,11 +10,7 @@ import api from "@/services/Api";
 
 import { Inputs, SuscribeSchema } from "@/types";
 
-import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
 import Loader from "@/components/ui/Loader";
-import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
 
 function Suscribe() {
   const t = useTranslations("no-mobile");
@@ -32,7 +28,7 @@ function Suscribe() {
     handleSubmit,
     setError,
     clearErrors,
-    formState: { errors, isSubmitSuccessful, isSubmitting, isValid, isDirty },
+    formState: { errors, isSubmitSuccessful, isSubmitting },
   } = useForm<Inputs>({
     resolver: zodResolver(SuscribeSchema),
   });
@@ -51,36 +47,52 @@ function Suscribe() {
   }
 
   return (
-    <article className="h-44 space-y-4 rounded-lg bg-black bg-opacity-80 bg-clip-padding px-8 py-4 backdrop-blur-sm backdrop-filter">
-      <Text classes="text-lg text-white">{t("subscription.notify_message")}</Text>
+    <article className="flex flex-col gap-3 rounded-[24px] bg-surface-inverse p-5 text-ink-inverse">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-lg font-semibold">{t("subscription.title")}</h2>
+        <p className="text-[0.9375rem] text-ink-inverse/70">{t("subscription.notify_message")}</p>
+      </div>
 
-      <Stack
-        as="form"
-        grid
-        cols={"1fr auto"}
-        onSubmit={handleSubmit(onSubmit)}
-        onKeyDown={onKeyPress}
-      >
-        <Input
-          placeholder="username@email.com"
-          classes="h-full w-full text-sm shadow-sm"
-          type="text"
-          {...register("email")}
-        />
-        <Button
-          variant={"gradient_primary"}
-          classes="transform animate-text p-1 transition-transform active:scale-75"
+      {isSubmitSuccessful && mutation.isSuccess ? (
+        <p
+          role="status"
+          className="flex h-12 items-center text-[0.9375rem] font-semibold text-live"
         >
-          <Text classes="font-black text-white">Notify Me</Text>
-        </Button>
-      </Stack>
-      {isSubmitting && <Loader.spinner />}
-
-      {!isValid && (
-        <Text classes="animate-shake text-sm text-red-700">{errors.email?.message}</Text>
+          {t("subscription.success_message")}
+        </p>
+      ) : (
+        <form
+          className="grid grid-cols-[minmax(0,1fr)_auto] gap-2"
+          onSubmit={handleSubmit(onSubmit)}
+          onKeyDown={onKeyPress}
+          noValidate
+        >
+          <label htmlFor="waitlist-email" className="sr-only">
+            Email
+          </label>
+          <input
+            id="waitlist-email"
+            type="email"
+            autoComplete="email"
+            placeholder="username@email.com"
+            aria-invalid={!!errors.email}
+            className="h-12 w-full rounded-xl border border-white/15 bg-white/8 px-4 text-[0.9375rem] text-ink-inverse outline-hidden transition-colors placeholder:text-ink-inverse/45 focus:border-live"
+            {...register("email")}
+          />
+          <button
+            type="submit"
+            disabled={isSubmitting || mutation.isPending}
+            className="flex h-12 items-center gap-2 rounded-xl bg-live px-5 text-[0.9375rem] font-semibold text-surface-inverse transition-transform active:scale-95 disabled:opacity-60"
+          >
+            {mutation.isPending ? <Loader.spinner bg="text-ink/30" spinColor="fill-ink" /> : null}
+            Notify Me
+          </button>
+        </form>
       )}
 
-      {isSubmitSuccessful && <Text variant="success">{t("subscription.success_message")}</Text>}
+      {errors.email?.message ? (
+        <p className="text-sm font-medium text-destructive-bright">{errors.email.message}</p>
+      ) : null}
     </article>
   );
 }
