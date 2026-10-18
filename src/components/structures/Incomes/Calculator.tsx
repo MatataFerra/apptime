@@ -78,7 +78,7 @@ function Calculator() {
       <Stack
         orientation="vertical"
         spacing={1}
-        classes="rounded-xl bg-surface-inverse p-5 text-ink-inverse"
+        classes="w-full rounded-xl bg-surface-inverse p-5 text-ink-inverse"
         aria-live="polite"
       >
         <Text classes="text-sm text-ink-inverse/70">You are going to earn:</Text>
