@@ -104,7 +104,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
 
     onEditShift(shiftUpdated, taxesToDelete).then(async (res) => {
       Toast({
-        type: "info",
+        type: "loading",
         message: "Shift is being updated",
         duration: Infinity,
       });

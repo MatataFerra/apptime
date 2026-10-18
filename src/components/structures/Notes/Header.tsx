@@ -1,14 +1,24 @@
 import Input from "@/components/ui/Input";
 
+import useTrack from "@/hooks/useTrack";
+
 import { useShiftData } from "@/store/useShiftData";
 
+/** Job name of the running shift; saved when the shift is finished. */
 function Header() {
-  const { setData } = useShiftData((state) => state);
+  const { data, setData } = useShiftData((state) => state);
+  const {
+    shiftUnclosed: { shift },
+  } = useTrack();
+
   return (
     <Input
-      placeholder="Title your job"
-      variant="outlined"
-      classes="w-full bg-warning-soft [&>input]:bg-warning-soft"
+      name="notes-job-name"
+      label="Job name"
+      labelClasses="text-fast-ink"
+      placeholder="Packhouse, apple picking…"
+      defaultValue={data.name || shift?.name || ""}
+      classes="bg-surface"
       onChange={(e) => setData({ name: e.target.value })}
     />
   );

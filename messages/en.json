@@ -3,8 +3,22 @@
     "navigation": {},
     "subscription": {
       "notify_message": "Do you want to get notice when the app is available for desktop?",
-      "success_message": "Thank you for subscribing!"
-    }
+      "success_message": "Thank you for subscribing!",
+      "title": "Desktop is on the way"
+    },
+    "badge": "Mobile only, for now",
+    "eyebrow": "Made for your phone",
+    "title": "Your season, tracked from your pocket.",
+    "body": "CasualApp is meant to be used on the job: start a shift, log your pieces and see what you've earned. Open it on your phone to get going.",
+    "scan": "Scan to open on your phone",
+    "scan_hint": "Point your phone's camera at the code.",
+    "or_visit": "Or visit",
+    "feature_track": "Clock in and out",
+    "feature_track_hint": "Hours and breaks, live",
+    "feature_pieces": "Log piece work",
+    "feature_pieces_hint": "Bins, trays, rows",
+    "feature_pay": "Know your pay",
+    "feature_pay_hint": "Taxes taken off"
   },
   "login": {
     "wrong_password": "User or password are not valid",

@@ -5,7 +5,6 @@ import ShiftService from "@/services/Shift";
 import Toast from "@/services/Toast";
 
 import Button from "@/components/ui/Button";
-import Loader from "@/components/ui/Loader";
 
 import { invalidateShiftQueries } from "@/utils/helpers/invalidateShiftQueries";
 import useTrack from "@/hooks/useTrack";
@@ -74,9 +73,8 @@ function FinishButton({ buttonStatus }: Props) {
     onUpdateTrackJob({ ...prepareShiftToBeUpdated }, shift?.id).then((response) => {
       Toast({
         message: "Closing shift",
-        type: "plain",
+        type: "loading",
         description: "Updating status, please wait...",
-        action: <Loader.spinner bg="text-ink" spinColor="fill-slate-100" />,
         duration: 2000,
       });
 
@@ -93,7 +91,6 @@ function FinishButton({ buttonStatus }: Props) {
           message: "Shift updated",
           type: "success",
           description: "Your shift has been updated successfully",
-          action: <Loader.spinner bg="text-ink" spinColor="fill-ink" />,
           duration: 1000,
         });
 
@@ -113,7 +110,6 @@ function FinishButton({ buttonStatus }: Props) {
         message: "Error",
         type: "error",
         description: "An error occurred while updating your shift",
-        action: <Loader.spinner bg="text-ink" spinColor="fill-ink" />,
         duration: 1000,
       });
 

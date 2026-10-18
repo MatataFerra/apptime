@@ -54,7 +54,7 @@ function Form() {
     if (isSubmitting) {
       Toast({
         message: "Updating settings...",
-        type: "info",
+        type: "loading",
       });
     }
 

@@ -169,7 +169,7 @@ function Inputs() {
     };
 
     Toast({
-      type: "info",
+      type: "loading",
       message: "Your request is being processed",
       description: "Please wait a moment...",
       duration: 2500,

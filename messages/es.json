@@ -2,9 +2,23 @@
   "no-mobile": {
     "navigation": {},
     "subscription": {
-      "notify_message": "Do you want to get notice when the app is available for desktop?",
-      "success_message": "Thank you for subscribing!"
-    }
+      "notify_message": "¿Quieres que te avisemos cuando la versión de escritorio esté disponible?",
+      "success_message": "¡Gracias por suscribirte!",
+      "title": "La versión de escritorio está en camino"
+    },
+    "badge": "Solo móvil, por ahora",
+    "eyebrow": "Hecha para tu teléfono",
+    "title": "Tu temporada, en tu bolsillo.",
+    "body": "CasualApp está pensada para usarla en el trabajo: empieza un turno, registra tus piezas y mira cuánto ganaste. Ábrela en tu teléfono para empezar.",
+    "scan": "Escanea para abrirla en tu teléfono",
+    "scan_hint": "Apunta la cámara de tu teléfono al código.",
+    "or_visit": "O entra a",
+    "feature_track": "Ficha entrada y salida",
+    "feature_track_hint": "Horas y descansos, en vivo",
+    "feature_pieces": "Registra trabajo por pieza",
+    "feature_pieces_hint": "Bins, bandejas, hileras",
+    "feature_pay": "Sabe cuánto cobras",
+    "feature_pay_hint": "Con impuestos descontados"
   },
   "login": {
     "wrong_password": "User or password are not valid",

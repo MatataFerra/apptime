@@ -33,7 +33,7 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
   function onStartShift() {
     Toast({
       message: "Shift is being created",
-      type: "info",
+      type: "loading",
     });
 
     updateShiftStatus(true);

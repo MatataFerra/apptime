@@ -65,7 +65,7 @@ function TableDialog({
 
     onMutate: () => {
       Toast({
-        type: "info",
+        type: "loading",
         message: "Deleting shift...",
         duration: Infinity,
       });

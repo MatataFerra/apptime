@@ -21,6 +21,10 @@ const WeekSummary = dynamic(() => import("@/components/structures/Home/WeekSumma
   loading: () => <Skeleton classes="h-52 w-full rounded-2xl" />,
 });
 
+const LiveShift = dynamic(() => import("@/components/structures/Home/LiveShift"), {
+  ssr: false,
+});
+
 type Props = {
   params: LocaleParams;
 };
@@ -30,6 +34,7 @@ function Content({ params }: Props) {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4">
         <HomeHeader locale={params.locale} />
+        <LiveShift />
         <WeekSummary />
       </div>
       <nav className="flex w-full flex-col gap-6" aria-label="Modules">

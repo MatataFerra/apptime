@@ -52,6 +52,8 @@
   --fast-soft: #f6ead3;
   --fast-ink: #7a4f0b;
   --fast-bright: #e3a23b;
+  --destructive-bright: #ff9a88; /* on inverse surfaces */
+  --insight-bright: #a9bdf6;
   --production: #9d3d6b;
   --production-soft: #f5e1ea;
   --production-ink: #7d2f55;
@@ -102,6 +104,8 @@
   --fast-soft: #3a2c14;
   --fast-ink: #f2c879;
   --fast-bright: #f0b552;
+  --destructive-bright: #ff9a88;
+  --insight-bright: #b6c7f8;
   --production: #e48fb5;
   --production-soft: #3d1f2e;
   --production-ink: #f1b9d2;
@@ -164,6 +168,8 @@
   --color-fast-soft: var(--fast-soft);
   --color-fast-ink: var(--fast-ink);
   --color-fast-bright: var(--fast-bright);
+  --color-destructive-bright: var(--destructive-bright);
+  --color-insight-bright: var(--insight-bright);
   --color-production: var(--production);
   --color-production-soft: var(--production-soft);
   --color-production-ink: var(--production-ink);
