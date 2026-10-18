@@ -11,6 +11,7 @@ import Text from "@/components/ui/Text";
 
 type IncomesInputs = {
   hours: string;
+  minutes: string;
   value: number;
   times: number;
   "holiday-pay": number;
@@ -21,22 +22,22 @@ function Calculator() {
   const { register, watch } = useForm<IncomesInputs>();
 
   const hours = watch("hours");
+  const minutes = watch("minutes");
   const value = watch("value");
   const holidayPay = watch("holiday-pay");
   const times = watch("times");
   const unpaidBreaks = watch("unpaid-breaks");
 
+  // Worked time is a duration, not a time of day: two number fields instead of
+  // <input type="time">, which Safari shows as a clock ("10:00 pm") and whose
+  // value it doesn't always report while editing.
   const hoursMemo = useMemo(() => {
-    if (!hours) return 0;
+    const h = Number(hours) || 0;
+    const m = Number(minutes) || 0;
+    const total = h * 60 + m;
 
-    const [hour, minutes] = hours?.split(":");
-    const hourToMinutes = parseInt(hour) * 60;
-    const total = hourToMinutes + parseInt(minutes);
-
-    const toDecimal = ShiftService.convertAmountInDecimal(total);
-
-    return toDecimal;
-  }, [hours]);
+    return ShiftService.convertAmountInDecimal(total);
+  }, [hours, minutes]);
 
   const calculate = useMemo(() => {
     const total = ShiftService.calculateEarnings({
@@ -55,7 +56,26 @@ function Calculator() {
   return (
     <>
       <Stack spacing={4} wrap>
-        <Input type="time" label="Hours" {...register("hours")} />
+        <div className="grid w-full grid-cols-2 gap-4">
+          <Input
+            type="number"
+            inputMode="numeric"
+            label="Hours"
+            measure="h"
+            min={0}
+            max={24}
+            {...register("hours")}
+          />
+          <Input
+            type="number"
+            inputMode="numeric"
+            label="Minutes"
+            measure="min"
+            min={0}
+            max={59}
+            {...register("minutes")}
+          />
+        </div>
         <Input
           type="number"
           label="Value hour"

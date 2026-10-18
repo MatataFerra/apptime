@@ -14,8 +14,8 @@ describe("IncomesCalculator", () => {
     render(<IncomesCalculator />);
     const hoursInput = screen.getByLabelText("Hours");
 
-    fireEvent.change(hoursInput, { target: { value: "08:00" } });
-    expect(hoursInput).toHaveValue("08:00");
+    fireEvent.change(hoursInput, { target: { value: "8" } });
+    expect(hoursInput).toHaveValue(8);
   });
 
   test("calculates the income correctly", () => {
@@ -24,7 +24,7 @@ describe("IncomesCalculator", () => {
     const valueInput = screen.getByLabelText("Value hour");
     const timesInput = screen.getByLabelText("How many days?");
 
-    fireEvent.change(hoursInput, { target: { value: "08:00" } });
+    fireEvent.change(hoursInput, { target: { value: "8" } });
     fireEvent.change(valueInput, { target: { value: 10 } });
     fireEvent.change(timesInput, { target: { value: 2 } });
 
