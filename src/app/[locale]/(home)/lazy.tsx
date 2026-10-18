@@ -11,9 +11,6 @@ export const SheetHamMenu = dynamic(
     ssr: false,
   }
 );
-export const UserInfo = dynamic(() => import("@/components/structures/SheetHamMenu/UserInfo"), {
-  ssr: false,
-});
 export const Header = dynamic(() => import("@/components/ui/Header"), {
   ssr: false,
   loading: () => (

@@ -22,7 +22,9 @@ const LOGGED_ROUTES = ["/forgot-password", "/reset", "/success"];
 export default async function proxy(req: NextRequest) {
   const nextPathName = req.nextUrl.pathname;
   const I18N = new i18n("en");
-  const locale = I18N.getLocale(req) ?? "en";
+  // The URL's locale wins; the browser language only fills in when it's missing.
+  // (Using the browser language for /es/... built /en/es/... and skipped every check.)
+  const locale = Router.localeFromPath(nextPathName) ?? I18N.getLocale(req) ?? "en";
   const routeLocale = Router.addLocale(nextPathName, locale);
   const router = new Router(PRIVATES_ROUTES).addLocalesToRoutes();
   const loggedRoutes = new Router(LOGGED_ROUTES).addLocalesToRoutes();

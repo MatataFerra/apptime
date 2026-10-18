@@ -1,6 +1,7 @@
 import ModuleShell from "@/components/Layout/ModuleShell";
+import UserInfo from "@/components/structures/SheetHamMenu/UserInfo";
 
-import { Header,SheetHamMenu, UserInfo } from "./lazy";
+import { Header, SheetHamMenu } from "./lazy";
 
 export default async function HomeLayout({ children }: LayoutProps<"/[locale]">) {
   return (
