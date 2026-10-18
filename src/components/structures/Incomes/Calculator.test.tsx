@@ -3,16 +3,19 @@ import { describe, expect, test } from "vitest";
 
 import IncomesCalculator from "./Calculator";
 
+function money(n: number) {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+}
+
 describe("IncomesCalculator", () => {
   test("renders the component", () => {
     render(<IncomesCalculator />);
-    const component = screen.getByLabelText("Hours");
-    expect(component).toBeInTheDocument();
+    expect(screen.getByLabelText("Hours a day")).toBeInTheDocument();
   });
 
   test("can change the hours", () => {
     render(<IncomesCalculator />);
-    const hoursInput = screen.getByLabelText("Hours");
+    const hoursInput = screen.getByLabelText("Hours a day");
 
     fireEvent.change(hoursInput, { target: { value: "8" } });
     expect(hoursInput).toHaveValue(8);
@@ -20,35 +23,28 @@ describe("IncomesCalculator", () => {
 
   test("calculates the income correctly", () => {
     render(<IncomesCalculator />);
-    const hoursInput = screen.getByLabelText("Hours");
-    const valueInput = screen.getByLabelText("Value hour");
-    const timesInput = screen.getByLabelText("How many days?");
 
-    fireEvent.change(hoursInput, { target: { value: "8" } });
-    fireEvent.change(valueInput, { target: { value: 10 } });
-    fireEvent.change(timesInput, { target: { value: 2 } });
+    fireEvent.change(screen.getByLabelText("Hours a day"), { target: { value: "8" } });
+    fireEvent.change(screen.getByLabelText("Hourly rate"), { target: { value: "10" } });
+    fireEvent.click(screen.getByRole("button", { name: "2" }));
 
-    const { hours, value, times, holidayPay } = {
-      hours: 8,
-      value: 10,
-      times: 2,
-      holidayPay: 8,
-    };
+    // 8h x $10 x 2 days + 8% holiday pay
+    expect(screen.getByTestId("estimate-total")).toHaveTextContent(money(8 * 10 * 2 * 1.08));
+  });
 
-    const expectedResult = hours * value * times + (hours * value * times * holidayPay) / 100;
+  test("uses the default holiday pay when the field is empty", () => {
+    render(<IncomesCalculator />);
 
-    const expectedIncome = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(expectedResult);
-    const incomeText = screen.getByText("You are going to earn:");
-    expect(incomeText.nextSibling?.textContent).toBe(expectedIncome);
+    fireEvent.change(screen.getByLabelText("Hours a day"), { target: { value: "8" } });
+    fireEvent.change(screen.getByLabelText("Hourly rate"), { target: { value: "25" } });
+    fireEvent.change(screen.getByLabelText("Holiday pay"), { target: { value: "" } });
+    fireEvent.click(screen.getByRole("button", { name: "1" }));
+
+    expect(screen.getByTestId("estimate-total")).toHaveTextContent(money(216));
   });
 
   test("displays default holiday pay rate", () => {
     render(<IncomesCalculator />);
-    const holidayPayInput = screen.getByLabelText("Holiday pay");
-
-    expect(holidayPayInput).toHaveValue(8);
+    expect(screen.getByLabelText("Holiday pay")).toHaveValue(8);
   });
 });
