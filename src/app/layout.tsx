@@ -2,11 +2,12 @@ import { ReactNode } from "react";
 
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Poppins } from "next/font/google";
 
 import { cn } from "@/utils/helpers/styleMerger";
 
 import "@/app/globals.css";
+
+import { bricolage, figtree } from "./fonts";
 
 export function generateStaticParams() {
   return [{ locale: "en" }, { locale: "de" }];
@@ -17,18 +18,10 @@ export const metadata = {
   description: "Track your time, and get things done!",
 };
 
-const poppinsFont = Poppins({
-  weight: ["200", "400", "700"],
-  subsets: ["latin"],
-  variable: "--font-poppins",
-  fallback: ["system-ui"],
-  preload: true,
-});
-
 async function Layout({ children }: { children: ReactNode }) {
   return (
-    <html className={cn(poppinsFont.className)}>
-      <body>
+    <html className={cn(figtree.variable, bricolage.variable)}>
+      <body className="font-sans">
         {children}
         <Analytics />
         <SpeedInsights />

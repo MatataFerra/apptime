@@ -11,7 +11,6 @@ import type {
 import type { JWT } from "next-auth/jwt";
 import { z } from "zod";
 
-import type { BG_TAILWIND_COLOR, FROM_TO_TAILWIND_COLOR } from "@/types/tailwind";
 import { HandleErrorTypeSchema } from "@/types/zod";
 
 // Types
@@ -103,15 +102,3 @@ export type EarnsMonthData = {
   earnings: number;
 } | null;
 
-//Color
-
-export type Gradient = {
-  from: FROM_TO_TAILWIND_COLOR["from"];
-  to: FROM_TO_TAILWIND_COLOR["to"];
-};
-
-export type PlainColor = BG_TAILWIND_COLOR;
-
-export type Color = PlainColor | Gradient;
-
-export type ColorWithGradientAndHex<T> = T extends Gradient ? { from: string; to: string } : string;

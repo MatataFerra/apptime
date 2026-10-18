@@ -27,11 +27,11 @@ import { CHART_MONTH } from "@/utils/constants";
 const chartConfig = {
   hourly: {
     label: "Hourly",
-    color: "hsl(var(--chart-1))",
+    color: "var(--chart-1)",
   },
   production: {
     label: "Production",
-    color: "hsl(var(--chart-2))",
+    color: "var(--chart-2)",
   },
 } satisfies ChartConfig;
 

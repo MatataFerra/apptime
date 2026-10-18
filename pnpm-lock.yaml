@@ -80,9 +80,6 @@ importers:
       bcryptjs:
         specifier: ^2.4.3
         version: 2.4.3
-      chroma-js:
-        specifier: ^2.4.2
-        version: 2.4.2
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.0
@@ -198,9 +195,6 @@ importers:
       '@types/bcryptjs':
         specifier: ^2.4.6
         version: 2.4.6
-      '@types/chroma-js':
-        specifier: ^2.4.4
-        version: 2.4.4
       '@types/jsonwebtoken':
         specifier: ^9.0.6
         version: 9.0.6
@@ -1815,9 +1809,6 @@ packages:
   '@types/bcryptjs@2.4.6':
     resolution: {integrity: sha512-9xlo6R2qDs5uixm0bcIqCeMCE6HiQsIyel9KQySStiyqNl2tnj2mP3DX1Nf56MD6KMenNNlBBsy3LJ7gUEQPXQ==}
 
-  '@types/chroma-js@2.4.4':
-    resolution: {integrity: sha512-/DTccpHTaKomqussrn+ciEvfW4k6NAHzNzs/sts1TCqg333qNxOhy8TNIoQCmbGG3Tl8KdEhkGAssb1n3mTXiQ==}
-
   '@types/cookie@0.4.1':
     resolution: {integrity: sha512-XW/Aa8APYr6jSVVA1y/DEIZX0/GMKLEVekNG727R8cs56ahETkRAy/3DR7+fJyh7oUgGwNQaRfXCun0+KbWY7Q==}
 
@@ -2251,9 +2242,6 @@ packages:
   chokidar@3.5.3:
     resolution: {integrity: sha512-Dr3sfKRP6oTcjf2JmUmFJfeVMvXBdegxB0iVQ5eb2V10uFJUCAS8OByZdVAyVb8xXNz3GjjTgj9kLWsZTqE6kw==}
     engines: {node: '>= 8.10.0'}
-
-  chroma-js@2.4.2:
-    resolution: {integrity: sha512-U9eDw6+wt7V8z5NncY2jJfZa+hUH8XEj8FQHgFJTrUFnJfXYf4Ml4adI2vXZOjqRDpFWtYVWypDfZwnJ+HIR4A==}
 
   class-variance-authority@0.7.0:
     resolution: {integrity: sha512-jFI8IQw4hczaL4ALINxqLEXQbWcNjoSkloa4IaufXCJr6QawJyw7tuRysRsrE8w2p/4gGaxKIt/hX3qz/IbD1A==}
@@ -6178,8 +6166,6 @@ snapshots:
 
   '@types/bcryptjs@2.4.6': {}
 
-  '@types/chroma-js@2.4.4': {}
-
   '@types/cookie@0.4.1': {}
 
   '@types/d3-array@3.2.1': {}
@@ -6668,8 +6654,6 @@ snapshots:
       readdirp: 3.6.0
     optionalDependencies:
       fsevents: 2.3.3
-
-  chroma-js@2.4.2: {}
 
   class-variance-authority@0.7.0:
     dependencies:
