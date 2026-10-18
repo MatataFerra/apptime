@@ -36,10 +36,10 @@ function Taxes({ shift }: Props) {
           key={tax.id}
           className={cn(
             "flex items-center justify-between gap-x-2 transition-all",
-            isTaxAdded(tax.id) ? "text-red-600/80" : "text-gray-800"
+            isTaxAdded(tax.id) ? "text-destructive/80" : "text-ink"
           )}
         >
-          <article className="flex gap-1 text-balance text-xs">
+          <article className="flex gap-1 text-xs text-balance">
             <p>
               {tax.name} {tax.value}%
             </p>
@@ -52,7 +52,7 @@ function Taxes({ shift }: Props) {
               size="xs"
               classes={cn(
                 "border px-2 transition-colors",
-                "cursor-pointer border-green-400 bg-green-100 text-gray-900 active:bg-green-300 active:shadow-button-inner"
+                "cursor-pointer border-accent bg-accent-soft text-ink active:bg-green-300 active:shadow-button-inner"
               )}
               onClick={() => {
                 restoreTax(tax.id);
@@ -60,7 +60,7 @@ function Taxes({ shift }: Props) {
                   type: "plain",
                   message: "Tax restored",
                   duration: 1500,
-                  classes: "text-gray-500",
+                  classes: "text-ink-muted",
                 });
               }}
             >
@@ -73,7 +73,7 @@ function Taxes({ shift }: Props) {
               size="xs"
               classes={cn(
                 "border px-2 transition-colors",
-                "cursor-pointer border-red-400 text-gray-900 active:bg-red-200 active:shadow-button-inner"
+                "cursor-pointer border-destructive text-ink active:bg-destructive-soft active:shadow-button-inner"
               )}
               onClick={() => {
                 addTaxToDelete(tax);
@@ -82,7 +82,7 @@ function Taxes({ shift }: Props) {
                   message: "Tax will be deleted",
                   description: "Please press save to delete it",
                   duration: 1500,
-                  classes: "text-red-600",
+                  classes: "text-destructive",
                 });
               }}
             >

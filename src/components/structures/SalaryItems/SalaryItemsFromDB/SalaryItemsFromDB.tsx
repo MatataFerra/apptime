@@ -77,7 +77,7 @@ function SalaryItemsFromDB({ add, type }: Props) {
                     <Button
                       size="xs"
                       variant="outlined"
-                      classes="border border-green-300 transition-colors active:bg-green-400/20"
+                      classes="border border-accent transition-colors active:bg-accent/20"
                       onClick={() => {
                         if (userHasAddedSalaryItem) return;
                         setUserHasAddedSalaryItem(true);
@@ -104,7 +104,7 @@ function SalaryItemsFromDB({ add, type }: Props) {
             userNotification={
               <>
                 {userHasAddedSalaryItem ? (
-                  <div className="absolute left-0 animate-fade-in rounded-md bg-slate-800/70 px-2 py-1 text-center text-white transition-all">
+                  <div className="absolute left-0 animate-fade-in rounded-md bg-primary/70 px-2 py-1 text-center text-white transition-all">
                     Added
                   </div>
                 ) : null}

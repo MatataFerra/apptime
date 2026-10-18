@@ -9,7 +9,7 @@ function Container({ children }: PropsWithChildren<Props>) {
     <Stack
       as="article"
       orientation="vertical"
-      classes="w-full rounded-lg border border-stone-300/40 p-2 shadow-md"
+      classes="w-full rounded-lg border border-border/40 p-2 shadow-md"
     >
       {children}
     </Stack>

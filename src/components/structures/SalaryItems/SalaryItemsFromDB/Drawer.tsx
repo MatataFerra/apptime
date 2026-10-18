@@ -91,7 +91,7 @@ function DrawerSalaryItemsFromDB({
             </VisuallyHidden.Root>
           </DrawerDescription>
         </DrawerHeader>
-        <article className="mx-auto my-0 h-full w-11/12 border border-slate-500/20 p-4 shadow-md">
+        <article className="mx-auto my-0 h-full w-11/12 border border-border-strong/20 p-4 shadow-md">
           <SalaryItemsFromDB add={add} type={type} />
         </article>
         <DrawerFooter>

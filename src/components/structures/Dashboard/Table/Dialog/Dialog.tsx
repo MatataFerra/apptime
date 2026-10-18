@@ -109,7 +109,7 @@ function TableDialog({
           {step === "info" ? (
             <>
               <DialogHeader>
-                <DialogTitle className="py-2 text-left text-xl text-slate-800">{title}</DialogTitle>
+                <DialogTitle className="py-2 text-left text-xl text-ink">{title}</DialogTitle>
                 <DialogDescription>
                   <VisualyHidden.Root>
                     Take a quick view about your job, edit it if you need

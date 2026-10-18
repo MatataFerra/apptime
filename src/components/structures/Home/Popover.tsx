@@ -14,7 +14,7 @@ function PopoverHome() {
         <Icon.mark />
       </PopoverTrigger>
       <PopoverContent side="top" className="w-60">
-        <Text variant="default" classes="balance_text text-sm text-black">
+        <Text variant="default" classes="balance_text text-sm text-ink">
           {t("popover")}
         </Text>
       </PopoverContent>

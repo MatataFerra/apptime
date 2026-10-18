@@ -71,7 +71,7 @@ function RegisterForm() {
             type: "warning",
             message: t("user_already_exist"),
             duration: 2000,
-            action: <Loader.spinner bg="text-black" spinColor="fill-gray-50" />,
+            action: <Loader.spinner bg="text-ink" spinColor="fill-ink" />,
           });
 
           setTimeout(() => {

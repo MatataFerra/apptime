@@ -75,7 +75,7 @@ function FinishButton({ buttonStatus }: Props) {
         message: "Closing shift",
         type: "plain",
         description: "Updating status, please wait...",
-        action: <Loader.spinner bg="text-black" spinColor="fill-slate-100" />,
+        action: <Loader.spinner bg="text-ink" spinColor="fill-slate-100" />,
         duration: 2000,
       });
 
@@ -92,7 +92,7 @@ function FinishButton({ buttonStatus }: Props) {
           message: "Shift updated",
           type: "success",
           description: "Your shift has been updated successfully",
-          action: <Loader.spinner bg="text-black" spinColor="fill-gray-50" />,
+          action: <Loader.spinner bg="text-ink" spinColor="fill-ink" />,
           duration: 1000,
         });
 
@@ -112,7 +112,7 @@ function FinishButton({ buttonStatus }: Props) {
         message: "Error",
         type: "error",
         description: "An error occurred while updating your shift",
-        action: <Loader.spinner bg="text-black" spinColor="fill-gray-50" />,
+        action: <Loader.spinner bg="text-ink" spinColor="fill-ink" />,
         duration: 1000,
       });
 

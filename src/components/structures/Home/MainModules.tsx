@@ -4,9 +4,9 @@ import Text from "@/components/ui/Text";
 
 function MainModules() {
   return (
-    <Stack orientation="vertical">
-      <Text variant="subtitle" classes="text-center text-lg">
-        Main modules
+    <Stack orientation="vertical" spacing={2}>
+      <Text as="h2" variant="label" classes="px-1 text-ink-muted">
+        Log work
       </Text>
       <Features />
     </Stack>

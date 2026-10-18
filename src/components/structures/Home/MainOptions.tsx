@@ -4,8 +4,10 @@ import Text from "@/components/ui/Text";
 
 function MainOptions() {
   return (
-    <Stack orientation="vertical" classes="w-full">
-      <Text classes="text-center text-xs">Shortcuts</Text>
+    <Stack orientation="vertical" spacing={2} classes="w-full">
+      <Text as="h2" variant="label" classes="px-1 text-ink-muted">
+        See your money
+      </Text>
       <Options />
     </Stack>
   );

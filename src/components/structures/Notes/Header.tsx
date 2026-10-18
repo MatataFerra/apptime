@@ -8,7 +8,7 @@ function Header() {
     <Input
       placeholder="Title your job"
       variant="outlined"
-      classes="w-full bg-yellow-200 [&>input]:bg-yellow-200"
+      classes="w-full bg-warning-soft [&>input]:bg-warning-soft"
       onChange={(e) => setData({ name: e.target.value })}
     />
   );

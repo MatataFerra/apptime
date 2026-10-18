@@ -1,43 +1,43 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-import Img from "@/components/ui/Image";
-import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
+import { cn } from "@/utils/helpers/styleMerger";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 interface Props {
   withText?: boolean;
+  classes?: string;
 }
 
-function Logo({ withText }: Props) {
-  const router = useRouter();
+// Brand mark drawn inline so it follows the current text colour.
+export function LogoMark({ className }: { className?: string }) {
   return (
-    <Stack
-      orientation="horizontal"
-      alignItems="center"
-      classes="cursor-pointer transition-all active:scale-95 active:transform"
-      onClick={() => router.push(PATH_NAMES.HOME)}
-    >
-      <Img
-        src="/assets/apptime-logo.svg"
-        alt="Casual app logo"
-        classes="size-8"
-        width={0}
-        height={0}
+    <svg viewBox="0 0 35 27" aria-hidden="true" className={cn("h-6 w-auto", className)}>
+      <path
+        fill="currentColor"
+        d="M10.4469 23.968C7.46073 26.9542 2.40329 26.9423 0.990883 22.9624C0.714354 22.1832 0.493259 21.382 0.330644 20.5645C-0.333309 17.2265 0.00745571 13.7667 1.30985 10.6224C2.61224 7.4782 4.81776 4.79076 7.64751 2.89998C10.4773 1.0092 13.8042 -1.45785e-07 17.2075 0C20.6108 1.45785e-07 23.9377 1.0092 26.7674 2.89998C29.5972 4.79076 31.8027 7.4782 33.1051 10.6225C34.4075 13.7667 34.7482 17.2265 34.0843 20.5645C33.9217 21.382 33.7006 22.1832 33.424 22.9624C32.0116 26.9423 26.9542 26.9542 23.968 23.968L19.3584 19.3584C18.918 18.918 18.9635 18.1917 19.085 17.5809C19.1588 17.2096 19.1209 16.8247 18.976 16.4749C18.8311 16.1251 18.5858 15.8261 18.271 15.6158C17.9562 15.4055 17.5861 15.2932 17.2075 15.2932C16.8289 15.2932 16.4588 15.4055 16.144 15.6158C15.8291 15.8261 15.5838 16.1251 15.4389 16.4749C15.294 16.8247 15.2561 17.2096 15.33 17.5809C15.4515 18.1917 15.4969 18.918 15.0565 19.3584L10.4469 23.968Z"
       />
+    </svg>
+  );
+}
+
+function Logo({ withText, classes }: Props) {
+  return (
+    <Link
+      href={PATH_NAMES.HOME}
+      aria-label="CasualApp, home"
+      className={cn(
+        "flex items-center gap-2 rounded-md text-ink transition-transform select-none active:scale-95",
+        classes
+      )}
+    >
+      <LogoMark className="text-accent" />
       {withText ? (
-        <Text
-          as="h1"
-          gradient="secondary"
-          classes="select-none text-base font-bold active:animate-text active:duration-1000"
-        >
-          Casual app
-        </Text>
+        <span className="font-display text-lg font-semibold tracking-tight">casualapp</span>
       ) : null}
-    </Stack>
+    </Link>
   );
 }
 

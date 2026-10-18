@@ -66,7 +66,7 @@ function SalaryElement({
                     ${salaryItem.description ? `(${salaryItem.description})` : ""}
                   `}
                 </span>
-                <span className="line-clamp-1 font-bold text-slate-600">
+                <span className="line-clamp-1 font-bold text-ink-muted">
                   {`Saved tax: ${foundRepeated(salaryItem.name)?.name}: ${foundRepeated(salaryItem.name)?.value}% 
                     ${foundRepeated(salaryItem.name)?.description ? `(${foundRepeated(salaryItem.name)?.description})` : ""}
                   `}
@@ -77,10 +77,10 @@ function SalaryElement({
             <p
               className={cn(
                 "line-clamp-1 text-xs",
-                isRepeated(salaryItem.name) ? "animate-shake text-red-500 repeat-1" : ""
+                isRepeated(salaryItem.name) ? "animate-shake text-destructive repeat-1" : ""
               )}
             >
-              <span className="text-xs text-slate-400">{index + 1}. </span>
+              <span className="text-xs text-ink-subtle">{index + 1}. </span>
               {salaryItem.name}: {salaryItem.value}%{" "}
               {salaryItem.description ? `(${salaryItem.description})` : ""}
             </p>
@@ -88,7 +88,7 @@ function SalaryElement({
           <Button
             size="xs"
             variant="outlined"
-            classes="text-red-500 hover:underline"
+            classes="text-destructive hover:underline"
             onClick={() => remove(salaryItem.name)}
           >
             delete
@@ -96,15 +96,15 @@ function SalaryElement({
         </>
       ) : (
         <>
-          <p className={cn("text-xs", isRepeated(salaryItem.name) ? "text-red-500" : "")}>
-            <span className="text-xs text-slate-400">{index + 1}. </span>
+          <p className={cn("text-xs", isRepeated(salaryItem.name) ? "text-destructive" : "")}>
+            <span className="text-xs text-ink-subtle">{index + 1}. </span>
             {salaryItem.name}: {salaryItem.value}%{" "}
             {salaryItem.description ? `(${salaryItem.description})` : ""}
           </p>
           <Button
             size="xs"
             variant="outlined"
-            classes="text-red-500 hover:underline"
+            classes="text-destructive hover:underline"
             onClick={() => remove(salaryItem.name)}
           >
             delete

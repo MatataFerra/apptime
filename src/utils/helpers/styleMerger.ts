@@ -1,5 +1,16 @@
 import { type ClassValue, clsx } from "clsx";
-import { ClassNameValue, twMerge } from "tailwind-merge";
+import { ClassNameValue, extendTailwindMerge } from "tailwind-merge";
+
+// Teach tailwind-merge about the custom font sizes in globals.css so that
+// e.g. `text-figure` is treated as a size and not dropped in favour of `text-ink`.
+const twMerge = extendTailwindMerge({
+  extend: {
+    theme: {
+      text: ["figure", "clamp-1-to-2_5", "clamp-1-to-3"],
+      shadow: ["float", "button", "button-inner", "input"],
+    },
+  },
+});
 
 /**
  * @description Function to merge tailwind classes also you can use conditional styles

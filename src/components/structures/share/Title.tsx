@@ -9,25 +9,20 @@ interface Props {
 }
 
 function WelcomeTitle({ user }: Props) {
+  const name = user?.name
+    ? user.name.split(" ")[0].trim()
+    : user?.email
+      ? shortEmail({ user })
+      : null;
+
   return (
     <div className="flex flex-col gap-1">
-      <Text variant="title" classes="text-5xl">
-        Welcome
+      <Text as="p" variant="small">
+        Welcome back
       </Text>
-
-      {user?.name ? (
-        <Text gradient="title" classes="balance_text text-3xl font-bold">
-          {user.name.split(" ")[0].trim()}
-        </Text>
-      ) : user?.email ? (
-        <Text gradient="title" classes="balance_text text-3xl font-bold">
-          {shortEmail({ user })}
-        </Text>
-      ) : (
-        <Text gradient="title" classes="balance_text animate-text text-base font-bold">
-          Manage your work
-        </Text>
-      )}
+      <Text as="h1" variant="title" classes="balance_text text-4xl">
+        {name ?? "Manage your work"}
+      </Text>
     </div>
   );
 }

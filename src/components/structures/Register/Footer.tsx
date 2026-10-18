@@ -24,7 +24,7 @@ function RegisterFooter({ classes, idForm }: Props) {
       <Button
         type="submit"
         variant="black"
-        classes={cn("w-full text-lg", isButtonBloqued && "bg-gray-400 text-gray-600")}
+        classes={cn("w-full text-lg", isButtonBloqued && "bg-gray-400 text-ink-muted")}
         disabled={isButtonBloqued}
         form={idForm}
       >
@@ -33,7 +33,7 @@ function RegisterFooter({ classes, idForm }: Props) {
       <NextLink
         href={PATH_NAMES.LOGIN}
         className={cn(
-          "h-12 w-full cursor-pointer rounded-lg border border-slate-800 bg-white p-3 text-center text-lg text-black transition-all hover:bg-gray-200"
+          "h-12 w-full cursor-pointer rounded-lg border border-border-strong bg-surface p-3 text-center text-lg text-ink transition-all hover:bg-surface-sunken"
         )}
         role="button"
       >

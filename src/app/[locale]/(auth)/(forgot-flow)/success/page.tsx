@@ -11,7 +11,7 @@ export default async function SuccessPage() {
       <NextLink
         href={PATH_NAMES.HOME}
         className={
-          "flex h-12 w-full cursor-pointer items-center justify-center rounded-lg border border-slate-800 bg-white p-3 text-center text-lg text-black transition-all hover:bg-gray-200"
+          "flex h-12 w-full cursor-pointer items-center justify-center rounded-lg border border-border-strong bg-surface p-3 text-center text-lg text-ink transition-all hover:bg-surface-sunken"
         }
         role="button"
       >

@@ -45,7 +45,7 @@ function Tracker() {
                 priority
               />
 
-              <h1 className="text-2xl font-bold text-gray-800">No shift has started</h1>
+              <h1 className="text-2xl font-bold text-ink">No shift has started</h1>
             </div>
           )}
         </>

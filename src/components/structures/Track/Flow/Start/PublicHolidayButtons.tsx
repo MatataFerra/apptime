@@ -26,7 +26,7 @@ function ShiftStartPublicHolidaysButtons() {
         >
           <Text
             as="span"
-            classes="flex h-full w-full items-center justify-center p-2 text-xs text-black"
+            classes="flex h-full w-full items-center justify-center p-2 text-xs text-ink"
           >
             Yes! Money 🤑
           </Text>

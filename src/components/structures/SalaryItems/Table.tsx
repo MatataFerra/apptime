@@ -18,7 +18,7 @@ function TableSalary({ data, remove, type }: Props) {
   return (
     <div role="table" className="w-full transition-all">
       <article>
-        <div className="rounded-md border border-slate-500/20 p-2 shadow-md">
+        <div className="rounded-md border border-border-strong/20 p-2 shadow-md">
           <h3 className="mb-2 animate-pulse">
             {!isEmpty(data)
               ? `Check out your ${type === "taxes" ? "taxes" : "contributions"}:`

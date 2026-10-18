@@ -51,7 +51,7 @@ function Suscribe() {
   }
 
   return (
-    <article className="h-44 space-y-4 rounded-lg bg-black bg-opacity-80 bg-clip-padding px-8 py-4 backdrop-blur-xs backdrop-filter">
+    <article className="bg-opacity-80 h-44 space-y-4 rounded-lg bg-primary bg-clip-padding px-8 py-4 backdrop-blur-xs backdrop-filter">
       <Text classes="text-lg text-white">{t("subscription.notify_message")}</Text>
 
       <Stack
@@ -77,7 +77,7 @@ function Suscribe() {
       {isSubmitting && <Loader.spinner />}
 
       {!isValid && (
-        <Text classes="animate-shake text-sm text-red-700">{errors.email?.message}</Text>
+        <Text classes="animate-shake text-sm text-destructive">{errors.email?.message}</Text>
       )}
 
       {isSubmitSuccessful && <Text variant="success">{t("subscription.success_message")}</Text>}

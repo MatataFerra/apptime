@@ -2,7 +2,6 @@ import dynamic from "next/dynamic";
 
 import { type LocaleParams, type UserType } from "@/types";
 
-import Line from "@/components/ui/Line";
 import Skeleton from "@/components/ui/Skeleton";
 
 const Stack = dynamic(() => import("@/components/ui/Stack"), {
@@ -13,8 +12,8 @@ const Title = dynamic(() => import("@/components/structures/share/Title"), {
   ssr: false,
   loading: () => (
     <Stack as="div" orientation="vertical" spacing={4}>
-      <Skeleton classes="h-12 w-60" />
-      <Skeleton classes="h-12 w-28" />
+      <Skeleton classes="h-4 w-28" />
+      <Skeleton classes="h-10 w-48" />
     </Stack>
   ),
 });
@@ -28,24 +27,14 @@ const MainModules = dynamic(() => import("@/components/structures/Home/MainModul
   ssr: false,
   loading: () => (
     <>
-      <Stack classes="size-full" orientation="vertical" spacing={4}>
-        <Skeleton classes="size-full" />
-        <Skeleton classes="size-full" />
-        <Skeleton classes="size-full" />
-      </Stack>
+      <Skeleton classes="h-52 w-full rounded-lg" />
     </>
   ),
 });
 
 const MainOptions = dynamic(() => import("@/components/structures/Home/MainOptions"), {
   ssr: false,
-  loading: () => (
-    <Stack alignItems="center" classes="w-full" spacing={4}>
-      <Skeleton classes="size-5" />
-      <Skeleton classes="size-5" />
-      <Skeleton classes="size-5" />
-    </Stack>
-  ),
+  loading: () => <Skeleton classes="h-52 w-full rounded-lg" />,
 });
 
 type Props = {
@@ -54,13 +43,12 @@ type Props = {
 
 function Content({ params }: Props) {
   return (
-    <Stack orientation="vertical" spacing={8}>
-      <Stack as="div" orientation="vertical" spacing={4}>
+    <Stack orientation="vertical" spacing={8} classes="pt-2">
+      <Stack as="div" orientation="vertical" spacing={2}>
         <Title />
         <TodayDate locale={params.locale} />
       </Stack>
-      <Line color="bg-stone-300" />
-      <Stack as="menu" orientation="vertical" classes="w-full p-2" spacing={8}>
+      <Stack as="nav" orientation="vertical" classes="w-full" spacing={8}>
         <MainModules />
         <MainOptions />
       </Stack>

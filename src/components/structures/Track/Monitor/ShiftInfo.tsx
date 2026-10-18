@@ -38,12 +38,12 @@ function ShiftTrackInfo() {
   return (
     <>
       {getUser?.shifts?.hourly.length === 0 ? (
-        <Text classes="mx-0 my-auto block text-center text-xl text-red-700">
+        <Text classes="mx-0 my-auto block text-center text-xl text-destructive">
           {"You haven't started your shift yet! Please press the 'Start Shift' button."}
         </Text>
       ) : (
         <Stack as="div" orientation="vertical">
-          <Text classes="text-xl">{`Last shift tracked: ${isLoading ? "waiting for data..." : dateHumanized ?? "no date available"}`}</Text>
+          <Text classes="text-xl">{`Last shift tracked: ${isLoading ? "waiting for data..." : (dateHumanized ?? "no date available")}`}</Text>
           <Text classes="text-xl">
             Money earn at the moment:{" "}
             {isLoading ? "waiting for data..." : `${earnings?.toFixed(2)}`}$

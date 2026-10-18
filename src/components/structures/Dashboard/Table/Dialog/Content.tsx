@@ -27,7 +27,7 @@ function TableDialogContent({ shift }: Props) {
   return (
     <Stack grid cols={2}>
       {shift.name ? (
-        <Text classes="col-span-2 border-b border-b-slate-500/40 text-lg text-slate-800">
+        <Text classes="col-span-2 border-b border-b-slate-500/40 text-lg text-ink">
           {shift.name}
         </Text>
       ) : null}
@@ -104,14 +104,14 @@ function TableDialogContent({ shift }: Props) {
         </Text>{" "}
         {isProductionShift(shift) ? TYPE_SHIFT.PRODUCTION : TYPE_SHIFT.TRACK}
       </Text>
-      <Text color="text-red-700">Gross pay: {`$${new Pay(shift).gross()?.toFixed(2)}`}</Text>
+      <Text color="text-destructive">Gross pay: {`$${new Pay(shift).gross()?.toFixed(2)}`}</Text>
       {!!new Pay(shift).netPay() ? (
-        <Text color="text-green-700">Net pay: {`$${new Pay(shift).netPay()?.toFixed(2)}`}</Text>
+        <Text color="text-accent">Net pay: {`$${new Pay(shift).netPay()?.toFixed(2)}`}</Text>
       ) : null}
       {!isEmpty(shift.taxes) ? (
         <Stack>
           <DropdownMenu>
-            <DropdownMenuTrigger className="group flex w-full items-center justify-between py-2 pr-4 text-xs text-gray-800 dark:text-gray-100">
+            <DropdownMenuTrigger className="group flex w-full items-center justify-between py-2 pr-4 text-xs text-ink">
               Taxes {`(${shift.taxes?.length ?? 0})`}
               <ChevronDownIcon className="transition-all group-data-[state=open]:rotate-180 group-data-[state=open]:transform" />
             </DropdownMenuTrigger>

@@ -1,53 +1,67 @@
-"use client";
+import Link from "next/link";
 
-import { useRouter } from "next/navigation";
+import {
+  ArrowLeftRight,
+  ChartColumn,
+  ChevronRight,
+  Coins,
+  type LucideIcon,
+  Package,
+  Timer,
+  Zap,
+} from "lucide-react";
 
 import { type CSSClassNames } from "@/types";
 
-import Icon from "@/components/ui/Icons";
-import Stack from "@/components/ui/Stack";
-import Text from "@/components/ui/Text";
+import { cn } from "@/utils/helpers/styleMerger";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 type Props = {
   title?: string;
+  description?: string;
   path?: string;
   classes?: CSSClassNames;
 };
 
-const ICONS = {
-  [PATH_NAMES.FAST_CHARGE]: <Icon.lightning width={"100%"} height={"100%"} />,
-  [PATH_NAMES.TRACK]: <Icon.clock width={"100%"} height={"100%"} />,
-  [PATH_NAMES.PRODUCTION]: <Icon.box width={"100%"} height={"100%"} />,
-  [PATH_NAMES.DASHBOARD]: <Icon.dashboard width={"100%"} height={"100%"} />,
-  [PATH_NAMES.INCOMES]: <Icon.incomes width={"100%"} height={"100%"} />,
-  [PATH_NAMES.COMPARE]: <Icon.compare width={"100%"} height={"100%"} />,
-  default: <Icon.default width={"100%"} height={"100%"} className="animate-pulse duration-5000" />,
+const ICONS: Record<string, LucideIcon> = {
+  [PATH_NAMES.FAST_CHARGE]: Zap,
+  [PATH_NAMES.TRACK]: Timer,
+  [PATH_NAMES.PRODUCTION]: Package,
+  [PATH_NAMES.DASHBOARD]: ChartColumn,
+  [PATH_NAMES.INCOMES]: Coins,
+  [PATH_NAMES.COMPARE]: ArrowLeftRight,
 };
 
-function OptionCard({ title, path, classes }: Props) {
-  const router = useRouter();
+/**
+ * Navigation row used on Home: icon, title, one-line description, chevron.
+ */
+function OptionCard({ title, description, path = PATH_NAMES.HOME, classes }: Props) {
+  const Icon = ICONS[path] ?? ChevronRight;
 
   return (
-    <Stack
-      orientation="vertical"
-      justifyContent="center"
-      alignItems="center"
-      as="div"
-      onClick={() => router.push(path ?? PATH_NAMES.HOME)}
+    <Link
+      href={path}
+      data-testid={`option-card-${path.split("/")[1]}`}
+      className={cn(
+        "group flex min-h-16 items-center gap-3 px-4 py-3 transition-colors active:bg-surface-sunken",
+        classes
+      )}
     >
-      <Stack
-        data-testid={`option-card-${path?.split("/")[1]}`}
-        as="figure"
-        justifyContent="center"
-        alignItems="center"
-        classes={`size-14 cursor-pointer rounded-lg border border-border bg-surface p-3 text-ink transition-colors active:bg-surface-sunken ${classes}`}
-      >
-        <div className={`size-fit`}>{ICONS[(path as keyof typeof ICONS) ?? "default"]}</div>
-      </Stack>
-      {title ? <Text classes="mt-1.5 text-xs font-medium text-ink-muted">{title}</Text> : null}
-    </Stack>
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-surface-sunken text-ink">
+        <Icon className="size-5" strokeWidth={1.75} aria-hidden="true" />
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col">
+        {title ? <span className="text-base font-medium text-ink">{title}</span> : null}
+        {description ? (
+          <span className="truncate text-sm text-ink-muted">{description}</span>
+        ) : null}
+      </span>
+      <ChevronRight
+        className="size-4 shrink-0 text-ink-subtle transition-transform group-active:translate-x-0.5"
+        aria-hidden="true"
+      />
+    </Link>
   );
 }
 

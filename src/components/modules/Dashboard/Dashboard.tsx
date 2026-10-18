@@ -20,7 +20,7 @@ const TableHistory = dynamic(() => import("@/components/modules/Dashboard/TableH
   loading: () => (
     <Stack
       orientation="vertical"
-      classes="h-fit max-h-60 min-h-60 w-full overflow-y-scroll rounded-lg border border-gray-200 bg-white shadow-input"
+      classes="h-fit max-h-60 min-h-60 w-full overflow-y-scroll rounded-lg border border-border bg-surface shadow-input"
     >
       <Skeleton classes="h-full w-full" />
     </Stack>
@@ -61,7 +61,7 @@ async function Dashboard() {
       </Stack>
       <Stack
         orientation="vertical"
-        classes="h-fit max-h-60 min-h-60 w-full overflow-y-scroll rounded-lg border border-gray-200 bg-white shadow-input"
+        classes="h-fit max-h-60 min-h-60 w-full overflow-y-scroll rounded-lg border border-border bg-surface shadow-input"
       >
         <TableHistory />
       </Stack>

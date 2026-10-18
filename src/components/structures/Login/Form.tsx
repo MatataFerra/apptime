@@ -101,20 +101,17 @@ export default function FormLogin() {
               {...register("password")}
             />
           </fieldset>
-          <div className="flex items-center justify-between text-base ">
+          <div className="flex items-center justify-between text-base">
             <p>
               <Link
-                className="font-bold text-slate-800 underline"
+                className="font-bold text-ink underline"
                 href={`/${locale}${PATH_NAMES.REGISTER}`}
               >
                 register new account
               </Link>
             </p>
             <p>
-              <Link
-                className="text-slate-800 underline"
-                href={`/${locale}${PATH_NAMES.RESET_PASSWORD}`}
-              >
+              <Link className="text-ink underline" href={`/${locale}${PATH_NAMES.RESET_PASSWORD}`}>
                 forgotten password?
               </Link>
             </p>

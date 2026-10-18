@@ -63,7 +63,7 @@ const USER_OPTIONS: DrawerOption[] = [
 
 function Options() {
   return (
-    <Stack as="div" orientation="vertical" spacing={0} classes="w-full divide-y divide-sky-300/50">
+    <Stack as="div" orientation="vertical" spacing={0} classes="w-full divide-y divide-border">
       <Stack as="div" orientation="vertical" classes="w-full py-2">
         <Title title="User options" />
         {USER_OPTIONS.map((option) => (

@@ -56,7 +56,7 @@ function SheetHamMenu({ children }: PropsWithChildren<Props>) {
       <SheetContent
         aria-describedby={"main menu"}
         side="left"
-        className="isolate bg-white/90 shadow-2xl backdrop-blur-md"
+        className="isolate bg-surface/90 shadow-2xl backdrop-blur-md"
       >
         <SheetHeader>
           <SheetTitle>{children}</SheetTitle>

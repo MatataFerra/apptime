@@ -86,7 +86,7 @@ function Report() {
                   <Text
                     variant="subtitle"
                     gradient={compareWages.better ? "poison" : "ocean"}
-                    classes="rounded-lg border border-slate-400 px-1  py-2 text-sm"
+                    classes="rounded-lg border border-border-strong px-1 py-2 text-sm"
                   >
                     {compareWages.better ? "Hourly wage is better" : "Production wage is better"}
                   </Text>

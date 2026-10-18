@@ -55,16 +55,16 @@ function CustomChartTooltip({
     // );
 
     return (
-      <div className="flex flex-col divide-y-2 rounded-lg bg-white p-2 shadow-lg">
-        {/* <p className="w-full py-1 text-xs text-gray-700">
+      <div className="flex flex-col divide-y-2 rounded-lg bg-surface p-2 shadow-lg">
+        {/* <p className="w-full py-1 text-xs text-ink">
           {findMonthName !== -1 ? FULL_MONTHS_NAMES[findMonthName] : label}
         </p> */}
         {customLegend ? (
           <>{customLegend}</>
         ) : (
           <div>
-            <p className="text-md w-full py-1 text-gray-900">{`${legend}: $${sumValue} `}</p>
-            <p className="w-full text-sm text-gray-800">{`Type: ${dataKey?.name}`}</p>
+            <p className="text-md w-full py-1 text-ink">{`${legend}: $${sumValue} `}</p>
+            <p className="w-full text-sm text-ink">{`Type: ${dataKey?.name}`}</p>
             {/* {showDates && (
               <ul className="w-full list-inside list-disc text-sm text-violet-600">
                 {dates.map(({ date, id }: { date: string; id: number }) => (

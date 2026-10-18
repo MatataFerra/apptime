@@ -49,7 +49,7 @@ function DropdownFlagSearchable({
           variant="ghost"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between text-slate-600"
+          className="w-full justify-between text-ink-muted"
         >
           {search ? data.find((item) => item?.value === search)?.label : `${staleTitle}`}
           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />

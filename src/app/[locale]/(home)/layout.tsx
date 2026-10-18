@@ -17,8 +17,8 @@ const Header = dynamic(() => import("@/components/ui/Header"), {
   ssr: false,
   loading: () => (
     <Stack orientation="horizontal">
-      <Skeleton classes="h-10 w-20" />
-      <Skeleton classes="w-50 h-10" />
+      <Skeleton classes="size-10" />
+      <Skeleton classes="h-6 w-28" />
     </Stack>
   ),
 });
@@ -32,12 +32,12 @@ export default async function HomeLayout({ children }: Props) {
     <>
       <main
         vaul-drawer-wrapper=""
-        className="grid h-full min-h-dvh grid-rows-[auto_1fr] bg-white *:p-4"
+        className="grid h-full min-h-dvh grid-rows-[auto_1fr] bg-background *:px-4 *:pb-4"
         data-testid="drawer-close"
       >
         <Header
           position="between"
-          classes="sticky top-0 z-10 bg-white bg-clip-text backdrop-blur-md backdrop-opacity-100 backdrop-filter"
+          classes="sticky top-0 z-10 h-16 bg-background/85 pb-0! backdrop-blur-md"
         >
           <SheetHamMenu>
             <UserInfo />
