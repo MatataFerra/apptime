@@ -93,6 +93,21 @@ describe("Summary service", () => {
     expect(result.current.earned).toBeCloseTo(200, 2);
     expect(result.previous.earned).toBeCloseTo(100, 2);
     expect(result.change).toBe(100);
+    expect(result.previousFull.earned).toBeCloseTo(260, 2);
+    expect(result.shareOfPrevious).toBe(77);
+  });
+
+  test("a shift late last month still counts for the whole-month comparison", () => {
+    // Oct 18; the only September shift is on the 24th, outside Sep 1-18
+    const result = compareWithPreviousMonth(
+      [hourly("2026-09-24T08:00:00", 10), hourly("2026-10-05T08:00:00", 5)],
+      [],
+      new Date(2026, 9, 18, 18, 0)
+    );
+
+    expect(result.change).toBeNull();
+    expect(result.previousFull.earned).toBeCloseTo(200, 2);
+    expect(result.shareOfPrevious).toBe(50);
   });
 
   test("has no change when last month had no earnings", () => {

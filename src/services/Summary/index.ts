@@ -113,9 +113,14 @@ export function summarizeWeek(
 
 export type MonthComparison = {
   current: PeriodSummary;
+  /** Previous month, 1st up to today's day number. */
   previous: PeriodSummary;
-  /** Percent change of earnings vs the previous month; null when there is nothing to compare. */
+  /** The whole previous month. */
+  previousFull: PeriodSummary;
+  /** Percent change vs the same days of the previous month; null when those days earned nothing. */
   change: number | null;
+  /** This month so far as a percent of the whole previous month; null when it earned nothing. */
+  shareOfPrevious: number | null;
 };
 
 /**
@@ -137,11 +142,14 @@ export function compareWithPreviousMonth(
     Math.min(prevMonthEnd.valueOf(), sameDay.valueOf() + (now.valueOf() - startOfDay(now).valueOf()))
   );
   const previous = summarizePeriod(hourly, production, prevStart, prevEnd);
+  const previousFull = summarizePeriod(hourly, production, prevStart, prevMonthEnd);
 
   const change =
     previous.earned > 0 ? Math.round(((current.earned - previous.earned) / previous.earned) * 100) : null;
+  const shareOfPrevious =
+    previousFull.earned > 0 ? Math.round((current.earned / previousFull.earned) * 100) : null;
 
-  return { current, previous, change };
+  return { current, previous, previousFull, change, shareOfPrevious };
 }
 
 /**

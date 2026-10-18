@@ -5,14 +5,18 @@ import { useOnClickOutside } from "usehooks-ts";
 import { useDatalistStore } from "@/components/structures/ShiftForms/store/useDatalistStore";
 import Datalist from "@/components/ui/Datalist";
 
+/**
+ * Suggestions for the job name. `onSelect` must update both the form and
+ * any store that mirrors it (the review dialog reads the store).
+ */
 function DatalistShiftNames({
   data,
-  setValue,
   value,
+  onSelect,
 }: {
   data: string[] | undefined;
   value: string | null;
-  setValue: (name: string | any, value: string | boolean | null, config?: Object) => void;
+  onSelect: (name: string) => void;
 }) {
   const { isWritingName, setIsWriting } = useDatalistStore((state) => state);
   const listNamesRef = useRef(null);
@@ -26,19 +30,17 @@ function DatalistShiftNames({
     if (!value) return setIsWriting(false);
   }, [setIsWriting, value]);
 
+  if (!isWritingName) return null;
+
   return (
-    <>
-      {isWritingName ? (
-        <Datalist
-          data={data}
-          ref={listNamesRef}
-          onClick={(e) => {
-            setValue("name", e.currentTarget.innerText);
-            setIsWriting(false);
-          }}
-        />
-      ) : null}
-    </>
+    <Datalist
+      data={data}
+      ref={listNamesRef}
+      onSelect={(name) => {
+        onSelect(name);
+        setIsWriting(false);
+      }}
+    />
   );
 }
 

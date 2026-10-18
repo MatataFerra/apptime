@@ -1,34 +1,34 @@
-import { forwardRef, type LiHTMLAttributes, type Ref } from "react";
+import { forwardRef, type Ref } from "react";
 
 import isEmpty from "lodash/isEmpty";
 
-interface DataListProps extends LiHTMLAttributes<HTMLLIElement> {
+interface DataListProps {
   data: string[] | undefined;
+  /** Called with the suggestion exactly as stored (not as displayed). */
+  onSelect: (value: string) => void;
 }
 
-function Datalist({ data, onClick, ...rest }: DataListProps, ref: Ref<HTMLUListElement>) {
+function Datalist({ data, onSelect }: DataListProps, ref: Ref<HTMLUListElement>) {
+  if (isEmpty(data)) return null;
+
   return (
-    <>
-      {!isEmpty(data) ? (
-        <ul
-          role="listbox"
-          ref={ref}
-          className="absolute top-full z-10 w-full animate-fade-in space-y-2 rounded-b-md border border-t-0 border-border-strong bg-surface py-1 text-ink shadow-float"
-        >
-          {data?.map((name) => (
-            <li
-              role="listitem"
-              onClick={onClick}
-              key={name}
-              className="w-full p-2 capitalize hover:bg-surface-sunken active:bg-surface-sunken"
-              {...rest}
-            >
-              {name}
-            </li>
-          ))}
-        </ul>
-      ) : null}
-    </>
+    <ul
+      role="listbox"
+      ref={ref}
+      className="absolute top-full z-10 w-full animate-fade-in rounded-b-md border border-t-0 border-border-strong bg-surface py-1 text-ink shadow-float"
+    >
+      {data?.map((name) => (
+        <li key={name} role="option" aria-selected={false}>
+          <button
+            type="button"
+            onClick={() => onSelect(name)}
+            className="w-full px-3 py-2.5 text-left hover:bg-surface-sunken active:bg-surface-sunken"
+          >
+            {name}
+          </button>
+        </li>
+      ))}
+    </ul>
   );
 }
 

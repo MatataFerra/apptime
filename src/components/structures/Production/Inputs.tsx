@@ -13,12 +13,17 @@ import type { ProductionInputs } from "@/types/forms";
 
 import { observer } from "@/components/structures/SalaryItems/observer";
 import DatalistShiftNames from "@/components/structures/ShiftForms/Datalist";
+import HolidayChoice, {
+  fromHolidayValue,
+  toHolidayValue,
+} from "@/components/structures/ShiftForms/HolidayChoice";
 import { useDatalistStore } from "@/components/structures/ShiftForms/store/useDatalistStore";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
+import { defaultFinish, needsDefaultFinish } from "@/utils/helpers/defaultFinish";
 import useGetUniqueSalaryItems from "@/hooks/useGetUniqueSalaryItems";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
 import useProductionShifts from "@/hooks/useProductionShifts";
@@ -57,6 +62,7 @@ function Inputs() {
     watch,
     reset,
     setValue,
+    getValues,
     formState: { errors },
   } = useFormContext<ProductionInputs>();
 
@@ -314,7 +320,14 @@ function Inputs() {
               },
             })}
           />
-          <DatalistShiftNames data={names} setValue={setValue} value={watch("name")} />
+          <DatalistShiftNames
+            data={names}
+            value={watch("name")}
+            onSelect={(name) => {
+              setValue("name", name, { shouldValidate: true, shouldDirty: true });
+              setStoreValues({ name });
+            }}
+          />
         </Stack>
         <Stack grid cols={2} as="fieldset" classes="w-full">
           <Input
@@ -323,7 +336,15 @@ function Inputs() {
             type="datetime-local"
             {...register("start-date", {
               onChange(e) {
-                setStoreValues({ startDate: e.target.value });
+                const start = e.target.value;
+                setStoreValues({ startDate: start });
+
+                // A shift rarely spans days: suggest a finish on the same day.
+                if (start && needsDefaultFinish(start, getValues("finish-date"))) {
+                  const finish = defaultFinish(start);
+                  setValue("finish-date", finish, { shouldValidate: true });
+                  setStoreValues({ finishDate: finish });
+                }
               },
             })}
           />
@@ -367,38 +388,19 @@ function Inputs() {
             },
           })}
         />
-        <Stack orientation="horizontal" wrap classes="mt-4">
-          <Stack alignItems="center">
-            <input
-              className="size-4"
-              type="checkbox"
-              id="production-holiday"
-              {...register("is-public-holiday", {
-                onChange(e) {
-                  setStoreValues({ isPublicHoliday: e.target.checked });
-                },
-              })}
-            />
-            <Text as="label" htmlFor="production-holiday">
-              is it a public holiday?
-            </Text>
-          </Stack>
-          <Stack alignItems="center">
-            <input
-              className="size-4"
-              type="checkbox"
-              id="production-worked"
-              {...register("is-worked", {
-                onChange(e) {
-                  setStoreValues({ publicHolidayWorked: e.target.checked });
-                },
-              })}
-            />
-            <Text as="label" htmlFor="production-worked">
-              did you work it?
-            </Text>
-          </Stack>
-        </Stack>
+        <input type="checkbox" hidden {...register("is-public-holiday")} />
+        <input type="checkbox" hidden {...register("is-worked")} />
+        <div className="mt-2 w-full">
+          <HolidayChoice
+            value={toHolidayValue(watch("is-public-holiday"), watch("is-worked"))}
+            onChange={(next) => {
+              const { isPublicHoliday, publicHolidayWorked } = fromHolidayValue(next);
+              setValue("is-public-holiday", isPublicHoliday);
+              setValue("is-worked", publicHolidayWorked);
+              setStoreValues({ isPublicHoliday, publicHolidayWorked });
+            }}
+          />
+        </div>
       </Stack>
     </>
   );

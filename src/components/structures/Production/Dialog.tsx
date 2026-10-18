@@ -33,6 +33,8 @@ function DialogProduction({ children }: PropsWithChildren) {
     const prepareShift = {
       itemValue: Number(values.itemValue ?? 0),
       itemQuantity: Number(values.itemQuantity),
+      isPublicHoliday: !!values.isPublicHoliday,
+      publicHolidayWorked: !!values.publicHolidayWorked,
     };
     const gross = new ShiftService(prepareShift).checkPublicHoliday().calculateEarnings();
     const afterTaxes = Pay.afterTax(gross, taxes);
@@ -41,7 +43,13 @@ function DialogProduction({ children }: PropsWithChildren) {
       gross: isNaN(gross) ? 0 : gross,
       afterTaxes: isNaN(afterTaxes) ? 0 : afterTaxes,
     };
-  }, [taxes, values.itemQuantity, values.itemValue]);
+  }, [
+    taxes,
+    values.itemQuantity,
+    values.itemValue,
+    values.isPublicHoliday,
+    values.publicHolidayWorked,
+  ]);
 
   const tags = [
     values.isPublicHoliday ? "Public holiday" : null,

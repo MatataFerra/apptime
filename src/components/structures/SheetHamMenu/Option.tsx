@@ -33,7 +33,7 @@ function Option({ option }: Props) {
         data-testid={option.dataTestId}
         aria-current={active ? "page" : undefined}
         className={cn(
-          "flex min-h-12 items-center gap-3 rounded-xl px-2 py-1.5 text-[0.9375rem] font-medium text-ink transition-colors",
+          "flex min-h-12 items-center gap-3 rounded-xl py-1.5 pr-5 pl-2 text-[0.9375rem] font-medium text-ink transition-colors",
           active ? "bg-surface-sunken" : "hover:bg-surface-sunken/70"
         )}
       >

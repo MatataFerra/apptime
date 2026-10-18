@@ -100,34 +100,59 @@ function DashboardStats({ params }: Props) {
 
   return (
     <div className="grid w-full grid-cols-2 gap-2.5">
-      <section className="col-span-2 flex flex-col gap-4 rounded-[18px] bg-surface-inverse p-4 text-ink-inverse">
+      <section className="col-span-2 flex flex-col gap-3 rounded-[18px] bg-surface-inverse p-4 text-ink-inverse">
         <span className="text-[0.8125rem] text-ink-inverse/70">
           Earned in {format(new Date(), "MMMM")}
         </span>
-        <div className="flex flex-wrap items-end justify-between gap-x-3 gap-y-1">
-          <span className="figure text-[3.25rem] leading-[0.9] text-live">
-            {formatMoney(month.current.earned)}
-          </span>
-          <span
-            className={cn(
-              "flex items-center gap-1 text-[0.8125rem] font-semibold",
-              change === null ? "text-ink-inverse/70" : change >= 0 ? "text-live" : "text-production-bright"
-            )}
-          >
-            {change === null ? (
-              `Nothing to compare in ${previousMonth}`
-            ) : (
-              <>
+        <span className="figure text-[3.25rem] leading-[0.9] text-live">
+          {formatMoney(month.current.earned)}
+        </span>
+        {month.previousFull.earned > 0 ? (
+          <div className="flex flex-col gap-2.5 border-t border-ink-inverse/15 pt-3">
+            <div className="flex items-baseline justify-between gap-3 text-[0.8125rem]">
+              <span className="text-ink-inverse/70">
+                {previousMonth}: {formatMoney(month.previousFull.earned)}
+              </span>
+              <span className="font-semibold">
+                {(month.shareOfPrevious ?? 0) >= 100
+                  ? "Already past it"
+                  : `${month.shareOfPrevious}% of it so far`}
+              </span>
+            </div>
+            <div
+              className="h-2 overflow-hidden rounded-full bg-ink-inverse/12"
+              role="progressbar"
+              aria-label={`This month compared with ${previousMonth}`}
+              aria-valuenow={Math.min(100, month.shareOfPrevious ?? 0)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            >
+              <div
+                className="h-full rounded-full bg-live"
+                style={{ width: `${Math.min(100, month.shareOfPrevious ?? 0)}%` }}
+              />
+            </div>
+            {change !== null ? (
+              <span
+                className={cn(
+                  "flex items-center gap-1 text-[0.8125rem] font-semibold",
+                  change >= 0 ? "text-live" : "text-production-bright"
+                )}
+              >
                 <TrendingUp
                   className={cn("size-4", change < 0 && "-scale-y-100")}
                   aria-hidden="true"
                 />
                 {change >= 0 ? "+" : ""}
-                {change}% vs same days of {previousMonth}
-              </>
-            )}
+                {change}% vs {previousMonth} 1 to {new Date().getDate()}
+              </span>
+            ) : null}
+          </div>
+        ) : (
+          <span className="text-[0.8125rem] text-ink-inverse/70">
+            No earnings in {previousMonth} to compare with.
           </span>
-        </div>
+        )}
       </section>
       <Stat icon={Clock3} theme="track" value={`${stats.hoursWorked}h`} label="hours worked" />
       <Stat icon={Layers} theme="production" value={stats.shiftsLen} label="shifts saved" />
