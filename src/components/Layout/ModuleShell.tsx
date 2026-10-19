@@ -18,7 +18,7 @@ function ModuleShell({ header, children }: { header: ReactNode; children: ReactN
   return (
     <main
       vaul-drawer-wrapper=""
-      className="grid h-full min-h-dvh grid-rows-[auto_1fr] bg-background *:px-4 *:pb-4"
+      className="grid h-full min-h-dvh grid-cols-[minmax(0,1fr)] grid-rows-[auto_1fr] bg-background *:px-4 *:pb-4"
       data-testid="drawer-close"
       style={{ "--band": band } as CSSProperties}
     >
