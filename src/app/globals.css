@@ -68,6 +68,9 @@
   --chart-3: #8fb3a4;
   --chart-4: #c98a2b;
   --chart-5: #6b7fd7;
+  /* Chart series, validated for colour-blind separation (dataviz validator) */
+  --series-hourly: #0e7a57;
+  --series-production: #d36aa0;
 }
 
 .dark {
@@ -119,6 +122,8 @@
   --chart-3: #5f8a78;
   --chart-4: #e3a74a;
   --chart-5: #8d9ef0;
+  --series-hourly: #1f9c6c;
+  --series-production: #b0457f;
 }
 
 @theme inline {
@@ -168,6 +173,8 @@
   --color-fast-soft: var(--fast-soft);
   --color-fast-ink: var(--fast-ink);
   --color-fast-bright: var(--fast-bright);
+  --color-series-hourly: var(--series-hourly);
+  --color-series-production: var(--series-production);
   --color-destructive-bright: var(--destructive-bright);
   --color-insight-bright: var(--insight-bright);
   --color-production: var(--production);

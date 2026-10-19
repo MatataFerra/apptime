@@ -28,7 +28,7 @@ export const useDashHourlyStore = create<DashHourlyState>((set, get) => ({
   delete: (id: number) =>
     set({
       ...get(),
-      hourly: get().hourly?.filter((hourly) => hourly.id === id),
+      hourly: get().hourly?.filter((hourly) => hourly.id !== id),
     }),
 
   update: (hourly: Partial<HourlyType>) =>

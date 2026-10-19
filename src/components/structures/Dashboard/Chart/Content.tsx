@@ -1,32 +1,47 @@
 "use client";
 
-import dynamic from "next/dynamic";
+import { cumulativeEarnings, historyEntries, weeklyEarnings } from "@/services/History";
+import { weekStartsOnIndex } from "@/services/Summary";
 
+import SeasonChart from "@/components/structures/Dashboard/Charts/SeasonChart";
+import WeeklyChart from "@/components/structures/Dashboard/Charts/WeeklyChart";
 import Skeleton from "@/components/ui/Skeleton";
 
 import useHourlyShifts from "@/hooks/useHourlyShifts";
 import useProductionShifts from "@/hooks/useProductionShifts";
-
-const EarnsPerDay = dynamic(() => import("@/components/structures/Dashboard/Chart/EarnsPerDay"), {
-  ssr: false,
-  loading: () => <Skeleton classes="h-72 w-full" />,
-});
-
-const ChartEmpty = dynamic(() => import("@/components/structures/Dashboard/Chart/Empty"), {
-  ssr: false,
-  loading: () => <Skeleton classes="h-72 w-full" />,
-});
+import useUser from "@/hooks/useUser";
 
 function Content() {
-  const { data: production } = useProductionShifts();
-  const { data: hourly } = useHourlyShifts();
+  const { data: user } = useUser();
+  const { data: hourly, isLoading: loadingHourly } = useHourlyShifts();
+  const { data: production, isLoading: loadingProduction } = useProductionShifts();
 
-  const merge = [...(hourly ?? []), ...(production ?? [])];
+  if (loadingHourly || loadingProduction) {
+    return (
+      <div className="flex flex-col gap-4">
+        <Skeleton classes="h-80 w-full rounded-[20px]" />
+        <Skeleton classes="h-80 w-full rounded-[20px]" />
+      </div>
+    );
+  }
+
+  const entries = historyEntries(hourly, production);
+
+  if (!entries.length) {
+    return (
+      <p className="rounded-[20px] border border-dashed border-border-strong p-6 text-center text-sm text-ink-muted">
+        Your charts show up after your first saved shift.
+      </p>
+    );
+  }
+
+  const weekStartsOn = weekStartsOnIndex(user?.config?.weekStartsOn);
 
   return (
-    <ChartEmpty data={merge}>
-      <EarnsPerDay />
-    </ChartEmpty>
+    <div className="flex flex-col gap-4">
+      <WeeklyChart data={weeklyEarnings(entries, { weekStartsOn })} />
+      <SeasonChart data={cumulativeEarnings(entries)} />
+    </div>
   );
 }
 

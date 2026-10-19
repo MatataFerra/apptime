@@ -10,8 +10,8 @@ export default function Layout({ children, table, charts }: Props) {
   return (
     <div className="flex flex-col gap-8">
       {children}
-      {table}
       {charts}
+      {table}
     </div>
   );
 }

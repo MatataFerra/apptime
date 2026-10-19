@@ -26,7 +26,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/Dialog";
 
-import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
+import { invalidateShiftQueries } from "@/utils/helpers/invalidateShiftQueries";
 import useDashboard from "@/hooks/useDashboard";
 
 import { useTableStore } from "@/store/useTableStore";
@@ -86,8 +86,7 @@ function TableDialog({
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.USER, user?.email] });
-      queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.HOURLY] });
+      invalidateShiftQueries(queryClient);
       router.refresh();
     },
   });
