@@ -63,6 +63,8 @@ export type FastChargeInputsParsed = {
   unpaidBreaks: number;
   taxes: TaxElement[] | [];
   contributions: ContributionElement[] | [];
+  /** ISO 4217; null means the user's default currency. */
+  currency?: string | null;
 };
 
 // Production Form
@@ -77,6 +79,8 @@ export type ProductionInputsParsed = {
   publicHolidayWorked: boolean;
   taxes: TaxElement[] | [];
   contributions: ContributionElement[] | [];
+  /** ISO 4217; null means the user's default currency. */
+  currency?: string | null;
 };
 
 // Track Form

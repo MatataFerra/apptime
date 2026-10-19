@@ -34,6 +34,8 @@ export const useShiftData = create(
         publicHolidayWorked: false,
         unpaidBreaks: 0,
         shiftId: null,
+        currency: null,
+        source: "track",
       },
       errors: false,
       step: ShiftStep.HasConfig,

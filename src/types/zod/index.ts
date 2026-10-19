@@ -35,6 +35,8 @@ const BaseShiftSchema = z.object({
   notes: z.string().nullable(),
   unpaidBreaks: z.number().nullable(),
   shiftId: z.number().nullable(),
+  /** ISO 4217; null means the user's default currency. */
+  currency: z.string().length(3).nullable().optional(),
 });
 
 const ProductionShiftSchema = BaseShiftSchema.merge(
@@ -53,6 +55,8 @@ const HourlyShiftSchema = BaseShiftSchema.merge(
       required_error: "Id must be provided correctly",
     }),
     hourValue: z.number().nullable(),
+    /** "track" | "fast" */
+    source: z.string().nullable().optional(),
   })
 );
 
