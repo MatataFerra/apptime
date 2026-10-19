@@ -101,7 +101,7 @@ function RepeatFastCharge() {
       className="flex flex-col gap-3 rounded-[20px] bg-fast-soft p-4 text-fast-ink"
     >
       <div className="flex items-center gap-3.5">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-[14px] bg-fast text-white">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-[14px] bg-fast text-on-module">
           <Zap className="size-5" strokeWidth={2} aria-hidden="true" />
         </span>
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -137,7 +137,7 @@ function RepeatFastCharge() {
           <button
             type="button"
             disabled={saving}
-            className="flex h-11 w-full items-center justify-center gap-1.5 rounded-xl bg-fast px-3.5 text-sm font-semibold text-white transition-transform active:scale-[0.98] disabled:opacity-60"
+            className="flex h-11 w-full items-center justify-center gap-1.5 rounded-xl bg-fast px-3.5 text-sm font-semibold text-on-module transition-transform active:scale-[0.98] disabled:opacity-60"
           >
             <Repeat className="size-4" aria-hidden="true" />
             Log it for today

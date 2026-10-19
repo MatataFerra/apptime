@@ -45,7 +45,7 @@ function LiveShift() {
     <section
       data-testid="live-shift"
       aria-label="Shift in progress"
-      className="flex flex-col gap-3 rounded-[20px] bg-track p-4 text-white shadow-float"
+      className="flex flex-col gap-3 rounded-[20px] bg-track p-4 text-on-module shadow-float"
     >
       <Link
         href={PATH_NAMES.TRACK}
@@ -53,29 +53,29 @@ function LiveShift() {
         className="group flex items-center gap-3.5 rounded-xl"
       >
         <span className="relative flex size-2.5 shrink-0" aria-hidden="true">
-          <span className="absolute inline-flex size-full animate-ping rounded-full bg-live opacity-70 motion-reduce:animate-none" />
-          <span className="relative inline-flex size-2.5 rounded-full bg-live" />
+          <span className="absolute inline-flex size-full animate-ping rounded-full bg-live opacity-70 motion-reduce:animate-none dark:bg-on-module" />
+          <span className="relative inline-flex size-2.5 rounded-full bg-live dark:bg-on-module" />
         </span>
 
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="text-[0.8125rem] font-medium text-white/75">
+          <span className="text-[0.8125rem] font-medium text-on-module/75">
             On the clock since {startedAt}
           </span>
           <span className="flex items-baseline gap-2.5">
             <span className="figure text-[1.75rem] leading-none">
               {hours}
-              <span className="mr-[0.15em] text-[0.6em] text-white/60">h</span>
+              <span className="mr-[0.15em] text-[0.6em] text-on-module/60">h</span>
               {String(mins).padStart(2, "0")}
-              <span className="text-[0.6em] text-white/60">m</span>
+              <span className="text-[0.6em] text-on-module/60">m</span>
             </span>
-            <span className="truncate text-sm text-white/80">
+            <span className="truncate text-sm text-on-module/80">
               {earned > 0 ? `${formatMoney(earned)} so far` : running.name || "Hourly shift"}
             </span>
           </span>
         </span>
 
         <ChevronRight
-          className="size-5 shrink-0 text-white/70 transition-transform group-hover:translate-x-0.5"
+          className="size-5 shrink-0 text-on-module/70 transition-transform group-hover:translate-x-0.5"
           aria-hidden="true"
         />
       </Link>
@@ -85,7 +85,7 @@ function LiveShift() {
           <button
             type="button"
             onClick={() => setConfirming(false)}
-            className="h-11 rounded-xl bg-white/15 text-sm font-semibold transition-colors hover:bg-white/25"
+            className="h-11 rounded-xl bg-on-module/15 text-sm font-semibold transition-colors hover:bg-on-module/25"
           >
             Keep going
           </button>
@@ -96,7 +96,7 @@ function LiveShift() {
               await finish(running);
               setConfirming(false);
             }}
-            className="h-11 rounded-xl bg-white text-sm font-semibold text-track-ink transition-transform active:scale-[0.98] disabled:opacity-60"
+            className="h-11 rounded-xl bg-surface text-sm font-semibold text-ink transition-transform active:scale-[0.98] disabled:opacity-60"
           >
             {finishing
               ? "Finishing…"
@@ -110,7 +110,7 @@ function LiveShift() {
             setNow(new Date());
             setConfirming(true);
           }}
-          className="flex h-11 items-center justify-center gap-2 rounded-xl bg-white/15 text-sm font-semibold transition-colors hover:bg-white/25"
+          className="flex h-11 items-center justify-center gap-2 rounded-xl bg-on-module/15 text-sm font-semibold transition-colors hover:bg-on-module/25"
         >
           <Square className="size-3.5 fill-current" aria-hidden="true" />
           Finish shift

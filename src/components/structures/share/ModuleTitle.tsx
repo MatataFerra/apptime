@@ -38,7 +38,7 @@ function ModuleTitle({ title, subtitle, module, theme, aside }: Props) {
         {Icon && banded ? (
           <span
             className={cn(
-              "flex size-13 shrink-0 items-center justify-center rounded-2xl text-white",
+              "flex size-13 shrink-0 items-center justify-center rounded-2xl text-on-module",
               colors.strong
             )}
           >

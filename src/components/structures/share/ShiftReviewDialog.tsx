@@ -149,7 +149,7 @@ function ShiftReviewDialog({
             type="submit"
             size="lg"
             form={formId}
-            classes={cn("w-full text-white hover:opacity-90", colors.strong)}
+            classes={cn("w-full text-on-module hover:opacity-90", colors.strong)}
           >
             Save shift
           </Button>

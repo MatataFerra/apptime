@@ -135,7 +135,7 @@ function Calculator() {
                 className={cn(
                   "h-11 rounded-xl border text-[0.9375rem] font-semibold transition-colors",
                   n === days
-                    ? "border-insight bg-insight text-white"
+                    ? "border-insight bg-insight text-on-module"
                     : "border-border-strong bg-surface text-ink hover:bg-surface-sunken"
                 )}
               >
