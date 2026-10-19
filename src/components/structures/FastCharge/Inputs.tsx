@@ -1,6 +1,6 @@
 "use client";
 
-import { type ChangeEvent, useEffect } from "react";
+import { type ChangeEvent, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
 import { useQueryClient } from "@tanstack/react-query";
@@ -326,7 +326,7 @@ function Inputs() {
     });
   }
 
-  const thisYear = new Date(Date.now()).getFullYear().toString();
+  const [thisYear] = useState(() => String(new Date().getFullYear()));
 
   return (
     <>

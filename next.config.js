@@ -5,6 +5,9 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')()
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Automatic memoization. Components that break the rules of React are
+  // skipped by the compiler; eslint (react-hooks) reports them as errors.
+  reactCompiler: true,
   logging: {
     fetches: {
       fullUrl: true,

@@ -9,9 +9,9 @@ import UserService from "@/services/User";
 
 import type { TrackInputs } from "@/types/forms";
 
-import type { ContributionElement, TaxElement } from "@/store/useTaxOrContributionStore";
-
 import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
+
+import type { ContributionElement, TaxElement } from "@/store/useTaxOrContributionStore";
 
 type UpdateTrackData = Partial<TrackInputs> & {
   taxes: TaxElement[];

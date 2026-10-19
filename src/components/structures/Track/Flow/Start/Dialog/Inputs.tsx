@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,7 +26,7 @@ const InputsSchema = z.object({
 
 function ShiftStartInputs() {
   const { setData, setErrors } = useShiftData((state) => state);
-  const { register, watch } = useForm({
+  const { register, control } = useForm({
     resolver: zodResolver(InputsSchema),
     defaultValues: {
       hourValue: "",
@@ -34,8 +34,8 @@ function ShiftStartInputs() {
     },
   });
 
-  const hourValue = watch("hourValue");
-  const unpaidBreaks = watch("unpaidBreaks");
+  const hourValue = useWatch({ control, name: "hourValue" });
+  const unpaidBreaks = useWatch({ control, name: "unpaidBreaks" });
 
   useEffect(() => {
     if (!hourValue) setErrors(true);

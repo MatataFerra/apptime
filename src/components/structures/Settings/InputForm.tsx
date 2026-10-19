@@ -40,17 +40,14 @@ function InputForm({
   const [hover, setOnHover] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  useEffect(() => {
-    if (hover) {
-      inputRef.current?.focus();
-    }
-  }, [hover]);
+  // Only one field is edited at a time: opening another one closes this one.
+  const editing = hover && currentInput === id;
 
   useEffect(() => {
-    if (currentInput !== id) {
-      setOnHover(false);
+    if (editing) {
+      inputRef.current?.focus();
     }
-  }, [currentInput, id]);
+  }, [editing]);
 
   function onDataChange(e: ChangeEvent<HTMLInputElement>) {
     onHandleChange && onHandleChange(e);
@@ -59,7 +56,7 @@ function InputForm({
   return (
     <>
       <Stack as="div" grid cols={"1fr auto"} alignItems="center" classes="group min-h-7 w-full">
-        {hover ? (
+        {editing ? (
           children ? (
             <>{children}</>
           ) : (
@@ -91,14 +88,14 @@ function InputForm({
             )}
           </Stack>
         )}
-        {!hover ? (
+        {!editing ? (
           <Button
             type="button"
             size="xs"
             variant="info"
             classes="invisible ml-auto animate-fade-out justify-self-end transition-all group-hover:visible group-hover:animate-fade-in active:shadow-button-inner"
             onClick={() => {
-              setOnHover(!hover);
+              setOnHover(!editing);
               setCurrentInput(id);
             }}
           >
@@ -110,7 +107,7 @@ function InputForm({
             size="xs"
             variant="success"
             classes="invisible ml-auto animate-fade-out justify-self-end transition-all group-hover:visible group-hover:animate-fade-in active:shadow-button-inner"
-            onClick={() => setOnHover(!hover)}
+            onClick={() => setOnHover(!editing)}
           >
             Save
           </Button>

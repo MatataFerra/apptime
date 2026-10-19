@@ -7,7 +7,6 @@ import UserService from "@/services/User";
 
 import { WEEK_DAYS } from "@/utils/constants";
 import { SETTINGS_FIELDS } from "@/utils/constants/settings";
-
 import { revalidateSettingsPage } from "@/utils/helpers/revalidateShiftPages";
 
 const SettingsSchema = z.object({

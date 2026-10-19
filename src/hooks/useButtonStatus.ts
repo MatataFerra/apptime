@@ -1,63 +1,15 @@
-import { useEffect, useState } from "react";
-
 import useTrack from "@/hooks/useTrack";
 
+const ENABLED = { disabled: false, apply_variant: true };
+const DISABLED = { disabled: true, apply_variant: false };
+
+/** Start is enabled when no shift is running, Finish when one is. */
 function useButtonStatus() {
   const { isShiftActive } = useTrack();
 
-  const [btnStatus, setbtnStatus] = useState({
-    startButton: {
-      disabled: true,
-      apply_variant: false,
-    },
-    finishButton: {
-      disabled: true,
-      apply_variant: false,
-    },
-  });
-
-  useEffect(() => {
-    if (typeof isShiftActive === "undefined")
-      return setbtnStatus((prev) => ({
-        ...prev,
-        startButton: {
-          disabled: false,
-          apply_variant: true,
-        },
-        finishButton: {
-          disabled: true,
-          apply_variant: false,
-        },
-      }));
-
-    if (!isShiftActive) {
-      return setbtnStatus((prev) => ({
-        ...prev,
-        startButton: {
-          disabled: false,
-          apply_variant: true,
-        },
-        finishButton: {
-          disabled: true,
-          apply_variant: false,
-        },
-      }));
-    }
-
-    return setbtnStatus((prev) => ({
-      ...prev,
-      startButton: {
-        disabled: true,
-        apply_variant: false,
-      },
-      finishButton: {
-        disabled: false,
-        apply_variant: true,
-      },
-    }));
-  }, [isShiftActive]);
-
-  return btnStatus;
+  return isShiftActive
+    ? { startButton: DISABLED, finishButton: ENABLED }
+    : { startButton: ENABLED, finishButton: DISABLED };
 }
 
 export default useButtonStatus;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams, useRouter } from "next/navigation";
@@ -39,7 +39,7 @@ function ResetForm() {
     handleSubmit,
     register,
     setFocus,
-    watch,
+    control,
     setError,
     clearErrors,
     formState: { errors },
@@ -48,7 +48,7 @@ function ResetForm() {
   });
 
   const { token } = useParams<Params>();
-  const passwordWatched = watch("password");
+  const passwordWatched = useWatch({ control, name: "password" }) ?? "";
   const { passedErrors } = usePasswordErrors(passwordWatched);
   const [changeType, setChangeType] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);

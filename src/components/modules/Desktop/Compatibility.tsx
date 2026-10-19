@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 import { ChartColumn, Package, Smartphone, Timer } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -19,17 +19,21 @@ const FEATURES: { key: string; theme: ModuleTheme; icon: typeof Timer }[] = [
   { key: "pay", theme: "insight", icon: ChartColumn },
 ];
 
+function subscribeToNothing() {
+  return () => {};
+}
+
+function readOrigin() {
+  return window.location.origin;
+}
+
 /**
  * Temporary landing for desktop browsers: the app only runs on phones,
  * so this explains it and hands the link over with a QR code.
  */
 function Compatibility() {
   const t = useTranslations("no-mobile");
-  const [url, setUrl] = useState("");
-
-  useEffect(() => {
-    setUrl(window.location.origin);
-  }, []);
+  const url = useSyncExternalStore(subscribeToNothing, readOrigin, () => "");
 
   return (
     <div className="relative isolate flex min-h-dvh flex-col overflow-hidden bg-background text-ink">

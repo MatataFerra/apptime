@@ -1,7 +1,5 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
-
 import type { Hourly } from "@prisma/client";
 import dynamic from "next/dynamic";
 
@@ -40,13 +38,8 @@ function HourlyRow({ shift }: { shift: Hourly }) {
 
   const shortDate = useHumanizeDate({ date: shift.startDate, typeFormat: "short" });
 
-  const calculateEarnings = useCallback((shift: Hourly) => {
-    return new ShiftService(shift).calculateEarnings();
-  }, []);
-
-  const getTimeDifference = useMemo(() => {
-    return ShiftService.differenceInHHmm(shift.startDate, shift?.endDate);
-  }, [shift?.endDate, shift.startDate]);
+  const earnings = new ShiftService(shift).calculateEarnings();
+  const getTimeDifference = ShiftService.differenceInHHmm(shift.startDate, shift?.endDate);
 
   return (
     <TableDialog
@@ -62,7 +55,7 @@ function HourlyRow({ shift }: { shift: Hourly }) {
         <TableElement>
           {getTimeDifference.diff ? `${String(getTimeDifference.text)}` : "..."}
         </TableElement>
-        <TableElement>{formatMoney(calculateEarnings(shift))}</TableElement>
+        <TableElement>{formatMoney(earnings)}</TableElement>
         <TableElement align="center">
           {shift?.isPublicHoliday ? (
             <span className="inline-flex rounded-full bg-fast-soft px-2 py-0.5 text-xs font-semibold text-fast-ink">

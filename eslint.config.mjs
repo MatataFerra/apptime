@@ -56,18 +56,6 @@ const config = [
       "import/no-duplicates": "warn",
     },
   },
-  {
-    // React Compiler rules from eslint-plugin-react-hooks 7 (new with Next 16).
-    // They flag patterns that predate the upgrade; kept visible as warnings
-    // and fixed in the logic refactor.
-    rules: {
-      "react-hooks/set-state-in-effect": "warn",
-      "react-hooks/refs": "warn",
-      "react-hooks/purity": "warn",
-      "react-hooks/preserve-manual-memoization": "warn",
-      "react-hooks/incompatible-library": "warn",
-    },
-  },
   prettier,
 ];
 
