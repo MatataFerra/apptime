@@ -6,7 +6,11 @@
       "dom.iterable",
       "esnext"
     ],
-    "types": ["@testing-library/jest-dom", "@testing-library/react","node"],
+    "types": [
+      "@testing-library/jest-dom",
+      "@testing-library/react",
+      "node"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -14,10 +18,10 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "paths": {
       "@/*": [
@@ -38,8 +42,10 @@
     "next-auth-extensions.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
-, "__test__/vitest.setup.js"  ],
+    ".next/types/**/*.ts",
+    "__test__/vitest.setup.js",
+    ".next/dev/types/**/*.ts"
+  ],
   "exclude": [
     "node_modules"
   ]

@@ -1,40 +1,27 @@
-import type { ReactNode } from "react";
-
-import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
+import { getMessages } from "next-intl/server";
 
-import type { LocaleParams } from "@/types";
-
+import { SUPPORTED_LOCALES } from "@/utils/constants";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
+import { isLocale } from "@/utils/helpers/locale";
 
 import "../globals.css";
 
-const Providers = dynamic(() => import("@/providers/Providers"), {
-  ssr: false,
-});
+import { Providers, Toaster } from "./lazy";
 
-const Toaster = dynamic(() => import("@/components/ui/Toast/toaster"), {
-  ssr: false,
-});
+export function generateStaticParams() {
+  return SUPPORTED_LOCALES.map((locale) => ({ locale }));
+}
 
-export default async function RootLayout({
-  children,
-  params,
-}: {
-  children: ReactNode;
-  params: LocaleParams;
-}) {
-  let messages;
-
-  try {
-    messages = (await import(`#/messages/${params.locale}.json`)).default;
-  } catch (error) {
-    redirect(PATH_NAMES.HOME);
-  }
+export default async function LocaleLayout({ children, params }: LayoutProps<"/[locale]">) {
+  const { locale } = await params;
+  if (!isLocale(locale)) redirect(PATH_NAMES.HOME);
+  // Same loader as the next-intl request config (src/i18n.ts).
+  const messages = await getMessages({ locale });
 
   return (
     <>
-      <Providers i18n={{ messages, locale: params.locale }}>{children}</Providers>
+      <Providers i18n={{ messages, locale }}>{children}</Providers>
       <Toaster />
     </>
   );

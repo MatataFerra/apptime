@@ -1,12 +1,8 @@
-import dynamic from "next/dynamic";
-
 import ModuleTitle from "@/components/structures/share/ModuleTitle";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-const ProfileCard = dynamic(() => import("@/components/structures/Settings/ProfileCard"), {
-  ssr: false,
-});
+import { ProfileCard } from "./lazy";
 
 export default async function BodyPage() {
   return (

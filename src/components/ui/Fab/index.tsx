@@ -11,7 +11,7 @@ interface Props extends Omit<React.HTMLAttributes<HTMLButtonElement>, "className
   classes?: CSSClassNames;
   text?: string;
   disabled?: boolean;
-  icon?: JSX.Element;
+  icon?: React.JSX.Element;
 }
 
 function FloatingActionButton(

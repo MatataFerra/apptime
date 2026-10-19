@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { type RefObject, useEffect, useRef } from "react";
 
 import { useOnClickOutside } from "usehooks-ts";
 
@@ -19,8 +19,8 @@ function DatalistShiftNames({
   onSelect: (name: string) => void;
 }) {
   const { isWritingName, setIsWriting } = useDatalistStore((state) => state);
-  const listNamesRef = useRef(null);
-  useOnClickOutside([listNamesRef], () => {
+  const listNamesRef = useRef<HTMLUListElement>(null);
+  useOnClickOutside([listNamesRef as RefObject<HTMLElement>], () => {
     if (isWritingName) {
       setIsWriting(false);
     }

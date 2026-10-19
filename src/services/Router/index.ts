@@ -71,6 +71,13 @@ class Router {
     return `/${locale}${endpoint}`;
   }
 
+  /** The locale the pathname starts with (`/es/track` -> `es`), if any. */
+  static localeFromPath(pathname: string) {
+    return SUPPORTED_LOCALES.find(
+      (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)
+    );
+  }
+
   static isMissingLocale(route: string): boolean {
     return SUPPORTED_LOCALES.every(
       (locale) => !route.startsWith(`/${locale}/`) && route !== `/${locale}`

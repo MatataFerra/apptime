@@ -1,5 +1,4 @@
 import _ from "lodash";
-import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { NextRequestWithAuth } from "next-auth/middleware";
 
@@ -45,17 +44,6 @@ class Utilities {
    */
   public static isServer(): boolean {
     return typeof window === "undefined";
-  }
-
-  /**
-   * @description Check if the user is using a tablet SSR support.
-   * @returns {boolean} - Returns true if the user is using a tablet.
-   */
-  public static isTablet(): boolean {
-    const userAgent = headers().get("user-agent") ?? "";
-    const isTablet = /iPad|Android (?!.*Mobile)|Tablet|Touch|(Nexus 7)|Surface/i.test(userAgent);
-
-    return isTablet;
   }
 
   /**

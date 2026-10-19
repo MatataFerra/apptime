@@ -23,9 +23,9 @@ export type TypeShift = "PRODUCTION" | "FAST" | "TRACK";
 */
 
 export type RouteParams = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 /*

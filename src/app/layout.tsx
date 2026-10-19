@@ -9,10 +9,6 @@ import "@/app/globals.css";
 
 import { bricolage, figtree, schibsted } from "./fonts";
 
-export function generateStaticParams() {
-  return [{ locale: "en" }, { locale: "de" }];
-}
-
 export const metadata = {
   title: "CasualApp",
   description: "Track your hours and see what you earn, shift by shift.",

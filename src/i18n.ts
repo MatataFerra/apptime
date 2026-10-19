@@ -1,13 +1,19 @@
-import { notFound } from "next/navigation";
 import { getRequestConfig } from "next-intl/server";
 
-import { SUPPORTED_LOCALES } from "@/utils/constants";
+import type { Locale } from "@/types";
 
-export default getRequestConfig(async ({ locale }) => {
-  // Validate that the incoming `locale` parameter is valid
-  if (!SUPPORTED_LOCALES.includes(locale as any)) notFound();
+import { isLocale } from "@/utils/helpers/locale";
+
+/**
+ * Request config for next-intl's server APIs. The client components get
+ * their messages from the `[locale]` layout through NextIntlClientProvider.
+ */
+export default getRequestConfig(async ({ requestLocale }) => {
+  const requested = await requestLocale;
+  const locale: Locale = isLocale(requested) ? requested : "en";
 
   return {
+    locale,
     messages: (await import(`../messages/${locale}.json`)).default,
     timeZone: "UTC",
   };

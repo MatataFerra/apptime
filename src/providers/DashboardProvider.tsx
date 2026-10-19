@@ -24,7 +24,7 @@ type Props = {
  */
 function DashboardProvider({ children, user }: Props) {
   const store = useRef(createDashboardStore({ user })).current;
-  const query = useQuery({
+  const { isError, isSuccess, data } = useQuery({
     queryKey: ["user", user?.email],
     queryFn: () =>
       api.getUserByEmail.bind(api)({
@@ -36,12 +36,12 @@ function DashboardProvider({ children, user }: Props) {
   });
 
   useEffect(() => {
-    if (query.isError) {
+    if (isError) {
       store.setState({ user });
-    } else {
-      query.isSuccess && store.setState({ user: query?.data?.user as UserType });
+    } else if (isSuccess) {
+      store.setState({ user: data?.user as UserType });
     }
-  }, [query, store, user]);
+  }, [isError, isSuccess, data, store, user]);
 
   return <DashboardContext.Provider value={store}>{children}</DashboardContext.Provider>;
 }

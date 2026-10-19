@@ -15,10 +15,7 @@ interface ImgProps {
 }
 
 function Img({ alt = "App time, control your time", ...props }: Omit<ImgProps, "className">) {
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <Image alt={alt} className={cm(props.classes)} {...props} />
-  );
+  return <Image alt={alt} className={cm(props.classes)} {...props} />;
 }
 
 export default Img;

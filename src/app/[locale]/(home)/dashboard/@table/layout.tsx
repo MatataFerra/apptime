@@ -1,13 +1,12 @@
-import type { PropsWithChildren, ReactElement } from "react";
-
-interface TableLayoutProps {
-  history: ReactElement;
-}
+import type { ReactNode } from "react";
 
 export default async function TableLayout({
   children,
   history,
-}: PropsWithChildren<TableLayoutProps>) {
+}: {
+  children: ReactNode;
+  history: ReactNode;
+}) {
   return (
     <>
       {children}

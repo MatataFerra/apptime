@@ -1,4 +1,4 @@
-const withNextIntl = require('next-intl/plugin')();
+const withNextIntl = require('next-intl/plugin')('./src/i18n.ts');
 const withBundleAnalyzer = require('@next/bundle-analyzer')()
 
 
@@ -18,11 +18,15 @@ const nextConfig = {
     }],
     dangerouslyAllowSVG: true,
   },
+  // VS Code dev tunnels (e.g. d33vz13z-3000.aue.devtunnels.ms). Hosts only:
+  // no scheme, no trailing slash. The app's own origin is always allowed.
+  allowedDevOrigins: ["*.aue.devtunnels.ms"],
   experimental: {
+    // Server Actions are stable; their options still live under `experimental`.
     serverActions: {
-      allowedOrigins: ["https://d33vz13z-3000.aue.devtunnels.ms/","localhost:3000"]
-    }
-  }
+      allowedOrigins: ["*.aue.devtunnels.ms"],
+    },
+  },
 };
 
 module.exports = 

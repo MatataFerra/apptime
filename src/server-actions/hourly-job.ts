@@ -1,13 +1,14 @@
 "use server";
 
 import type { Hourly } from "@prisma/client";
-import { revalidatePath } from "next/cache";
 
 import ShiftService from "@/services/Shift";
 import HourlyService from "@/services/Shift/Hourly";
 import UserService from "@/services/User";
 
 import type { FastChargeInputsParsed } from "@/types/forms";
+
+import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
 
 export default async function onCreateHourlyShift(data: FastChargeInputsParsed) {
   const currentUser = await UserService.getSessionUser();
@@ -66,7 +67,7 @@ export default async function onCreateHourlyShift(data: FastChargeInputsParsed) 
 
     const response = await hourlyService.create();
 
-    revalidatePath("/dashboard", "page");
+    revalidateShiftPages();
 
     return {
       response: typeof response !== "string",

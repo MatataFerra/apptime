@@ -8,6 +8,7 @@ import { ProfileUpdateSchema, RouteParams } from "@/types";
 import prisma from "#/prisma/client";
 
 export async function PUT(req: NextRequest, { params }: RouteParams) {
+  const { id } = await params;
   const body: Profile = await req.json();
   const parsedBody = ProfileUpdateSchema.safeParse(body);
 
@@ -26,7 +27,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
   try {
     const updatedProfile = await prisma.profile.update({
       where: {
-        id: Number(params.id),
+        id: Number(id),
       },
       data: {
         ...parsedBody.data,

@@ -1,8 +1,7 @@
 import { compare } from "bcryptjs";
 import assign from "lodash/assign";
 import cloneDeep from "lodash/cloneDeep";
-import { NextApiRequest, NextApiResponse } from "next";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
@@ -11,10 +10,12 @@ import AuthService from "@/services/Auth";
 import i18n from "@/services/i18n";
 import UserService from "@/services/User";
 
-async function authOptions(req: NextApiRequest & NextRequest, res: NextResponse & NextApiResponse) {
+type RouteContext = { params: Promise<{ nextauth: string[] }> };
+
+async function authOptions(req: NextRequest, context: RouteContext) {
   const locale = new i18n("en").getLocale(req);
 
-  return await NextAuth(req, res, {
+  return await NextAuth(req, context, {
     providers: [
       CredentialsProvider({
         name: "email and password",
@@ -106,10 +107,10 @@ async function authOptions(req: NextApiRequest & NextRequest, res: NextResponse 
   });
 }
 
-export async function GET(req: NextApiRequest & NextRequest, res: NextResponse & NextApiResponse) {
-  return await authOptions(req, res);
+export async function GET(req: NextRequest, context: RouteContext) {
+  return await authOptions(req, context);
 }
 
-export async function POST(req: NextApiRequest & NextRequest, res: NextResponse & NextApiResponse) {
-  return await authOptions(req, res);
+export async function POST(req: NextRequest, context: RouteContext) {
+  return await authOptions(req, context);
 }
