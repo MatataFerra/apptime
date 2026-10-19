@@ -1,9 +1,16 @@
+import { HydrationBoundary } from "@tanstack/react-query";
+
+import { prefetchUserData } from "@/services/Prefetch";
+
 import ModuleShell from "@/components/Layout/ModuleShell";
 import UserInfo from "@/components/structures/SheetHamMenu/UserInfo";
 
 import { Header, SheetHamMenu } from "./lazy";
 
 export default async function HomeLayout({ children }: LayoutProps<"/[locale]">) {
+  // Runs on full page loads; client-side navigation keeps the layout and its cache.
+  const { profile, state } = await prefetchUserData();
+
   return (
     <ModuleShell
       header={
@@ -12,12 +19,12 @@ export default async function HomeLayout({ children }: LayoutProps<"/[locale]">)
           classes="sticky top-0 z-10 h-16 bg-(--band) pb-0! transition-colors"
         >
           <SheetHamMenu>
-            <UserInfo />
+            <UserInfo user={profile} />
           </SheetHamMenu>
         </Header>
       }
     >
-      {children}
+      <HydrationBoundary state={state}>{children}</HydrationBoundary>
     </ModuleShell>
   );
 }

@@ -4,8 +4,6 @@ import Stack from "@/components/ui/Stack";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-export const dynamic = "force-static";
-
 export default async function Incomes() {
   return (
     <Stack orientation="vertical" spacing={6}>

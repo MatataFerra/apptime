@@ -1,5 +1,3 @@
-import UserService from "@/services/User";
-
 import Image from "@/components/ui/Image";
 
 function initials(name?: string | null, email?: string | null) {
@@ -8,12 +6,12 @@ function initials(name?: string | null, email?: string | null) {
   return (parts.length > 1 ? parts[0][0] + parts[1][0] : source.slice(0, 2)).toUpperCase();
 }
 
-/** Who is signed in, at the top of the side menu. */
-async function UserInfo() {
-  // The menu header is decorative: if the user can't be loaded, show the
-  // default header instead of breaking the whole page.
-  const user = await UserService.getSessionUser().catch(() => null);
+type Props = {
+  user: { name?: string | null; email?: string | null; image?: string | null } | null;
+};
 
+/** Who is signed in, at the top of the side menu. Falls back to a plain title. */
+function UserInfo({ user }: Props) {
   if (!user) {
     return <span className="text-[0.9375rem] font-semibold text-ink">Menu</span>;
   }

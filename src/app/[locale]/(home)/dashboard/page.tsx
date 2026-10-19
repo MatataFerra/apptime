@@ -5,8 +5,6 @@ import Stack from "@/components/ui/Stack";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 import { isLocale } from "@/utils/helpers/locale";
 
-export const dynamic = "force-static";
-
 export default async function HistoryShift(props: PageProps<"/[locale]/dashboard">) {
   const { locale: segment } = await props.params;
   const params = { locale: isLocale(segment) ? segment : "en" } as const;

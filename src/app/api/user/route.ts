@@ -79,30 +79,23 @@ export async function GET(req: NextRequest) {
     }
 
     if (parsedSearchParams.data.email && onlyParam.length === 0) {
-      if (user.role !== "ADMIN" || user.email !== checkToken?.email) {
-        const userFiltered = await UserService.removeProps(user, ["password"]);
-        return NextResponse.json(
-          {
-            message: "success",
-            response: true,
-            user: { ...userFiltered },
-          },
-          { status: 200 }
-        );
-      }
-
+      // The password hash never leaves the server (it used to for an admin reading their own user).
+      const userFiltered = await UserService.removeProps(user, ["password"]);
       return NextResponse.json(
         {
           message: "success",
           response: true,
-          user,
+          user: { ...userFiltered },
         },
         { status: 200 }
       );
     }
 
     if (parsedSearchParams.data.email && onlyParam.length > 0) {
-      const userFiltered = await UserService.filterUserProps(user, onlyParam);
+      const userFiltered = await UserService.filterUserProps(
+        user,
+        onlyParam.filter((prop) => prop !== "password")
+      );
 
       return NextResponse.json(
         {
@@ -118,7 +111,7 @@ export async function GET(req: NextRequest) {
       {
         message: "success",
         response: true,
-        user,
+        user: await UserService.removeProps(user, ["password"]),
       },
       { status: 200 }
     );
