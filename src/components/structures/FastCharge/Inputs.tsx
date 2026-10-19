@@ -4,6 +4,8 @@ import { type ChangeEvent, useEffect, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { RotateCcw } from "lucide-react";
 
 import Toast from "@/services/Toast";
 
@@ -32,6 +34,7 @@ import type { SalaryItems } from "@/hooks/useSalaryItems";
 import useShiftNames from "@/hooks/useShiftNames";
 import useUser from "@/hooks/useUser";
 
+import useRepeatPrefill from "./useRepeatPrefill";
 import onCreateHourlyShift from "@/server-actions/hourly-job";
 import { useFastChargeStore } from "@/store/useFastChargeStore";
 import { useHourlyTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
@@ -84,6 +87,9 @@ function Inputs() {
   const { data: hourly } = useHourlyShifts();
   const { data: production } = useProductionShifts();
   const { names } = useShiftNames({ hourly, production }, nameWatch);
+  const repeatedFrom = useRepeatPrefill(hourly, (name, value) =>
+    setValue(name, value as never, { shouldValidate: true, shouldDirty: true })
+  );
 
   /*
     set when user is typing to show datalist
@@ -353,6 +359,16 @@ function Inputs() {
         wrap
         onSubmit={handleSubmit(onSubmit)}
       >
+        {repeatedFrom ? (
+          <p
+            role="status"
+            className="flex w-full items-center gap-2 rounded-xl bg-fast-soft px-3.5 py-2.5 text-sm text-fast-ink"
+          >
+            <RotateCcw className="size-4 shrink-0" aria-hidden="true" />
+            Filled in from your shift on {format(new Date(repeatedFrom.startDate), "EEEE d MMM")}.
+            Check it and save.
+          </p>
+        ) : null}
         <Stack as="fieldset" orientation="vertical" classes="relative w-full">
           <Input
             label="Name of your job"

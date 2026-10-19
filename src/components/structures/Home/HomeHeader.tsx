@@ -28,9 +28,7 @@ function HomeHeader({ locale = "en" }: { locale?: Locale }) {
         <span className="text-[0.9375rem] text-ink-muted first-letter:uppercase">
           {format(now, "EEEE, MMMM", { locale: dateLocale })}
         </span>
-        <h1 className="display-title text-[4.75rem] leading-[0.85] text-ink">
-          {format(now, "d")}
-        </h1>
+        <h1 className="display-title text-[4.75rem] leading-[0.85] text-ink">{format(now, "d")}</h1>
       </div>
       <p className="mb-1.5 max-w-[11rem] text-right text-[0.9375rem] text-pretty text-ink-muted">
         {name ? `Hi ${name}, ` : "Welcome, "}

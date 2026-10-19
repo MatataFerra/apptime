@@ -59,7 +59,9 @@ export function shiftEarnings(shift: AnyShift) {
 function closedIn<T extends AnyShift>(shifts: T[] | undefined | null, from: Date, to: Date) {
   return (shifts ?? []).filter((shift) => {
     const date = shiftDate(shift);
-    return shift.isClosed && !isNaN(date.valueOf()) && isWithinInterval(date, { start: from, end: to });
+    return (
+      shift.isClosed && !isNaN(date.valueOf()) && isWithinInterval(date, { start: from, end: to })
+    );
   });
 }
 
@@ -139,13 +141,18 @@ export function compareWithPreviousMonth(
   const prevMonthEnd = endOfMonth(prevStart);
   const sameDay = addDays(prevStart, now.getDate() - 1);
   const prevEnd = new Date(
-    Math.min(prevMonthEnd.valueOf(), sameDay.valueOf() + (now.valueOf() - startOfDay(now).valueOf()))
+    Math.min(
+      prevMonthEnd.valueOf(),
+      sameDay.valueOf() + (now.valueOf() - startOfDay(now).valueOf())
+    )
   );
   const previous = summarizePeriod(hourly, production, prevStart, prevEnd);
   const previousFull = summarizePeriod(hourly, production, prevStart, prevMonthEnd);
 
   const change =
-    previous.earned > 0 ? Math.round(((current.earned - previous.earned) / previous.earned) * 100) : null;
+    previous.earned > 0
+      ? Math.round(((current.earned - previous.earned) / previous.earned) * 100)
+      : null;
   const shareOfPrevious =
     previousFull.earned > 0 ? Math.round((current.earned / previousFull.earned) * 100) : null;
 
@@ -168,11 +175,16 @@ export function usualShiftMinutes(hourly: HourlyType[] | undefined | null, sampl
   if (durations.length < 3) return null;
 
   const mid = Math.floor(durations.length / 2);
-  return durations.length % 2 ? durations[mid] : Math.round((durations[mid - 1] + durations[mid]) / 2);
+  return durations.length % 2
+    ? durations[mid]
+    : Math.round((durations[mid - 1] + durations[mid]) / 2);
 }
 
 /** Earnings of an open hourly shift up to `now`, with its own rate and breaks. */
-export function runningShiftEarnings(shift: Partial<HourlyType> | null | undefined, now = new Date()) {
+export function runningShiftEarnings(
+  shift: Partial<HourlyType> | null | undefined,
+  now = new Date()
+) {
   if (!shift?.startDate || !shift.hourValue) return 0;
   return ShiftService.calculateEarnings({
     hourValue: shift.hourValue,

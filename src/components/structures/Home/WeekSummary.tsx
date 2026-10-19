@@ -73,7 +73,11 @@ function WeekSummary() {
           const label = `${format(day.date, "EEEE")}: ${total > 0 ? formatMoney(total) : "no shifts"}`;
 
           return (
-            <li key={day.date.toISOString()} className="flex h-full flex-col items-center gap-1" aria-label={label}>
+            <li
+              key={day.date.toISOString()}
+              className="flex h-full flex-col items-center gap-1"
+              aria-label={label}
+            >
               <div className="flex w-full flex-1 flex-col justify-end">
                 {total > 0 ? (
                   <div
@@ -97,7 +101,8 @@ function WeekSummary() {
                   <div
                     className={cn(
                       "h-1 w-full rounded-[4px] bg-ink-inverse/20",
-                      isToday && "outline-[1.5px] outline-offset-2 outline-ink-inverse outline-solid"
+                      isToday &&
+                        "outline-[1.5px] outline-offset-2 outline-ink-inverse outline-solid"
                     )}
                   />
                 )}

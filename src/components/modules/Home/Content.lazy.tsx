@@ -20,3 +20,6 @@ export const WeekSummary = dynamic(() => import("@/components/structures/Home/We
 export const LiveShift = dynamic(() => import("@/components/structures/Home/LiveShift"), {
   ssr: false,
 });
+export const RepeatShift = dynamic(() => import("@/components/structures/Home/RepeatShift"), {
+  ssr: false,
+});

@@ -13,7 +13,7 @@ const ITEMS = [
 /** The three ways to log work, each in its module colour. */
 function Features() {
   return (
-    <div className="grid w-full grid-cols-3 gap-2.5">
+    <div className="grid w-full grid-cols-3 gap-3">
       {ITEMS.map(({ path, title }) => {
         const { theme, icon: Icon } = MODULES[path];
         const colors = MODULE_THEMES[theme];
@@ -24,13 +24,13 @@ function Features() {
             href={path}
             data-testid={`option-card-${path.split("/")[1]}`}
             className={cn(
-              "flex min-h-24 flex-col justify-between gap-4 rounded-2xl px-3 py-3.5 transition-transform active:scale-[0.97]",
+              "flex min-h-28 flex-col justify-between gap-4 rounded-[20px] p-4 transition-transform active:scale-[0.97]",
               colors.soft,
               colors.ink
             )}
           >
             <Icon className="size-6" strokeWidth={1.75} aria-hidden="true" />
-            <span className="text-[0.9375rem] font-semibold">{title}</span>
+            <span className="text-[0.9375rem] leading-tight font-semibold text-balance">{title}</span>
           </Link>
         );
       })}
