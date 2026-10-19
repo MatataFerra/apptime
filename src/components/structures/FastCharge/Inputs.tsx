@@ -1,7 +1,7 @@
 "use client";
 
 import { type ChangeEvent, useEffect, useState } from "react";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -61,19 +61,24 @@ function Inputs() {
   */
   const {
     reset,
-    watch,
+    control,
     register,
     setValue,
     getValues,
     handleSubmit,
     formState: { touchedFields, errors },
   } = useFormContext<FastChargeInputs>();
+  // useWatch, not watch(): the React Compiler would memoize watch() and freeze the value.
+  const nameWatch = useWatch({ control, name: "name" });
+  const hourValueWatch = useWatch({ control, name: "hour-value" });
+  const isPublicHolidayWatch = useWatch({ control, name: "is-public-holiday" });
+  const isPublicHolidayWorkedWatch = useWatch({ control, name: "is-public-holiday-worked" });
 
   const queryClient = useQueryClient();
   const { data: user } = useUser();
   const { data: hourly } = useHourlyShifts();
   const { data: production } = useProductionShifts();
-  const { names } = useShiftNames({ hourly, production }, watch("name"));
+  const { names } = useShiftNames({ hourly, production }, nameWatch);
 
   /*
     set when user is typing to show datalist
@@ -112,8 +117,6 @@ function Inputs() {
   /*
     Watch the values of the form fields
   */
-
-  const hourValueWatch = watch("hour-value");
 
   useEffect(() => {
     const data = {
@@ -354,7 +357,7 @@ function Inputs() {
           />
           <DatalistShiftNames
             data={names}
-            value={watch("name")}
+            value={nameWatch}
             onSelect={(name) => {
               setValue("name", name, { shouldValidate: true, shouldDirty: true });
               setStoreValue({ name });
@@ -450,7 +453,7 @@ function Inputs() {
         <input type="checkbox" hidden {...register("is-public-holiday-worked")} />
         <div className="mt-2 w-full">
           <HolidayChoice
-            value={toHolidayValue(watch("is-public-holiday"), watch("is-public-holiday-worked"))}
+            value={toHolidayValue(isPublicHolidayWatch, isPublicHolidayWorkedWatch)}
             onChange={(next) => {
               const { isPublicHoliday, publicHolidayWorked } = fromHolidayValue(next);
               setValue("is-public-holiday", isPublicHoliday);

@@ -15,6 +15,16 @@ const config = [
     plugins: { "simple-import-sort": simpleImportSort },
     rules: {
       "no-console": "warn",
+      // With the React Compiler, watch() results get memoized and stop updating
+      // (the compiler's own check only sees useForm, not useFormContext).
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "VariableDeclarator[init.callee.name=/^useForm(Context)?$/] > ObjectPattern > Property[key.name='watch']",
+          message: "Use useWatch({ control, name }) instead of watch(): the React Compiler freezes watch() values.",
+        },
+      ],
       "func-style": ["error", "declaration", { allowArrowFunctions: false }],
       "@tanstack/query/exhaustive-deps": "error",
       "simple-import-sort/exports": "error",

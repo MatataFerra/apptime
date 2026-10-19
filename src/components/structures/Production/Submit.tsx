@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 
 import { isBefore } from "date-fns";
 
@@ -17,9 +17,10 @@ function Submit() {
     setFormError,
     values: { name },
   } = useProductionForm((state) => state);
-  const { setError, setFocus, watch, clearErrors } = useFormContext();
-  const startDateWatch = watch("start-date");
-  const finishDateWatch = watch("finish-date");
+  const { setError, setFocus, control, clearErrors } = useFormContext();
+  // useWatch, not watch(): the React Compiler would memoize watch() and freeze the value.
+  const startDateWatch = useWatch({ control, name: "start-date" });
+  const finishDateWatch = useWatch({ control, name: "finish-date" });
 
   function onOpenDialogAndCheckInputs() {
     if (isBefore(new Date(finishDateWatch), new Date(startDateWatch))) {
