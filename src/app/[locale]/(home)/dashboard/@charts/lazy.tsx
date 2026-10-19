@@ -3,13 +3,8 @@
 import dynamic from "next/dynamic";
 
 import Skeleton from "@/components/ui/Skeleton";
-import Stack from "@/components/ui/Stack";
 
-export const CarouselChart = dynamic(() => import("@/components/modules/Dashboard/CarouselChart"), {
+export const Insights = dynamic(() => import("@/components/structures/Dashboard/Insights"), {
   ssr: false,
-  loading: () => (
-    <Stack classes="h-[500px] w-full overflow-hidden">
-      <Skeleton classes="mx-auto mt-8 h-full w-full max-w-xl" />
-    </Stack>
-  ),
+  loading: () => <Skeleton classes="h-72 w-full rounded-[20px]" />,
 });

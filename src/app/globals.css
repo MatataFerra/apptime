@@ -63,8 +63,9 @@
   --insight-ink: #2b4aa8;
 
   /* charts */
+  /* chart series: hourly / per piece. Validated for CVD separation (dataviz validator) */
   --chart-1: #0e7a57;
-  --chart-2: #9d3d6b;
+  --chart-2: #d4739f;
   --chart-3: #8fb3a4;
   --chart-4: #c98a2b;
   --chart-5: #6b7fd7;
@@ -114,8 +115,8 @@
   --insight-soft: #1f2747;
   --insight-ink: #c2cbf7;
 
-  --chart-1: #3ccf96;
-  --chart-2: #e48fb5;
+  --chart-1: #2aa878;
+  --chart-2: #ad4f7e;
   --chart-3: #5f8a78;
   --chart-4: #e3a74a;
   --chart-5: #8d9ef0;

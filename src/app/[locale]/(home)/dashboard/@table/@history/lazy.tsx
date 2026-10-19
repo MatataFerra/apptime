@@ -3,16 +3,8 @@
 import dynamic from "next/dynamic";
 
 import Skeleton from "@/components/ui/Skeleton";
-import Stack from "@/components/ui/Stack";
 
-export const TableHistory = dynamic(() => import("@/components/modules/Dashboard/TableHistory"), {
+export const HistoryList = dynamic(() => import("@/components/structures/Dashboard/History/List"), {
   ssr: false,
-  loading: () => (
-    <Stack
-      orientation="vertical"
-      classes="h-fit max-h-60 min-h-60 w-full overflow-y-scroll rounded-lg border border-border bg-surface"
-    >
-      <Skeleton classes="h-full w-full" />
-    </Stack>
-  ),
+  loading: () => <Skeleton classes="h-72 w-full rounded-[20px]" />,
 });

@@ -8,9 +8,9 @@ export default async function TableLayout({
   history: ReactNode;
 }) {
   return (
-    <>
+    <section className="flex flex-col gap-3">
       {children}
       {history}
-    </>
+    </section>
   );
 }
