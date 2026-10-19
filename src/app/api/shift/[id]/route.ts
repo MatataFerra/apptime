@@ -1,5 +1,4 @@
 import { Hourly, Prisma, Production } from "@prisma/client";
-import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 import ErrorFactory from "@/services/Error/factory";
@@ -10,6 +9,8 @@ import { BaseShiftSchema, RouteParams, TypeShift } from "@/types";
 import { isProductionShift } from "@/utils/helpers/isProductionShift";
 
 import prisma from "#/prisma/client";
+
+import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
 
 export async function PUT(req: NextRequest, { params }: RouteParams) {
   const { id } = await params;
@@ -59,7 +60,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       );
     }
 
-    revalidatePath("/", "page");
+    revalidateShiftPages();
 
     return NextResponse.json(
       {

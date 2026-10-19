@@ -2,7 +2,6 @@
 
 import type { Hourly } from "@prisma/client";
 import isEmpty from "lodash/isEmpty";
-import { revalidatePath } from "next/cache";
 
 import ShiftService from "@/services/Shift";
 import HourlyService from "@/services/Shift/Hourly";
@@ -11,6 +10,8 @@ import UserService from "@/services/User";
 import type { TrackInputs } from "@/types/forms";
 
 import type { ContributionElement, TaxElement } from "@/store/useTaxOrContributionStore";
+
+import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
 
 type UpdateTrackData = Partial<TrackInputs> & {
   taxes: TaxElement[];
@@ -71,8 +72,7 @@ export default async function onUpdateTrackJob(data: UpdateTrackData, shiftId: n
 
     const response = await hourlyService.update(data.id!);
 
-    revalidatePath("/dashboard", "page");
-    revalidatePath("/[locale]/(home)/dashboard/@table/@history/page", "page");
+    revalidateShiftPages();
 
     return {
       response: typeof response !== "string",

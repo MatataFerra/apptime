@@ -1,13 +1,14 @@
 "use server";
 
 import type { Production } from "@prisma/client";
-import { revalidatePath } from "next/cache";
 
 import ShiftService from "@/services/Shift";
 import ProductionService from "@/services/Shift/Production";
 import UserService from "@/services/User";
 
 import type { ProductionInputsParsed } from "@/types/forms";
+
+import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
 
 export default async function onCreateProductionShift(data: ProductionInputsParsed) {
   const currentUser = await UserService.getSessionUser();
@@ -66,7 +67,7 @@ export default async function onCreateProductionShift(data: ProductionInputsPars
 
     const response = await productionService.create();
 
-    revalidatePath("/dashboard", "page");
+    revalidateShiftPages();
 
     return {
       response: typeof response !== "string",

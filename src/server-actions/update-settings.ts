@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import ErrorFactory from "@/services/Error/factory";
@@ -8,6 +7,8 @@ import UserService from "@/services/User";
 
 import { WEEK_DAYS } from "@/utils/constants";
 import { SETTINGS_FIELDS } from "@/utils/constants/settings";
+
+import { revalidateSettingsPage } from "@/utils/helpers/revalidateShiftPages";
 
 const SettingsSchema = z.object({
   name: z.string(),
@@ -79,7 +80,7 @@ export default async function onUpdateSettings(values: typeof SETTINGS_FIELDS) {
     return ErrorFactory.createError("SettingsNotUpdated");
   }
 
-  revalidatePath("/settings", "page");
+  revalidateSettingsPage();
 
   return updateSettings;
 }

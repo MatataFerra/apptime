@@ -1,5 +1,4 @@
 import { Hourly, Prisma } from "@prisma/client";
-import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 import ErrorFactory from "@/services/Error/factory";
@@ -8,6 +7,8 @@ import ShiftService from "@/services/Shift";
 import { HourlyUpdateSchema, RouteParams } from "@/types";
 
 import prisma from "#/prisma/client";
+
+import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
 
 export async function PUT(req: NextRequest, { params }: RouteParams) {
   const { id } = await params;
@@ -50,7 +51,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       );
     }
 
-    revalidatePath("/", "page");
+    revalidateShiftPages();
 
     return NextResponse.json(
       {

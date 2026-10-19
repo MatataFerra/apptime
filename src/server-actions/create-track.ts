@@ -1,12 +1,13 @@
 "use server";
 
 import type { Hourly } from "@prisma/client";
-import { revalidatePath } from "next/cache";
 
 import ShiftService from "@/services/Shift";
 import UserService from "@/services/User";
 
 import { HourlyCreateSchema } from "@/types";
+
+import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
 
 export default async function onCreateTrackJob(data: Omit<Hourly, "id">) {
   const currentUser = await UserService.getSessionUser();
@@ -29,7 +30,7 @@ export default async function onCreateTrackJob(data: Omit<Hourly, "id">) {
   try {
     const shift = await new ShiftService(shiftTransform).create<Hourly>();
 
-    revalidatePath("/dashboard", "page");
+    revalidateShiftPages();
 
     return {
       response: true,

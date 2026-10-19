@@ -1,12 +1,13 @@
 "use server";
 
 import type { Tax } from "@prisma/client";
-import { revalidatePath } from "next/cache";
 
 import ShiftService from "@/services/Shift";
 import UserService from "@/services/User";
 
 import type { HourlyType, ProductionType } from "@/types";
+
+import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
 
 export default async function onEditShift(data: ProductionType | HourlyType, taxes?: Tax[] | null) {
   const currentUser = await UserService.getSessionUser();
@@ -26,7 +27,7 @@ export default async function onEditShift(data: ProductionType | HourlyType, tax
       deleteTaxes: taxes ?? [],
     });
 
-    revalidatePath("/[locale]/(home)/dashboard", "page");
+    revalidateShiftPages();
 
     return updateShift;
   } catch (error) {
