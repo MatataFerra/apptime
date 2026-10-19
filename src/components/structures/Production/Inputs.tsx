@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -59,12 +59,20 @@ function Inputs() {
   const {
     handleSubmit,
     register,
-    watch,
+    control,
     reset,
     setValue,
     getValues,
     formState: { errors },
   } = useFormContext<ProductionInputs>();
+  // useWatch, not watch(): the React Compiler would memoize watch() and freeze the value.
+  const nameWatch = useWatch({ control, name: "name" });
+  const startDateWatch = useWatch({ control, name: "start-date" });
+  const finishDateWatch = useWatch({ control, name: "finish-date" });
+  const itemValueWatch = useWatch({ control, name: "item-value" });
+  const itemQuantityWatch = useWatch({ control, name: "item-quantity" });
+  const isPublicHolidayWatch = useWatch({ control, name: "is-public-holiday" });
+  const isWorkedWatch = useWatch({ control, name: "is-worked" });
 
   /*
     observe when the submit is done
@@ -75,7 +83,7 @@ function Inputs() {
   const { data: user } = useUser();
   const { data: hourly } = useHourlyShifts();
   const { data: production } = useProductionShifts();
-  const { names } = useShiftNames({ hourly, production }, watch("name"));
+  const { names } = useShiftNames({ hourly, production }, nameWatch);
 
   /*
     set when user is typing to show datalist
@@ -95,11 +103,6 @@ function Inputs() {
   /*
     Watch the values of the form fields
   */
-
-  const startDateWatch = watch("start-date");
-  const finishDateWatch = watch("finish-date");
-  const itemValueWatch = watch("item-value");
-  const itemQuantityWatch = watch("item-quantity");
 
   useEffect(() => {
     const data = {
@@ -322,7 +325,7 @@ function Inputs() {
           />
           <DatalistShiftNames
             data={names}
-            value={watch("name")}
+            value={nameWatch}
             onSelect={(name) => {
               setValue("name", name, { shouldValidate: true, shouldDirty: true });
               setStoreValues({ name });
@@ -392,7 +395,7 @@ function Inputs() {
         <input type="checkbox" hidden {...register("is-worked")} />
         <div className="mt-2 w-full">
           <HolidayChoice
-            value={toHolidayValue(watch("is-public-holiday"), watch("is-worked"))}
+            value={toHolidayValue(isPublicHolidayWatch, isWorkedWatch)}
             onChange={(next) => {
               const { isPublicHoliday, publicHolidayWorked } = fromHolidayValue(next);
               setValue("is-public-holiday", isPublicHoliday);

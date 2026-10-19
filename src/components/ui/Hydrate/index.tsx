@@ -1,6 +1,6 @@
 "use client";
 
-import { type PropsWithChildren, useEffect, useState } from "react";
+import { type PropsWithChildren, useEffect, useRef } from "react";
 
 import every from "lodash/every";
 import isObject from "lodash/isObject";
@@ -31,16 +31,16 @@ type Props<T> = {
 };
 
 function Hydrate<T>({ data, store, loading = false, children }: PropsWithChildren<Props<T>>) {
-  const [isHydrated, setIsHydrated] = useState(false);
+  // Hydrates the store once, with the first non-empty data.
+  const hydrated = useRef(false);
   useEffect(() => {
-    if (loading) return;
-    if (isHydrated) return;
+    if (loading || hydrated.current) return;
 
     if (!isEmptyDeep(data)) {
       hydrateStore(store, data);
-      setIsHydrated(true);
+      hydrated.current = true;
     }
-  }, [data, loading, store, isHydrated]);
+  }, [data, loading, store]);
 
   return <>{children}</>;
 }

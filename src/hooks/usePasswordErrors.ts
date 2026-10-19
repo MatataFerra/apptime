@@ -1,33 +1,19 @@
-import { useEffect, useState } from "react";
-
 import Password from "@/services/Auth/password";
 
 import { PassedErrors } from "@/types";
 
+/** Which password rules are still failing, derived from the current value. */
 function usePasswordErrors(password: string) {
-  const [passedErrors, setPassedErrors] = useState<PassedErrors>({
-    CAPITAL_LETTER: false,
-    MIN_LENGTH: false,
-    ONE_NUMBER: false,
-    SPECIAL_CHAR: false,
-  });
-  const [isValid, setIsValid] = useState(false);
+  const { errors, valid } = new Password(password).validPassword();
 
-  useEffect(() => {
-    const { errors, valid } = new Password(password).validPassword();
+  const passedErrors: PassedErrors = {
+    CAPITAL_LETTER: !!errors.CAPITAL_LETTER?.code,
+    MIN_LENGTH: !!errors.MIN_LENGTH?.code,
+    ONE_NUMBER: !!errors.ONE_NUMBER?.code,
+    SPECIAL_CHAR: !!errors.SPECIAL_CHAR?.code,
+  };
 
-    setIsValid(valid);
-
-    setPassedErrors((prev) => ({
-      ...prev,
-      CAPITAL_LETTER: !!errors.CAPITAL_LETTER?.code,
-      MIN_LENGTH: !!errors.MIN_LENGTH?.code,
-      ONE_NUMBER: !!errors.ONE_NUMBER?.code,
-      SPECIAL_CHAR: !!errors.SPECIAL_CHAR?.code,
-    }));
-  }, [password]);
-
-  return { passedErrors, isValid };
+  return { passedErrors, isValid: valid };
 }
 
 export default usePasswordErrors;

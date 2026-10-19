@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 import { useQueryClient } from "@tanstack/react-query";
 import { format, isBefore } from "date-fns";
@@ -41,12 +41,22 @@ type EditShiftHourlyForm = {
 function TableDialogEditHourly({ shift, user }: Props) {
   const {
     register,
-    watch,
+    control,
     setValue,
     handleSubmit,
     setError,
     formState: { errors },
   } = useForm<EditShiftHourlyForm>();
+  const isPublicHoliday = useWatch({
+    control,
+    name: "isPublicHoliday",
+    defaultValue: shift.isPublicHoliday,
+  });
+  const publicHolidayWorked = useWatch({
+    control,
+    name: "publicHolidayWorked",
+    defaultValue: shift.publicHolidayWorked,
+  });
   const router = useRouter();
   const queryClient = useQueryClient();
   const { setStep } = useTableStore((state) => state);
@@ -163,7 +173,7 @@ function TableDialogEditHourly({ shift, user }: Props) {
         {...register("publicHolidayWorked", { value: shift.publicHolidayWorked })}
       />
       <HolidayChoice
-        value={toHolidayValue(watch("isPublicHoliday"), watch("publicHolidayWorked"))}
+        value={toHolidayValue(isPublicHoliday, publicHolidayWorked)}
         onChange={(next) => {
           const { isPublicHoliday, publicHolidayWorked } = fromHolidayValue(next);
           setValue("isPublicHoliday", isPublicHoliday, { shouldDirty: true });

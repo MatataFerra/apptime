@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { useInterval } from "usehooks-ts";
 
@@ -27,24 +27,15 @@ function ShiftTrackInfo() {
 
   useInterval(() => setNow(new Date()), running ? 5000 : null);
 
-  const hourly = useMemo(() => user?.shifts?.hourly ?? [], [user?.shifts?.hourly]);
-  const usual = useMemo(() => usualShiftMinutes(hourly), [hourly]);
-  const lastClosed = useMemo(
-    () =>
-      hourly
-        .filter((s) => s.isClosed)
-        .sort((a, b) => new Date(a.startDate).valueOf() - new Date(b.startDate).valueOf())
-        .at(-1),
-    [hourly]
-  );
-
-  const lastLabel = useMemo(
-    () =>
-      lastClosed?.startDate
-        ? new DateHumanizer("long").humanizeDate(new Date(lastClosed.startDate))
-        : "None yet",
-    [lastClosed?.startDate]
-  );
+  const hourly = user?.shifts?.hourly ?? [];
+  const usual = usualShiftMinutes(hourly);
+  const lastClosed = hourly
+    .filter((s) => s.isClosed)
+    .sort((a, b) => new Date(a.startDate).valueOf() - new Date(b.startDate).valueOf())
+    .at(-1);
+  const lastLabel = lastClosed?.startDate
+    ? new DateHumanizer("long").humanizeDate(new Date(lastClosed.startDate))
+    : "None yet";
 
   if (running) {
     const elapsed = ShiftService.differenceInHHmm(shiftUnclosed.shift?.startDate ?? "", "").diff;

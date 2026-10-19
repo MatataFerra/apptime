@@ -1,10 +1,9 @@
 "use client";
 
-import { type ChangeEvent, useEffect } from "react";
-import { useFormContext } from "react-hook-form";
+import { type ChangeEvent, useEffect, useState } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
 
 import Toast from "@/services/Toast";
 
@@ -24,6 +23,7 @@ import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
+import { defaultFinish, needsDefaultFinish } from "@/utils/helpers/defaultFinish";
 import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
 import useGetUniqueSalaryItems from "@/hooks/useGetUniqueSalaryItems";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
@@ -35,6 +35,11 @@ import useUser from "@/hooks/useUser";
 import onCreateHourlyShift from "@/server-actions/hourly-job";
 import { useFastChargeStore } from "@/store/useFastChargeStore";
 import { useHourlyTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
+
+/** "2026-10-12" + "08:00" -> "2026-10-12T08:00" (empty until both are set). */
+function joinDateTime(date?: string | null, time?: string | null) {
+  return date && time ? `${date}T${time}` : "";
+}
 
 function Inputs() {
   /*
@@ -61,19 +66,24 @@ function Inputs() {
   */
   const {
     reset,
-    watch,
+    control,
     register,
     setValue,
     getValues,
     handleSubmit,
-    formState: { touchedFields, errors },
+    formState: { errors },
   } = useFormContext<FastChargeInputs>();
+  // useWatch, not watch(): the React Compiler would memoize watch() and freeze the value.
+  const nameWatch = useWatch({ control, name: "name" });
+  const hourValueWatch = useWatch({ control, name: "hour-value" });
+  const isPublicHolidayWatch = useWatch({ control, name: "is-public-holiday" });
+  const isPublicHolidayWorkedWatch = useWatch({ control, name: "is-public-holiday-worked" });
 
   const queryClient = useQueryClient();
   const { data: user } = useUser();
   const { data: hourly } = useHourlyShifts();
   const { data: production } = useProductionShifts();
-  const { names } = useShiftNames({ hourly, production }, watch("name"));
+  const { names } = useShiftNames({ hourly, production }, nameWatch);
 
   /*
     set when user is typing to show datalist
@@ -113,8 +123,6 @@ function Inputs() {
     Watch the values of the form fields
   */
 
-  const hourValueWatch = watch("hour-value");
-
   useEffect(() => {
     const data = {
       startDate: formatStart,
@@ -139,19 +147,26 @@ function Inputs() {
   */
 
   /*
-    Set the finish date with the start date if the finish date is not set
+    ================================================================================
+    ================================================================================
   */
-  useEffect(() => {
-    if (startDate && !touchedFields["finish-date"]) {
-      setValue("finish-date", startDate);
-      setStoreValue({ finishDate: startDate });
-    }
-  }, [startDate, setValue, touchedFields, setStoreValue]);
 
   /*
-    ================================================================================
-    ================================================================================
+    Start and finish are datetime-local inputs (Safari doesn't report changes
+    on type="time"). They still fill the four fields the schema, Submit and the
+    review read: start/finish date and time.
   */
+  function setDateTime(which: "start" | "finish", value: string) {
+    const [date = "", time = ""] = value.split("T");
+    const opts = { shouldValidate: true, shouldDirty: true };
+    setValue(`${which}-date`, date, opts);
+    setValue(`${which}-time`, time, opts);
+    setStoreValue(
+      which === "start"
+        ? { startDate: date, startTime: time }
+        : { finishDate: date, finishTime: time }
+    );
+  }
 
   function onSubmit(formData: FastChargeInputs) {
     const parseData = {
@@ -326,7 +341,7 @@ function Inputs() {
     });
   }
 
-  const thisYear = new Date(Date.now()).getFullYear().toString();
+  const [thisYear] = useState(() => String(new Date().getFullYear()));
 
   return (
     <>
@@ -354,7 +369,7 @@ function Inputs() {
           />
           <DatalistShiftNames
             data={names}
-            value={watch("name")}
+            value={nameWatch}
             onSelect={(name) => {
               setValue("name", name, { shouldValidate: true, shouldDirty: true });
               setStoreValue({ name });
@@ -364,64 +379,35 @@ function Inputs() {
         <Input
           containerClasses="flex-1"
           classes="h-full"
-          label="Start date"
-          type="date"
-          isError={!!errors["start-date"]}
-          description={errors["start-date"]?.message}
-          max={format(new Date(`${thisYear}-12-31`), "yyyy-MM-dd")}
-          {...register("start-date", {
-            onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              const start = e.target.value;
-              setStoreValue({ startDate: start });
+          label="Start"
+          name="start-datetime"
+          type="datetime-local"
+          isError={!!(errors["start-date"] || errors["start-time"])}
+          description={errors["start-date"]?.message ?? errors["start-time"]?.message}
+          max={`${thisYear}-12-31T23:59`}
+          value={joinDateTime(startDate, startTime)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            const start = e.target.value;
+            setDateTime("start", start);
 
-              // A shift rarely spans days: the finish defaults to the same day.
-              const finish = getValues("finish-date");
-              if (start && (!finish || finish < start || finish !== start)) {
-                setValue("finish-date", start, { shouldValidate: true });
-                setStoreValue({ finishDate: start });
-              }
-            },
-
-            required: true,
-          })}
+            // A shift rarely spans days: suggest a finish 8h later, same day.
+            const finish = joinDateTime(finishDate, finishTime);
+            if (start && needsDefaultFinish(start, finish)) {
+              setDateTime("finish", defaultFinish(start));
+            }
+          }}
         />
         <Input
           containerClasses="flex-1"
           classes="h-full"
-          label="Finish date"
-          type="date"
-          isError={!!errors["finish-date"]}
-          description={errors["finish-date"]?.message}
-          max={format(new Date(`${thisYear}-12-31`), "yyyy-MM-dd")}
-          {...register("finish-date", {
-            onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              setStoreValue({ finishDate: e.target.value });
-            },
-          })}
-        />
-        <Input
-          containerClasses="flex-1"
-          label="Start time"
-          type="time"
-          isError={!!errors["start-time"]}
-          description={errors["start-time"]?.message}
-          {...register("start-time", {
-            onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              setStoreValue({ startTime: e.target.value });
-            },
-          })}
-        />
-        <Input
-          containerClasses="flex-1"
-          label="Finish time"
-          type="time"
-          isError={!!errors["finish-time"]}
-          description={errors["finish-time"]?.message}
-          {...register("finish-time", {
-            onChange: (e: ChangeEvent<HTMLInputElement>) => {
-              setStoreValue({ finishTime: e.target.value });
-            },
-          })}
+          label="Finish"
+          name="finish-datetime"
+          type="datetime-local"
+          isError={!!(errors["finish-date"] || errors["finish-time"])}
+          description={errors["finish-date"]?.message ?? errors["finish-time"]?.message}
+          max={`${thisYear}-12-31T23:59`}
+          value={joinDateTime(finishDate, finishTime)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setDateTime("finish", e.target.value)}
         />
         <Input
           label="Hour value"
@@ -450,7 +436,7 @@ function Inputs() {
         <input type="checkbox" hidden {...register("is-public-holiday-worked")} />
         <div className="mt-2 w-full">
           <HolidayChoice
-            value={toHolidayValue(watch("is-public-holiday"), watch("is-public-holiday-worked"))}
+            value={toHolidayValue(isPublicHolidayWatch, isPublicHolidayWorkedWatch)}
             onChange={(next) => {
               const { isPublicHoliday, publicHolidayWorked } = fromHolidayValue(next);
               setValue("is-public-holiday", isPublicHoliday);

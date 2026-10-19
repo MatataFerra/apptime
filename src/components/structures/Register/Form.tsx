@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { User } from "@prisma/client";
@@ -41,12 +41,12 @@ function RegisterForm() {
   const router = useRouter();
   const t = useTranslations("register");
 
-  const { handleSubmit, register, setFocus, watch } = useForm<RegisterInputs>({
+  const { handleSubmit, register, setFocus, control } = useForm<RegisterInputs>({
     resolver: zodResolver(RegisterSchema),
   });
 
-  const passwordWatched = watch("password");
-  const emailWatched = watch("email");
+  const passwordWatched = useWatch({ control, name: "password" }) ?? "";
+  const emailWatched = useWatch({ control, name: "email" }) ?? "";
 
   const { updateButtonBloqued, addAttempToRegister, attempsToRegister } = usePasswordValid();
   const { passedErrors } = usePasswordErrors(passwordWatched);

@@ -1,7 +1,4 @@
-import { useEffect, useState } from "react";
-
 import type { Contribution, Tax } from "@prisma/client";
-import isEqual from "lodash/isEqual";
 
 import useSalaryItems from "@/hooks/useSalaryItems";
 
@@ -10,47 +7,23 @@ type HookProps = {
   localContributions: Omit<Contribution, "id">[];
 };
 
+type Named = { name: string };
+
+function notSavedYet<T extends Named>(local: T[], saved: Named[] | undefined) {
+  return local.filter((item) => !saved?.some((s) => s.name === item.name));
+}
+
 /**
- * @description Custom hook to get the saved taxes.
- * It maps the user and the type of shift and returns the saved taxes
+ * Taxes and contributions picked for this shift that aren't saved yet,
+ * so the optimistic update only adds the new ones.
  */
 function useGetUniqueSalaryItems({ localTaxes, localContributions }: HookProps) {
   const { data } = useSalaryItems();
-  const [savedTaxesFromDB, setSavedTaxesFromDB] = useState<Omit<Tax, "id">[]>();
-  const [savedContributionsFromDB, setSavedContributionsFromDB] =
-    useState<Omit<Contribution, "id">[]>();
 
-  useEffect(() => {
-    if (localTaxes.length > 0) {
-      const taxesAlreadyInDB = data?.salaryItems.taxes?.filter((tax) =>
-        localTaxes.some((newTax) => {
-          return isEqual(newTax.name, tax.name);
-        })
-      );
-
-      const uniqueTaxes = localTaxes.filter(
-        (tax) => !taxesAlreadyInDB?.some((filterTax) => isEqual(filterTax.name, tax.name))
-      );
-      setSavedTaxesFromDB(uniqueTaxes);
-    }
-  }, [data?.salaryItems.taxes, localTaxes]);
-
-  useEffect(() => {
-    if (localContributions.length > 0) {
-      const taxesAlreadyInDB = data?.salaryItems.contributions?.filter((tax) =>
-        localContributions.some((newTax) => {
-          return isEqual(newTax.name, tax.name);
-        })
-      );
-
-      const uniqueContributions = localContributions.filter(
-        (tax) => !taxesAlreadyInDB?.some((filterTax) => isEqual(filterTax.name, tax.name))
-      );
-      setSavedContributionsFromDB(uniqueContributions);
-    }
-  }, [data?.salaryItems.contributions, localContributions]);
-
-  return { uniqueTaxes: savedTaxesFromDB, uniqueContributions: savedContributionsFromDB };
+  return {
+    uniqueTaxes: notSavedYet(localTaxes, data?.salaryItems.taxes),
+    uniqueContributions: notSavedYet(localContributions, data?.salaryItems.contributions),
+  };
 }
 
 export default useGetUniqueSalaryItems;

@@ -15,6 +15,16 @@ const config = [
     plugins: { "simple-import-sort": simpleImportSort },
     rules: {
       "no-console": "warn",
+      // With the React Compiler, watch() results get memoized and stop updating
+      // (the compiler's own check only sees useForm, not useFormContext).
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "VariableDeclarator[init.callee.name=/^useForm(Context)?$/] > ObjectPattern > Property[key.name='watch']",
+          message: "Use useWatch({ control, name }) instead of watch(): the React Compiler freezes watch() values.",
+        },
+      ],
       "func-style": ["error", "declaration", { allowArrowFunctions: false }],
       "@tanstack/query/exhaustive-deps": "error",
       "simple-import-sort/exports": "error",
@@ -54,18 +64,6 @@ const config = [
       "import/no-named-as-default": "warn",
       "import/no-named-as-default-member": "warn",
       "import/no-duplicates": "warn",
-    },
-  },
-  {
-    // React Compiler rules from eslint-plugin-react-hooks 7 (new with Next 16).
-    // They flag patterns that predate the upgrade; kept visible as warnings
-    // and fixed in the logic refactor.
-    rules: {
-      "react-hooks/set-state-in-effect": "warn",
-      "react-hooks/refs": "warn",
-      "react-hooks/purity": "warn",
-      "react-hooks/preserve-manual-memoization": "warn",
-      "react-hooks/incompatible-library": "warn",
     },
   },
   prettier,

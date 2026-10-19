@@ -7,10 +7,9 @@ import ShiftService from "@/services/Shift";
 import { BaseShiftSchema, RouteParams, TypeShift } from "@/types";
 
 import { isProductionShift } from "@/utils/helpers/isProductionShift";
+import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
 
 import prisma from "#/prisma/client";
-
-import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
 
 export async function PUT(req: NextRequest, { params }: RouteParams) {
   const { id } = await params;

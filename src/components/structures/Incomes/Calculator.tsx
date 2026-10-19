@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 import { formatMoney } from "@/services/Summary";
 
@@ -31,18 +31,15 @@ function round(n: number) {
 }
 
 function Calculator() {
-  const { register, watch } = useForm<IncomesInputs>({
+  const { register, control } = useForm<IncomesInputs>({
     defaultValues: { "holiday-pay": String(DEFAULT_HOLIDAY_PAY_RATE) },
   });
   const [days, setDays] = useState(5);
 
-  const [hours, minutes, value, holidayPay, unpaidBreaks] = watch([
-    "hours",
-    "minutes",
-    "value",
-    "holiday-pay",
-    "unpaid-breaks",
-  ]);
+  const [hours, minutes, value, holidayPay, unpaidBreaks] = useWatch({
+    control,
+    name: ["hours", "minutes", "value", "holiday-pay", "unpaid-breaks"],
+  });
 
   const result = useMemo(() => {
     const worked = (Number(hours) || 0) * 60 + (Number(minutes) || 0);
