@@ -4,7 +4,7 @@ import { useMemo } from "react";
 
 import { format, isSameDay } from "date-fns";
 
-import { formatHours, summarizeWeek, weekStartsOnIndex } from "@/services/Summary";
+import { formatHours, summarizePeriod, summarizeWeek, weekStartsOnIndex } from "@/services/Summary";
 
 import Skeleton from "@/components/ui/Skeleton";
 
@@ -22,13 +22,31 @@ function WeekSummary() {
   const money = useMoney();
   const { data: user } = useUser();
   // Totals in the Settings currency; shifts in other currencies aren't added in.
-  const { hourly, production, isLoading, otherCurrencies, currency } = useShiftsInCurrency();
+  const { hourly, production, allHourly, allProduction, isLoading, otherCurrencies, currency } =
+    useShiftsInCurrency();
   const weekStartsOn = weekStartsOnIndex(user?.config?.weekStartsOn);
 
   const week = useMemo(
     () => summarizeWeek(hourly, production, { weekStartsOn }),
     [hourly, production, weekStartsOn]
   );
+  // Hours, shift count and which days were worked include every currency;
+  // only money is kept per currency.
+  const worked = useMemo(
+    () => summarizeWeek(allHourly, allProduction, { weekStartsOn }),
+    [allHourly, allProduction, weekStartsOn]
+  );
+  const otherEarnings = otherCurrencies
+    .map((code) => {
+      const period = summarizePeriod(
+        allHourly?.filter((s) => s.currency === code),
+        allProduction?.filter((s) => s.currency === code),
+        week.from,
+        week.to
+      );
+      return { code, earned: period.earned, shifts: period.shifts };
+    })
+    .filter((other) => other.shifts > 0);
 
   if (isLoading) {
     return <Skeleton classes="h-52 w-full rounded-2xl" />;
@@ -58,20 +76,26 @@ function WeekSummary() {
         </div>
         <div className="flex flex-col-reverse gap-0.5">
           <dt className="text-xs text-ink-inverse/70">worked</dt>
-          <dd className="figure text-[1.875rem] leading-none">{formatHours(week.minutes)}</dd>
+          <dd className="figure text-[1.875rem] leading-none">{formatHours(worked.minutes)}</dd>
         </div>
         <div className="flex flex-col-reverse gap-0.5">
-          <dt className="text-xs text-ink-inverse/70">{week.shifts === 1 ? "shift" : "shifts"}</dt>
-          <dd className="figure text-[1.875rem] leading-none">{week.shifts}</dd>
+          <dt className="text-xs text-ink-inverse/70">
+            {worked.shifts === 1 ? "shift" : "shifts"}
+          </dt>
+          <dd className="figure text-[1.875rem] leading-none">{worked.shifts}</dd>
         </div>
       </dl>
 
       <ol className="grid h-14 grid-cols-7 items-end gap-1.5" aria-label="Earnings per day">
-        {week.days.map((day) => {
+        {week.days.map((day, i) => {
           const total = day.hourly + day.production;
+          // Worked, but only in another currency: a neutral bar, not a money one.
+          const otherOnly = total === 0 && worked.days[i].hourly + worked.days[i].production > 0;
           const isToday = isSameDay(day.date, today);
           const height = total > 0 ? Math.max(12, Math.round((total / max) * 100)) : 0;
-          const label = `${format(day.date, "EEEE")}: ${total > 0 ? money(total) : "no shifts"}`;
+          const label = `${format(day.date, "EEEE")}: ${
+            total > 0 ? money(total) : otherOnly ? "shifts in another currency" : "no shifts"
+          }`;
 
           return (
             <li
@@ -98,6 +122,8 @@ function WeekSummary() {
                       />
                     ) : null}
                   </div>
+                ) : otherOnly ? (
+                  <div className="h-[30%] w-full rounded-[4px] bg-ink-inverse/35" />
                 ) : (
                   <div
                     className={cn(
@@ -121,9 +147,13 @@ function WeekSummary() {
           );
         })}
       </ol>
-      {otherCurrencies.length > 0 ? (
-        <p className="text-xs text-ink-inverse/60">
-          Totals in {currency}. Shifts in {otherCurrencies.join(", ")} aren&apos;t added in.
+      {otherEarnings.length > 0 ? (
+        <p className="text-xs text-ink-inverse/70">
+          Earned in {currency}. Also this week:{" "}
+          {otherEarnings
+            .map((other) => `${money(other.earned, { currency: other.code })} (${other.code})`)
+            .join(", ")}
+          .
         </p>
       ) : null}
     </section>
