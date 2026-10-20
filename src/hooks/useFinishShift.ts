@@ -67,6 +67,7 @@ function useFinishShift() {
     setFinishing(false);
 
     if (response) {
+      setIsClosing(false);
       removelocalNote();
       Toast({
         message: "Shift saved",

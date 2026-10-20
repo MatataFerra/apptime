@@ -4,6 +4,7 @@ import Button from "@/components/ui/Button";
 
 import { useSettingsStore } from "@/store/useSettingsStore";
 
+/** Saves "Your details" only; the other sections save on their own. */
 function Submit() {
   const { isDirty } = useSettingsStore((state) => state);
 
@@ -16,7 +17,7 @@ function Submit() {
       classes="w-full rounded-2xl"
       form="settings"
     >
-      Save
+      Save details
     </Button>
   );
 }

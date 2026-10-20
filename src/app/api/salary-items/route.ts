@@ -39,7 +39,9 @@ export async function GET(req: NextRequest) {
       response: true,
       message: "success",
     });
-  } catch {
+  } catch (error) {
+    // eslint-disable-next-line no-console -- server log for failed saves
+    console.error("[api/salary-items]", error);
     return NextResponse.json({ error: "Something went wrong", response: false }, { status: 500 });
   }
 }

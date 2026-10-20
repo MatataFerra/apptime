@@ -79,6 +79,8 @@ export default async function onUpdateTrackJob(data: UpdateTrackData, shiftId: n
       createShift: response,
     };
   } catch (error) {
+    // eslint-disable-next-line no-console -- server log for failed saves
+    console.error("[update-track]", error);
     return null;
   }
 }

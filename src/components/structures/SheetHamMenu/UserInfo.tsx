@@ -22,7 +22,7 @@ function UserInfo({ user }: Props) {
         <Image classes="size-11 rounded-full" src={user.image} alt="" width={44} height={44} />
       ) : (
         <span
-          className="flex size-11 shrink-0 items-center justify-center rounded-full bg-live display-title text-lg leading-none text-ink"
+          className="flex size-11 shrink-0 items-center justify-center rounded-full bg-live display-title text-lg leading-none text-on-live"
           aria-hidden="true"
         >
           {initials(user.name, user.email)}

@@ -76,6 +76,8 @@ export default async function onCreateHourlyShift(data: FastChargeInputsParsed) 
       createShift: response,
     };
   } catch (error) {
+    // eslint-disable-next-line no-console -- server log for failed saves
+    console.error("[hourly-job]", error);
     return null;
   }
 }

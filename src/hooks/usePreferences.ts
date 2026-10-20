@@ -45,6 +45,8 @@ function usePreferences() {
       });
       return false;
     }
+    // Settings save on their own (no Save button), so say it happened.
+    Toast({ type: "success", message: "Saved", duration: 1200 });
     return true;
   }
 

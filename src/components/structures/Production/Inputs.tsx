@@ -164,13 +164,13 @@ function Inputs() {
 
     //* Optimistic update
     queryClient.cancelQueries({ queryKey: [USE_QUERY_KEYS.SALARY] }).then(() => {
-      const prevTaxes = previousSalaryItemsData?.salaryItems.taxes.map((taxes) => {
+      const prevTaxes = previousSalaryItemsData?.salaryItems?.taxes?.map((taxes) => {
         return {
           ...taxes,
         };
       });
 
-      const prevContributions = previousSalaryItemsData?.salaryItems.contributions.map(
+      const prevContributions = previousSalaryItemsData?.salaryItems?.contributions?.map(
         (contributions) => {
           return {
             ...contributions,

@@ -20,7 +20,7 @@ function ProfileCard() {
   return (
     <section className="flex w-full items-center gap-3.5 rounded-[20px] bg-surface-inverse p-4 text-ink-inverse">
       <span
-        className="flex size-14 shrink-0 items-center justify-center rounded-full bg-live display-title text-2xl leading-none text-ink"
+        className="flex size-14 shrink-0 items-center justify-center rounded-full bg-live display-title text-2xl leading-none text-on-live"
         aria-hidden="true"
       >
         {initials(user.name, user.email)}

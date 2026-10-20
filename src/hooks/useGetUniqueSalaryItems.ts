@@ -23,8 +23,8 @@ function useGetUniqueSalaryItems({ localTaxes, localContributions }: HookProps) 
   const { data } = useSalaryItems();
 
   return {
-    uniqueTaxes: notSavedYet(localTaxes, data?.salaryItems.taxes),
-    uniqueContributions: notSavedYet(localContributions, data?.salaryItems.contributions),
+    uniqueTaxes: notSavedYet(localTaxes, data?.salaryItems?.taxes),
+    uniqueContributions: notSavedYet(localContributions, data?.salaryItems?.contributions),
   };
 }
 

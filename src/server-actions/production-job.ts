@@ -75,6 +75,8 @@ export default async function onCreateProductionShift(data: ProductionInputsPars
       createShift: response,
     };
   } catch (error) {
+    // eslint-disable-next-line no-console -- server log for failed saves
+    console.error("[production-job]", error);
     return null;
   }
 }

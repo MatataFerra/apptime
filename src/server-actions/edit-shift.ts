@@ -81,6 +81,8 @@ export default async function onEditShift(
 
     return updateShift;
   } catch (error) {
+    // eslint-disable-next-line no-console -- server log for failed saves
+    console.error("[edit-shift]", error);
     return null;
   }
 }
