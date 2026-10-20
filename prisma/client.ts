@@ -23,7 +23,12 @@ function newPrismaClient() {
       : { url: LOCAL_DATABASE_URL }
   );
 
-  return new PrismaClient({ adapter });
+  return new PrismaClient({
+    adapter,
+    // Each statement is a round trip to Turso, so Prisma's defaults (2 s to
+    // start, 5 s to finish) are too tight for the few writes that need one.
+    transactionOptions: { maxWait: 10_000, timeout: 20_000 },
+  });
 }
 
 // One client per server process; in dev it survives hot reloads.

@@ -35,6 +35,7 @@ vi.mock("@/services/User", () => ({
 import HourlyService from "@/services/Shift/Hourly";
 
 import { GET } from "@/app/api/salary-items/route";
+import { GET as getHourly } from "@/app/api/shift/hourly/route";
 import onEditShift from "@/server-actions/edit-shift";
 import { onRemoveSalaryItem, onUpdateSalaryItem } from "@/server-actions/salary-items";
 import prisma from "#/prisma/client";
@@ -109,6 +110,13 @@ describe("taxes on a real database", () => {
       "2024-05-01T10:00:00.000Z",
       "2024-05-01T10:00:00.000Z",
     ]);
+  });
+
+  test("GET /api/shift/hourly returns only the user's shifts", async () => {
+    const response = await getHourly({} as never);
+    expect(response.status).toBe(200);
+    const json = await response.json();
+    expect(json.hourly.map((h: { id: number }) => h.id).sort()).toEqual([september, october]);
   });
 
   test("GET /api/salary-items returns the user's taxes with uses", async () => {

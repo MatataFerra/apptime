@@ -32,7 +32,8 @@ export async function GET(req: NextRequest) {
   };
 
   try {
-    const [contributionRows, taxRows] = await prisma.$transaction([
+    // Two reads; no transaction needed (it timed out on Turso).
+    const [contributionRows, taxRows] = await Promise.all([
       prisma.contribution.findMany(query),
       prisma.tax.findMany(query),
     ]);
