@@ -12,6 +12,7 @@ import type { SuccessApiResponse } from "@/types/api_response";
 import type { FastChargeInputs } from "@/types/forms";
 
 import { observer } from "@/components/structures/SalaryItems/observer";
+import CurrencySelect from "@/components/structures/ShiftForms/CurrencySelect";
 import DatalistShiftNames from "@/components/structures/ShiftForms/Datalist";
 import HolidayChoice, {
   fromHolidayValue,
@@ -22,11 +23,13 @@ import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
+import { currencySymbol } from "@/utils/constants/currencies";
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import { defaultFinish, needsDefaultFinish } from "@/utils/helpers/defaultFinish";
 import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
 import useGetUniqueSalaryItems from "@/hooks/useGetUniqueSalaryItems";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
+import { useCurrency } from "@/hooks/useMoney";
 import useProductionShifts from "@/hooks/useProductionShifts";
 import type { SalaryItems } from "@/hooks/useSalaryItems";
 import useShiftNames from "@/hooks/useShiftNames";
@@ -48,7 +51,7 @@ function Inputs() {
   const {
     setValues: setStoreValue,
     reset: resetStoreValues,
-    values: { startDate, finishDate, finishTime, startTime },
+    values: { startDate, finishDate, finishTime, startTime, currency: shiftCurrency },
     setIsFormReady,
     setDialogState,
   } = useFastChargeStore((state) => state);
@@ -79,6 +82,7 @@ function Inputs() {
   const isPublicHolidayWatch = useWatch({ control, name: "is-public-holiday" });
   const isPublicHolidayWorkedWatch = useWatch({ control, name: "is-public-holiday-worked" });
 
+  const defaultCurrency = useCurrency();
   const queryClient = useQueryClient();
   const { data: user } = useUser();
   const { data: hourly } = useHourlyShifts();
@@ -151,6 +155,20 @@ function Inputs() {
     ================================================================================
   */
 
+  // Prefill the rate and breaks saved in Settings, without overwriting what was typed.
+  const savedRate = user?.config?.hourValue;
+  const savedBreaks = user?.config?.unpaidBreaks;
+  useEffect(() => {
+    if (savedRate && !getValues("hour-value")) {
+      setValue("hour-value", String(savedRate));
+      setStoreValue({ hourValue: String(savedRate) });
+    }
+    if (savedBreaks && !getValues("unpaid-breaks")) {
+      setValue("unpaid-breaks", String(savedBreaks));
+      setStoreValue({ unpaidBreaks: String(savedBreaks) });
+    }
+  }, [savedRate, savedBreaks, getValues, setValue, setStoreValue]);
+
   /*
     Start and finish are datetime-local inputs (Safari doesn't report changes
     on type="time"). They still fill the four fields the schema, Submit and the
@@ -181,6 +199,7 @@ function Inputs() {
         : Number(formData["unpaid-breaks"]),
       taxes,
       contributions,
+      currency: shiftCurrency ?? null,
     };
 
     Toast({
@@ -250,6 +269,7 @@ function Inputs() {
         {
           id: lastId + 1,
           startDate: parseData.startDate,
+          currency: parseData.currency,
           endDate: parseData.endDate,
           name: parseData.name,
           hourValue: parseData.hourValue,
@@ -414,13 +434,17 @@ function Inputs() {
           type="number"
           step="0.01"
           min={0}
-          measure="$"
+          measure={currencySymbol(shiftCurrency || defaultCurrency)}
           measurePlace="left"
           {...register("hour-value", {
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
               setStoreValue({ hourValue: e.target.value });
             },
           })}
+        />
+        <CurrencySelect
+          value={shiftCurrency}
+          onChange={(currency) => setStoreValue({ currency })}
         />
         <Input
           label="Unpaid breaks"

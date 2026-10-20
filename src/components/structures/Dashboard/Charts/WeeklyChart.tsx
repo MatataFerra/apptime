@@ -13,13 +13,11 @@ import {
 } from "recharts";
 
 import type { WeekPoint } from "@/services/History";
-import { formatMoney } from "@/services/Summary";
+import { formatMoneyCompact } from "@/services/Summary";
+
+import useMoney, { useCurrency } from "@/hooks/useMoney";
 
 import ChartCard, { SERIES, SeriesKey } from "./ChartCard";
-
-function compact(value: number) {
-  return value >= 1000 ? `$${Math.round(value / 100) / 10}k` : `$${Math.round(value)}`;
-}
 
 function WeekTooltip({
   active,
@@ -28,6 +26,7 @@ function WeekTooltip({
   active?: boolean;
   payload?: { payload: WeekPoint }[];
 }) {
+  const money = useMoney();
   const point = payload?.[0]?.payload;
   if (!active || !point) return null;
   const total = point.hourly + point.production;
@@ -41,11 +40,11 @@ function WeekTooltip({
             <span className="size-2 rounded-[2px]" style={{ background: SERIES[kind].color }} />
             {SERIES[kind].label}
           </span>
-          <span className="text-ink tabular-nums">{formatMoney(point[kind])}</span>
+          <span className="text-ink tabular-nums">{money(point[kind])}</span>
         </p>
       ))}
       <p className="mt-1.5 flex justify-between border-t border-border pt-1.5 font-semibold text-ink">
-        Total <span className="tabular-nums">{formatMoney(total)}</span>
+        Total <span className="tabular-nums">{money(total)}</span>
       </p>
     </div>
   );
@@ -53,6 +52,8 @@ function WeekTooltip({
 
 /** Earned per week, stacked by kind. Rounded only at the top of each column. */
 function WeeklyChart({ data }: { data: WeekPoint[] }) {
+  const money = useMoney();
+  const currency = useCurrency();
   const totals = data.reduce(
     (acc, w) => ({ hourly: acc.hourly + w.hourly, production: acc.production + w.production }),
     { hourly: 0, production: 0 }
@@ -66,15 +67,15 @@ function WeeklyChart({ data }: { data: WeekPoint[] }) {
       subtitle={`Last ${data.length} weeks`}
       figure={
         <span className="figure text-[1.75rem] leading-none text-ink">
-          {formatMoney(total, { cents: false })}
+          {money(total, { cents: false })}
         </span>
       }
       legend={
         <SeriesKey
           items={[
-            { ...SERIES.hourly, value: formatMoney(totals.hourly, { cents: false }) },
+            { ...SERIES.hourly, value: money(totals.hourly, { cents: false }) },
             ...(hasProduction
-              ? [{ ...SERIES.production, value: formatMoney(totals.production, { cents: false }) }]
+              ? [{ ...SERIES.production, value: money(totals.production, { cents: false }) }]
               : []),
           ]}
         />
@@ -83,7 +84,7 @@ function WeeklyChart({ data }: { data: WeekPoint[] }) {
       <div
         className="h-52 w-full"
         role="img"
-        aria-label={`Weekly earnings, ${formatMoney(total)} in total`}
+        aria-label={`Weekly earnings, ${money(total)} in total`}
       >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
@@ -105,7 +106,7 @@ function WeeklyChart({ data }: { data: WeekPoint[] }) {
               axisLine={false}
               width={40}
               tickCount={4}
-              tickFormatter={compact}
+              tickFormatter={(value: number) => formatMoneyCompact(value, currency)}
               tick={{ fill: "var(--color-ink-muted)", fontSize: 11 }}
             />
             <Tooltip cursor={{ fill: "var(--color-surface-sunken)" }} content={<WeekTooltip />} />

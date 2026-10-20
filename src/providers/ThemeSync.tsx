@@ -19,9 +19,9 @@ function ThemeSync() {
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => {
+    function onChange() {
       if (readThemeCookie() === "system") applyTheme("system");
-    };
+    }
     media.addEventListener("change", onChange);
     return () => media.removeEventListener("change", onChange);
   }, []);

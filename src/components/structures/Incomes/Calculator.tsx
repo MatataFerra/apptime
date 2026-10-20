@@ -3,11 +3,11 @@
 import { useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
-import { formatMoney } from "@/services/Summary";
-
 import Input from "@/components/ui/Input";
 
 import { cn } from "@/utils/helpers/styleMerger";
+import useMoney from "@/hooks/useMoney";
+import useUser from "@/hooks/useUser";
 
 type IncomesInputs = {
   hours: string;
@@ -31,8 +31,17 @@ function round(n: number) {
 }
 
 function Calculator() {
+  const money = useMoney();
+  const { data: user } = useUser();
+  // Settings' defaults: holiday pay % and the usual hourly rate.
+  const defaultHolidayRate = user?.config?.holidayPay ?? DEFAULT_HOLIDAY_PAY_RATE;
+  const savedRate = user?.config?.hourValue;
   const { register, control } = useForm<IncomesInputs>({
-    defaultValues: { "holiday-pay": String(DEFAULT_HOLIDAY_PAY_RATE) },
+    values: {
+      "holiday-pay": String(defaultHolidayRate),
+      value: savedRate ? String(savedRate) : "",
+    } as IncomesInputs,
+    resetOptions: { keepDirtyValues: true },
   });
   const [days, setDays] = useState(5);
 
@@ -49,7 +58,7 @@ function Calculator() {
     // An empty field means the default rate shown in the hint, not 0%.
     const holidayRate =
       holidayPay === undefined || String(holidayPay).trim() === ""
-        ? DEFAULT_HOLIDAY_PAY_RATE
+        ? defaultHolidayRate
         : Number(holidayPay) || 0;
 
     const baseDay = (paid / 60) * rate;
@@ -63,7 +72,7 @@ function Calculator() {
       perDay: round(baseDay + holidayDay),
       total: round((baseDay + holidayDay) * days),
     };
-  }, [hours, minutes, value, holidayPay, unpaidBreaks, days]);
+  }, [hours, minutes, value, holidayPay, unpaidBreaks, days, defaultHolidayRate]);
 
   const paidLabel = `${Math.floor(result.paid / 60)}h ${String(Math.round(result.paid % 60)).padStart(2, "0")}m`;
 
@@ -76,7 +85,7 @@ function Calculator() {
         <div className="flex flex-col gap-1.5 text-sm text-ink-inverse/70">
           <p>You&apos;d earn, before tax</p>
           <p className="figure text-[4rem] leading-[0.95] text-live" data-testid="estimate-total">
-            {formatMoney(result.total)}
+            {money(result.total)}
           </p>
         </div>
         <dl className="flex flex-col gap-2 border-t border-ink-inverse/15 pt-3 text-sm">
@@ -86,17 +95,17 @@ function Calculator() {
           </div>
           <div className="flex justify-between">
             <dt className="text-ink-inverse/70">Base pay</dt>
-            <dd className="tabular-nums">{formatMoney(result.base)}</dd>
+            <dd className="tabular-nums">{money(result.base)}</dd>
           </div>
           <div className="flex justify-between">
             <dt className="text-ink-inverse/70">Holiday pay, {result.holidayRate}%</dt>
-            <dd className="tabular-nums">{formatMoney(result.holiday)}</dd>
+            <dd className="tabular-nums">{money(result.holiday)}</dd>
           </div>
           <div className="flex justify-between">
             <dt className="text-ink-inverse/70">
               Per day, for {days} {days === 1 ? "day" : "days"}
             </dt>
-            <dd className="tabular-nums">{formatMoney(result.perDay)}</dd>
+            <dd className="tabular-nums">{money(result.perDay)}</dd>
           </div>
         </dl>
       </section>
@@ -164,7 +173,7 @@ function Calculator() {
             inputMode="decimal"
             label="Holiday pay"
             measure="%"
-            placeholder={String(DEFAULT_HOLIDAY_PAY_RATE)}
+            placeholder={String(defaultHolidayRate)}
             min={0}
             {...register("holiday-pay")}
           />
@@ -178,7 +187,7 @@ function Calculator() {
           />
         </div>
         <p className="text-[0.8125rem] text-ink-muted">
-          Leave holiday pay empty to use the standard {DEFAULT_HOLIDAY_PAY_RATE}%.
+          Leave holiday pay empty to use {defaultHolidayRate}%.
         </p>
       </section>
     </div>

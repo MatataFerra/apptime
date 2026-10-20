@@ -25,9 +25,26 @@ export type HistoryEntry = {
   afterTaxes: number;
   /** "worked" (1.5×), "off" (paid day off) or null for a regular day. */
   holiday: "worked" | "off" | null;
+  /** The shift's own currency; null means the user's default. */
+  currency: string | null;
 };
 
-export type MonthGroup = { key: string; label: string; earned: number; entries: HistoryEntry[] };
+export type MonthGroup = {
+  key: string;
+  label: string;
+  /** Total per currency, the default currency first. Amounts are never added across currencies. */
+  totals: { currency: string; amount: number }[];
+  entries: HistoryEntry[];
+};
+
+/** Whether an entry is in `currency`, counting shifts without one as the default. */
+export function inCurrency(
+  entry: Pick<HistoryEntry, "currency">,
+  currency: string,
+  fallback: string
+) {
+  return (entry.currency ?? fallback) === currency;
+}
 
 function toEntry(shift: HourlyType | ProductionType, kind: ShiftKind): HistoryEntry | null {
   const date = new Date(shift.startDate);
@@ -44,6 +61,7 @@ function toEntry(shift: HourlyType | ProductionType, kind: ShiftKind): HistoryEn
     earned,
     afterTaxes: Pay.afterTax(earned, shift.taxes ?? []),
     holiday: shift.publicHolidayWorked ? "worked" : shift.isPublicHoliday ? "off" : null,
+    currency: shift.currency ?? null,
   };
 }
 
@@ -60,22 +78,35 @@ export function historyEntries(
     .sort((a, b) => b.date.valueOf() - a.date.valueOf());
 }
 
-/** Entries grouped by calendar month (newest first), with each month's total. */
-export function groupByMonth(entries: HistoryEntry[]): MonthGroup[] {
-  const groups = new Map<string, MonthGroup>();
+/**
+ * Entries grouped by calendar month (newest first), with each month's
+ * total per currency. `fallback` is the currency of shifts saved without one.
+ */
+export function groupByMonth(entries: HistoryEntry[], fallback = "USD"): MonthGroup[] {
+  const groups = new Map<
+    string,
+    { label: string; sums: Map<string, number>; entries: HistoryEntry[] }
+  >();
   for (const entry of entries) {
     const key = format(entry.date, "yyyy-MM");
     const group = groups.get(key) ?? {
-      key,
       label: format(startOfMonth(entry.date), "MMMM yyyy"),
-      earned: 0,
+      sums: new Map<string, number>(),
       entries: [],
     };
-    group.earned += entry.earned;
+    const currency = entry.currency ?? fallback;
+    group.sums.set(currency, (group.sums.get(currency) ?? 0) + entry.earned);
     group.entries.push(entry);
     groups.set(key, group);
   }
-  return [...groups.values()];
+  return [...groups.entries()].map(([key, g]) => ({
+    key,
+    label: g.label,
+    entries: g.entries,
+    totals: [...g.sums.entries()]
+      .map(([currency, amount]) => ({ currency, amount: round(amount) }))
+      .sort((a, b) => Number(b.currency === fallback) - Number(a.currency === fallback)),
+  }));
 }
 
 export type WeekPoint = { label: string; start: Date; hourly: number; production: number };
@@ -91,8 +122,9 @@ export function weeklyEarnings(
     const start = addWeeks(thisWeek, i - weeks + 1);
     const end = new Date(addWeeks(start, 1).valueOf() - 1);
     const inWeek = entries.filter((e) => isWithinInterval(e.date, { start, end }));
-    const sum = (kind: ShiftKind) =>
-      round(inWeek.filter((e) => e.kind === kind).reduce((acc, e) => acc + e.earned, 0));
+    function sum(kind: ShiftKind) {
+      return round(inWeek.filter((e) => e.kind === kind).reduce((acc, e) => acc + e.earned, 0));
+    }
 
     return {
       label: format(start, "d MMM"),

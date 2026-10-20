@@ -6,11 +6,12 @@ import { ChevronRight, Square } from "lucide-react";
 import Link from "next/link";
 import { useInterval } from "usehooks-ts";
 
-import { formatMoney, runningShiftEarnings } from "@/services/Summary";
+import { runningShiftEarnings } from "@/services/Summary";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 import useFinishShift from "@/hooks/useFinishShift";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
+import useMoney from "@/hooks/useMoney";
 
 function elapsed(start: Date, now: Date) {
   const minutes = Math.max(0, Math.floor((now.valueOf() - start.valueOf()) / 60000));
@@ -22,6 +23,7 @@ function elapsed(start: Date, now: Date) {
  * what it's worth so far, and a way to finish it without opening Track.
  */
 function LiveShift() {
+  const money = useMoney();
   const { data: hourly } = useHourlyShifts();
   const { finish, finishing } = useFinishShift();
   const [now, setNow] = useState(() => new Date());
@@ -69,7 +71,9 @@ function LiveShift() {
               <span className="text-[0.6em] text-on-module/60">m</span>
             </span>
             <span className="truncate text-sm text-on-module/80">
-              {earned > 0 ? `${formatMoney(earned)} so far` : running.name || "Hourly shift"}
+              {earned > 0
+                ? `${money(earned, { currency: running.currency })} so far`
+                : running.name || "Hourly shift"}
             </span>
           </span>
         </span>

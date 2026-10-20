@@ -1,13 +1,21 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import IncomesCalculator from "./Calculator";
+
+// The calculator reads Settings (currency, holiday pay, rate) from the user.
+const user = vi.hoisted(() => ({ current: null as null | { config: Record<string, unknown> } }));
+vi.mock("@/hooks/useUser", () => ({ default: () => ({ data: user.current }) }));
 
 function money(n: number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
 }
 
 describe("IncomesCalculator", () => {
+  beforeEach(() => {
+    user.current = null;
+  });
+
   test("renders the component", () => {
     render(<IncomesCalculator />);
     expect(screen.getByLabelText("Hours a day")).toBeInTheDocument();
@@ -46,5 +54,12 @@ describe("IncomesCalculator", () => {
   test("displays default holiday pay rate", () => {
     render(<IncomesCalculator />);
     expect(screen.getByLabelText("Holiday pay")).toHaveValue(8);
+  });
+
+  test("starts from the holiday pay and rate saved in Settings", () => {
+    user.current = { config: { holidayPay: 12, hourValue: 30, currency: "USD" } };
+    render(<IncomesCalculator />);
+    expect(screen.getByLabelText("Holiday pay")).toHaveValue(12);
+    expect(screen.getByLabelText(/hourly rate/i)).toHaveValue(30);
   });
 });

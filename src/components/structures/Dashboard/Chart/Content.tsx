@@ -7,16 +7,14 @@ import SeasonChart from "@/components/structures/Dashboard/Charts/SeasonChart";
 import WeeklyChart from "@/components/structures/Dashboard/Charts/WeeklyChart";
 import Skeleton from "@/components/ui/Skeleton";
 
-import useHourlyShifts from "@/hooks/useHourlyShifts";
-import useProductionShifts from "@/hooks/useProductionShifts";
+import useShiftsInCurrency from "@/hooks/useShiftsInCurrency";
 import useUser from "@/hooks/useUser";
 
 function Content() {
   const { data: user } = useUser();
-  const { data: hourly, isLoading: loadingHourly } = useHourlyShifts();
-  const { data: production, isLoading: loadingProduction } = useProductionShifts();
+  const { hourly, production, isLoading } = useShiftsInCurrency();
 
-  if (loadingHourly || loadingProduction) {
+  if (isLoading) {
     return (
       <div className="flex flex-col gap-4">
         <Skeleton classes="h-80 w-full rounded-[20px]" />

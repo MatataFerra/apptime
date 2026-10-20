@@ -28,7 +28,7 @@ This was created for real purposes. When I thought on this app it was for a real
 This app was buit with
 - Next.js 14.x
 - Prisma as ORM 5.14
-- Node.js: 20.9.0
+- Node.js: 24
 - ShadcnUI for components
 - TailwindCSS
 - React-Query

@@ -5,7 +5,6 @@ import { z } from "zod";
 import ErrorFactory from "@/services/Error/factory";
 import UserService from "@/services/User";
 
-import { WEEK_DAYS } from "@/utils/constants";
 import { SETTINGS_FIELDS } from "@/utils/constants/settings";
 import { revalidateSettingsPage } from "@/utils/helpers/revalidateShiftPages";
 
@@ -14,7 +13,6 @@ const SettingsSchema = z.object({
   email: z.string().email(),
   country: z.string(),
   city: z.string(),
-  weekStartsOn: z.enum(WEEK_DAYS).default("monday"),
 });
 
 export default async function onUpdateSettings(values: typeof SETTINGS_FIELDS) {
@@ -27,7 +25,6 @@ export default async function onUpdateSettings(values: typeof SETTINGS_FIELDS) {
   const data = {
     name: values.account.name,
     email: values.account.email,
-    weekStartsOn: values.configs.weekStartsOn,
     country: values.personal.country,
     city: values.personal.city,
   };
@@ -49,17 +46,6 @@ export default async function onUpdateSettings(values: typeof SETTINGS_FIELDS) {
         name: checkData.data.name,
       },
     }),
-    prisma.config.upsert({
-      where: { userId: user.id },
-      create: {
-        userId: user.id,
-        weekStartsOn: checkData.data.weekStartsOn,
-      },
-      update: {
-        weekStartsOn: checkData.data.weekStartsOn,
-      },
-    }),
-
     prisma.profile.upsert({
       where: { userId: user.id },
       create: {

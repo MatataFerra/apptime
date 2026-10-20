@@ -12,6 +12,7 @@ import type { SuccessApiResponse } from "@/types/api_response";
 import type { ProductionInputs } from "@/types/forms";
 
 import { observer } from "@/components/structures/SalaryItems/observer";
+import CurrencySelect from "@/components/structures/ShiftForms/CurrencySelect";
 import DatalistShiftNames from "@/components/structures/ShiftForms/Datalist";
 import HolidayChoice, {
   fromHolidayValue,
@@ -22,10 +23,12 @@ import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
+import { currencySymbol } from "@/utils/constants/currencies";
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import { defaultFinish, needsDefaultFinish } from "@/utils/helpers/defaultFinish";
 import useGetUniqueSalaryItems from "@/hooks/useGetUniqueSalaryItems";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
+import { useCurrency } from "@/hooks/useMoney";
 import useProductionShifts from "@/hooks/useProductionShifts";
 import type { SalaryItems } from "@/hooks/useSalaryItems";
 import useShiftNames from "@/hooks/useShiftNames";
@@ -45,6 +48,8 @@ function Inputs() {
     setIsFormReady,
     setDialogState,
   } = useProductionForm((state) => state);
+  const shiftCurrency = useProductionForm((state) => state.values.currency);
+  const defaultCurrency = useCurrency();
 
   /*
     Custom hook to get the taxes from the store
@@ -139,6 +144,7 @@ function Inputs() {
       name: formData["name"],
       taxes,
       contributions,
+      currency: shiftCurrency ?? null,
     };
 
     Toast({
@@ -208,6 +214,7 @@ function Inputs() {
         {
           id: lastId + 1,
           startDate: parseData.startDate,
+          currency: parseData.currency,
           endDate: parseData.endDate,
           name: parseData.name,
           amount: 0,
@@ -371,8 +378,8 @@ function Inputs() {
           min={0}
           type="number"
           step={"any"}
-          measure="$"
-          description="If you produce boxes, each box costs $0.023"
+          measure={currencySymbol(shiftCurrency || defaultCurrency)}
+          description="What you're paid for each bin, box or piece"
           measurePlace="left"
           {...register("item-value", {
             onChange(e) {
@@ -390,6 +397,10 @@ function Inputs() {
               setStoreValues({ itemQuantity: e.target.value });
             },
           })}
+        />
+        <CurrencySelect
+          value={shiftCurrency}
+          onChange={(currency) => setStoreValues({ currency })}
         />
         <input type="checkbox" hidden {...register("is-public-holiday")} />
         <input type="checkbox" hidden {...register("is-worked")} />

@@ -1,14 +1,15 @@
 "use client";
 
-import { type PropsWithChildren, useEffect, useMemo } from "react";
+import { type PropsWithChildren, useEffect } from "react";
 
 import { format } from "date-fns";
 
 import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
-import { formatMoney } from "@/services/Summary";
 
 import ShiftReviewDialog from "@/components/structures/share/ShiftReviewDialog";
+
+import useMoney from "@/hooks/useMoney";
 
 import { useProductionForm } from "@/store/useProductionForm";
 import { useProductionTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
@@ -20,7 +21,13 @@ function humanize(date?: string | null) {
 }
 
 function DialogProduction({ children }: PropsWithChildren) {
+  const format$ = useMoney();
   const { values, dialog, setDialogState, formError } = useProductionForm((state) => state);
+  const currency = values.currency;
+  // In the shift's own currency.
+  function money(value: number) {
+    return format$(value, { currency });
+  }
   const {
     taxesModule: { salaryElement: taxes },
   } = useProductionTaxesOrContributionsStore((state) => state);
@@ -29,27 +36,19 @@ function DialogProduction({ children }: PropsWithChildren) {
     if (formError) return setDialogState(false);
   }, [formError, setDialogState, dialog]);
 
-  const earnings = useMemo(() => {
-    const prepareShift = {
-      itemValue: Number(values.itemValue ?? 0),
-      itemQuantity: Number(values.itemQuantity),
-      isPublicHoliday: !!values.isPublicHoliday,
-      publicHolidayWorked: !!values.publicHolidayWorked,
-    };
-    const gross = new ShiftService(prepareShift).checkPublicHoliday().calculateEarnings();
-    const afterTaxes = Pay.afterTax(gross, taxes);
-
-    return {
-      gross: isNaN(gross) ? 0 : gross,
-      afterTaxes: isNaN(afterTaxes) ? 0 : afterTaxes,
-    };
-  }, [
-    taxes,
-    values.itemQuantity,
-    values.itemValue,
-    values.isPublicHoliday,
-    values.publicHolidayWorked,
-  ]);
+  const gross = new ShiftService({
+    itemValue: Number(values.itemValue ?? 0),
+    itemQuantity: Number(values.itemQuantity),
+    isPublicHoliday: !!values.isPublicHoliday,
+    publicHolidayWorked: !!values.publicHolidayWorked,
+  })
+    .checkPublicHoliday()
+    .calculateEarnings();
+  const afterTaxes = Pay.afterTax(gross, taxes);
+  const earnings = {
+    gross: isNaN(gross) ? 0 : gross,
+    afterTaxes: isNaN(afterTaxes) ? 0 : afterTaxes,
+  };
 
   const tags = [
     values.isPublicHoliday ? "Public holiday" : null,
@@ -62,6 +61,7 @@ function DialogProduction({ children }: PropsWithChildren) {
       onOpenChange={setDialogState}
       formId="production-job"
       theme="production"
+      currency={currency}
       gross={earnings.gross}
       afterTaxes={earnings.afterTaxes}
       taxes={taxes}
@@ -72,7 +72,7 @@ function DialogProduction({ children }: PropsWithChildren) {
         { label: "Finish", value: humanize(values.finishDate) },
         {
           label: "Pieces",
-          value: `${values.itemQuantity ?? 0} × ${formatMoney(Number(values.itemValue ?? 0))}`,
+          value: `${values.itemQuantity ?? 0} × ${money(Number(values.itemValue ?? 0))}`,
         },
         ...(values.holidayPayRate
           ? [{ label: "Holiday pay", value: `${values.holidayPayRate}%` }]

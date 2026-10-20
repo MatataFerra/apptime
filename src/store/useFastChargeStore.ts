@@ -11,6 +11,8 @@ interface FastCharge {
     fastHoliday?: boolean;
     fastWorked?: boolean;
     unpaidBreaks?: string;
+    /** null: the Settings currency */
+    currency?: string | null;
   };
 
   errors: {
@@ -59,6 +61,7 @@ export const useFastChargeStore = create<FastCharge>((set, get) => ({
     fastHoliday: false,
     fastWorked: false,
     unpaidBreaks: "",
+    currency: null,
   },
 
   errors: {

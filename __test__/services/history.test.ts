@@ -77,7 +77,22 @@ describe("History service", () => {
   test("groups by month with totals", () => {
     const groups = groupByMonth(entries);
     expect(groups.map((g) => g.label)).toEqual(["October 2026", "September 2026"]);
-    expect(groups[1].earned).toBeCloseTo(100, 2);
+    expect(groups[1].totals).toEqual([{ currency: "USD", amount: 100 }]);
+  });
+
+  test("month totals never add up different currencies", () => {
+    const mixed = historyEntries(
+      [
+        hourly(new Date(2026, 9, 5, 9), 5), // $100, saved without a currency
+        hourly(new Date(2026, 9, 6, 9), 2, { currency: "EUR" }), // €40
+        hourly(new Date(2026, 9, 7, 9), 1, { currency: "USD" }), // $20
+      ],
+      []
+    );
+    expect(groupByMonth(mixed, "USD")[0].totals).toEqual([
+      { currency: "USD", amount: 120 },
+      { currency: "EUR", amount: 40 },
+    ]);
   });
 
   test("weekly earnings split by kind, oldest first, empty weeks included", () => {

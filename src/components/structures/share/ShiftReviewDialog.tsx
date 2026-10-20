@@ -4,8 +4,6 @@ import type { PropsWithChildren, ReactNode } from "react";
 
 import { ClipboardCheck } from "lucide-react";
 
-import { formatMoney } from "@/services/Summary";
-
 import { effectiveRate } from "@/components/structures/SalaryItems/TaxPicker";
 import Button from "@/components/ui/Button";
 import {
@@ -21,6 +19,7 @@ import {
 
 import { MODULE_THEMES, type ModuleTheme } from "@/utils/constants/modules";
 import { cn } from "@/utils/helpers/styleMerger";
+import useMoney from "@/hooks/useMoney";
 
 export type ReviewRow = { label: string; value: ReactNode };
 
@@ -31,6 +30,8 @@ type Props = {
   formId: string;
   theme: ModuleTheme;
   gross: number;
+  /** The shift's currency; defaults to the one in Settings. */
+  currency?: string | null;
   afterTaxes: number;
   taxes: { name: string; value: number }[];
   rows: ReviewRow[];
@@ -48,12 +49,17 @@ function ShiftReviewDialog({
   formId,
   theme,
   gross,
+  currency,
   afterTaxes,
   taxes,
   rows,
   tags = [],
   children,
 }: PropsWithChildren<Props>) {
+  const format$ = useMoney();
+  function money(value: number) {
+    return format$(value, { currency });
+  }
   const colors = MODULE_THEMES[theme];
   const hasTaxes = taxes.length > 0;
 
@@ -83,19 +89,17 @@ function ShiftReviewDialog({
         >
           <div className="flex flex-col gap-1">
             <span className="text-[0.8125rem] text-ink-inverse/70">You&apos;ll earn</span>
-            <span className="figure text-[2.75rem] leading-none text-live">
-              {formatMoney(gross)}
-            </span>
+            <span className="figure text-[2.75rem] leading-none text-live">{money(gross)}</span>
           </div>
           {hasTaxes ? (
             <dl className="flex flex-col gap-1.5 border-t border-ink-inverse/15 pt-3 text-sm">
               <div className="flex justify-between">
                 <dt className="text-ink-inverse/70">Taxes, {effectiveRate(taxes)}%</dt>
-                <dd className="tabular-nums">−{formatMoney(Math.max(0, gross - afterTaxes))}</dd>
+                <dd className="tabular-nums">−{money(Math.max(0, gross - afterTaxes))}</dd>
               </div>
               <div className="flex justify-between font-semibold">
                 <dt>After taxes</dt>
-                <dd className="tabular-nums">{formatMoney(afterTaxes)}</dd>
+                <dd className="tabular-nums">{money(afterTaxes)}</dd>
               </div>
             </dl>
           ) : null}

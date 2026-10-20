@@ -6,9 +6,14 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
+import CurrencySelect from "@/components/structures/ShiftForms/CurrencySelect";
 import PublicHolidayDropdown from "@/components/structures/Track/Flow/Start/Dialog/Dropdown";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
+
+import { currencySymbol } from "@/utils/constants/currencies";
+import { useCurrency } from "@/hooks/useMoney";
+import useUser from "@/hooks/useUser";
 
 import { useShiftData } from "@/store/useShiftData";
 
@@ -25,11 +30,14 @@ const InputsSchema = z.object({
 });
 
 function ShiftStartInputs() {
-  const { setData, setErrors } = useShiftData((state) => state);
+  const { data, setData, setErrors } = useShiftData((state) => state);
+  const { data: user } = useUser();
+  const defaultCurrency = useCurrency();
   const { register, control } = useForm({
     resolver: zodResolver(InputsSchema),
     defaultValues: {
-      hourValue: "",
+      // The rate from Settings, if one is saved.
+      hourValue: user?.config?.hourValue ? String(user.config.hourValue) : "",
       unpaidBreaks: "1",
     },
   });
@@ -58,7 +66,7 @@ function ShiftStartInputs() {
         <Input
           data-testid="hourValue"
           description="Hour value"
-          measure="$"
+          measure={currencySymbol(data.currency || defaultCurrency)}
           type="number"
           required
           min={0}
@@ -73,6 +81,7 @@ function ShiftStartInputs() {
           {...register("unpaidBreaks", {})}
         />
       </Stack>
+      <CurrencySelect value={data.currency} onChange={(currency) => setData({ currency })} />
       <Stack orientation="vertical" classes="h-20">
         <PublicHolidayDropdown />
       </Stack>

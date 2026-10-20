@@ -8,11 +8,11 @@ import { ChevronRight } from "lucide-react";
 
 import {
   groupByMonth,
-  type HistoryEntry,
   historyEntries,
+  type HistoryEntry,
   type ShiftKind,
 } from "@/services/History";
-import { formatHours, formatMoney } from "@/services/Summary";
+import { formatHours } from "@/services/Summary";
 
 import Content from "@/components/structures/Dashboard/Table/Dialog/Content";
 import TableDialog from "@/components/structures/Dashboard/Table/Dialog/Dialog";
@@ -21,6 +21,7 @@ import Skeleton from "@/components/ui/Skeleton";
 import { cn } from "@/utils/helpers/styleMerger";
 import useDashboard from "@/hooks/useDashboard";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
+import useMoney, { useCurrency } from "@/hooks/useMoney";
 import useProductionShifts from "@/hooks/useProductionShifts";
 
 import { useDashHourlyStore } from "@/store/useDashHourlyStore";
@@ -34,16 +35,21 @@ const FILTERS: { value: Filter; label: string }[] = [
   { value: "production", label: "Per piece" },
 ];
 
-function detail(entry: HistoryEntry) {
+function detail(entry: HistoryEntry, money: (value: number) => string) {
   if (entry.kind === "hourly") {
     const rate = (entry.shift as Hourly).hourValue;
-    return `${formatHours(entry.minutes)} · ${formatMoney(rate)}/h`;
+    return `${formatHours(entry.minutes)} · ${money(rate)}/h`;
   }
   const { itemQuantity, itemValue } = entry.shift as Production;
-  return `${itemQuantity ?? 0} pieces × ${formatMoney(itemValue ?? 0)}`;
+  return `${itemQuantity ?? 0} pieces × ${money(itemValue ?? 0)}`;
 }
 
 function HistoryRow({ entry }: { entry: HistoryEntry }) {
+  const format$ = useMoney();
+  // Each shift in its own currency.
+  function money(value: number) {
+    return format$(value, { currency: entry.currency });
+  }
   const hourlyStore = useDashHourlyStore();
   const productionStore = useDashProductionStore();
   const store = entry.kind === "hourly" ? hourlyStore : productionStore;
@@ -80,7 +86,7 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
             {entry.name || (isHourly ? "Hourly shift" : "Per piece shift")}
           </span>
           <span className="truncate text-[0.8125rem] text-ink-muted">
-            {isHourly ? "Per hour" : "Per piece"} · {detail(entry)}
+            {isHourly ? "Per hour" : "Per piece"} · {detail(entry, money)}
           </span>
           {entry.holiday ? (
             <span className="mt-0.5 w-fit rounded-full bg-fast-soft px-2 py-0.5 text-[0.6875rem] font-semibold text-fast-ink">
@@ -91,11 +97,11 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
 
         <span className="flex shrink-0 flex-col items-end gap-0.5">
           <span className="text-[0.9375rem] font-semibold text-ink tabular-nums">
-            {formatMoney(entry.earned)}
+            {money(entry.earned)}
           </span>
           {entry.afterTaxes < entry.earned - 0.005 ? (
             <span className="text-xs text-ink-muted tabular-nums">
-              {formatMoney(entry.afterTaxes)} net
+              {money(entry.afterTaxes)} net
             </span>
           ) : null}
         </span>
@@ -110,6 +116,8 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
  * Tap a shift for the details, to edit or to delete it.
  */
 function ShiftHistory() {
+  const money = useMoney();
+  const currency = useCurrency();
   const [filter, setFilter] = useState<Filter>("all");
   const { isDateFiltered } = useDashboard();
   const { data: hourlyData, isLoading: loadingHourly } = useHourlyShifts();
@@ -132,7 +140,7 @@ function ShiftHistory() {
   const entries = historyEntries(hourly, productions).filter(
     (e) => filter === "all" || e.kind === filter
   );
-  const months = groupByMonth(entries);
+  const months = groupByMonth(entries, currency);
 
   return (
     <div className="flex flex-col gap-4">
@@ -167,7 +175,12 @@ function ShiftHistory() {
               <h3 className="text-sm font-semibold text-ink">{month.label}</h3>
               <span className="text-sm text-ink-muted tabular-nums">
                 {month.entries.length} {month.entries.length === 1 ? "shift" : "shifts"} ·{" "}
-                <span className="font-semibold text-ink">{formatMoney(month.earned)}</span>
+                {month.totals.map((t, i) => (
+                  <span key={t.currency} className="font-semibold text-ink">
+                    {i > 0 ? " + " : ""}
+                    {money(t.amount, { currency: t.currency })}
+                  </span>
+                ))}
               </span>
             </header>
             <ul className="divide-y divide-border overflow-hidden rounded-[20px] border border-border bg-surface">

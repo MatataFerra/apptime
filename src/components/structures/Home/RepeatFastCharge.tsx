@@ -8,7 +8,7 @@ import { Repeat, Zap } from "lucide-react";
 
 import { repeatableFastCharge } from "@/services/Repeat";
 import ShiftService from "@/services/Shift";
-import { formatHours, formatMoney } from "@/services/Summary";
+import { formatHours } from "@/services/Summary";
 import Toast from "@/services/Toast";
 
 import { effectiveRate } from "@/components/structures/SalaryItems/TaxPicker";
@@ -16,6 +16,7 @@ import ShiftReviewDialog from "@/components/structures/share/ShiftReviewDialog";
 
 import { invalidateShiftQueries } from "@/utils/helpers/invalidateShiftQueries";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
+import useMoney from "@/hooks/useMoney";
 
 import onCreateHourlyShift from "@/server-actions/hourly-job";
 
@@ -30,6 +31,11 @@ function time(date: Date) {
  * the same hours, rate, breaks and taxes, after a review.
  */
 function RepeatFastCharge() {
+  const format$ = useMoney();
+  // In the shift's own currency.
+  function money(value: number) {
+    return format$(value, { currency: last?.currency });
+  }
   const { data: hourly } = useHourlyShifts();
   const queryClient = useQueryClient();
   const [now] = useState(() => new Date());
@@ -111,7 +117,7 @@ function RepeatFastCharge() {
           </span>
           <span className="truncate text-[0.8125rem] opacity-80">
             {time(start)} – {time(end)} · {formatHours(Math.max(0, minutes))} at{" "}
-            {formatMoney(last.hourValue)}/h
+            {money(last.hourValue)}/h
           </span>
         </div>
       </div>
@@ -122,6 +128,7 @@ function RepeatFastCharge() {
           onOpenChange={setOpen}
           formId={FORM_ID}
           theme="fast"
+          currency={last.currency}
           gross={gross}
           afterTaxes={afterTaxes}
           taxes={taxes}
@@ -131,7 +138,7 @@ function RepeatFastCharge() {
             { label: "Start", value: format(start, "EEE d MMM, h:mm a") },
             { label: "Finish", value: format(end, "EEE d MMM, h:mm a") },
             { label: "Unpaid breaks", value: `${last.unpaidBreaks ?? 0} min` },
-            { label: "Hourly rate", value: formatMoney(last.hourValue) },
+            { label: "Hourly rate", value: money(last.hourValue) },
           ]}
         >
           <button

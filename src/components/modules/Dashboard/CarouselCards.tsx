@@ -7,7 +7,7 @@ import { CalendarDays, Clock3, Layers, type LucideIcon, TrendingUp } from "lucid
 
 import Dashboard from "@/services/Dashboard";
 import DateHumanizer from "@/services/Date";
-import { compareWithPreviousMonth, formatMoney } from "@/services/Summary";
+import { compareWithPreviousMonth } from "@/services/Summary";
 
 import { LocaleParams } from "@/types";
 
@@ -15,8 +15,8 @@ import Skeleton from "@/components/ui/Skeleton";
 
 import { MODULE_THEMES, type ModuleTheme } from "@/utils/constants/modules";
 import { cn } from "@/utils/helpers/styleMerger";
-import useHourlyShifts from "@/hooks/useHourlyShifts";
-import useProductionShifts from "@/hooks/useProductionShifts";
+import useMoney from "@/hooks/useMoney";
+import useShiftsInCurrency from "@/hooks/useShiftsInCurrency";
 
 type Props = {
   params: LocaleParams;
@@ -60,8 +60,8 @@ function Stat({
 
 /** Month earnings against last month, plus all-time stats. */
 function DashboardStats({ params }: Props) {
-  const { data: hourlies, isLoading: loadingHourly } = useHourlyShifts();
-  const { data: productions, isLoading: loadingProduction } = useProductionShifts();
+  const money = useMoney();
+  const { hourly: hourlies, production: productions, isLoading } = useShiftsInCurrency();
 
   const stats = useMemo(
     () =>
@@ -81,7 +81,7 @@ function DashboardStats({ params }: Props) {
     [hourlies, productions]
   );
 
-  if (loadingHourly || loadingProduction) {
+  if (isLoading) {
     return (
       <div className="grid w-full grid-cols-2 gap-2.5">
         <Skeleton classes="col-span-2 h-28 rounded-[18px]" />
@@ -105,13 +105,13 @@ function DashboardStats({ params }: Props) {
           Earned in {format(new Date(), "MMMM")}
         </span>
         <span className="figure text-[3.25rem] leading-[0.9] text-live">
-          {formatMoney(month.current.earned)}
+          {money(month.current.earned)}
         </span>
         {month.previousFull.earned > 0 ? (
           <div className="flex flex-col gap-2.5 border-t border-ink-inverse/15 pt-3">
             <div className="flex items-baseline justify-between gap-3 text-[0.8125rem]">
               <span className="text-ink-inverse/70">
-                {previousMonth}: {formatMoney(month.previousFull.earned)}
+                {previousMonth}: {money(month.previousFull.earned)}
               </span>
               <span className="font-semibold">
                 {(month.shareOfPrevious ?? 0) >= 100

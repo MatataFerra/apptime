@@ -11,6 +11,8 @@ interface Production {
     publicHolidayWorked?: boolean;
     unpaidBreaks?: string;
     name?: string;
+    /** null: the Settings currency */
+    currency?: string | null;
   };
 
   errors: {
@@ -62,6 +64,7 @@ export const useProductionForm = create<Production>((set, get) => ({
     isPublicHoliday: false,
     publicHolidayWorked: false,
     unpaidBreaks: "",
+    currency: null,
   },
 
   errors: {

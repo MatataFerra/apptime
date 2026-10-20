@@ -1,0 +1,28 @@
+import { formatMoney } from "@/services/Summary";
+
+import { type CurrencyCode, DEFAULT_CURRENCY, isCurrency } from "@/utils/constants/currencies";
+import useUser from "@/hooks/useUser";
+
+/** The currency picked in Settings (USD until one is chosen). */
+export function useCurrency(): CurrencyCode {
+  const { data: user } = useUser();
+  const saved = user?.config?.currency;
+  return isCurrency(saved) ? saved : DEFAULT_CURRENCY;
+}
+
+/**
+ * formatMoney in the user's currency. Pass `currency` for a shift saved
+ * in another one.
+ */
+function useMoney() {
+  const currency = useCurrency();
+
+  return function money(
+    value: number,
+    options: { cents?: boolean; currency?: string | null } = {}
+  ) {
+    return formatMoney(value, { cents: options.cents, currency: options.currency || currency });
+  };
+}
+
+export default useMoney;

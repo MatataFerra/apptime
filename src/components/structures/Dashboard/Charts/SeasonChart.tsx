@@ -12,13 +12,11 @@ import {
 } from "recharts";
 
 import type { CumulativePoint } from "@/services/History";
-import { formatMoney } from "@/services/Summary";
+import { formatMoneyCompact } from "@/services/Summary";
+
+import useMoney, { useCurrency } from "@/hooks/useMoney";
 
 import ChartCard, { SERIES, SeriesKey } from "./ChartCard";
-
-function compact(value: number) {
-  return value >= 1000 ? `$${Math.round(value / 100) / 10}k` : `$${Math.round(value)}`;
-}
 
 function SeasonTooltip({
   active,
@@ -27,6 +25,7 @@ function SeasonTooltip({
   active?: boolean;
   payload?: { payload: CumulativePoint }[];
 }) {
+  const money = useMoney();
   const point = payload?.[0]?.payload;
   if (!active || !point) return null;
 
@@ -39,7 +38,7 @@ function SeasonTooltip({
             <span className="size-2 rounded-full" style={{ background: SERIES[kind].color }} />
             {SERIES[kind].label}
           </span>
-          <span className="text-ink tabular-nums">{formatMoney(point[kind])}</span>
+          <span className="text-ink tabular-nums">{money(point[kind])}</span>
         </p>
       ))}
     </div>
@@ -51,6 +50,8 @@ function SeasonTooltip({
  * total splits between them on top.
  */
 function SeasonChart({ data }: { data: CumulativePoint[] }) {
+  const money = useMoney();
+  const currency = useCurrency();
   const last = data.at(-1) ?? { hourly: 0, production: 0 };
   const total = last.hourly + last.production;
   const share = total > 0 ? Math.round((last.hourly / total) * 100) : 0;
@@ -63,7 +64,7 @@ function SeasonChart({ data }: { data: CumulativePoint[] }) {
       subtitle={data.length ? `Since ${data[0].label}` : undefined}
       figure={
         <span className="figure text-[1.75rem] leading-none text-ink">
-          {formatMoney(total, { cents: false })}
+          {money(total, { cents: false })}
         </span>
       }
       legend={
@@ -88,15 +89,13 @@ function SeasonChart({ data }: { data: CumulativePoint[] }) {
             items={[
               {
                 ...SERIES.hourly,
-                value: both ? `${share}%` : formatMoney(last.hourly, { cents: false }),
+                value: both ? `${share}%` : money(last.hourly, { cents: false }),
               },
               ...(last.production > 0
                 ? [
                     {
                       ...SERIES.production,
-                      value: both
-                        ? `${100 - share}%`
-                        : formatMoney(last.production, { cents: false }),
+                      value: both ? `${100 - share}%` : money(last.production, { cents: false }),
                     },
                   ]
                 : []),
@@ -130,7 +129,7 @@ function SeasonChart({ data }: { data: CumulativePoint[] }) {
               axisLine={false}
               width={40}
               tickCount={4}
-              tickFormatter={compact}
+              tickFormatter={(value: number) => formatMoneyCompact(value, currency)}
               tick={{ fill: "var(--color-ink-muted)", fontSize: 11 }}
             />
             <Tooltip

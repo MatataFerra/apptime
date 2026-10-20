@@ -6,13 +6,9 @@ import { useInterval } from "usehooks-ts";
 
 import DateHumanizer from "@/services/Date";
 import ShiftService from "@/services/Shift";
-import {
-  formatHours,
-  formatMoney,
-  runningShiftEarnings,
-  usualShiftMinutes,
-} from "@/services/Summary";
+import { formatHours, runningShiftEarnings, usualShiftMinutes } from "@/services/Summary";
 
+import useMoney from "@/hooks/useMoney";
 import useTrack from "@/hooks/useTrack";
 
 /**
@@ -21,6 +17,7 @@ import useTrack from "@/hooks/useTrack";
  * shift and the usual length.
  */
 function ShiftTrackInfo() {
+  const money = useMoney();
   const { user, isShiftActive, isClosing, shiftUnclosed } = useTrack();
   const [now, setNow] = useState(() => new Date());
   const running = isShiftActive && !isClosing && !!shiftUnclosed.shift?.startDate;
@@ -63,7 +60,7 @@ function ShiftTrackInfo() {
           <div className="flex flex-col gap-0.5">
             <dt className="text-xs text-ink-inverse/60">This shift so far</dt>
             <dd className="figure text-[1.625rem] leading-tight text-live">
-              {formatMoney(earned)}
+              {money(earned, { currency: shiftUnclosed.shift?.currency })}
             </dd>
           </div>
           <div className="flex flex-col gap-0.5">
