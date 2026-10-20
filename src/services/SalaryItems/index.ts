@@ -74,9 +74,10 @@ const SalaryItems = {
   async uses(kind: SalaryItemKind, itemId: number) {
     const row = await items(kind).findUnique({
       where: { id: itemId },
-      select: { _count: { select: { hourly: true, production: true } } },
+      // Not `_count`: on Turso a zero count comes back as NULL and Prisma 5 throws.
+      select: { hourly: { select: { id: true } }, production: { select: { id: true } } },
     });
-    return row ? row._count.hourly + row._count.production : 0;
+    return row ? row.hourly.length + row.production.length : 0;
   },
 
   items,

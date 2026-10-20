@@ -18,6 +18,7 @@ const MONEY: DrawerOption[] = [
   { id: "dashboard", label: "Dashboard", dataTestId: "dashboard", url: "/dashboard" },
   { id: "estimate-income", label: "Estimate", dataTestId: "estimate-income", url: "/incomes" },
   { id: "compare", label: "Compare", dataTestId: "compare", url: "/compare" },
+  { id: "taxes", label: "Taxes", dataTestId: "taxes", url: "/taxes" },
 ];
 
 const ACCOUNT: DrawerOption[] = [

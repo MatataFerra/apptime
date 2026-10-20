@@ -4,11 +4,16 @@ import { getToken } from "next-auth/jwt";
 import prisma from "#/prisma/client";
 
 /** Flattens the relation counts into how many shifts use the item. */
-function withUses<T extends { _count: { hourly: number; production: number } }>({
-  _count,
+/**
+ * How many shifts use the item. Counted from the ids rather than with
+ * `_count`: on Turso a zero count comes back as NULL and Prisma 5 throws.
+ */
+function withUses<T extends { hourly: { id: number }[]; production: { id: number }[] }>({
+  hourly,
+  production,
   ...item
 }: T) {
-  return { ...item, uses: _count.hourly + _count.production };
+  return { ...item, uses: hourly.length + production.length };
 }
 
 export async function GET(req: NextRequest) {
@@ -23,7 +28,7 @@ export async function GET(req: NextRequest) {
   const query = {
     where: { user: { email: checkToken.email }, archived: false },
     orderBy: { name: "asc" as const },
-    include: { _count: { select: { hourly: true, production: true } } },
+    include: { hourly: { select: { id: true } }, production: { select: { id: true } } },
   };
 
   try {

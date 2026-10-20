@@ -111,13 +111,10 @@ export async function onRemoveSalaryItem(input: z.input<typeof RemoveSchema>) {
   if (!parsed.success) return { ok: false as const, error: "Invalid item" };
   const { kind, id } = parsed.data;
 
-  const item = await model(kind).findFirst({
-    where: { id, userId },
-    select: { _count: { select: { hourly: true, production: true } } },
-  });
+  const item = await model(kind).findFirst({ where: { id, userId }, select: { id: true } });
   if (!item) return { ok: false as const, error: "Not found" };
 
-  const used = item._count.hourly + item._count.production > 0;
+  const used = (await SalaryItems.uses(kind, id)) > 0;
   if (used) {
     await model(kind).updateMany({ where: { id, userId }, data: { archived: true } });
   } else {

@@ -2,7 +2,7 @@ import ModuleTitle from "@/components/structures/share/ModuleTitle";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-import { AppearanceSection, MoneySection, ProfileCard, TaxesSection } from "./lazy";
+import { AppearanceSection, MoneySection, ProfileCard } from "./lazy";
 
 export default async function BodyPage() {
   return (
@@ -11,7 +11,6 @@ export default async function BodyPage() {
       <ProfileCard />
       <AppearanceSection />
       <MoneySection />
-      <TaxesSection />
       <h2 className="-mb-2 px-1 text-sm font-semibold text-ink-muted">Your details</h2>
     </>
   );

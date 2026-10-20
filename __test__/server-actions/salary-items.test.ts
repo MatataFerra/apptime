@@ -77,7 +77,7 @@ describe("onUpdateSalaryItem", () => {
       { id: 11, startDate: new Date("2026-10-02T08:00:00Z").toString() },
     ]);
     db.production.findMany.mockResolvedValue([]);
-    db.tax.findUnique.mockResolvedValue({ _count: { hourly: 1, production: 0 } });
+    db.tax.findUnique.mockResolvedValue({ hourly: [{ id: 10 }], production: [] });
 
     const result = await onUpdateSalaryItem({ ...edit, from: "2026-10-01T00:00:00.000Z" });
 
@@ -103,7 +103,7 @@ describe("onUpdateSalaryItem", () => {
       { id: 11, startDate: new Date("2026-10-02T08:00:00Z").toString() },
     ]);
     db.production.findMany.mockResolvedValue([]);
-    db.tax.findUnique.mockResolvedValue({ _count: { hourly: 0, production: 0 } });
+    db.tax.findUnique.mockResolvedValue({ hourly: [], production: [] });
 
     await onUpdateSalaryItem({ ...edit, from: "2020-01-01T00:00:00.000Z" });
 

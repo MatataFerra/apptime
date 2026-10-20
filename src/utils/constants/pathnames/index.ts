@@ -12,6 +12,7 @@ export const PATH_NAMES = {
   TRACK: "/track",
   COMPARE: "/compare",
   SETTINGS: "/settings",
+  TAXES: "/taxes",
   RESET_PASSWORD: "/forgot-password",
   RESET_TOKEN: "/reset",
   RESET_SUCCESS: "/success",
