@@ -49,7 +49,7 @@ function LiveShift() {
     <section
       data-testid="live-shift"
       aria-label="Shift in progress"
-      className="flex flex-col gap-3 rounded-[20px] bg-track p-4 text-on-module shadow-float"
+      className="flex flex-col gap-3 rounded-xl bg-track p-4 text-on-module shadow-float"
     >
       <Link
         href={PATH_NAMES.TRACK}

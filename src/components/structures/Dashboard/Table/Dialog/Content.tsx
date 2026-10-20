@@ -65,7 +65,7 @@ function TableDialogContent({ shift }: Props) {
         ) : null}
       </div>
 
-      <section className="flex flex-col gap-3 rounded-[20px] bg-surface-inverse p-4 text-ink-inverse">
+      <section className="flex flex-col gap-3 rounded-xl bg-surface-inverse p-4 text-ink-inverse">
         <div className="flex flex-col gap-1">
           <span className="text-[0.8125rem] text-ink-inverse/70">Earned</span>
           <span className="figure text-[2.5rem] leading-none text-live">{money(gross)}</span>

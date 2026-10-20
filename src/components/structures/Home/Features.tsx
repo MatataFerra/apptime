@@ -24,7 +24,7 @@ function Features() {
             href={path}
             data-testid={`option-card-${path.split("/")[1]}`}
             className={cn(
-              "flex min-h-28 flex-col justify-between gap-5 rounded-[20px] p-4 transition-transform active:scale-[0.97]",
+              "flex min-h-28 flex-col justify-between gap-5 rounded-xl p-4 transition-transform active:scale-[0.97]",
               colors.soft,
               colors.ink
             )}

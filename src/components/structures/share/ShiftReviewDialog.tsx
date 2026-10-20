@@ -85,7 +85,7 @@ function ShiftReviewDialog({
 
         <section
           aria-live="polite"
-          className="flex flex-col gap-3 rounded-[20px] bg-surface-inverse p-4 text-ink-inverse"
+          className="flex flex-col gap-3 rounded-xl bg-surface-inverse p-4 text-ink-inverse"
         >
           <div className="flex flex-col gap-1">
             <span className="text-[0.8125rem] text-ink-inverse/70">You&apos;ll earn</span>

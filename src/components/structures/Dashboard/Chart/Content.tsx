@@ -17,8 +17,8 @@ function Content() {
   if (isLoading) {
     return (
       <div className="flex flex-col gap-4">
-        <Skeleton classes="h-80 w-full rounded-[20px]" />
-        <Skeleton classes="h-80 w-full rounded-[20px]" />
+        <Skeleton classes="h-80 w-full rounded-xl" />
+        <Skeleton classes="h-80 w-full rounded-xl" />
       </div>
     );
   }
@@ -27,7 +27,7 @@ function Content() {
 
   if (!entries.length) {
     return (
-      <p className="rounded-[20px] border border-dashed border-border-strong p-6 text-center text-sm text-ink-muted">
+      <p className="rounded-xl border border-dashed border-border-strong p-6 text-center text-sm text-ink-muted">
         Your charts show up after your first saved shift.
       </p>
     );

@@ -40,7 +40,7 @@ function WeekSummary() {
   return (
     <section
       aria-label="This week"
-      className="flex flex-col gap-4 rounded-[20px] bg-surface-inverse px-4.5 pt-4.5 pb-4 text-ink-inverse"
+      className="flex flex-col gap-4 rounded-xl bg-surface-inverse px-4.5 pt-4.5 pb-4 text-ink-inverse"
     >
       <div className="flex items-baseline justify-between text-[0.8125rem] text-ink-inverse/70">
         <span>This week</span>

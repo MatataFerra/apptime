@@ -119,7 +119,7 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
       aria-labelledby="tax-picker-title"
       className={cn(
         "flex w-full flex-col gap-4",
-        !bare && "rounded-[20px] border border-border bg-surface p-4"
+        !bare && "rounded-xl border border-border bg-surface p-4"
       )}
     >
       <header className="flex items-start justify-between gap-3">

@@ -49,7 +49,7 @@ function Notes({ children }: PropsWithChildren) {
           note?.focus();
           note?.setSelectionRange(note.value.length, note.value.length);
         }}
-        className="mx-auto flex max-w-md flex-col gap-4 rounded-b-[28px] border-none bg-fast-soft px-4 pt-[max(env(safe-area-inset-top),1.25rem)] pb-3 [&>button]:hidden"
+        className="mx-auto flex max-w-md flex-col gap-4 rounded-b-2xl border-none bg-fast-soft px-4 pt-[max(env(safe-area-inset-top),1.25rem)] pb-3 [&>button]:hidden"
       >
         <SheetHeader className="flex-row items-center gap-3 space-y-0 text-left">
           <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-fast text-on-module">

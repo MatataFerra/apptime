@@ -312,7 +312,7 @@ function TaxList() {
     );
   }
 
-  if (isLoading) return <Skeleton classes="h-40 w-full rounded-[20px]" />;
+  if (isLoading) return <Skeleton classes="h-40 w-full rounded-xl" />;
 
   const groups = [
     { kind: "tax" as const, title: "Taxes", items: taxes },

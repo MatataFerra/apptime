@@ -22,7 +22,7 @@ import { useTrackTaxesOrContributionsStore } from "@/store/useTaxOrContributionS
 
 const TaxPicker = dynamic(() => import("@/components/structures/SalaryItems/TaxPicker"), {
   ssr: false,
-  loading: () => <Skeleton classes="h-40 w-full rounded-[20px]" />,
+  loading: () => <Skeleton classes="h-40 w-full rounded-xl" />,
 });
 
 type Observer = {

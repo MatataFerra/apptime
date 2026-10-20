@@ -31,7 +31,7 @@ function ModuleTitle({ title, subtitle, module, theme, aside }: Props) {
     <header
       className={cn(
         "-mx-4 flex items-end justify-between gap-3 self-stretch px-5 pt-2",
-        banded ? "rounded-b-[28px] bg-(--band) pb-6" : "pb-2"
+        banded ? "bg-(--band) pb-6" : "pb-2"
       )}
     >
       <div className="flex min-w-0 items-start gap-3.5">

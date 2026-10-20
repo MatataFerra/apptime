@@ -134,7 +134,7 @@ function ShiftHistory() {
   }, [productionData, isDateFiltered, setInitialProductions]);
 
   if (loadingHourly || loadingProduction) {
-    return <Skeleton classes="h-64 w-full rounded-[20px]" />;
+    return <Skeleton classes="h-64 w-full rounded-xl" />;
   }
 
   const entries = historyEntries(hourly, productions).filter(
@@ -165,7 +165,7 @@ function ShiftHistory() {
       </div>
 
       {months.length === 0 ? (
-        <p className="rounded-[20px] border border-dashed border-border-strong p-6 text-center text-sm text-ink-muted">
+        <p className="rounded-xl border border-dashed border-border-strong p-6 text-center text-sm text-ink-muted">
           {isDateFiltered ? "No shifts in those dates." : "No shifts saved yet."}
         </p>
       ) : (
@@ -183,7 +183,7 @@ function ShiftHistory() {
                 ))}
               </span>
             </header>
-            <ul className="divide-y divide-border overflow-hidden rounded-[20px] border border-border bg-surface">
+            <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
               {month.entries.map((entry) => (
                 <li key={`${entry.kind}-${entry.id}`}>
                   <HistoryRow entry={entry} />

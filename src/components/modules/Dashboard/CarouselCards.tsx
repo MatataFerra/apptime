@@ -38,7 +38,7 @@ function Stat({
   const colors = MODULE_THEMES[theme];
 
   return (
-    <div className="flex flex-col gap-3.5 rounded-[18px] border border-border bg-surface p-3.5">
+    <div className="flex flex-col gap-3.5 rounded-xl border border-border bg-surface p-3.5">
       <span
         className={cn(
           "flex size-8 items-center justify-center rounded-[10px]",
@@ -84,9 +84,9 @@ function DashboardStats({ params }: Props) {
   if (isLoading) {
     return (
       <div className="grid w-full grid-cols-2 gap-2.5">
-        <Skeleton classes="col-span-2 h-28 rounded-[18px]" />
-        <Skeleton classes="h-28 rounded-[18px]" />
-        <Skeleton classes="h-28 rounded-[18px]" />
+        <Skeleton classes="col-span-2 h-28 rounded-xl" />
+        <Skeleton classes="h-28 rounded-xl" />
+        <Skeleton classes="h-28 rounded-xl" />
       </div>
     );
   }
@@ -100,7 +100,7 @@ function DashboardStats({ params }: Props) {
 
   return (
     <div className="grid w-full grid-cols-2 gap-2.5">
-      <section className="col-span-2 flex flex-col gap-3 rounded-[18px] bg-surface-inverse p-4 text-ink-inverse">
+      <section className="col-span-2 flex flex-col gap-3 rounded-xl bg-surface-inverse p-4 text-ink-inverse">
         <span className="text-[0.8125rem] text-ink-inverse/70">
           Earned in {format(new Date(), "MMMM")}
         </span>

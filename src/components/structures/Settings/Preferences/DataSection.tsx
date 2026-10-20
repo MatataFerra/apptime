@@ -2,44 +2,22 @@
 
 import { useId, useState } from "react";
 
-import { Download, LogOut, Trash2 } from "lucide-react";
+import { Lock, LogOut, Trash2 } from "lucide-react";
 import { signOut } from "next-auth/react";
 
-import { shiftsToCsv } from "@/services/Export";
 import Toast from "@/services/Toast";
 
 import Button from "@/components/ui/Button";
 
-import useHourlyShifts from "@/hooks/useHourlyShifts";
-import { useCurrency } from "@/hooks/useMoney";
-import useProductionShifts from "@/hooks/useProductionShifts";
-
 import { Row, Section } from "./Section";
 import onDeleteAccount from "@/server-actions/delete-account";
 
-function download(name: string, text: string) {
-  const url = URL.createObjectURL(new Blob([text], { type: "text/csv;charset=utf-8" }));
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = name;
-  link.click();
-  URL.revokeObjectURL(url);
-}
-
-/** Export your shifts, log out, or delete the account for good. */
+/** Export (Premium), log out, or delete the account for good. */
 function DataSection() {
-  const currency = useCurrency();
-  const { data: hourly } = useHourlyShifts();
-  const { data: production } = useProductionShifts();
   const [deleting, setDeleting] = useState(false);
   const [confirmation, setConfirmation] = useState("");
   const [busy, setBusy] = useState(false);
   const confirmId = useId();
-
-  function onExport() {
-    const csv = shiftsToCsv(hourly, production, currency);
-    download(`casualapp-shifts-${new Date().toISOString().slice(0, 10)}.csv`, csv);
-  }
 
   async function onDelete() {
     setBusy(true);
@@ -58,11 +36,12 @@ function DataSection() {
 
   return (
     <Section title="Your data">
-      <Row label="Export shifts" hint="A CSV file you can open in Excel or Sheets.">
-        <Button type="button" variant="outline" size="sm" onClick={onExport}>
-          <Download className="size-4" aria-hidden="true" />
-          CSV
-        </Button>
+      {/* Export is a Premium feature; shiftsToCsv (services/Export) is ready for it. */}
+      <Row label="Export shifts" hint="A CSV file for Excel or Sheets. Coming with Premium.">
+        <span className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-surface-sunken px-3 text-[0.8125rem] font-semibold text-ink-muted">
+          <Lock className="size-3.5" aria-hidden="true" />
+          Premium
+        </span>
       </Row>
       <Row label="Log out" hint="On this device.">
         <Button
