@@ -3,20 +3,22 @@ import type { Contribution, Production, Tax } from "@prisma/client";
 import ContributionService from "@/services/Contribution";
 import TaxService from "@/services/Tax";
 
-import type { ProductionType } from "@/types";
+import type { ProductionType, SalaryItemInput } from "@/types";
 
 import prisma from "../../../prisma/client";
 
 type HourlyOptions = {
   deleteTaxes?: Tax[];
-  createTaxes?: Tax[];
+  createTaxes?: SalaryItemInput[];
+  /** Owner of the shift; new taxes are created for this user. */
+  userId?: string;
 };
 
 interface ProductionInterface {
   update(id: number): Promise<Production>;
   create(): Promise<Production>;
   delete(id: number): Promise<Production>;
-  addtaxes(taxes: Tax[] | Omit<Tax, "id">[]): Promise<ProductionService>;
+  addtaxes(taxes: SalaryItemInput[], userId: string): Promise<ProductionService>;
   build(): Omit<Production, "shiftId" | "id">;
   calculateEarnings(): number;
   getConfig(): Pick<Production, "itemValue" | "itemQuantity">;
@@ -84,7 +86,7 @@ class ProductionService implements ProductionInterface {
   */
 
   async update(id: number) {
-    const { deleteTaxes, createTaxes } = this.options || {};
+    const { deleteTaxes, createTaxes, userId } = this.options || {};
 
     // Delete case
     if (this.getTaxesIds(deleteTaxes ?? []).length > 0) {
@@ -105,8 +107,8 @@ class ProductionService implements ProductionInterface {
     }
 
     // Create case
-    if (createTaxes && createTaxes?.length > 0) {
-      await this.addtaxes(createTaxes);
+    if (userId && createTaxes && createTaxes.length > 0) {
+      await this.addtaxes(createTaxes, userId);
       const updatedShiftData = await prisma.production.update({
         where: { id },
         data: {
@@ -162,16 +164,16 @@ class ProductionService implements ProductionInterface {
     ============================================================
   */
 
-  async addContributions(contributions: Contribution[] | Omit<Contribution, "id">[]) {
-    const created = await new ContributionService(contributions).create();
+  async addContributions(contributions: SalaryItemInput[], userId: string) {
+    const created = await new ContributionService(contributions, userId).create();
 
     this.contributions = created;
 
     return this;
   }
 
-  async addtaxes(taxes: Tax[] | Omit<Tax, "id">[]) {
-    const created = await new TaxService(taxes).create();
+  async addtaxes(taxes: SalaryItemInput[], userId: string) {
+    const created = await new TaxService(taxes, userId).create();
 
     this.taxes = created;
 

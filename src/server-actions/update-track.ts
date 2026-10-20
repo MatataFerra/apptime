@@ -67,8 +67,8 @@ export default async function onUpdateTrackJob(data: UpdateTrackData, shiftId: n
 
     const hourlyService = new HourlyService(shift);
 
-    await hourlyService.addContributions(contributionsFromLocal);
-    await hourlyService.addtaxes(taxesFromLocal);
+    await hourlyService.addContributions(contributionsFromLocal, currentUser.id);
+    await hourlyService.addtaxes(taxesFromLocal, currentUser.id);
 
     const response = await hourlyService.update(data.id!);
 
@@ -79,6 +79,8 @@ export default async function onUpdateTrackJob(data: UpdateTrackData, shiftId: n
       createShift: response,
     };
   } catch (error) {
+    // eslint-disable-next-line no-console -- server log for failed saves
+    console.error("[update-track]", error);
     return null;
   }
 }

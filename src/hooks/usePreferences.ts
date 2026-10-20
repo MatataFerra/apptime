@@ -22,7 +22,7 @@ function usePreferences() {
   const { data: user } = useUser();
   const key = [USE_QUERY_KEYS.USER, user?.email];
 
-  async function save(patch: PreferencesPatch) {
+  async function save(patch: PreferencesPatch, { silent = false }: { silent?: boolean } = {}) {
     const previous = queryClient.getQueryData<UserResponse>(key);
 
     queryClient.setQueryData<UserResponse>(key, (old) =>
@@ -45,6 +45,8 @@ function usePreferences() {
       });
       return false;
     }
+    // Settings save on their own (no Save button), so say it happened.
+    if (!silent) Toast({ type: "success", message: "Saved", duration: 1200 });
     return true;
   }
 

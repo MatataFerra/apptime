@@ -16,6 +16,11 @@ function Options() {
         description="Per piece or per hour"
         path={PATH_NAMES.COMPARE}
       />
+      <HomeCardOption
+        title="Taxes"
+        description="Your rates and deductions"
+        path={PATH_NAMES.TAXES}
+      />
     </div>
   );
 }

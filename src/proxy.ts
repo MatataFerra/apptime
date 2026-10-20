@@ -11,6 +11,7 @@ import { PATH_NAMES } from "@/utils/constants/pathnames";
 const PRIVATES_ROUTES = [
   "/dashboard",
   "/settings",
+  "/taxes",
   "/fast-charge",
   "/track",
   "/production",
@@ -122,6 +123,9 @@ export const config = {
     "/settings",
     "/es/settings",
     "/en/settings",
+    "/taxes",
+    "/es/taxes",
+    "/en/taxes",
     "/dashboard",
     "/es/dashboard",
     "/en/dashboard",

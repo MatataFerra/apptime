@@ -7,7 +7,7 @@ import isEmpty from "lodash/isEmpty";
 import HourlyService from "@/services/Shift/Hourly";
 import ProductionService from "@/services/Shift/Production";
 
-import type { HourlyType, ProductionType, Shifts } from "@/types";
+import type { HourlyType, ProductionType, SalaryItemInput,Shifts } from "@/types";
 
 type ShiftHourlyOrProduction = Hourly | Production;
 type ShiftWithTaxesType = HourlyType | ProductionType;
@@ -25,7 +25,7 @@ type UpdateOptions = {
 
 interface ShiftServiceInterface {
   shift: Shift;
-  create: (taxes?: Omit<Tax, "id">[]) => Promise<ShiftHourlyOrProduction | undefined>;
+  create: (taxes?: SalaryItemInput[]) => Promise<ShiftHourlyOrProduction | undefined>;
   differenceInMinsBetweenStartAndEnd: () => this;
   closeShift: () => this;
   checkPublicHoliday: () => this;

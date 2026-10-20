@@ -1,10 +1,12 @@
 import type { Contribution, Tax } from "@prisma/client";
 
+import type { SalaryItemInput } from "@/types";
+
 import useSalaryItems from "@/hooks/useSalaryItems";
 
 type HookProps = {
-  localTaxes: Omit<Tax, "id">[];
-  localContributions: Omit<Contribution, "id">[];
+  localTaxes: SalaryItemInput[];
+  localContributions: SalaryItemInput[];
 };
 
 type Named = { name: string };
@@ -21,8 +23,8 @@ function useGetUniqueSalaryItems({ localTaxes, localContributions }: HookProps) 
   const { data } = useSalaryItems();
 
   return {
-    uniqueTaxes: notSavedYet(localTaxes, data?.salaryItems.taxes),
-    uniqueContributions: notSavedYet(localContributions, data?.salaryItems.contributions),
+    uniqueTaxes: notSavedYet(localTaxes, data?.salaryItems?.taxes),
+    uniqueContributions: notSavedYet(localContributions, data?.salaryItems?.contributions),
   };
 }
 

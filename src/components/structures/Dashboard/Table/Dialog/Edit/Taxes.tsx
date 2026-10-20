@@ -1,8 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
-
-import isEmpty from "lodash/isEmpty";
+import { useState } from "react";
 
 import Toast from "@/services/Toast";
 
@@ -17,39 +15,99 @@ type Props = {
   shift: HourlyType | ProductionType;
 };
 
-function Taxes({ shift }: Props) {
-  const { taxesToDelete, addTaxToDelete, restoreTax } = useTaxesHandlerDelete((state) => state);
+type ShiftTax = NonNullable<HourlyType["taxes"]>[number];
 
-  const isTaxAdded = useCallback(
-    (id: number) => {
-      const tax = taxesToDelete.find((t) => t.id === id);
+/** Rate input for one tax; the change only applies to this shift. */
+function RateEditor({ tax, onDone }: { tax: ShiftTax; onDone: () => void }) {
+  const { rateChanges, setRate, clearRate } = useTaxesHandlerDelete((state) => state);
+  const pending = rateChanges.find((c) => c.id === tax.id);
+  const [draft, setDraft] = useState(String(pending?.value ?? tax.value));
 
-      return !isEmpty(tax);
-    },
-    [taxesToDelete]
+  function commit() {
+    const value = Number(draft);
+    if (draft.trim() === "" || !Number.isFinite(value) || value < 0 || value > 100) {
+      Toast({ type: "error", message: "Enter a rate between 0 and 100", duration: 1500 });
+      return;
+    }
+    if (value === Number(tax.value)) clearRate(tax.id);
+    else setRate({ id: tax.id, value });
+    onDone();
+  }
+
+  return (
+    <span className="flex items-center gap-2">
+      <span className="flex h-10 w-24 items-center gap-1 rounded-xl border border-border-strong bg-surface px-2.5 focus-within:border-accent">
+        <input
+          autoFocus
+          type="number"
+          inputMode="decimal"
+          min={0}
+          max={100}
+          step="any"
+          aria-label={`New rate for ${tax.name}`}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              commit();
+            }
+            if (e.key === "Escape") onDone();
+          }}
+          className="w-full min-w-0 bg-transparent text-right text-sm text-ink tabular-nums outline-hidden"
+        />
+        <span className="text-xs text-ink-muted">%</span>
+      </span>
+      <Button type="button" variant="ghost" size="sm" classes="w-auto" onClick={commit}>
+        OK
+      </Button>
+    </span>
   );
+}
+
+function Taxes({ shift }: Props) {
+  const { taxesToDelete, rateChanges, addTaxToDelete, restoreTax, clearRate } =
+    useTaxesHandlerDelete((state) => state);
+  const [editing, setEditing] = useState<number | null>(null);
 
   return (
     <ul className="flex flex-col gap-2">
       {shift?.taxes?.map((tax) => {
-        const removing = isTaxAdded(tax.id);
+        const removing = taxesToDelete.some((t) => t.id === tax.id);
+        const newRate = rateChanges.find((c) => c.id === tax.id)?.value;
+        const changed = newRate !== undefined;
 
         return (
           <li
             key={tax.id}
             className={cn(
               "flex min-h-12 items-center justify-between gap-3 rounded-xl border px-3.5 py-2 transition-colors",
-              removing ? "border-destructive/40 bg-destructive-soft" : "border-border bg-surface"
+              removing
+                ? "border-destructive/40 bg-destructive-soft"
+                : changed
+                  ? "border-accent/40 bg-accent-soft"
+                  : "border-border bg-surface"
             )}
           >
             <span className={cn("flex min-w-0 flex-col", removing && "text-destructive")}>
               <span className={cn("text-sm font-medium", removing && "line-through")}>
-                {tax.name} <span className="tabular-nums">{tax.value}%</span>
+                {tax.name}{" "}
+                {changed ? (
+                  <span className="whitespace-nowrap">
+                    <span className="text-ink-muted tabular-nums line-through">{tax.value}%</span>{" "}
+                    <span className="tabular-nums">{newRate}%</span>
+                  </span>
+                ) : (
+                  <span className="tabular-nums">{tax.value}%</span>
+                )}
               </span>
-              {tax.description ? (
+              {changed ? (
+                <span className="text-xs text-ink-muted">Only for this shift</span>
+              ) : tax.description ? (
                 <span className="truncate text-xs text-ink-muted">{tax.description}</span>
               ) : null}
             </span>
+
             {removing ? (
               <Button
                 type="button"
@@ -63,24 +121,49 @@ function Taxes({ shift }: Props) {
               >
                 Undo
               </Button>
+            ) : editing === tax.id ? (
+              <RateEditor tax={tax} onDone={() => setEditing(null)} />
             ) : (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                classes="w-auto text-destructive"
-                onClick={() => {
-                  addTaxToDelete(tax);
-                  Toast({
-                    type: "plain",
-                    message: "Tax will be removed",
-                    description: "Save changes to apply it.",
-                    duration: 1500,
-                  });
-                }}
-              >
-                Remove
-              </Button>
+              <span className="flex shrink-0 items-center">
+                {changed ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    classes="w-auto"
+                    onClick={() => clearRate(tax.id)}
+                  >
+                    Undo
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    classes="w-auto"
+                    onClick={() => setEditing(tax.id)}
+                  >
+                    Change %
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  classes="w-auto text-destructive"
+                  onClick={() => {
+                    addTaxToDelete(tax);
+                    Toast({
+                      type: "plain",
+                      message: "Tax will be removed",
+                      description: "Save changes to apply it.",
+                      duration: 1500,
+                    });
+                  }}
+                >
+                  Remove
+                </Button>
+              </span>
             )}
           </li>
         );

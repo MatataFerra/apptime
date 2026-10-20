@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { ChevronRight, Square } from "lucide-react";
+import { ChevronRight, LoaderCircle, Square } from "lucide-react";
 import Link from "next/link";
 import { useInterval } from "usehooks-ts";
 
@@ -28,13 +28,15 @@ function LiveShift() {
   const { finish, finishing } = useFinishShift();
   const [now, setNow] = useState(() => new Date());
   const [confirming, setConfirming] = useState(false);
+  // Hidden as soon as the save succeeds, before the shift list refetches.
+  const [closedId, setClosedId] = useState<number | null>(null);
   const running = hourly?.find((shift) => !shift.isClosed);
 
   useInterval(() => setNow(new Date()), running ? 15000 : null);
-  // The confirmation step closes itself if it isn't used.
-  useInterval(() => setConfirming(false), confirming ? 4000 : null);
+  // The confirmation step closes itself if it isn't used (never mid-save).
+  useInterval(() => setConfirming(false), confirming && !finishing ? 6000 : null);
 
-  if (!running?.startDate) return null;
+  if (!running?.startDate || running.id === closedId) return null;
 
   const start = new Date(running.startDate);
   if (isNaN(start.valueOf())) return null;
@@ -84,7 +86,18 @@ function LiveShift() {
         />
       </Link>
 
-      {confirming ? (
+      {finishing ? (
+        <div
+          role="status"
+          className="flex h-11 items-center justify-center gap-2 rounded-xl bg-on-module/15 text-sm font-semibold"
+        >
+          <LoaderCircle
+            className="size-4 animate-spin motion-reduce:animate-none"
+            aria-hidden="true"
+          />
+          Saving your shift…
+        </div>
+      ) : confirming ? (
         <div className="grid grid-cols-2 gap-2" role="group" aria-label="Finish this shift?">
           <button
             type="button"
@@ -95,16 +108,13 @@ function LiveShift() {
           </button>
           <button
             type="button"
-            disabled={finishing}
             onClick={async () => {
-              await finish(running);
               setConfirming(false);
+              if (await finish(running)) setClosedId(running.id);
             }}
-            className="h-11 rounded-xl bg-surface text-sm font-semibold text-ink transition-transform active:scale-[0.98] disabled:opacity-60"
+            className="h-11 rounded-xl bg-surface text-sm font-semibold text-ink transition-transform active:scale-[0.98]"
           >
-            {finishing
-              ? "Finishing…"
-              : `Finish at ${now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`}
+            {`Finish at ${now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`}
           </button>
         </div>
       ) : (

@@ -59,3 +59,22 @@ export type LoginInputs = {
 };
 
 export type TaxCodes = (typeof TAX_CODES)[keyof typeof TAX_CODES];
+
+/**
+ * A tax or contribution as the user enters it. Owner (userId) and
+ * `archived` are set on the server.
+ */
+export type SalaryItemInput = { name: string; value: number; description: string | null };
+
+/** A saved tax or contribution, with how many shifts use it. */
+export type SavedSalaryItem = {
+  id: number;
+  name: string;
+  value: number;
+  description: string | null;
+  archived: boolean;
+  userId: string | null;
+  uses: number;
+};
+
+export type SalaryItems = { contributions: SavedSalaryItem[]; taxes: SavedSalaryItem[] };

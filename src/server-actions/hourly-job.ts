@@ -64,8 +64,8 @@ export default async function onCreateHourlyShift(data: FastChargeInputsParsed) 
 
     const hourlyService = new HourlyService(shift);
 
-    await hourlyService.addContributions(contributionsFromLocal);
-    await hourlyService.addtaxes(taxesFromLocal);
+    await hourlyService.addContributions(contributionsFromLocal, currentUser.id);
+    await hourlyService.addtaxes(taxesFromLocal, currentUser.id);
 
     const response = await hourlyService.create();
 
@@ -76,6 +76,8 @@ export default async function onCreateHourlyShift(data: FastChargeInputsParsed) 
       createShift: response,
     };
   } catch (error) {
+    // eslint-disable-next-line no-console -- server log for failed saves
+    console.error("[hourly-job]", error);
     return null;
   }
 }

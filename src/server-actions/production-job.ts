@@ -63,8 +63,8 @@ export default async function onCreateProductionShift(data: ProductionInputsPars
 
     const productionService = new ProductionService(shift);
 
-    await productionService.addContributions(contributionsFromLocal);
-    await productionService.addtaxes(taxesFromLocal);
+    await productionService.addContributions(contributionsFromLocal, currentUser.id);
+    await productionService.addtaxes(taxesFromLocal, currentUser.id);
 
     const response = await productionService.create();
 
@@ -75,6 +75,8 @@ export default async function onCreateProductionShift(data: ProductionInputsPars
       createShift: response,
     };
   } catch (error) {
+    // eslint-disable-next-line no-console -- server log for failed saves
+    console.error("[production-job]", error);
     return null;
   }
 }

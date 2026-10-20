@@ -3,7 +3,7 @@ import type { Tax } from "@prisma/client";
 import HourlyService from "@/services/Shift/Hourly";
 import ProductionService from "@/services/Shift/Production";
 
-import type { ProductionType, ShiftType } from "@/types";
+import type { ProductionType, SalaryItemInput,ShiftType } from "@/types";
 
 type Shift = ShiftType;
 
@@ -60,7 +60,7 @@ class Pay implements PayInterface {
     );
   }
 
-  static afterTax(gross: number, taxes: Omit<Tax, "id">[]) {
+  static afterTax(gross: number, taxes: SalaryItemInput[]) {
     return (
       taxes?.reduce((acc, tax) => {
         const value = Number(tax.value);

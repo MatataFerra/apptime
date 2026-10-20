@@ -36,6 +36,7 @@
   --accent-foreground: #ffffff;
   --accent-soft: #dcf1e8;
   --live: #13efa0; /* running-clock signal, only on inverse surfaces */
+  --on-live: #062a1c; /* text on --live, same in light and dark */
   --destructive: #c2412d;
   --destructive-foreground: #ffffff;
   --destructive-soft: #f8e3df;
@@ -154,6 +155,7 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-accent-soft: var(--accent-soft);
   --color-live: var(--live);
+  --color-on-live: var(--on-live);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-destructive-soft: var(--destructive-soft);
