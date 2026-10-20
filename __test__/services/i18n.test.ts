@@ -1,6 +1,4 @@
-import { afterAll, describe, expect,test, vi } from "vitest";
-
-
+import { afterAll, describe, expect, test, vi } from "vitest";
 
 describe("i18n", () => {
   afterAll(() => {

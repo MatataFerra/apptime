@@ -9,6 +9,8 @@ import { type AbstractIntlMessages, NextIntlClientProvider } from "next-intl";
 
 import ut from "@/services/Utilities/client";
 
+import ThemeSync from "@/providers/ThemeSync";
+
 type Props = {
   children?: ReactNode;
   /** Read on the server, so the client doesn't wait for /api/auth/session. */
@@ -36,6 +38,7 @@ function Providers({ children, i18n, session }: Props) {
       )}
       <SessionProvider session={session}>
         <NextIntlClientProvider {...i18n} timeZone="UTC">
+          <ThemeSync />
           {children}
         </NextIntlClientProvider>
       </SessionProvider>

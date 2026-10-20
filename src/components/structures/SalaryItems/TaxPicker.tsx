@@ -189,13 +189,15 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
                     className={cn(
                       "flex h-10 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-colors",
                       on
-                        ? cn("border-transparent", colors.strong, "text-white")
+                        ? cn("border-transparent", colors.strong, "text-on-module")
                         : "border-border-strong bg-surface text-ink hover:bg-surface-sunken"
                     )}
                   >
                     {on ? <Check className="size-4" strokeWidth={2.5} aria-hidden="true" /> : null}
                     {tax.name}
-                    <span className={cn("tabular-nums", on ? "text-white/80" : "text-ink-muted")}>
+                    <span
+                      className={cn("tabular-nums", on ? "text-on-module/80" : "text-ink-muted")}
+                    >
                       {tax.value}%
                     </span>
                   </button>

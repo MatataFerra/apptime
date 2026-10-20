@@ -50,6 +50,8 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
       hourValue: Number(data.hourValue),
       unpaidBreaks: Number(data.unpaidBreaks),
       shiftId: user?.shifts?.id as number | null,
+      currency: data.currency ?? null,
+      source: "track",
     }).then((response) => {
       if (response?.response) {
         Toast({

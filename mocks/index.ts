@@ -78,6 +78,7 @@ export const userShiftsMocked: UserType["shifts"] = {
     notes: "",
     publicHolidayWorked: false,
     shiftId: 1,
+    currency: null,
   })),
   hourly: datesMock.map((date, i) => ({
     startDate: date.toString(),
@@ -95,6 +96,8 @@ export const userShiftsMocked: UserType["shifts"] = {
     publicHolidayWorked: false,
     unpaidBreaks: 0,
     shiftId: 1,
+    currency: null,
+    source: null,
   })),
 };
 
@@ -113,6 +116,11 @@ export const userMocked: UserType = {
     id: 1,
     userId: userMockedParsed.id,
     weekStartsOn: "sunday",
+    currency: "USD",
+    hourValue: null,
+    unpaidBreaks: null,
+    holidayPay: 8,
+    theme: "system",
   },
 };
 
@@ -132,6 +140,11 @@ export const userTestData: UserType = {
     id: 1,
     weekStartsOn: "Monday",
     userId: "user-123",
+    currency: "USD",
+    hourValue: null,
+    unpaidBreaks: null,
+    holidayPay: 8,
+    theme: "system",
   },
   shifts: {
     id: 1,
@@ -150,6 +163,7 @@ export const userTestData: UserType = {
         itemValue: 50,
         itemQuantity: 40,
         shiftId: 1001,
+        currency: null,
         taxes: [
           { id: 1, name: "VAT", value: 10, description: "Value-added tax" },
           { id: 2, name: "Income Tax", value: 15, description: "Income tax" },
@@ -179,6 +193,8 @@ export const userTestData: UserType = {
         hourValue: 30,
         unpaidBreaks: 1,
         shiftId: 1002,
+        currency: null,
+        source: null,
         taxes: [
           { id: 3, name: "State Tax", value: 8, description: "State tax" },
           { id: 4, name: "Federal Tax", value: 12, description: "Federal tax" },

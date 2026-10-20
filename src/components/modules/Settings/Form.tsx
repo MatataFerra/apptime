@@ -30,11 +30,6 @@ const Personal = dynamic(() => import("@/components/modules/Settings/Personal"),
   loading: () => <Skeleton classes="h-20 w-full" />,
 });
 
-const Shift = dynamic(() => import("@/components/modules/Settings/Shift"), {
-  ssr: false,
-  loading: () => <Skeleton classes="h-20 w-full" />,
-});
-
 function Form() {
   const queryClient = useQueryClient();
   const session = useSession();
@@ -78,9 +73,6 @@ function Form() {
             ...previousUserData?.user,
             name: values.account.name,
             email: values.account.email,
-            config: {
-              weekStartsOn: values.configs.weekStartsOn,
-            },
 
             profile: {
               ...previousUserData?.user?.profile,
@@ -105,7 +97,6 @@ function Form() {
     session.data?.user?.email,
     values.account.name,
     values.account.email,
-    values.configs.weekStartsOn,
     values.personal.city,
     values.personal.country,
   ]);
@@ -122,7 +113,6 @@ function Form() {
     >
       <AccordionSettings>
         <Account />
-        <Shift />
         <Personal />
       </AccordionSettings>
     </FormBase>

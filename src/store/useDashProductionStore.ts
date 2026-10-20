@@ -28,7 +28,7 @@ export const useDashProductionStore = create<DashProductionState>((set, get) => 
   delete: (id: number) =>
     set({
       ...get(),
-      productions: get().productions?.filter((p) => p.id === id),
+      productions: get().productions?.filter((p) => p.id !== id),
     }),
 
   update: (production: Partial<ProductionType>) =>

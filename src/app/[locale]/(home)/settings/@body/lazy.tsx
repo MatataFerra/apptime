@@ -2,6 +2,17 @@
 
 import dynamic from "next/dynamic";
 
+import Skeleton from "@/components/ui/Skeleton";
+
 export const ProfileCard = dynamic(() => import("@/components/structures/Settings/ProfileCard"), {
   ssr: false,
 });
+
+export const AppearanceSection = dynamic(
+  () => import("@/components/structures/Settings/Preferences/AppearanceSection"),
+  { ssr: false, loading: () => <Skeleton classes="h-40 w-full rounded-[20px]" /> }
+);
+export const MoneySection = dynamic(
+  () => import("@/components/structures/Settings/Preferences/MoneySection"),
+  { ssr: false, loading: () => <Skeleton classes="h-72 w-full rounded-[20px]" /> }
+);

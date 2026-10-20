@@ -68,9 +68,15 @@
   --chart-3: #8fb3a4;
   --chart-4: #c98a2b;
   --chart-5: #6b7fd7;
+  /* Chart series, validated for colour-blind separation (dataviz validator) */
+  --series-hourly: #0e7a57;
+  /* Text and icons on a module's strong colour (bg-track, bg-fast...) */
+  --on-module: #ffffff;
+  --series-production: #d36aa0;
 }
 
 .dark {
+  color-scheme: dark;
   --background: #0f1714;
   --surface: #17221e;
   --surface-sunken: #1f2c27;
@@ -119,6 +125,9 @@
   --chart-3: #5f8a78;
   --chart-4: #e3a74a;
   --chart-5: #8d9ef0;
+  --series-hourly: #1f9c6c;
+  --on-module: #0f1714;
+  --series-production: #b0457f;
 }
 
 @theme inline {
@@ -168,6 +177,9 @@
   --color-fast-soft: var(--fast-soft);
   --color-fast-ink: var(--fast-ink);
   --color-fast-bright: var(--fast-bright);
+  --color-series-hourly: var(--series-hourly);
+  --color-on-module: var(--on-module);
+  --color-series-production: var(--series-production);
   --color-destructive-bright: var(--destructive-bright);
   --color-insight-bright: var(--insight-bright);
   --color-production: var(--production);

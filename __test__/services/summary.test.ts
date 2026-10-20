@@ -111,7 +111,11 @@ describe("Summary service", () => {
   });
 
   test("has no change when last month had no earnings", () => {
-    const result = compareWithPreviousMonth([hourly("2026-10-02T09:00:00", 1)], [], new Date(2026, 9, 5));
+    const result = compareWithPreviousMonth(
+      [hourly("2026-10-02T09:00:00", 1)],
+      [],
+      new Date(2026, 9, 5)
+    );
     expect(result.change).toBeNull();
   });
 

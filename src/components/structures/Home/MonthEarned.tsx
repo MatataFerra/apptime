@@ -2,15 +2,15 @@
 
 import { useMemo } from "react";
 
-import { compareWithPreviousMonth, formatMoney } from "@/services/Summary";
+import { compareWithPreviousMonth } from "@/services/Summary";
 
-import useHourlyShifts from "@/hooks/useHourlyShifts";
-import useProductionShifts from "@/hooks/useProductionShifts";
+import useMoney from "@/hooks/useMoney";
+import useShiftsInCurrency from "@/hooks/useShiftsInCurrency";
 
 /** "$3,410 this month", for the dashboard shortcut. */
 function MonthEarned() {
-  const { data: hourly } = useHourlyShifts();
-  const { data: production } = useProductionShifts();
+  const money = useMoney();
+  const { hourly, production } = useShiftsInCurrency();
   const earned = useMemo(
     () => compareWithPreviousMonth(hourly, production).current.earned,
     [hourly, production]
@@ -18,7 +18,7 @@ function MonthEarned() {
 
   if (!earned) return null;
 
-  return <>{formatMoney(earned, { cents: false })} this month</>;
+  return <>{money(earned, { cents: false })} this month</>;
 }
 
 export default MonthEarned;

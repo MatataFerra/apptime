@@ -1,0 +1,50 @@
+"use server";
+
+import { getServerSession } from "next-auth";
+import { z } from "zod";
+
+import { WEEK_DAYS } from "@/utils/constants";
+import { CURRENCIES } from "@/utils/constants/currencies";
+import { revalidateSettingsPage, revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
+import { THEMES } from "@/utils/theme";
+
+import prisma from "#/prisma/client";
+
+const CODES = CURRENCIES.map((c) => c.code) as [string, ...string[]];
+const optionalAmount = z.number().min(0).max(100000).nullable().optional();
+
+/** Every field optional: each control in Settings saves only what it changed. */
+const PreferencesSchema = z
+  .object({
+    theme: z.enum(THEMES).optional(),
+    currency: z.enum(CODES).optional(),
+    weekStartsOn: z.enum(WEEK_DAYS).optional(),
+    hourValue: optionalAmount,
+    unpaidBreaks: z.number().min(0).max(600).nullable().optional(),
+    holidayPay: z.number().min(0).max(100).optional(),
+  })
+  .strict();
+
+export type PreferencesPatch = z.infer<typeof PreferencesSchema>;
+
+export default async function onUpdatePreferences(patch: PreferencesPatch) {
+  const email = (await getServerSession())?.user?.email;
+  const user = email
+    ? await prisma.user.findUnique({ where: { email }, select: { id: true } })
+    : null;
+  if (!user) return { ok: false as const, error: "Not signed in" };
+
+  const parsed = PreferencesSchema.safeParse(patch);
+  if (!parsed.success) return { ok: false as const, error: "Invalid value" };
+
+  const config = await prisma.config.upsert({
+    where: { userId: user.id },
+    create: { userId: user.id, ...parsed.data },
+    update: parsed.data,
+  });
+
+  revalidateSettingsPage();
+  revalidateShiftPages();
+
+  return { ok: true as const, config };
+}

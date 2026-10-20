@@ -4,11 +4,10 @@ import { useMemo } from "react";
 
 import { RotateCcw } from "lucide-react";
 
-import { formatMoney } from "@/services/Summary";
-
 import { buttonVariants } from "@/components/ui/Button";
 
 import { cn } from "@/utils/helpers/styleMerger";
+import useMoney from "@/hooks/useMoney";
 
 import { compareWages } from "./compareWages";
 import { useCompareStore } from "@/store/useCompareStore";
@@ -30,13 +29,14 @@ function Bar({
   max: number;
   className: string;
 }) {
+  const money = useMoney();
   const width = max > 0 ? Math.round((value / max) * 100) : 0;
 
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex justify-between text-sm">
         <span>{label}</span>
-        <span className="tabular-nums">{formatMoney(value)}</span>
+        <span className="tabular-nums">{money(value)}</span>
       </div>
       <div className="h-3 rounded-full bg-ink-inverse/10">
         <div
@@ -50,6 +50,7 @@ function Bar({
 
 /** Live result: who pays more, by how much, and pieces needed to match. */
 function Report() {
+  const money = useMoney();
   const { hourly, production, reset } = useCompareStore((state) => state);
   const result = useMemo(() => compareWages({ ...production, ...hourly }), [hourly, production]);
   const max = Math.max(result.production, result.hourly);
@@ -77,8 +78,8 @@ function Report() {
             {result.winner === "even"
               ? "Even"
               : result.winner
-                ? `+${formatMoney(result.difference)}`
-                : formatMoney(0)}
+                ? `+${money(result.difference)}`
+                : money(0)}
           </p>
         </div>
         <button

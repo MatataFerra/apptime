@@ -6,26 +6,31 @@ import prisma from "#/prisma/client";
 export async function GET(req: NextRequest) {
   const checkToken = await getToken({ req });
 
-  if (!checkToken) {
+  if (!checkToken?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const contribution = prisma.contribution.findMany();
-
-  const tax = prisma.tax.findMany();
+  // Only the taxes and contributions used in this user's own shifts.
+  // (It used to return every user's.)
+  const mine = {
+    OR: [
+      { hourly: { some: { shift: { user: { email: checkToken.email } } } } },
+      { production: { some: { shift: { user: { email: checkToken.email } } } } },
+    ],
+  };
 
   try {
-    const [contributions, taxes] = await prisma.$transaction([contribution, tax]);
+    const [contributions, taxes] = await prisma.$transaction([
+      prisma.contribution.findMany({ where: mine }),
+      prisma.tax.findMany({ where: mine }),
+    ]);
 
     return NextResponse.json({
-      salaryItems: {
-        contributions,
-        taxes,
-      },
+      salaryItems: { contributions, taxes },
       response: true,
       message: "success",
     });
-  } catch (error) {
-    return NextResponse.json({ error: "Something went wrong", response: false }, { status: 401 });
+  } catch {
+    return NextResponse.json({ error: "Something went wrong", response: false }, { status: 500 });
   }
 }

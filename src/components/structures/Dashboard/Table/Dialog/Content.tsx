@@ -3,13 +3,13 @@ import isEmpty from "lodash/isEmpty";
 
 import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
-import { formatMoney } from "@/services/Summary";
 
 import type { ShiftType } from "@/types";
 
 import { MODULE_THEMES } from "@/utils/constants/modules";
 import { isProductionShift } from "@/utils/helpers/isProductionShift";
 import { cn } from "@/utils/helpers/styleMerger";
+import useMoney from "@/hooks/useMoney";
 
 type Props = {
   shift: ShiftType;
@@ -23,6 +23,11 @@ function when(date?: string | null) {
 
 /** Read-only view of a saved shift: pay first, then the details. */
 function TableDialogContent({ shift }: Props) {
+  const format$ = useMoney();
+  // In the shift's own currency.
+  function money(value: number) {
+    return format$(value, { currency: shift.currency });
+  }
   const production = isProductionShift(shift);
   const colors = MODULE_THEMES[production ? "production" : "track"];
   const pay = new Pay(shift);
@@ -36,15 +41,13 @@ function TableDialogContent({ shift }: Props) {
     production
       ? {
           label: "Pieces",
-          value: `${shift.itemQuantity ?? 0} × ${formatMoney(Number(shift.itemValue ?? 0))}`,
+          value: `${shift.itemQuantity ?? 0} × ${money(Number(shift.itemValue ?? 0))}`,
         }
       : {
           label: "Time worked",
           value: shift.amount ? `${ShiftService.convertAmountInDecimal(shift.amount)}h` : "–",
         },
-    ...(!production
-      ? [{ label: "Hourly rate", value: formatMoney(Number(shift.hourValue ?? 0)) }]
-      : []),
+    ...(!production ? [{ label: "Hourly rate", value: money(Number(shift.hourValue ?? 0)) }] : []),
   ];
 
   return (
@@ -65,12 +68,12 @@ function TableDialogContent({ shift }: Props) {
       <section className="flex flex-col gap-3 rounded-[20px] bg-surface-inverse p-4 text-ink-inverse">
         <div className="flex flex-col gap-1">
           <span className="text-[0.8125rem] text-ink-inverse/70">Earned</span>
-          <span className="figure text-[2.5rem] leading-none text-live">{formatMoney(gross)}</span>
+          <span className="figure text-[2.5rem] leading-none text-live">{money(gross)}</span>
         </div>
         {hasTaxes ? (
           <div className="flex justify-between border-t border-ink-inverse/15 pt-3 text-sm font-semibold">
             <span>After taxes</span>
-            <span className="tabular-nums">{formatMoney(net)}</span>
+            <span className="tabular-nums">{money(net)}</span>
           </div>
         ) : null}
       </section>

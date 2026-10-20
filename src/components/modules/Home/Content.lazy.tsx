@@ -20,3 +20,7 @@ export const WeekSummary = dynamic(() => import("@/components/structures/Home/We
 export const LiveShift = dynamic(() => import("@/components/structures/Home/LiveShift"), {
   ssr: false,
 });
+export const RepeatFastCharge = dynamic(
+  () => import("@/components/structures/Home/RepeatFastCharge"),
+  { ssr: false }
+);

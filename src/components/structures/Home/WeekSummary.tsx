@@ -4,13 +4,13 @@ import { useMemo } from "react";
 
 import { format, isSameDay } from "date-fns";
 
-import { formatHours, formatMoney, summarizeWeek, weekStartsOnIndex } from "@/services/Summary";
+import { formatHours, summarizeWeek, weekStartsOnIndex } from "@/services/Summary";
 
 import Skeleton from "@/components/ui/Skeleton";
 
 import { cn } from "@/utils/helpers/styleMerger";
-import useHourlyShifts from "@/hooks/useHourlyShifts";
-import useProductionShifts from "@/hooks/useProductionShifts";
+import useMoney from "@/hooks/useMoney";
+import useShiftsInCurrency from "@/hooks/useShiftsInCurrency";
 import useUser from "@/hooks/useUser";
 
 /**
@@ -19,9 +19,10 @@ import useUser from "@/hooks/useUser";
  * public holidays in amber.
  */
 function WeekSummary() {
+  const money = useMoney();
   const { data: user } = useUser();
-  const { data: hourly, isLoading: loadingHourly } = useHourlyShifts();
-  const { data: production, isLoading: loadingProduction } = useProductionShifts();
+  // Totals in the Settings currency; shifts in other currencies aren't added in.
+  const { hourly, production, isLoading, otherCurrencies, currency } = useShiftsInCurrency();
   const weekStartsOn = weekStartsOnIndex(user?.config?.weekStartsOn);
 
   const week = useMemo(
@@ -29,7 +30,7 @@ function WeekSummary() {
     [hourly, production, weekStartsOn]
   );
 
-  if (loadingHourly || loadingProduction) {
+  if (isLoading) {
     return <Skeleton classes="h-52 w-full rounded-2xl" />;
   }
 
@@ -52,7 +53,7 @@ function WeekSummary() {
         <div className="flex flex-col-reverse gap-0.5">
           <dt className="text-xs text-ink-inverse/70">earned</dt>
           <dd className="figure text-[1.875rem] leading-none text-live">
-            {formatMoney(week.earned, { cents: week.earned < 1000 })}
+            {money(week.earned, { cents: week.earned < 1000 })}
           </dd>
         </div>
         <div className="flex flex-col-reverse gap-0.5">
@@ -70,10 +71,14 @@ function WeekSummary() {
           const total = day.hourly + day.production;
           const isToday = isSameDay(day.date, today);
           const height = total > 0 ? Math.max(12, Math.round((total / max) * 100)) : 0;
-          const label = `${format(day.date, "EEEE")}: ${total > 0 ? formatMoney(total) : "no shifts"}`;
+          const label = `${format(day.date, "EEEE")}: ${total > 0 ? money(total) : "no shifts"}`;
 
           return (
-            <li key={day.date.toISOString()} className="flex h-full flex-col items-center gap-1" aria-label={label}>
+            <li
+              key={day.date.toISOString()}
+              className="flex h-full flex-col items-center gap-1"
+              aria-label={label}
+            >
               <div className="flex w-full flex-1 flex-col justify-end">
                 {total > 0 ? (
                   <div
@@ -97,7 +102,8 @@ function WeekSummary() {
                   <div
                     className={cn(
                       "h-1 w-full rounded-[4px] bg-ink-inverse/20",
-                      isToday && "outline-[1.5px] outline-offset-2 outline-ink-inverse outline-solid"
+                      isToday &&
+                        "outline-[1.5px] outline-offset-2 outline-ink-inverse outline-solid"
                     )}
                   />
                 )}
@@ -115,6 +121,11 @@ function WeekSummary() {
           );
         })}
       </ol>
+      {otherCurrencies.length > 0 ? (
+        <p className="text-xs text-ink-inverse/60">
+          Totals in {currency}. Shifts in {otherCurrencies.join(", ")} aren&apos;t added in.
+        </p>
+      ) : null}
     </section>
   );
 }

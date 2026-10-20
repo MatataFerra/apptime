@@ -11,7 +11,6 @@ const { findUnique, getServerSession } = vi.hoisted(() => ({
 vi.mock("#/prisma/client", () => ({ default: { user: { findUnique } } }));
 vi.mock("next-auth", () => ({ getServerSession }));
 
-
 const start = new Date("2026-10-18T08:00:00.000Z");
 const dbUser = {
   id: "u1",
@@ -21,7 +20,9 @@ const dbUser = {
   role: "USER",
   shifts: {
     id: 1,
-    hourly: [{ id: 10, startDate: start, isClosed: true, taxes: [{ id: 1, name: "PAYE", value: 10.5 }] }],
+    hourly: [
+      { id: 10, startDate: start, isClosed: true, taxes: [{ id: 1, name: "PAYE", value: 10.5 }] },
+    ],
     production: [{ id: 20, startDate: start, isClosed: true, taxes: [] }],
   },
   profile: null,
@@ -29,7 +30,8 @@ const dbUser = {
 };
 
 function query(state: Awaited<ReturnType<typeof prefetchUserData>>["state"], key: unknown[]) {
-  return state.queries.find((q) => JSON.stringify(q.queryKey) === JSON.stringify(key))?.state.data as any;
+  return state.queries.find((q) => JSON.stringify(q.queryKey) === JSON.stringify(key))?.state
+    .data as any;
 }
 
 describe("prefetchUserData", () => {

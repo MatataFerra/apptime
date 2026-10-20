@@ -71,6 +71,8 @@ model Production {
   notes               String?
   itemValue           Float?
   itemQuantity        Float?
+  /// ISO 4217 code. Null: the user's default currency (Config.currency).
+  currency            String?
   shiftId             Int?
   taxes               Tax[]
   contributions       Contribution[]
@@ -89,6 +91,10 @@ model Hourly {
   notes               String?
   hourValue           Float
   unpaidBreaks        Float?
+  /// ISO 4217 code. Null: the user's default currency (Config.currency).
+  currency            String?
+  /// Where the shift was logged: "track" (live clock) or "fast" (Fast charge). Null: before this existed.
+  source              String?
   shiftId             Int?
   taxes               Tax[]
   contributions       Contribution[]
@@ -116,6 +122,14 @@ model Contribution {
 model Config {
   id           Int     @id @default(autoincrement())
   weekStartsOn String  @default("monday")
+  /// Default currency for new shifts and for shifts saved before currencies existed.
+  currency     String  @default("USD")
+  /// Defaults that prefill Track, Fast charge and Estimate.
+  hourValue    Float?
+  unpaidBreaks Float?
+  holidayPay   Float   @default(8)
+  /// "system" | "light" | "dark"
+  theme        String  @default("system")
   userId       String? @unique
   user         User?   @relation(fields: [userId], references: [id])
 }

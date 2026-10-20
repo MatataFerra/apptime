@@ -29,6 +29,7 @@ export default async function onCreateProductionShift(data: ProductionInputsPars
     itemQuantity: data.itemQuantity,
     isPublicHoliday: data.isPublicHoliday,
     publicHolidayWorked: data.publicHolidayWorked,
+    currency: data.currency ?? null,
     amount: 0,
     isClosed: true,
     notes: "",

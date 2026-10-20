@@ -33,6 +33,8 @@ export default async function onCreateHourlyShift(data: FastChargeInputsParsed) 
     notes: "",
     unpaidBreaks: data.unpaidBreaks,
     shiftId: currentUser.shifts?.id,
+    currency: data.currency ?? null,
+    source: "fast",
   })
     .closeShift()
     .checkPublicHoliday()

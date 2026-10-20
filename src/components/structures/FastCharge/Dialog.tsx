@@ -6,11 +6,11 @@ import { differenceInMinutes, format } from "date-fns";
 
 import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
-import { formatMoney } from "@/services/Summary";
 
 import ShiftReviewDialog from "@/components/structures/share/ShiftReviewDialog";
 
 import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
+import useMoney from "@/hooks/useMoney";
 
 import { useFastChargeStore } from "@/store/useFastChargeStore";
 import { useHourlyTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
@@ -22,6 +22,7 @@ function humanize(date?: string | Date | null) {
 }
 
 function DialogHourly({ children }: PropsWithChildren) {
+  const money = useMoney();
   const {
     values: {
       startDate,
@@ -32,6 +33,7 @@ function DialogHourly({ children }: PropsWithChildren) {
       hourValue,
       unpaidBreaks,
       fastHoliday,
+      currency,
     },
     dialog,
     setDialogState,
@@ -94,6 +96,7 @@ function DialogHourly({ children }: PropsWithChildren) {
       formId="fast-charge"
       theme="fast"
       gross={calculateEarn.sharp}
+      currency={currency}
       afterTaxes={calculateEarn.afterTaxes}
       taxes={taxes}
       tags={tags}
@@ -101,7 +104,7 @@ function DialogHourly({ children }: PropsWithChildren) {
         { label: "Start", value: humanize(formatStart) },
         { label: "Finish", value: humanize(formatEnd) },
         { label: "Time worked", value: totalTimeWorked },
-        { label: "Hourly rate", value: formatMoney(Number(hourValue) || 0) },
+        { label: "Hourly rate", value: money(Number(hourValue) || 0, { currency }) },
         ...(unpaidBreaks ? [{ label: "Unpaid breaks", value: `${unpaidBreaks} min` }] : []),
       ]}
     >
