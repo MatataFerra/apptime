@@ -16,11 +16,25 @@ import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import useSalaryItems from "@/hooks/useSalaryItems";
 
 import { Section } from "./Section";
+import Segmented from "./Segmented";
 import {
   onRemoveSalaryItem,
   onUpdateSalaryItem,
   type SalaryItemKind,
 } from "@/server-actions/salary-items";
+
+type Draft = {
+  name: string;
+  value: number;
+  description: string | null;
+  /** ISO start of the day the change applies from; null for every shift. */
+  from: string | null;
+};
+
+function today() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 function shifts(count: number) {
   return count === 1 ? "1 shift" : `${count} shifts`;
@@ -39,7 +53,7 @@ function ItemEditor({
   item: SavedSalaryItem;
   busy: boolean;
   onCancel: () => void;
-  onSave: (draft: { name: string; value: number; description: string | null }) => void;
+  onSave: (draft: Draft) => void;
 }) {
   const [name, setName] = useState(item.name);
   const [value, setValue] = useState(String(item.value));
@@ -47,18 +61,31 @@ function ItemEditor({
   const nameId = useId();
   const valueId = useId();
   const noteId = useId();
+  const dateId = useId();
+  const [scope, setScope] = useState<"all" | "from">("from");
+  const [fromDay, setFromDay] = useState(today);
 
   const rate = Number(value);
   const validRate = value.trim() !== "" && Number.isFinite(rate) && rate >= 0 && rate <= 100;
   const valid = name.trim() !== "" && validRate;
-  const rateChanged = validRate && rate !== Number(item.value);
+  const rateChanged = validRate && (rate !== Number(item.value) || name.trim() !== item.name);
+  // Only worth asking when saved shifts would be affected.
+  const askScope = rateChanged && item.uses > 0;
+  const validDay = scope === "all" || /^\d{4}-\d{2}-\d{2}$/.test(fromDay);
 
   return (
     <form
       className="flex flex-col gap-3 px-4 py-4"
       onSubmit={(e) => {
         e.preventDefault();
-        if (valid) onSave({ name: name.trim(), value: rate, description: description.trim() || null });
+        if (!valid || !validDay) return;
+        onSave({
+          name: name.trim(),
+          value: rate,
+          description: description.trim() || null,
+          // Midnight of that day where the user is.
+          from: askScope && scope === "from" ? new Date(`${fromDay}T00:00`).toISOString() : null,
+        });
       }}
     >
       <div className="grid grid-cols-[1fr_7rem] gap-2">
@@ -101,18 +128,48 @@ function ItemEditor({
         />
       </label>
 
-      {rateChanged && item.uses > 0 ? (
-        <p role="status" className="rounded-xl bg-warning-soft px-3 py-2 text-[0.8125rem] text-ink">
-          The new rate also applies to the {shifts(item.uses)} that use it, so their pay after
-          taxes changes.
-        </p>
+      {askScope ? (
+        <div className="flex flex-col gap-2.5 rounded-xl bg-warning-soft px-3 py-3">
+          <p className="text-[0.8125rem] font-medium text-ink">
+            {shifts(item.uses)} use it. Which ones get the change?
+          </p>
+          <Segmented
+            label="Apply the change to"
+            value={scope}
+            onChange={setScope}
+            options={[
+              { value: "from", label: "From a date" },
+              { value: "all", label: "All shifts" },
+            ]}
+          />
+          {scope === "from" ? (
+            <label
+              htmlFor={dateId}
+              className="flex items-center justify-between gap-3 text-[0.8125rem] text-ink"
+            >
+              Shifts from
+              <input
+                id={dateId}
+                type="date"
+                value={fromDay}
+                onChange={(e) => setFromDay(e.target.value)}
+                className="h-10 rounded-xl border border-border-strong bg-surface px-3 text-[0.9375rem] text-ink"
+              />
+            </label>
+          ) : null}
+          <p role="status" className="text-[0.8125rem] text-ink-muted">
+            {scope === "from"
+              ? "Earlier shifts keep the current rate. New shifts use the new one."
+              : "Every shift, past ones included, uses the new values. Use this to fix a mistake."}
+          </p>
+        </div>
       ) : null}
 
       <div className="grid grid-cols-2 gap-2">
         <Button type="button" variant="ghost" size="md" classes="w-full" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="submit" size="md" classes="w-full" disabled={!valid || busy}>
+        <Button type="submit" size="md" classes="w-full" disabled={!valid || !validDay || busy}>
           {busy ? "Saving…" : "Save"}
         </Button>
       </div>
@@ -132,13 +189,20 @@ function ItemRow({
   const [mode, setMode] = useState<"view" | "edit" | "remove">("view");
   const [busy, setBusy] = useState(false);
 
-  async function save(draft: { name: string; value: number; description: string | null }) {
+  async function save(draft: Draft) {
     setBusy(true);
     const result = await onUpdateSalaryItem({ kind, id: item.id, ...draft }).catch(() => null);
     setBusy(false);
     if (!result?.ok) {
       Toast({ type: "error", message: "Couldn't save", description: result?.error });
       return;
+    }
+    if (result.moved !== null) {
+      Toast({
+        type: "success",
+        message: "Rate updated",
+        description: `${shifts(result.moved)} from that date use the new rate.`,
+      });
     }
     await onChanged();
     setMode("view");

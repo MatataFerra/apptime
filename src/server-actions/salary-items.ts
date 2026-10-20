@@ -3,6 +3,8 @@
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 
+import SalaryItems, { startsOnOrAfter } from "@/services/SalaryItems";
+
 import { revalidateSettingsPage, revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
 
 import prisma from "#/prisma/client";
@@ -17,6 +19,12 @@ const UpdateSchema = z
     name: z.string().trim().min(1).max(60),
     value: z.number().min(0).max(100),
     description: z.string().trim().max(200).nullable(),
+    /**
+     * Without it the change applies to every shift (fixing a typo).
+     * With it, only shifts from that day on get the new values; older
+     * ones keep the old rate (a rate that changed by law, say).
+     */
+    from: z.string().datetime().nullable().optional(),
   })
   .strict();
 
@@ -40,8 +48,8 @@ function revalidate() {
 }
 
 /**
- * Rename a tax or change its rate. Every shift that uses it shows the new
- * values, which is what the Settings screen warns about.
+ * Rename a tax or change its rate, for every shift that uses it or only
+ * for shifts from a date on.
  */
 export async function onUpdateSalaryItem(input: z.input<typeof UpdateSchema>) {
   const userId = await sessionUserId();
@@ -49,17 +57,46 @@ export async function onUpdateSalaryItem(input: z.input<typeof UpdateSchema>) {
 
   const parsed = UpdateSchema.safeParse(input);
   if (!parsed.success) return { ok: false as const, error: "Check the name and rate" };
-  const { kind, id, name, value, description } = parsed.data;
+  const { kind, id, name, value, from } = parsed.data;
+  const description = parsed.data.description || null;
 
-  // updateMany with userId in the filter: someone else's id updates nothing.
-  const { count } = await model(kind).updateMany({
-    where: { id, userId },
-    data: { name, value, description: description || null },
-  });
-  if (count === 0) return { ok: false as const, error: "Not found" };
+  // Filtered by owner: someone else's id is "not found".
+  const current = await model(kind).findFirst({ where: { id, userId } });
+  if (!current) return { ok: false as const, error: "Not found" };
+
+  const sameRate = current.name === name && Number(current.value) === value;
+
+  if (!from || sameRate) {
+    await model(kind).update({ where: { id }, data: { name, value, description } });
+    revalidate();
+    return { ok: true as const, moved: null };
+  }
+
+  // From a date: shifts on or after it move to a row with the new values.
+  const since = new Date(from);
+  const target = await SalaryItems.findOrCreate(kind, userId, { name, value, description });
+  const moving = (await SalaryItems.shiftsUsing(kind, userId, id)).filter((shift) =>
+    startsOnOrAfter(shift.startDate, since)
+  );
+
+  if (target !== id && moving.length > 0) {
+    await prisma.$transaction(
+      moving.map((shift) => SalaryItems.relink(kind, shift.kind, shift.id, id, target))
+    );
+  }
+
+  // The old row now only belongs to older shifts: keep it for them but stop
+  // offering it, or delete it if nothing uses it anymore.
+  if (target !== id) {
+    if ((await SalaryItems.uses(kind, id)) === 0) {
+      await model(kind).delete({ where: { id } });
+    } else {
+      await model(kind).update({ where: { id }, data: { archived: true } });
+    }
+  }
 
   revalidate();
-  return { ok: true as const };
+  return { ok: true as const, moved: moving.length };
 }
 
 /**

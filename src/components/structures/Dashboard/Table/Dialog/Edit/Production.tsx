@@ -61,7 +61,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { setStep } = useTableStore((state) => state);
-  const { taxesToDelete, reset } = useTaxesHandlerDelete((state) => state);
+  const { taxesToDelete, rateChanges, reset } = useTaxesHandlerDelete((state) => state);
 
   function onHandleEdit(data: EditProductionShiftForm) {
     const {
@@ -88,7 +88,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
     // Check if user made any changes
     const isShiftEqual = isEqual(shiftUpdated, shift);
 
-    if (isShiftEqual && taxesToDelete.length <= 0) {
+    if (isShiftEqual && taxesToDelete.length <= 0 && rateChanges.length <= 0) {
       Toast({
         type: "error",
         message: "No changes were made.",
@@ -112,7 +112,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
       return;
     }
 
-    onEditShift(shiftUpdated, taxesToDelete).then(async (res) => {
+    onEditShift(shiftUpdated, taxesToDelete, rateChanges).then(async (res) => {
       Toast({
         type: "loading",
         message: "Shift is being updated",
@@ -129,6 +129,10 @@ function TableDialogEditProduction({ shift, user }: Props) {
         });
 
         queryClient.refetchQueries({ queryKey: ["user", user?.email] });
+        // A rate change can add a tax and changes the shift totals.
+        queryClient.invalidateQueries({ queryKey: ["salary"] });
+        queryClient.invalidateQueries({ queryKey: ["hourly"] });
+        queryClient.invalidateQueries({ queryKey: ["production"] });
         setStep("info");
 
         reset();
