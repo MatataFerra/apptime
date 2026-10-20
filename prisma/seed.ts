@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
-import { type User } from "@prisma/client";
-import { hashSync } from "bcryptjs";
+import { hashPassword } from "better-auth/crypto";
+import { randomUUID } from "crypto";
 import { addDays, addMinutes, differenceInMinutes, isToday as isTheDateToday } from "date-fns";
 
 import prisma from "./client";
@@ -45,16 +45,16 @@ function addHourlyShiftsForSeed(dates: Array<Date>) {
   }));
 }
 
-function addUsersMocked(): Omit<User, "id">[] {
+function addUsersMocked() {
   return Array.from({ length: 5 }, (_, i) => {
     return {
       email: `usuario${i}@example.com`.trim(),
       name: `User Testing ${i}`,
-      emailVerified: null,
+      emailVerified: true,
       formCompleted: false,
       image: "/assets/avatar.svg",
       online: false,
-      password: hashSync(`Secreto${i}!`, 10),
+      password: `Secreto${i}!`,
       type_account: "CREDENTIALS",
       role: i === 4 ? "ADMIN" : "USER",
       isActive: true,
@@ -74,7 +74,6 @@ async function main() {
         formCompleted: userData.formCompleted,
         image: userData.image,
         online: userData.online,
-        password: userData.password,
         type_account: userData.type_account,
         role: userData.role,
         isActive: userData.isActive,
@@ -83,6 +82,17 @@ async function main() {
             weekStartsOn: "monday",
           },
         },
+      },
+    });
+
+    // Passwords live in the credential account (Better Auth, scrypt).
+    await prisma.account.create({
+      data: {
+        id: randomUUID(),
+        accountId: user.id,
+        providerId: "credential",
+        userId: user.id,
+        password: await hashPassword(userData.password),
       },
     });
 

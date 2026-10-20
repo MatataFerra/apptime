@@ -3,17 +3,12 @@
 import { useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { User } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import api from "@/services/Api";
 import Toast from "@/services/Toast";
-
-import { ApiResponse } from "@/types/api_response";
 
 import List from "@/components/structures/share/PasswordReqList";
 import Form from "@/components/ui/Form";
@@ -23,6 +18,7 @@ import Stack from "@/components/ui/Stack";
 
 import { usePasswordValid } from "@/providers/PasswordValidProvider";
 
+import { authClient } from "@/utils/auth/client";
 import { MAX_ATTEMPTS_TO_REGISTER } from "@/utils/constants";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 import usePasswordErrors from "@/hooks/usePasswordErrors";
@@ -52,7 +48,10 @@ function RegisterForm() {
   const { passedErrors } = usePasswordErrors(passwordWatched);
 
   const { mutate, isPending } = useMutation({
-    mutationFn: api.register.bind(api),
+    // Better Auth creates the user, the password account and the session
+    // (autoSignIn), so there's no separate sign-in step anymore.
+    mutationFn: ({ email, password }: RegisterInputs) =>
+      authClient.signUp.email({ email, password, name: email.split("@")[0] }),
 
     onMutate() {
       //Blocking the register button
@@ -62,11 +61,9 @@ function RegisterForm() {
       addAttempToRegister();
     },
 
-    onSuccess(data) {
-      const res = data as ApiResponse<User>;
-      if (!res.response) {
-        // Error handling
-        if (res.error.type_error === "UserAlreadyExists") {
+    onSuccess({ error }) {
+      if (error) {
+        if (error.code?.startsWith("USER_ALREADY_EXISTS")) {
           Toast({
             type: "warning",
             message: t("user_already_exist"),
@@ -87,7 +84,6 @@ function RegisterForm() {
         });
       }
 
-      // ui notif
       Toast({
         message: t("successful"),
         type: "success",
@@ -95,27 +91,8 @@ function RegisterForm() {
         itemID: "success_register",
       });
 
-      //Login with the credentials and redirect to the home
-      signIn("credentials", {
-        redirect: false,
-        callbackUrl: PATH_NAMES.HOME,
-        email: emailWatched,
-        password: passwordWatched,
-      }).then((res) => {
-        if (res?.error) {
-          // Error handling with login
-          Toast({
-            message: t("unexpected_error_after_register"),
-            type: "error",
-          });
-
-          return router.push(PATH_NAMES.LOGIN);
-        }
-
-        if (res?.ok && !res.error) {
-          router.push(PATH_NAMES.HOME);
-        }
-      });
+      // Full load, so the server renders with the new session.
+      window.location.assign(PATH_NAMES.HOME);
     },
 
     onSettled() {

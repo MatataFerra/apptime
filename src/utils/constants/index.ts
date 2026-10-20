@@ -95,9 +95,6 @@ export const WEEK_DAYS = [
   "sunday",
 ] as const;
 
-export const NEXT_AUTH_SESSION_TOKEN =
-  process.env.DEV_MODE === "true" ? "next-auth.session-token" : "__Secure-next-auth.session-token";
-
 export const TAX_CODES = {
   M: 0,
   CAE: 1,

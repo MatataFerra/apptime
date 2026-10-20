@@ -5,7 +5,6 @@ import type { PropsWithChildren } from "react";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter } from "next/navigation";
-import { signOut, useSession } from "next-auth/react";
 import { useLocale } from "next-intl";
 
 import Login from "@/components/structures/Auth/Login";
@@ -23,6 +22,9 @@ import {
 } from "@/components/ui/Sheet";
 import Skeleton from "@/components/ui/Skeleton";
 
+import { useAuthSession } from "@/providers/Session";
+
+import { signOutAndLeave } from "@/utils/auth/client";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 type Props = {};
@@ -36,13 +38,10 @@ function SheetHamMenu({ children }: PropsWithChildren<Props>) {
   const router = useRouter();
   const path = usePathname();
   const locale = useLocale();
-  const { status } = useSession();
+  const { isSignedIn } = useAuthSession();
 
   function handleLogout() {
-    signOut({
-      callbackUrl: PATH_NAMES.HOME,
-      redirect: true,
-    });
+    signOutAndLeave(PATH_NAMES.HOME);
   }
 
   function handleLogin() {
@@ -75,7 +74,7 @@ function SheetHamMenu({ children }: PropsWithChildren<Props>) {
         </SheetHeader>
         <Options />
         <SheetFooter className="mt-auto flex-col sm:flex-col sm:space-x-0">
-          {status === "authenticated" ? (
+          {isSignedIn ? (
             <Logout handleLogout={handleLogout} />
           ) : (
             <Login handleLogin={handleLogin} />

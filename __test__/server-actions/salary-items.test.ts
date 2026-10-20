@@ -24,8 +24,8 @@ const db = vi.hoisted(() => {
 });
 
 vi.mock("#/prisma/client", () => ({ default: db }));
-vi.mock("next-auth", () => ({
-  getServerSession: vi.fn(async () => ({ user: { email: "me@example.com" } })),
+vi.mock("@/utils/auth/session", () => ({
+  getSessionEmail: vi.fn(async () => "me@example.com"),
 }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 

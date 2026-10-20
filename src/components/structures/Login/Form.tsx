@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
 
 import { LoginInputs } from "@/types";
@@ -14,6 +13,7 @@ import Form from "@/components/ui/Form";
 import Input from "@/components/ui/Input";
 import Loader from "@/components/ui/Loader";
 
+import { authClient } from "@/utils/auth/client";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 export default function FormLogin() {
@@ -45,14 +45,18 @@ export default function FormLogin() {
       return;
     }
 
-    signIn("credentials", {
-      callbackUrl: searchParams.get("redirect") ?? PATH_NAMES.HOME,
-      redirect: true,
-      password,
-      email,
-    })
-      .then((res) => {
-        if (res?.error) {
+    authClient.signIn
+      .email({ email, password })
+      .then(({ error }) => {
+        if (!error) {
+          // Full load, so the server renders with the new session.
+          // Only same-site paths are followed.
+          const redirect = searchParams.get("redirect");
+          const sameSite = redirect?.startsWith("/") && !redirect.startsWith("//");
+          window.location.assign(sameSite ? redirect! : PATH_NAMES.HOME);
+          return;
+        }
+        if (error) {
           return setError(
             "password",
             {

@@ -1,22 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getToken, type JWT } from "next-auth/jwt";
 
 import ErrorFactory from "@/services/Error/factory";
 import UserService from "@/services/User";
 
 import { SearchParamsSchema } from "@/types";
 
+import { getRequestSession } from "@/utils/auth/session";
 import { QUERY_PARAMS } from "@/utils/constants";
 
 import prisma from "#/prisma/client";
 
-function parseEmailFromParams(token: JWT | null, email: string | null) {
+type SessionUser = { email: string; role?: string | null };
+
+function parseEmailFromParams(token: SessionUser | null, email: string | null) {
   if (token?.role !== "ADMIN") return token?.email;
   return email;
 }
 
 export async function GET(req: NextRequest) {
-  const checkToken = await getToken({ req });
+  const checkToken = (await getRequestSession(req))?.user ?? null;
 
   if (!checkToken) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

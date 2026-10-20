@@ -8,7 +8,6 @@ import type {
   Tax,
   User,
 } from "@prisma/client";
-import type { JWT } from "next-auth/jwt";
 import { z } from "zod";
 
 import { HandleErrorTypeSchema } from "@/types/zod";
@@ -71,14 +70,6 @@ export const DAYS = {
   saturday: 6,
 } as const;
 
-export interface JWTDecodedType extends JWT {
-  accessToken: string;
-  email: string;
-  name: string;
-  image: string;
-  role: "USER" | "ADMIN" | "SUPER_USER";
-}
-
 // Password
 export type PassedErrors = {
   CAPITAL_LETTER: boolean;
@@ -89,16 +80,10 @@ export type PassedErrors = {
 
 // Date Humanizer
 export type DateHumanizerStrategy =
-  | "today"
-  | "distanceToNow"
-  | "formatAndAddTime"
-  | "formatDate"
-  | "short"
-  | "long";
+  "today" | "distanceToNow" | "formatAndAddTime" | "formatDate" | "short" | "long";
 
 // Chart
 export type EarnsMonthData = {
   month: string;
   earnings: number;
 } | null;
-

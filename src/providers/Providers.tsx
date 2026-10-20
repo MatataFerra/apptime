@@ -3,18 +3,19 @@ import { type ReactNode, useEffect, useState } from "react";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import type { Session } from "next-auth";
-import { SessionProvider } from "next-auth/react";
 import { type AbstractIntlMessages, NextIntlClientProvider } from "next-intl";
 
 import ut from "@/services/Utilities/client";
 
+import { SessionProvider } from "@/providers/Session";
 import ThemeSync from "@/providers/ThemeSync";
+
+import type { ClientSession } from "@/utils/auth/session";
 
 type Props = {
   children?: ReactNode;
-  /** Read on the server, so the client doesn't wait for /api/auth/session. */
-  session: Session | null;
+  /** Read on the server, so the client doesn't wait for a session request. */
+  session: ClientSession;
   i18n: {
     messages: AbstractIntlMessages;
     locale: string;

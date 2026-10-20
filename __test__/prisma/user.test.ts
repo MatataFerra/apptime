@@ -1,9 +1,8 @@
-import { afterAll, beforeEach,describe, expect,test, vi } from "vitest";
+import { afterAll, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { userMocked } from "../../mocks";
 import prisma from "../../prisma/client";
 import prismaMock from "../../prisma/singleton";
-
 
 async function findFirstMock() {
   const user = await prisma.user.findFirst({
@@ -80,8 +79,9 @@ describe("GET /user", () => {
     const user = prismaMock.user.create.mockResolvedValueOnce({
       email: "",
       name: "test",
-      password: "test",
-      emailVerified: new Date(),
+      emailVerified: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
       role: "USER",
       isActive: true,
       formCompleted: true,

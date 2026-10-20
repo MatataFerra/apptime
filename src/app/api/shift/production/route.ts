@@ -1,11 +1,12 @@
 import { Prisma, Production } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
 
 import ErrorFactory from "@/services/Error/factory";
 import ShiftService from "@/services/Shift";
 
 import { ProductionCreateSchema } from "@/types";
+
+import { getRequestSession } from "@/utils/auth/session";
 
 import prisma from "#/prisma/client";
 
@@ -69,7 +70,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const checkToken = await getToken({ req });
+  const checkToken = (await getRequestSession(req))?.user ?? null;
 
   if (!checkToken) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

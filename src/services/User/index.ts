@@ -1,8 +1,8 @@
 import { User } from "@prisma/client";
-import { getServerSession } from "next-auth";
 
 import type { UserType } from "@/types";
 
+import { getSession } from "@/utils/auth/session";
 import { USER_ROLES } from "@/utils/constants";
 
 import prisma from "#/prisma/client";
@@ -46,8 +46,8 @@ class UserService {
         image: true,
         isActive: true,
         online: true,
-        passwordAttemps: true,
-        password: true,
+        createdAt: true,
+        updatedAt: true,
         shifts: {
           include: {
             hourly: {
@@ -115,38 +115,15 @@ class UserService {
       "profile" | "config" | "shifts"
     >
   ) {
-    const session = await getServerSession();
+    const session = await getSession();
     const user = await UserService.findUniqueUser({
-      email: session?.user?.email ?? "",
+      email: session?.user.email ?? "",
       shifts,
       profile,
       config,
     });
 
     return user;
-  }
-
-  async createUser() {
-    return await prisma.user.create({
-      data: {
-        ...this.user,
-        email: this.user.email,
-        password: this.user.password,
-        name: this.user.name,
-        type_account: this.user.type_account,
-        shifts: {
-          create: {
-            hourly: {},
-            production: {},
-          },
-        },
-        config: {
-          create: {
-            weekStartsOn: "monday",
-          },
-        },
-      },
-    });
   }
 
   static async updateUser({ id, user }: { id: string; user: Partial<User> }) {

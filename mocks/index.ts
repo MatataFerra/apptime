@@ -55,7 +55,9 @@ export const datesMock = [
 
 export const userMockedParsed: User = {
   ...userMock.userOne,
-  emailVerified: new Date(userMock.userOne.emailVerified),
+  emailVerified: true,
+  createdAt: new Date("2024-01-01T00:00:00Z"),
+  updatedAt: new Date("2024-01-01T00:00:00Z"),
   type_account: "CREDENTIALS",
   role: "USER",
   id: generateRandomID("uuid"),
@@ -127,10 +129,11 @@ export const userMocked: UserType = {
 export const userTestData: UserType = {
   id: "user-123",
   email: "testuser@example.com",
-  emailVerified: new Date("2024-08-01T12:00:00Z"),
+  emailVerified: true,
+  createdAt: new Date("2024-08-01T12:00:00Z"),
+  updatedAt: new Date("2024-08-01T12:00:00Z"),
   image: "http://example.com/image.jpg",
   name: "Test User",
-  password: "hashedpassword123",
   type_account: "standard",
   role: "employee",
   online: true,

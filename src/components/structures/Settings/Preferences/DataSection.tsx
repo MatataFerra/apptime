@@ -3,11 +3,12 @@
 import { useId, useState } from "react";
 
 import { Lock, LogOut, Trash2 } from "lucide-react";
-import { signOut } from "next-auth/react";
 
 import Toast from "@/services/Toast";
 
 import Button from "@/components/ui/Button";
+
+import { signOutAndLeave } from "@/utils/auth/client";
 
 import { Row, Section } from "./Section";
 import onDeleteAccount from "@/server-actions/delete-account";
@@ -23,7 +24,7 @@ function DataSection() {
     setBusy(true);
     const result = await onDeleteAccount(confirmation).catch(() => null);
     if (result?.ok) {
-      await signOut({ callbackUrl: "/" });
+      await signOutAndLeave("/");
       return;
     }
     setBusy(false);
@@ -44,12 +45,7 @@ function DataSection() {
         </span>
       </Row>
       <Row label="Log out" hint="On this device.">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => signOut({ callbackUrl: "/" })}
-        >
+        <Button type="button" variant="outline" size="sm" onClick={() => signOutAndLeave("/")}>
           <LogOut className="size-4" aria-hidden="true" />
           Log out
         </Button>

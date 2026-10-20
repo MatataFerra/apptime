@@ -1,6 +1,6 @@
 import { dehydrate, QueryClient } from "@tanstack/react-query";
-import { getServerSession } from "next-auth";
 
+import { getSession } from "@/utils/auth/session";
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 
 import "server-only";
@@ -49,8 +49,8 @@ function asJson<T>(value: T): T {
  */
 export async function prefetchUserData() {
   const queryClient = new QueryClient();
-  const session = await getServerSession();
-  const email = session?.user?.email;
+  const session = await getSession();
+  const email = session?.user.email;
   let profile: { name: string; email: string; image: string | null } | null = null;
 
   if (email) {

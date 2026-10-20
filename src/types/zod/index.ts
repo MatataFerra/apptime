@@ -139,10 +139,9 @@ const UserModelSchema = z.object({
     required_error: "Id must be provided correctly",
   }),
   email: z.string().email(),
-  emailVerified: z.date().nullable(),
+  emailVerified: z.boolean().default(false),
   image: z.string().nullable().default("/assets/avatar.svg"),
   name: z.string().default("User"),
-  password: z.string(),
   online: z.boolean().default(false),
   formCompleted: z.boolean().default(false),
   type_account: z.enum(["CREDENTIALS", "OAUTH"]).default("CREDENTIALS"),
@@ -165,7 +164,7 @@ const UserUpdateSchema = UserModelSchema.partial().superRefine((values, ctx) => 
     });
   }
 
-  if (values.password || values.email) {
+  if (values.email) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: "Can't update those fields",
@@ -193,14 +192,16 @@ const UserCreateSchema = UserModelSchema.omit({
 
 const UserCreateSafeAdminSchema = UserModelSchema.omit({
   id: true,
-}).superRefine((values, ctx) => {
-  if (Object.keys(values).length < 0) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "One field must be provided",
-    });
-  }
-});
+})
+  .extend({ password: z.string().min(8).max(128) })
+  .superRefine((values, ctx) => {
+    if (Object.keys(values).length < 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "One field must be provided",
+      });
+    }
+  });
 
 /*
 ===================================================================
