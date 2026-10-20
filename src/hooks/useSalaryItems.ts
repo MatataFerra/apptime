@@ -1,12 +1,9 @@
-import type { Contribution, Tax } from "@prisma/client";
+import type { SalaryItems } from "@/types";
+
+export type { SalaryItems };
 import { useQuery } from "@tanstack/react-query";
 
 import ApiSalaryItems from "@/services/Api/Salary";
-
-export type SalaryItems = {
-  contributions: Contribution[];
-  taxes: Tax[];
-};
 
 type Response = {
   response: boolean;

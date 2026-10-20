@@ -16,3 +16,7 @@ export const MoneySection = dynamic(
   () => import("@/components/structures/Settings/Preferences/MoneySection"),
   { ssr: false, loading: () => <Skeleton classes="h-72 w-full rounded-[20px]" /> }
 );
+export const TaxesSection = dynamic(
+  () => import("@/components/structures/Settings/Preferences/TaxesSection"),
+  { ssr: false, loading: () => <Skeleton classes="h-40 w-full rounded-[20px]" /> }
+);

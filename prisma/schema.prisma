@@ -46,6 +46,8 @@ model User {
   config             Config?
   passwordAttemps    PasswordAttemps?
   passwordResetToken PasswordResetToken[]
+  taxes              Tax[]
+  contributions      Contribution[]
 }
 
 model Profile {
@@ -106,8 +108,15 @@ model Tax {
   name        String
   value       Float
   description String?
+  /// Hidden from the picker; shifts that use it keep it.
+  archived    Boolean      @default(false)
+  /// Each user has their own taxes (they used to be shared by name).
+  userId      String?
+  user        User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
   production  Production[]
   hourly      Hourly[]
+
+  @@index([userId])
 }
 
 model Contribution {
@@ -115,8 +124,15 @@ model Contribution {
   name        String
   value       Float
   description String?
+  /// Hidden from the picker; shifts that use it keep it.
+  archived    Boolean      @default(false)
+  /// Each user has their own taxes (they used to be shared by name).
+  userId      String?
+  user        User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
   production  Production[]
   hourly      Hourly[]
+
+  @@index([userId])
 }
 
 model Config {

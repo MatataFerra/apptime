@@ -4,20 +4,22 @@ import { differenceInMinutes, endOfDay, isSameDay, startOfDay } from "date-fns";
 import ContributionService from "@/services/Contribution";
 import TaxService from "@/services/Tax";
 
-import type { HourlyType } from "@/types";
+import type { HourlyType, SalaryItemInput } from "@/types";
 
 import prisma from "../../../prisma/client";
 
 type HourlyOptions = {
   deleteTaxes?: Tax[];
-  createTaxes?: Omit<Tax, "id">[];
+  createTaxes?: SalaryItemInput[];
+  /** Owner of the shift; new taxes are created for this user. */
+  userId?: string;
 };
 
 interface HourlyInterface {
   update(id: number): Promise<Hourly>;
   create(): Promise<Hourly>;
   delete(id: number): Promise<Hourly>;
-  addtaxes(taxes: Tax[] | Omit<Tax, "id">[]): Promise<HourlyService>;
+  addtaxes(taxes: SalaryItemInput[], userId: string): Promise<HourlyService>;
   build(): Omit<Hourly, "shiftId" | "id">;
   calculateEarnings(): number;
   getConfig(): Pick<Hourly, "hourValue" | "unpaidBreaks">;
@@ -87,7 +89,7 @@ class HourlyService implements HourlyInterface {
     ===========================
   */
   async update(id: number) {
-    const { deleteTaxes, createTaxes } = this.options || {};
+    const { deleteTaxes, createTaxes, userId } = this.options || {};
 
     // Delete case
     if (this.getTaxesIds(deleteTaxes ?? []).length > 0) {
@@ -108,8 +110,8 @@ class HourlyService implements HourlyInterface {
     }
 
     // Create case
-    if (createTaxes && createTaxes?.length > 0) {
-      await this.addtaxes(createTaxes);
+    if (userId && createTaxes && createTaxes.length > 0) {
+      await this.addtaxes(createTaxes, userId);
       const updatedShiftData = await prisma.hourly.update({
         where: { id },
         data: {
@@ -165,16 +167,16 @@ class HourlyService implements HourlyInterface {
     ============================================================
   */
 
-  async addContributions(contributions: Contribution[] | Omit<Contribution, "id">[]) {
-    const created = await new ContributionService(contributions).create();
+  async addContributions(contributions: SalaryItemInput[], userId: string) {
+    const created = await new ContributionService(contributions, userId).create();
 
     this.contributions = created;
 
     return this;
   }
 
-  async addtaxes(taxes: Tax[] | Omit<Tax, "id">[]) {
-    const created = await new TaxService(taxes).create();
+  async addtaxes(taxes: SalaryItemInput[], userId: string) {
+    const created = await new TaxService(taxes, userId).create();
 
     this.taxes = created;
 

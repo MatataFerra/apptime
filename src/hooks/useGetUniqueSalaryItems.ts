@@ -1,10 +1,12 @@
 import type { Contribution, Tax } from "@prisma/client";
 
+import type { SalaryItemInput } from "@/types";
+
 import useSalaryItems from "@/hooks/useSalaryItems";
 
 type HookProps = {
-  localTaxes: Omit<Tax, "id">[];
-  localContributions: Omit<Contribution, "id">[];
+  localTaxes: SalaryItemInput[];
+  localContributions: SalaryItemInput[];
 };
 
 type Named = { name: string };

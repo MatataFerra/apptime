@@ -64,8 +64,8 @@ export default async function onCreateHourlyShift(data: FastChargeInputsParsed) 
 
     const hourlyService = new HourlyService(shift);
 
-    await hourlyService.addContributions(contributionsFromLocal);
-    await hourlyService.addtaxes(taxesFromLocal);
+    await hourlyService.addContributions(contributionsFromLocal, currentUser.id);
+    await hourlyService.addtaxes(taxesFromLocal, currentUser.id);
 
     const response = await hourlyService.create();
 

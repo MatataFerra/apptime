@@ -1,13 +1,13 @@
-import type { Contribution, Tax } from "@prisma/client";
-
 import ApiBase from "@/services/Api/Base";
+
+import type { SalaryItems } from "@/types";
 
 import { API_ENDPOINTS } from "@/utils/constants/endpoints";
 
 type Response = {
   response: boolean;
   message: string;
-  salaryItems: { contributions: Contribution[]; taxes: Tax[] };
+  salaryItems: SalaryItems;
 };
 
 class ApiSalaryItems extends ApiBase {

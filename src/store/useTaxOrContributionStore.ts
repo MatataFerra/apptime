@@ -2,8 +2,10 @@ import type { Contribution, Tax } from "@prisma/client";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
-export type ContributionElement = Omit<Contribution, "id"> & { fromDb?: boolean };
-export type TaxElement = Omit<Tax, "id"> & { fromDb?: boolean };
+import type { SalaryItemInput } from "@/types";
+
+export type ContributionElement = SalaryItemInput & { fromDb?: boolean };
+export type TaxElement = SalaryItemInput & { fromDb?: boolean };
 
 export type ContributionOrTax = ContributionElement | TaxElement;
 

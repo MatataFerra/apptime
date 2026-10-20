@@ -1,24 +1,27 @@
 import type { Contribution } from "@prisma/client";
 
+import type { SalaryItemInput } from "@/types";
+
 import prisma from "#/prisma/client";
 
 /**
- * Rows are shared, so only reuse one with the same name *and* rate.
- * Matching by name alone linked a shift to someone else's "Income tax"
- * with a different percentage.
+ * Each user owns their rows, and a row is only reused when the name *and*
+ * rate match, so a shift never ends up with a different percentage.
  */
 function sameItem(a: { name: string; value: number }, b: { name: string; value: number }) {
   return a.name === b.name && Number(a.value) === Number(b.value);
 }
 
 class ContributionService {
-  contributions: Omit<Contribution, "id">[];
-  constructor(contributions: Omit<Contribution, "id">[]) {
+  contributions: SalaryItemInput[];
+  userId: string;
+  constructor(contributions: SalaryItemInput[], userId: string) {
     this.contributions = contributions;
+    this.userId = userId;
   }
 
   async create() {
-    const contributionsFromDB = await ContributionService.getAll();
+    const contributionsFromDB = await ContributionService.getAll(this.userId);
     const filtered = this.prepareContributionsToCreate(contributionsFromDB);
     const toCreate = filtered
       .filter((contribution) => !contribution.exists)
@@ -34,19 +37,32 @@ class ContributionService {
       if (findContribution) existing.push(findContribution);
     }
 
+    await this.unarchive(existing);
     return newContributions.concat(existing.map((contribution) => ({ id: contribution.id })));
   }
 
-  static async getAll() {
-    return prisma.contribution.findMany();
+  /** The user's own rows, archived ones included (they can be reused). */
+  static async getAll(userId: string) {
+    return prisma.contribution.findMany({ where: { userId }, orderBy: { archived: "asc" } });
   }
 
-  private async createNewContributions(toCreate: Omit<Contribution, "id">[]) {
+  /** A removed item that gets typed in again shows up in the picker again. */
+  private async unarchive(items: { id: number; archived: boolean }[]) {
+    const ids = items.filter((item) => item.archived).map((item) => item.id);
+    if (ids.length === 0) return;
+    await prisma.contribution.updateMany({
+      where: { id: { in: ids }, userId: this.userId },
+      data: { archived: false },
+    });
+  }
+
+  private async createNewContributions(toCreate: SalaryItemInput[]) {
     const created = toCreate.map(async (contribution) => {
       const newContribution = await prisma.contribution.create({
         data: {
           name: contribution.name,
           value: contribution.value,
+          userId: this.userId,
           description: contribution.description,
         },
       });

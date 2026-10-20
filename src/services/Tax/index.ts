@@ -1,24 +1,27 @@
 import type { Tax } from "@prisma/client";
 
+import type { SalaryItemInput } from "@/types";
+
 import prisma from "#/prisma/client";
 
 /**
- * Rows are shared, so only reuse one with the same name *and* rate.
- * Matching by name alone linked a shift to someone else's "Income tax"
- * with a different percentage.
+ * Each user owns their rows, and a row is only reused when the name *and*
+ * rate match, so a shift never ends up with a different percentage.
  */
 function sameItem(a: { name: string; value: number }, b: { name: string; value: number }) {
   return a.name === b.name && Number(a.value) === Number(b.value);
 }
 
 class TaxService {
-  taxes: Omit<Tax, "id">[];
-  constructor(taxes: Omit<Tax, "id">[]) {
+  taxes: SalaryItemInput[];
+  userId: string;
+  constructor(taxes: SalaryItemInput[], userId: string) {
     this.taxes = taxes;
+    this.userId = userId;
   }
 
   async create() {
-    const taxesFromDB = await TaxService.getAll();
+    const taxesFromDB = await TaxService.getAll(this.userId);
     const filteredTaxes = this.prepareTaxesToCreate(taxesFromDB);
     const taxesToCreate = filteredTaxes.filter((tax) => !tax.exists).map((tax) => tax.tax);
     let existingTaxes: Tax[] = [];
@@ -30,19 +33,32 @@ class TaxService {
       if (findTax) existingTaxes.push(findTax);
     }
 
+    await this.unarchive(existingTaxes);
     return newTaxes.concat(existingTaxes.map((tax) => ({ id: tax.id })));
   }
 
-  static async getAll() {
-    return prisma.tax.findMany();
+  /** The user's own rows, archived ones included (they can be reused). */
+  static async getAll(userId: string) {
+    return prisma.tax.findMany({ where: { userId }, orderBy: { archived: "asc" } });
   }
 
-  private async createNewTaxes(taxesToCreate: Omit<Tax, "id">[]) {
+  /** A removed item that gets typed in again shows up in the picker again. */
+  private async unarchive(items: { id: number; archived: boolean }[]) {
+    const ids = items.filter((item) => item.archived).map((item) => item.id);
+    if (ids.length === 0) return;
+    await prisma.tax.updateMany({
+      where: { id: { in: ids }, userId: this.userId },
+      data: { archived: false },
+    });
+  }
+
+  private async createNewTaxes(taxesToCreate: SalaryItemInput[]) {
     const createdTaxes = taxesToCreate.map(async (tax) => {
       const newTax = await prisma.tax.create({
         data: {
           name: tax.name,
           value: tax.value,
+          userId: this.userId,
           description: tax.description,
         },
       });

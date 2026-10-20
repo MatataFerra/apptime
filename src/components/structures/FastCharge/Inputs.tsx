@@ -236,14 +236,23 @@ function Inputs() {
       const lastIdTax = prevTaxes?.at(-1)?.id ?? Math.random();
       const lastIdContribution = prevContributions?.at(-1)?.id ?? Math.random();
 
+      // Placeholder rows until the refetch brings the saved ones.
       const uniqueTax = uniqueTaxes?.map((tax) => ({
         ...tax,
         id: lastIdTax + 1,
+        archived: false,
+        userId: null,
+        // Saved with this shift, so one shift uses it.
+        uses: 1,
       }));
 
       const uniqueContribution = uniqueContributions?.map((contribution) => ({
         ...contribution,
         id: lastIdContribution + 1,
+        archived: false,
+        userId: null,
+        // Saved with this shift, so one shift uses it.
+        uses: 1,
       }));
 
       const all = prevTaxes?.concat(uniqueTax ?? []);
