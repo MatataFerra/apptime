@@ -229,7 +229,11 @@ function ItemRow({
         <p className="text-[0.9375rem] text-ink">
           Remove <span className="font-semibold">{item.name}</span>?{" "}
           {item.uses > 0
-            ? `It won't be offered for new shifts. The ${shifts(item.uses)} that use it keep it.`
+            ? `You won't see it when you save new shifts. ${
+                item.uses === 1
+                  ? "The shift that already has it keeps it"
+                  : `The ${item.uses} shifts that already have it keep it`
+              }, so their pay doesn't change.`
             : "No shift uses it."}
         </p>
         <div className="grid grid-cols-2 gap-2">
