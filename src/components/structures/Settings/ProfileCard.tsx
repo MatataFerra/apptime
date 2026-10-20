@@ -14,11 +14,11 @@ function initials(name?: string | null, email?: string | null) {
 function ProfileCard() {
   const { data: user, isLoading } = useUser();
 
-  if (isLoading) return <Skeleton classes="h-22 w-full rounded-[20px]" />;
+  if (isLoading) return <Skeleton classes="h-22 w-full rounded-xl" />;
   if (!user) return null;
 
   return (
-    <section className="flex w-full items-center gap-3.5 rounded-[20px] bg-surface-inverse p-4 text-ink-inverse">
+    <section className="flex w-full items-center gap-3.5 rounded-xl bg-surface-inverse p-4 text-ink-inverse">
       <span
         className="flex size-14 shrink-0 items-center justify-center rounded-full bg-live display-title text-2xl leading-none text-on-live"
         aria-hidden="true"

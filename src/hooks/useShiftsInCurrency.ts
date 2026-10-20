@@ -28,6 +28,9 @@ function useShiftsInCurrency() {
     hourly: allHourly?.filter(mine),
     production: allProduction?.filter(mine),
     otherCurrencies: [...new Set(others)],
+    /** Every shift, any currency: for hours and counts, which don't mix money. */
+    allHourly,
+    allProduction,
     isLoading: loadingHourly || loadingProduction,
   };
 }

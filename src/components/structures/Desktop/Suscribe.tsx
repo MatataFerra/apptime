@@ -47,7 +47,7 @@ function Suscribe() {
   }
 
   return (
-    <article className="flex flex-col gap-3 rounded-[24px] bg-surface-inverse p-5 text-ink-inverse">
+    <article className="flex flex-col gap-3 rounded-xl bg-surface-inverse p-5 text-ink-inverse">
       <div className="flex flex-col gap-1">
         <h2 className="text-lg font-semibold">{t("subscription.title")}</h2>
         <p className="text-[0.9375rem] text-ink-inverse/70">{t("subscription.notify_message")}</p>

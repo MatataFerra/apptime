@@ -40,10 +40,7 @@ function Logo({ withText, classes }: Props) {
     <Link
       href={PATH_NAMES.HOME}
       aria-label="CasualApp, home"
-      className={cn(
-        "flex items-center gap-1.5 rounded-md text-ink transition-transform select-none active:scale-95",
-        classes
-      )}
+      className={cn("flex items-center gap-1.5 rounded-md text-ink select-none", classes)}
     >
       <LogoMark className="size-7" />
       {withText ? (

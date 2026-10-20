@@ -16,7 +16,7 @@ export function Section({
         <h2 className="text-sm font-semibold text-ink-muted">{title}</h2>
         {description ? <p className="text-[0.8125rem] text-ink-subtle">{description}</p> : null}
       </header>
-      <div className="divide-y divide-border overflow-hidden rounded-[20px] border border-border bg-surface">
+      <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
         {children}
       </div>
     </section>

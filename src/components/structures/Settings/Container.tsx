@@ -9,7 +9,7 @@ function Container({ children }: PropsWithChildren<Props>) {
     <Stack
       as="article"
       orientation="vertical"
-      classes="w-full rounded-[18px] border border-border bg-surface px-1 py-0.5"
+      classes="w-full rounded-xl border border-border bg-surface px-1 py-0.5"
     >
       {children}
     </Stack>

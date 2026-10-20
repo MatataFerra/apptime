@@ -93,7 +93,7 @@ function Compatibility() {
             })}
           </ul>
 
-          <div className="flex items-center gap-5 rounded-[24px] border border-border bg-surface p-5 shadow-float">
+          <div className="flex items-center gap-5 rounded-xl border border-border bg-surface p-5 shadow-float">
             <div className="flex size-32 shrink-0 items-center justify-center rounded-2xl bg-white p-2.5">
               {url ? (
                 <QRCodeSVG

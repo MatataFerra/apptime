@@ -104,7 +104,7 @@ function RepeatFastCharge() {
     <section
       aria-label="Repeat your last Fast charge"
       data-testid="repeat-fast-charge"
-      className="flex flex-col gap-3 rounded-[20px] bg-fast-soft p-4 text-fast-ink"
+      className="flex flex-col gap-3 rounded-xl bg-fast-soft p-4 text-fast-ink"
     >
       <div className="flex items-center gap-3.5">
         <span className="flex size-11 shrink-0 items-center justify-center rounded-[14px] bg-fast text-on-module">

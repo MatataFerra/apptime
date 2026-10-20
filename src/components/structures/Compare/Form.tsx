@@ -15,7 +15,7 @@ function Side({ path, title, children }: { path: string; title: string; children
   const colors = MODULE_THEMES[theme];
 
   return (
-    <section className="overflow-hidden rounded-[20px] border border-border bg-surface">
+    <section className="overflow-hidden rounded-xl border border-border bg-surface">
       <div className={cn("flex items-center gap-2.5 px-4 py-3", colors.soft, colors.ink)}>
         <Icon className="size-5" strokeWidth={1.75} aria-hidden="true" />
         <h2 className="text-[0.9375rem] font-bold">{title}</h2>

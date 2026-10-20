@@ -10,9 +10,9 @@ export const ProfileCard = dynamic(() => import("@/components/structures/Setting
 
 export const AppearanceSection = dynamic(
   () => import("@/components/structures/Settings/Preferences/AppearanceSection"),
-  { ssr: false, loading: () => <Skeleton classes="h-40 w-full rounded-[20px]" /> }
+  { ssr: false, loading: () => <Skeleton classes="h-40 w-full rounded-xl" /> }
 );
 export const MoneySection = dynamic(
   () => import("@/components/structures/Settings/Preferences/MoneySection"),
-  { ssr: false, loading: () => <Skeleton classes="h-72 w-full rounded-[20px]" /> }
+  { ssr: false, loading: () => <Skeleton classes="h-72 w-full rounded-xl" /> }
 );

@@ -110,7 +110,7 @@ function Calculator() {
         </dl>
       </section>
 
-      <section className="flex flex-col gap-3.5 rounded-[20px] border border-border bg-surface p-4">
+      <section className="flex flex-col gap-3.5 rounded-xl border border-border bg-surface p-4">
         <h2 className="text-[0.9375rem] font-semibold">Time</h2>
         <div className="grid grid-cols-2 gap-2.5">
           <Input
@@ -155,7 +155,7 @@ function Calculator() {
         </fieldset>
       </section>
 
-      <section className="flex flex-col gap-3.5 rounded-[20px] border border-border bg-surface p-4">
+      <section className="flex flex-col gap-3.5 rounded-xl border border-border bg-surface p-4">
         <h2 className="text-[0.9375rem] font-semibold">Pay</h2>
         <Input
           type="number"
