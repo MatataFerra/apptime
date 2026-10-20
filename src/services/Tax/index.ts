@@ -2,6 +2,15 @@ import type { Tax } from "@prisma/client";
 
 import prisma from "#/prisma/client";
 
+/**
+ * Rows are shared, so only reuse one with the same name *and* rate.
+ * Matching by name alone linked a shift to someone else's "Income tax"
+ * with a different percentage.
+ */
+function sameItem(a: { name: string; value: number }, b: { name: string; value: number }) {
+  return a.name === b.name && Number(a.value) === Number(b.value);
+}
+
 class TaxService {
   taxes: Omit<Tax, "id">[];
   constructor(taxes: Omit<Tax, "id">[]) {
@@ -17,7 +26,7 @@ class TaxService {
     const newTaxes = await this.createNewTaxes(taxesToCreate);
 
     for (const tax of this.taxes) {
-      const findTax = taxesFromDB.find((userTax) => userTax.name === tax.name);
+      const findTax = taxesFromDB.find((userTax) => sameItem(userTax, tax));
       if (findTax) existingTaxes.push(findTax);
     }
 
@@ -45,7 +54,7 @@ class TaxService {
 
   prepareTaxesToCreate(dbTaxes: Tax[]) {
     return this.taxes.map((taxLocal) => {
-      const existingTax = dbTaxes.find((taxDB) => taxDB.name === taxLocal.name) as Tax;
+      const existingTax = dbTaxes.find((taxDB) => sameItem(taxDB, taxLocal)) as Tax;
       if (existingTax) {
         return { id: existingTax.id, exists: true, tax: taxLocal };
       } else {
