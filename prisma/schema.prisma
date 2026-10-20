@@ -12,13 +12,12 @@
 // PRODUCTION
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
+  provider = "prisma-client-js"
 }
 
+// The URL lives in prisma.config.ts (CLI) and prisma/client.ts (app).
 datasource db {
   provider = "sqlite"
-  url      = "file:./apptime.db"
 }
 
 model Shift {

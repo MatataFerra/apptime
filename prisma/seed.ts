@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 
-import { PrismaClient, type User } from "@prisma/client";
+import { type User } from "@prisma/client";
 import { hashSync } from "bcryptjs";
 import { addDays, addMinutes, differenceInMinutes, isToday as isTheDateToday } from "date-fns";
 
-const prisma = new PrismaClient();
+import prisma from "./client";
 
 const today = new Date();
 const myToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0);
@@ -25,8 +25,6 @@ function addProductionShiftsForSeed(dates: Array<Date>) {
     isClosed: isTheDateToday(date) ? false : true,
     itemValue: i === 2 ? 0.023 : null,
     itemQuantity: i === 2 ? 520 : null,
-    holidayPay: true,
-    holidayPayRate: 0,
     isPublicHoliday: false,
     notes: `This is a note for the shift ${i + 1}`,
     publicHolidayWorked: false,
@@ -40,8 +38,6 @@ function addHourlyShiftsForSeed(dates: Array<Date>) {
     amount: isTheDateToday(date) ? 0 : differenceInMinutes(addMinutes(date, 125 + i), date),
     isClosed: isTheDateToday(date) ? false : true,
     hourValue: 27,
-    holidayPay: true,
-    holidayPayRate: 0,
     isPublicHoliday: false,
     notes: "",
     publicHolidayWorked: false,
