@@ -75,40 +75,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const hourly = await prisma?.$transaction(async (ctx) => {
-    const email = checkToken?.email;
+  if (!checkToken.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-    if (!email) {
-      return {
-        response: false,
-      };
-    }
-
-    const user = await ctx?.user.findUnique({
-      where: {
-        email: email,
-      },
-      include: {
-        shifts: true,
-      },
-    });
-
-    if (!user) {
-      return {
-        response: false,
-      };
-    }
-
-    const hourlyShifts = await ctx?.hourly.findMany({
-      where: {
-        shiftId: user?.shifts?.id,
-      },
-      include: {
-        taxes: true,
-      },
-    });
-
-    return hourlyShifts;
+  // One query, no transaction: it's a read, and an interactive transaction
+  // over Turso could hit Prisma's 5 s timeout.
+  const hourly = await prisma.hourly.findMany({
+    where: { shift: { user: { email: checkToken.email } } },
+    include: { taxes: true },
   });
 
   if (!hourly) {
