@@ -60,8 +60,15 @@ function Stat({
 
 /** Month earnings against last month, plus all-time stats. */
 function DashboardStats({ params }: Props) {
-  const { allHourly, allProduction, otherCurrencies, currency, shiftsIn, isLoading } =
-    useShiftsInCurrency();
+  const {
+    allHourly,
+    allProduction,
+    otherCurrencies,
+    convertedFrom,
+    currency,
+    shiftsIn,
+    isLoading,
+  } = useShiftsInCurrency();
 
   // Money per currency this month; the headline is the usual currency
   // unless only another one earned something this month.
@@ -127,6 +134,11 @@ function DashboardStats({ params }: Props) {
         <span className="figure text-[3.25rem] leading-[0.9] text-live">
           {money(month.current.earned)}
         </span>
+        {convertedFrom.length > 0 ? (
+          <span className="text-xs text-ink-inverse/60">
+            Includes shifts in {convertedFrom.join(", ")} converted at each day&apos;s rate.
+          </span>
+        ) : null}
         {otherThisMonth.length > 0 ? (
           <span className="text-[0.8125rem] text-ink-inverse/80">
             Also:{" "}
