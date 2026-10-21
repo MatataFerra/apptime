@@ -380,37 +380,41 @@ function Inputs() {
             })}
           />
         </Stack>
-        <Input
-          containerClasses="flex-1 sm:flex-auto"
-          labelClasses="text-xs"
-          label="Value of each item"
-          min={0}
-          type="number"
-          step={"any"}
-          measure={currencySymbol(shiftCurrency || defaultCurrency)}
-          description="What you're paid for each bin, box or piece"
-          measurePlace="left"
-          {...register("item-value", {
-            onChange(e) {
-              setStoreValues({ itemValue: e.target.value });
-            },
-          })}
-        />
-        <Input
-          containerClasses="flex-1 sm:flex-auto"
-          label="Quantity"
-          min={0}
-          type="number"
-          {...register("item-quantity", {
-            onChange(e) {
-              setStoreValues({ itemQuantity: e.target.value });
-            },
-          })}
-        />
-        <CurrencySelect
-          value={shiftCurrency}
-          onChange={(currency) => setStoreValues({ currency })}
-        />
+        {/* Value and quantity side by side, the same width as the dates. */}
+        <Stack grid cols={2} as="fieldset" classes="w-full">
+          <Input
+            label="Value per item"
+            min={0}
+            type="number"
+            inputMode="decimal"
+            step={"any"}
+            measure={currencySymbol(shiftCurrency || defaultCurrency)}
+            description="Per bin, box or piece"
+            measurePlace="left"
+            {...register("item-value", {
+              onChange(e) {
+                setStoreValues({ itemValue: e.target.value });
+              },
+            })}
+          />
+          <Input
+            label="Quantity"
+            min={0}
+            type="number"
+            inputMode="numeric"
+            {...register("item-quantity", {
+              onChange(e) {
+                setStoreValues({ itemQuantity: e.target.value });
+              },
+            })}
+          />
+        </Stack>
+        <div className="w-full">
+          <CurrencySelect
+            value={shiftCurrency}
+            onChange={(currency) => setStoreValues({ currency })}
+          />
+        </div>
         <input type="checkbox" hidden {...register("is-public-holiday")} />
         <input type="checkbox" hidden {...register("is-worked")} />
         <div className="mt-2 w-full">

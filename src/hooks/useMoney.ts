@@ -11,11 +11,13 @@ export function useCurrency(): CurrencyCode {
 }
 
 /**
- * formatMoney in the user's currency. Pass `currency` for a shift saved
- * in another one.
+ * formatMoney in the user's currency (or `defaultCurrency`, e.g. the one
+ * totals are shown in). Pass `currency` per call for a shift saved in
+ * another one.
  */
-function useMoney() {
-  const currency = useCurrency();
+function useMoney(defaultCurrency?: string | null) {
+  const settings = useCurrency();
+  const currency = defaultCurrency || settings;
 
   return function money(
     value: number,

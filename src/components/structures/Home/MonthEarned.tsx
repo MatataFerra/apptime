@@ -9,8 +9,8 @@ import useShiftsInCurrency from "@/hooks/useShiftsInCurrency";
 
 /** "$3,410 this month", for the dashboard shortcut. */
 function MonthEarned() {
-  const money = useMoney();
-  const { hourly, production } = useShiftsInCurrency();
+  const { hourly, production, currency } = useShiftsInCurrency();
+  const money = useMoney(currency);
   const earned = useMemo(
     () => compareWithPreviousMonth(hourly, production).current.earned,
     [hourly, production]

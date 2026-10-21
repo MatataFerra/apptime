@@ -19,34 +19,31 @@ import useUser from "@/hooks/useUser";
  * public holidays in amber.
  */
 function WeekSummary() {
-  const money = useMoney();
   const { data: user } = useUser();
-  // Totals in the Settings currency; shifts in other currencies aren't added in.
-  const { hourly, production, allHourly, allProduction, isLoading, otherCurrencies, currency } =
+  const { allHourly, allProduction, isLoading, otherCurrencies, currency, shiftsIn } =
     useShiftsInCurrency();
   const weekStartsOn = weekStartsOnIndex(user?.config?.weekStartsOn);
 
-  const week = useMemo(
-    () => summarizeWeek(hourly, production, { weekStartsOn }),
-    [hourly, production, weekStartsOn]
-  );
-  // Hours, shift count and which days were worked include every currency;
-  // only money is kept per currency.
+  // Hours, shift count and which days were worked include every currency.
   const worked = useMemo(
     () => summarizeWeek(allHourly, allProduction, { weekStartsOn }),
     [allHourly, allProduction, weekStartsOn]
   );
-  const otherEarnings = otherCurrencies
-    .map((code) => {
-      const period = summarizePeriod(
-        allHourly?.filter((s) => s.currency === code),
-        allProduction?.filter((s) => s.currency === code),
-        week.from,
-        week.to
-      );
-      return { code, earned: period.earned, shifts: period.shifts };
-    })
-    .filter((other) => other.shifts > 0);
+
+  // Money per currency this week; the headline is the usual currency
+  // unless only another one earned something this week.
+  const earnedByCurrency = [currency, ...otherCurrencies].map((code) => {
+    const { hourly, production } = shiftsIn(code);
+    return { code, earned: summarizePeriod(hourly, production, worked.from, worked.to).earned };
+  });
+  const headline =
+    earnedByCurrency.find((c) => c.code === currency && c.earned > 0)?.code ??
+    [...earnedByCurrency].sort((a, b) => b.earned - a.earned).find((c) => c.earned > 0)?.code ??
+    currency;
+  const money = useMoney(headline);
+  const shown = shiftsIn(headline);
+  const week = summarizeWeek(shown.hourly, shown.production, { weekStartsOn });
+  const otherEarnings = earnedByCurrency.filter((c) => c.code !== headline && c.earned > 0);
 
   if (isLoading) {
     return <Skeleton classes="h-52 w-full rounded-2xl" />;
@@ -149,7 +146,7 @@ function WeekSummary() {
       </ol>
       {otherEarnings.length > 0 ? (
         <p className="text-xs text-ink-inverse/70">
-          Earned in {currency}. Also this week:{" "}
+          Earned in {headline}. Also this week:{" "}
           {otherEarnings
             .map((other) => `${money(other.earned, { currency: other.code })} (${other.code})`)
             .join(", ")}
