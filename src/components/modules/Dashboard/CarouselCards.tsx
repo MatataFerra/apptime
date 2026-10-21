@@ -2,12 +2,12 @@
 
 import { useMemo } from "react";
 
-import { format, subMonths } from "date-fns";
+import { endOfMonth, format, startOfMonth, subMonths } from "date-fns";
 import { CalendarDays, Clock3, Layers, type LucideIcon, TrendingUp } from "lucide-react";
 
 import Dashboard from "@/services/Dashboard";
 import DateHumanizer from "@/services/Date";
-import { compareWithPreviousMonth } from "@/services/Summary";
+import { compareWithPreviousMonth, summarizePeriod } from "@/services/Summary";
 
 import { LocaleParams } from "@/types";
 
@@ -60,20 +60,38 @@ function Stat({
 
 /** Month earnings against last month, plus all-time stats. */
 function DashboardStats({ params }: Props) {
-  const money = useMoney();
-  const { hourly: hourlies, production: productions, isLoading } = useShiftsInCurrency();
+  const { allHourly, allProduction, otherCurrencies, currency, shiftsIn, isLoading } =
+    useShiftsInCurrency();
 
+  // Money per currency this month; the headline is the usual currency
+  // unless only another one earned something this month.
+  const earnedThisMonth = [currency, ...otherCurrencies].map((code) => {
+    const { hourly, production } = shiftsIn(code);
+    return {
+      code,
+      earned: summarizePeriod(hourly, production, startOfMonth(new Date()), endOfMonth(new Date()))
+        .earned,
+    };
+  });
+  const headline =
+    earnedThisMonth.find((c) => c.code === currency && c.earned > 0)?.code ??
+    [...earnedThisMonth].sort((a, b) => b.earned - a.earned).find((c) => c.earned > 0)?.code ??
+    currency;
+  const money = useMoney(headline);
+  const { hourly: hourlies, production: productions } = shiftsIn(headline);
+
+  // Hours, shift count and last shift count every shift, any currency.
   const stats = useMemo(
     () =>
-      hourlies
-        ? new Dashboard(hourlies, productions ?? []).dashboardData()
+      allHourly
+        ? new Dashboard(allHourly, allProduction ?? []).dashboardData()
         : {
             shiftsLen: 0,
             hoursWorked: 0,
             averageHoursWorkedPerDay: 0,
             lastDayRegistered: "",
           },
-    [hourlies, productions]
+    [allHourly, allProduction]
   );
 
   const month = useMemo(
@@ -96,6 +114,8 @@ function DashboardStats({ params }: Props) {
     ? new DateHumanizer("short").humanizeDate(lastDay, { locale: params.locale })
     : "None yet";
   const previousMonth = format(subMonths(new Date(), 1), "MMMM");
+  // Money in other currencies this month, listed apart (never added up).
+  const otherThisMonth = earnedThisMonth.filter((c) => c.code !== headline && c.earned > 0);
   const change = month.change;
 
   return (
@@ -107,6 +127,14 @@ function DashboardStats({ params }: Props) {
         <span className="figure text-[3.25rem] leading-[0.9] text-live">
           {money(month.current.earned)}
         </span>
+        {otherThisMonth.length > 0 ? (
+          <span className="text-[0.8125rem] text-ink-inverse/80">
+            Also:{" "}
+            {otherThisMonth
+              .map((other) => `${money(other.earned, { currency: other.code })} (${other.code})`)
+              .join(", ")}
+          </span>
+        ) : null}
         {month.previousFull.earned > 0 ? (
           <div className="flex flex-col gap-2.5 border-t border-ink-inverse/15 pt-3">
             <div className="flex items-baseline justify-between gap-3 text-[0.8125rem]">

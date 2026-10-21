@@ -14,18 +14,20 @@ import {
 import type { CumulativePoint } from "@/services/History";
 import { formatMoneyCompact } from "@/services/Summary";
 
-import useMoney, { useCurrency } from "@/hooks/useMoney";
+import useMoney from "@/hooks/useMoney";
 
 import ChartCard, { SERIES, SeriesKey } from "./ChartCard";
 
 function SeasonTooltip({
   active,
   payload,
+  currency,
 }: {
+  currency: string;
   active?: boolean;
   payload?: { payload: CumulativePoint }[];
 }) {
-  const money = useMoney();
+  const money = useMoney(currency);
   const point = payload?.[0]?.payload;
   if (!active || !point) return null;
 
@@ -49,9 +51,8 @@ function SeasonTooltip({
  * Running totals of both kinds of income across the season, with how the
  * total splits between them on top.
  */
-function SeasonChart({ data }: { data: CumulativePoint[] }) {
-  const money = useMoney();
-  const currency = useCurrency();
+function SeasonChart({ data, currency }: { data: CumulativePoint[]; currency: string }) {
+  const money = useMoney(currency);
   const last = data.at(-1) ?? { hourly: 0, production: 0 };
   const total = last.hourly + last.production;
   const share = total > 0 ? Math.round((last.hourly / total) * 100) : 0;
@@ -134,7 +135,7 @@ function SeasonChart({ data }: { data: CumulativePoint[] }) {
             />
             <Tooltip
               cursor={{ stroke: "var(--color-border-strong)", strokeWidth: 1 }}
-              content={<SeasonTooltip />}
+              content={<SeasonTooltip currency={currency} />}
             />
             {(["hourly", "production"] as const)
               .filter((kind) => last[kind] > 0)

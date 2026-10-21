@@ -15,18 +15,20 @@ import {
 import type { WeekPoint } from "@/services/History";
 import { formatMoneyCompact } from "@/services/Summary";
 
-import useMoney, { useCurrency } from "@/hooks/useMoney";
+import useMoney from "@/hooks/useMoney";
 
 import ChartCard, { SERIES, SeriesKey } from "./ChartCard";
 
 function WeekTooltip({
   active,
   payload,
+  currency,
 }: {
+  currency: string;
   active?: boolean;
   payload?: { payload: WeekPoint }[];
 }) {
-  const money = useMoney();
+  const money = useMoney(currency);
   const point = payload?.[0]?.payload;
   if (!active || !point) return null;
   const total = point.hourly + point.production;
@@ -51,9 +53,8 @@ function WeekTooltip({
 }
 
 /** Earned per week, stacked by kind. Rounded only at the top of each column. */
-function WeeklyChart({ data }: { data: WeekPoint[] }) {
-  const money = useMoney();
-  const currency = useCurrency();
+function WeeklyChart({ data, currency }: { data: WeekPoint[]; currency: string }) {
+  const money = useMoney(currency);
   const totals = data.reduce(
     (acc, w) => ({ hourly: acc.hourly + w.hourly, production: acc.production + w.production }),
     { hourly: 0, production: 0 }
@@ -109,7 +110,10 @@ function WeeklyChart({ data }: { data: WeekPoint[] }) {
               tickFormatter={(value: number) => formatMoneyCompact(value, currency)}
               tick={{ fill: "var(--color-ink-muted)", fontSize: 11 }}
             />
-            <Tooltip cursor={{ fill: "var(--color-surface-sunken)" }} content={<WeekTooltip />} />
+            <Tooltip
+              cursor={{ fill: "var(--color-surface-sunken)" }}
+              content={<WeekTooltip currency={currency} />}
+            />
             <Bar
               dataKey="hourly"
               stackId="w"

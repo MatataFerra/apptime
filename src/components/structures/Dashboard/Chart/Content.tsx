@@ -12,7 +12,7 @@ import useUser from "@/hooks/useUser";
 
 function Content() {
   const { data: user } = useUser();
-  const { hourly, production, isLoading } = useShiftsInCurrency();
+  const { hourly, production, currency, isLoading } = useShiftsInCurrency();
 
   if (isLoading) {
     return (
@@ -37,8 +37,8 @@ function Content() {
 
   return (
     <div className="flex flex-col gap-4">
-      <WeeklyChart data={weeklyEarnings(entries, { weekStartsOn })} />
-      <SeasonChart data={cumulativeEarnings(entries)} />
+      <WeeklyChart data={weeklyEarnings(entries, { weekStartsOn })} currency={currency} />
+      <SeasonChart data={cumulativeEarnings(entries)} currency={currency} />
     </div>
   );
 }
