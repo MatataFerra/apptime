@@ -20,8 +20,15 @@ import useUser from "@/hooks/useUser";
  */
 function WeekSummary() {
   const { data: user } = useUser();
-  const { allHourly, allProduction, isLoading, otherCurrencies, currency, shiftsIn } =
-    useShiftsInCurrency();
+  const {
+    allHourly,
+    allProduction,
+    isLoading,
+    otherCurrencies,
+    convertedFrom,
+    currency,
+    shiftsIn,
+  } = useShiftsInCurrency();
   const weekStartsOn = weekStartsOnIndex(user?.config?.weekStartsOn);
 
   // Hours, shift count and which days were worked include every currency.
@@ -144,6 +151,11 @@ function WeekSummary() {
           );
         })}
       </ol>
+      {convertedFrom.length > 0 ? (
+        <p className="text-xs text-ink-inverse/60">
+          Includes shifts in {convertedFrom.join(", ")} converted at each day&apos;s rate.
+        </p>
+      ) : null}
       {otherEarnings.length > 0 ? (
         <p className="text-xs text-ink-inverse/70">
           Earned in {headline}. Also this week:{" "}

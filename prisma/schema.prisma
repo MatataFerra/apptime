@@ -238,3 +238,18 @@ model WaitingListDesktop {
   createdAt DateTime @default(now())
 }
 
+
+/// Exchange rates per day, EUR based (Frankfurter). One row per calendar
+/// day and currency: weekends and holidays repeat the last published rate
+/// (`filled`), so any shift date has one.
+model ExchangeRate {
+  /// YYYY-MM-DD
+  date   String
+  /// Currency per 1 EUR, e.g. USD 1.1228.
+  quote  String
+  rate   Float
+  /// Copied from the last published day (weekend, holiday, not out yet).
+  filled Boolean @default(false)
+
+  @@id([date, quote])
+}
