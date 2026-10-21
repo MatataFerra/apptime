@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 import i18n from "@/services/i18n";
 import Router from "@/services/Router";
-import TokenService from "@/services/Token";
 import ut from "@/services/Utilities";
 
-import { NEXT_AUTH_SESSION_TOKEN, USER_ROLES } from "@/utils/constants";
+import { auth } from "@/utils/auth";
+import { USER_ROLES } from "@/utils/constants";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 const PRIVATES_ROUTES = [
@@ -29,7 +29,10 @@ export default async function proxy(req: NextRequest) {
   const routeLocale = Router.addLocale(nextPathName, locale);
   const router = new Router(PRIVATES_ROUTES).addLocalesToRoutes();
   const loggedRoutes = new Router(LOGGED_ROUTES).addLocalesToRoutes();
-  const token = await new TokenService(NEXT_AUTH_SESSION_TOKEN).decodedCookieData(req.cookies);
+  // Proxy runs on Node in Next 16, so it can read the Better Auth session
+  // (from the signed cookie cache; the database only every few minutes).
+  const session = await auth.api.getSession({ headers: req.headers }).catch(() => null);
+  const token = session?.user ?? null;
 
   const pathnameIsMissingLocale = Router.isMissingLocale(nextPathName);
 

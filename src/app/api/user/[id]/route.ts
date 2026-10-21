@@ -1,20 +1,24 @@
 import { Prisma, type User } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import type { JWT } from "next-auth/jwt";
 
 import ErrorFactory from "@/services/Error/factory";
 
 import { type RouteParams, UserUpdateSchema } from "@/types";
 
-import prisma from "#/prisma/client";
+import { getRequestSession } from "@/utils/auth/session";
 
-function parseEmailFromParams(token: JWT | null, email: string | null) {
-  if (token?.role !== "ADMIN") return token?.email;
-  return email;
-}
+import prisma from "#/prisma/client";
 
 export async function PUT(req: NextRequest, { params }: RouteParams) {
   const { id } = await params;
+  const session = await getRequestSession(req);
+  const isAdmin = session?.user.role === "ADMIN";
+
+  // You can only update yourself (it used to accept any id, signed in or not).
+  if (!session || (session.user.id !== id && !isAdmin)) {
+    return NextResponse.json({ error: "Unauthorized", response: false }, { status: 401 });
+  }
+
   const body: User = await req.json();
   const parsedBody = UserUpdateSchema.safeParse(body);
 
@@ -51,9 +55,10 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       where: {
         id: user.id,
       },
-      data: {
-        ...parsedBody.data,
-      },
+      data: isAdmin
+        ? parsedBody.data
+        : // Role, account type and status are not self-service.
+          { ...parsedBody.data, role: undefined, type_account: undefined, isActive: undefined },
     });
 
     return NextResponse.json(

@@ -12,10 +12,11 @@ import { userMocked } from "../../mocks";
 const user: UserType = {
   id: "clwil47o10000t7mdgtf1gtsv",
   email: "matias.agf@gmail.com",
-  emailVerified: null,
+  emailVerified: false,
+  createdAt: new Date("2024-05-01T00:00:00Z"),
+  updatedAt: new Date("2024-05-01T00:00:00Z"),
   image: "/assets/avatar.svg",
   name: "User",
-  password: "$2a$10$1.E13mi1MY0KuAzFFALxvu0AeVaNowBM7tca/vI9ry47/dnpW0.b.",
   type_account: "CREDENTIALS",
   role: "ADMIN",
   online: false,

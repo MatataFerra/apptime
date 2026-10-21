@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+
+import { getRequestSession } from "@/utils/auth/session";
 
 import prisma from "#/prisma/client";
 
@@ -17,7 +18,7 @@ function withUses<T extends { hourly: { id: number }[]; production: { id: number
 }
 
 export async function GET(req: NextRequest) {
-  const checkToken = await getToken({ req });
+  const checkToken = (await getRequestSession(req))?.user ?? null;
 
   if (!checkToken?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -5,6 +5,8 @@ import ErrorFactory from "@/services/Error/factory";
 
 import { UserCreateSafeAdminSchema } from "@/types";
 
+import { auth } from "@/utils/auth";
+
 import prisma from "#/prisma/client";
 
 export const runtime = "nodejs";
@@ -44,11 +46,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const newUser = await prisma.user.create({
-    data: parseData.data,
-  });
+  // Created through Better Auth so the password ends up hashed in Account.
+  const { email, password, name, role } = parseData.data;
+  const created = await auth.api.signUpEmail({ body: { email, password, name } }).catch(() => null);
 
-  if (!newUser) {
+  if (!created) {
     return NextResponse.json({
       error: ErrorFactory.createError("CustomError", {
         message: "Error creating user",
@@ -58,7 +60,10 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const { password, ...userCreated } = newUser;
+  const userCreated = await prisma.user.update({
+    where: { id: created.user.id },
+    data: { role },
+  });
 
   return NextResponse.json(
     {

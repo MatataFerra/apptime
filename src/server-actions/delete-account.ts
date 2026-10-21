@@ -1,6 +1,6 @@
 "use server";
 
-import { getServerSession } from "next-auth";
+import { getSessionEmail } from "@/utils/auth/session";
 
 import prisma from "#/prisma/client";
 
@@ -13,7 +13,7 @@ export default async function onDeleteAccount(confirmation: string) {
     return { ok: false as const, error: "Type delete to confirm" };
   }
 
-  const email = (await getServerSession())?.user?.email;
+  const email = await getSessionEmail();
   const user = email
     ? await prisma.user.findUnique({ where: { email }, select: { id: true } })
     : null;
@@ -32,8 +32,7 @@ export default async function onDeleteAccount(confirmation: string) {
       : []),
     prisma.profile.deleteMany({ where: { userId: user.id } }),
     prisma.config.deleteMany({ where: { userId: user.id } }),
-    prisma.passwordAttemps.deleteMany({ where: { userId: user.id } }),
-    prisma.passwordResetToken.deleteMany({ where: { userId: user.id } }),
+    // Sessions, accounts (password, Google) and taxes cascade with the user.
     prisma.user.delete({ where: { id: user.id } }),
   ]);
 

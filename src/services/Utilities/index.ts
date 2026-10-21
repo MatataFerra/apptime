@@ -1,6 +1,5 @@
 import _ from "lodash";
 import { NextRequest, NextResponse } from "next/server";
-import { NextRequestWithAuth } from "next-auth/middleware";
 
 /**
  * @class Utilities
@@ -48,11 +47,11 @@ class Utilities {
 
   /**
    * @description Redirect the user to a specific page, requires request object.
-   * @param req { NextRequestWithAuth | NextRequest} - The request object.
+   * @param req { NextRequest } - The request object.
    * @param destination - The destination to redirect the user to.
    * @returns {NextResponse} - Returns a NextResponse object.
    */
-  public static redirect(req: NextRequestWithAuth | NextRequest, destination: string) {
+  public static redirect(req: NextRequest, destination: string) {
     const url = req.nextUrl.clone();
     url.pathname = destination;
     return NextResponse.redirect(url);

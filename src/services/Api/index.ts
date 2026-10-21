@@ -17,19 +17,6 @@ class ApiService extends ApiBase {
     });
   }
 
-  static async register({ email, password }: { email: string; password: string }) {
-    try {
-      const response: SuccessUserApiResponse = await this.post({
-        endpoint: API_ENDPOINTS.REGISTER,
-        body: { email, password, emailVerified: null },
-      });
-
-      return response;
-    } catch (error) {
-      return error;
-    }
-  }
-
   static async getUserByEmail({
     email,
     filters,

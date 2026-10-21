@@ -1,82 +1,121 @@
-import { compare } from "bcryptjs";
-import _ from "lodash";
-import { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { nextCookies } from "better-auth/next-js";
+import { Resend } from "resend";
 
-import AuthService from "@/services/Auth";
-import UserService from "@/services/User";
+import { EmailTemplate } from "@/components/ui/EmailTemplate";
 
-export const authOptions: NextAuthOptions = {
-  providers: [
-    CredentialsProvider({
-      name: "email and password",
-      credentials: {
-        email: {
-          label: "Email",
-          type: "email",
-          placeholder: "example@example.com",
-        },
-        password: { label: "Password", type: "password" },
+import { SUPPORTED_LOCALES } from "@/utils/constants";
+
+import prisma from "#/prisma/client";
+
+/** Locale of the page that asked for the reset, from the redirect it passed. */
+function localeFromResetUrl(url: string) {
+  try {
+    const callback = new URL(url).searchParams.get("callbackURL") ?? "";
+    const locale = callback.split("/").filter(Boolean)[0];
+    return (SUPPORTED_LOCALES as readonly string[]).includes(locale) ? locale : "en";
+  } catch {
+    return "en";
+  }
+}
+
+const baseURL = process.env.BETTER_AUTH_URL ?? process.env.NEXTAUTH_URL;
+
+/**
+ * Better Auth (replaces next-auth). Email + password (scrypt) and Google,
+ * database sessions in the Session table, cached in a signed cookie for
+ * 5 minutes so most requests don't hit Turso.
+ */
+export const auth = betterAuth({
+  appName: "CasualApp",
+  baseURL,
+  // Vercel previews live on their own host; let them sign in too.
+  trustedOrigins: process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : [],
+  // The old env names keep working until they're renamed.
+  secret: process.env.BETTER_AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+  database: prismaAdapter(prisma, { provider: "sqlite" }),
+
+  emailAndPassword: {
+    enabled: true,
+    minPasswordLength: 8,
+    maxPasswordLength: 128,
+    autoSignIn: true,
+    resetPasswordTokenExpiresIn: 60 * 60,
+    revokeSessionsOnPasswordReset: true,
+    async sendResetPassword({ user, url, token }) {
+      const locale = localeFromResetUrl(url);
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const { error } = await resend.emails.send({
+        from: `CasualApp Team <resetpassword@${process.env.RESEND_SENDER}>`,
+        to: user.email,
+        subject: process.env.RESEND_SUBJECT ?? "Reset your CasualApp password",
+        // Links to our own page (/{locale}/reset/{token}), which calls resetPassword.
+        react: EmailTemplate({
+          firstName: user.name,
+          url: `${(baseURL ?? "").replace(/\/$/, "")}/`,
+          locale,
+          endpoint: "reset",
+          token,
+        }),
+      });
+      if (error) throw new Error(`Reset email failed: ${error.message}`);
+    },
+  },
+
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+    },
+  },
+
+  account: {
+    // A Google sign-in with the same email joins the existing account.
+    accountLinking: { enabled: true, trustedProviders: ["google"] },
+  },
+
+  user: {
+    additionalFields: {
+      role: { type: "string", required: false, defaultValue: "USER", input: false },
+      type_account: {
+        type: "string",
+        required: false,
+        defaultValue: "CREDENTIALS",
+        input: false,
       },
-
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials.password) return null;
-
-        if (!credentials.password) return null;
-
-        const user = await UserService.findUniqueUser({
-          email: credentials.email,
-        });
-
-        if (!user || !(await compare(credentials.password, user.password ?? ""))) return null;
-
-        return {
-          ...user,
-          id: user.id.toString(),
-        };
-      },
-    }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    }),
-  ],
+    },
+  },
 
   session: {
-    strategy: "jwt",
+    expiresIn: 60 * 60 * 24 * 7, // 7 days, as before
+    updateAge: 60 * 60 * 24,
+    cookieCache: { enabled: true, maxAge: 5 * 60 },
   },
 
-  secret: process.env.NEXTAUTH_SECRET,
-
-  callbacks: {
-    async session({ session, token, user }) {
-      const sessionDeepClone = _.cloneDeep(session);
-      const sessionAccessToken = _.assign(sessionDeepClone, {
-        accessToken: token.accessToken,
-        type_account: token.type_account,
-      });
-
-      AuthService.oauthUser({
-        email: sessionAccessToken.user?.email ?? "",
-        name: sessionAccessToken.user?.name ?? "",
-        image: sessionAccessToken.user?.image ?? "",
-      });
-
-      return sessionAccessToken;
-    },
-    async jwt({ token, account }) {
-      if (account) {
-        const userFounded = await UserService.findUniqueUser({
-          email: token.email ?? "",
-        });
-        token.accessToken = account.access_token;
-        token.type_account = account.provider;
-        token.role = userFounded?.role ?? "NOT_FOUND";
-      }
-      const tokenClone = _.cloneDeep(token);
-
-      return tokenClone;
+  databaseHooks: {
+    user: {
+      create: {
+        // Every user needs their Shift container (shifts hang from it) and
+        // a Config row, as the old register flow created.
+        async after(user) {
+          await prisma.shift.upsert({
+            where: { userId: user.id },
+            create: { userId: user.id },
+            update: {},
+          });
+          await prisma.config.upsert({
+            where: { userId: user.id },
+            create: { userId: user.id, weekStartsOn: "monday" },
+            update: {},
+          });
+        },
+      },
     },
   },
-};
+
+  // Sets cookies from server actions (sign in/out called on the server).
+  plugins: [nextCookies()],
+});
+
+export type AuthSession = typeof auth.$Infer.Session;

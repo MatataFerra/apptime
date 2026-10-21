@@ -4,12 +4,12 @@ import { prefetchUserData } from "@/services/Prefetch";
 
 vi.mock("server-only", () => ({}));
 
-const { findUnique, getServerSession } = vi.hoisted(() => ({
+const { findUnique, getSession } = vi.hoisted(() => ({
   findUnique: vi.fn(),
-  getServerSession: vi.fn(),
+  getSession: vi.fn(),
 }));
 vi.mock("#/prisma/client", () => ({ default: { user: { findUnique } } }));
-vi.mock("next-auth", () => ({ getServerSession }));
+vi.mock("@/utils/auth/session", () => ({ getSession }));
 
 const start = new Date("2026-10-18T08:00:00.000Z");
 const dbUser = {
@@ -36,7 +36,7 @@ function query(state: Awaited<ReturnType<typeof prefetchUserData>>["state"], key
 
 describe("prefetchUserData", () => {
   test("seeds user, hourly and production from one query", async () => {
-    getServerSession.mockResolvedValueOnce({ user: { email: "ana@example.com" } });
+    getSession.mockResolvedValueOnce({ user: { email: "ana@example.com" } });
     findUnique.mockResolvedValueOnce(dbUser);
 
     const { state, profile } = await prefetchUserData();
@@ -49,7 +49,7 @@ describe("prefetchUserData", () => {
   });
 
   test("dates arrive as strings, like the API sends them", async () => {
-    getServerSession.mockResolvedValueOnce({ user: { email: "ana@example.com" } });
+    getSession.mockResolvedValueOnce({ user: { email: "ana@example.com" } });
     findUnique.mockResolvedValueOnce(dbUser);
 
     const { state } = await prefetchUserData();
@@ -58,7 +58,7 @@ describe("prefetchUserData", () => {
   });
 
   test("never selects the password", async () => {
-    getServerSession.mockResolvedValueOnce({ user: { email: "ana@example.com" } });
+    getSession.mockResolvedValueOnce({ user: { email: "ana@example.com" } });
     findUnique.mockResolvedValueOnce(dbUser);
 
     await prefetchUserData();
@@ -67,10 +67,10 @@ describe("prefetchUserData", () => {
   });
 
   test("signed out or database down: nothing is seeded and the client fetches as before", async () => {
-    getServerSession.mockResolvedValueOnce(null);
+    getSession.mockResolvedValueOnce(null);
     expect((await prefetchUserData()).state.queries).toHaveLength(0);
 
-    getServerSession.mockResolvedValueOnce({ user: { email: "ana@example.com" } });
+    getSession.mockResolvedValueOnce({ user: { email: "ana@example.com" } });
     findUnique.mockRejectedValueOnce(new Error("db down"));
     const down = await prefetchUserData();
     expect(down.state.queries).toHaveLength(0);

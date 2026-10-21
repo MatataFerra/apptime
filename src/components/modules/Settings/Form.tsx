@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 
 import { useQueryClient } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
-import { useSession } from "next-auth/react";
 
 import Toast from "@/services/Toast";
 
@@ -15,6 +14,8 @@ import { SuccessApiResponse } from "@/types/api_response";
 import AccordionSettings from "@/components/structures/Settings/Accordion";
 import FormBase from "@/components/ui/Form";
 import Skeleton from "@/components/ui/Skeleton";
+
+import { useAuthSession } from "@/providers/Session";
 
 import useSettings from "@/hooks/useSettings";
 
@@ -32,7 +33,8 @@ const Personal = dynamic(() => import("@/components/modules/Settings/Personal"),
 
 function Form() {
   const queryClient = useQueryClient();
-  const session = useSession();
+  const { user: sessionUser } = useAuthSession();
+  const email = sessionUser?.email;
   const { values } = useSettings();
   const {
     handleSubmit,
@@ -41,9 +43,9 @@ function Form() {
 
   useEffect(() => {
     queryClient.refetchQueries({
-      queryKey: ["user", session.data?.user?.email],
+      queryKey: ["user", email],
     });
-  }, [queryClient, session.data?.user?.email]);
+  }, [queryClient, email]);
 
   useEffect(() => {
     if (isSubmitting) {
@@ -62,12 +64,12 @@ function Form() {
 
     if (isSubmitSuccessful) {
       //* Optimistic update
-      queryClient.cancelQueries({ queryKey: ["user", session?.data?.user?.email] }).then(() => {
+      queryClient.cancelQueries({ queryKey: ["user", email] }).then(() => {
         const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
           "user",
-          session?.data?.user?.email,
+          email,
         ]);
-        queryClient.setQueryData(["user", session?.data?.user?.email], {
+        queryClient.setQueryData(["user", email], {
           ...previousUserData,
           user: {
             ...previousUserData?.user,
@@ -86,7 +88,7 @@ function Form() {
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["user", session.data?.user?.email],
+        queryKey: ["user", email],
       });
     }
   }, [
@@ -94,7 +96,7 @@ function Form() {
     isSubmitting,
     isSubmitSuccessful,
     queryClient,
-    session.data?.user?.email,
+    email,
     values.account.name,
     values.account.email,
     values.personal.city,

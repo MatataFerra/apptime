@@ -1,16 +1,17 @@
 import { useCallback } from "react";
 
 import { useQuery } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
 
 import api from "@/services/Api";
 
 import type { UserType } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 
+import { useAuthSession } from "@/providers/Session";
+
 function useUser() {
-  const session = useSession();
-  const email = session.data?.user?.email;
+  const { user } = useAuthSession();
+  const email = user?.email;
 
   const fetchUser = useCallback(async () => {
     if (!email) return;

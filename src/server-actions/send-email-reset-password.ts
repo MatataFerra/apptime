@@ -1,83 +1,22 @@
 "use server";
 
-import { randomUUID } from "crypto";
-import { Resend } from "resend";
+import { auth } from "@/utils/auth";
+import { isLocale } from "@/utils/helpers/locale";
 
-import { EmailTemplate } from "@/components/ui/EmailTemplate";
-
-import prisma from "#/prisma/client";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
+/**
+ * Starts a password reset with Better Auth. The email (sent from the auth
+ * config through Resend) links to /{locale}/reset/{token}. The answer is
+ * the same whether or not the email has an account.
+ */
 export default async function onSendEmailToResetPassword(email: string, locale?: string) {
-  const user = await prisma.user.findUnique({
-    where: {
-      email,
-    },
-  });
-
-  if (!user) {
-    return {
-      message: "Email has been sent to: " + email,
-    };
+  try {
+    await auth.api.requestPasswordReset({
+      body: { email, redirectTo: `/${locale && isLocale(locale) ? locale : "en"}/reset` },
+    });
+    return { response: true, message: "Email sent" };
+  } catch (error) {
+    // eslint-disable-next-line no-console -- server log for failed resets
+    console.error("[send-email-reset-password]", error);
+    return { response: false, message: "We couldn't send the email. Please try again." };
   }
-
-  const passwordResetToken = await prisma.passwordResetToken.findFirst({
-    where: {
-      userId: user.id,
-      createdAt: {
-        gt: new Date(Date.now() - 1000 * 60 * 15), //900.000 ms -> 15 min
-      },
-      resetAt: null,
-    },
-  });
-
-  if (passwordResetToken) {
-    return {
-      response: false,
-      message:
-        "You have already recieved and email for change your password, please check your inbox again",
-    };
-  }
-
-  const token = await prisma.passwordResetToken.create({
-    data: {
-      userId: user.id,
-      token: `${randomUUID()}${randomUUID()}`.replace(/-/g, ""),
-    },
-  });
-
-  const { data, error } = await resend.emails.send({
-    from: `CasualApp Team <resetpassword@${process.env.RESEND_SENDER}>`,
-    to: user.email,
-    subject: process.env.RESEND_SUBJECT,
-    react: EmailTemplate({
-      firstName: user.name,
-      url: process.env.NEXTAUTH_URL!,
-      locale: locale ?? "en",
-      endpoint: "reset",
-      token: token.token,
-    }),
-  });
-
-  if (error) {
-    return {
-      response: false,
-      error,
-    };
-  }
-
-  await prisma.passwordResetToken.update({
-    where: {
-      id: token.id,
-    },
-    data: {
-      emailId: data?.id,
-    },
-  });
-
-  return {
-    message: "Email sent",
-    response: true,
-  };
 }

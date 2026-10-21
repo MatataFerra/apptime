@@ -5,8 +5,13 @@ export const envSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string(),
   DATABASE_URL: z.string(),
   NEXT_PUBLIC_API_MOCKING: z.string().optional(),
-  NEXTAUTH_SECRET: z.string(),
-  NEXTAUTH_URL: z.string(),
+  /** Better Auth. Falls back to NEXTAUTH_SECRET / NEXTAUTH_URL until renamed. */
+  BETTER_AUTH_SECRET: z.string().optional(),
+  BETTER_AUTH_URL: z.string().optional(),
+  NEXTAUTH_SECRET: z.string().optional(),
+  NEXTAUTH_URL: z.string().optional(),
+  /** Set by Vercel: the deployment's own host (previews included). */
+  VERCEL_URL: z.string().optional(),
   NEXT_PUBLIC_SHOW_DEVTOOLS: z.string(),
   NEXT_PUBLIC_TURSO_DATABASE_URL: z.string(),
   TURSO_ON: z.string(),

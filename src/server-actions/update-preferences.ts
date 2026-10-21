@@ -1,8 +1,8 @@
 "use server";
 
-import { getServerSession } from "next-auth";
 import { z } from "zod";
 
+import { getSessionEmail } from "@/utils/auth/session";
 import { WEEK_DAYS } from "@/utils/constants";
 import { CURRENCIES } from "@/utils/constants/currencies";
 import { revalidateSettingsPage, revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
@@ -28,7 +28,7 @@ const PreferencesSchema = z
 export type PreferencesPatch = z.infer<typeof PreferencesSchema>;
 
 export default async function onUpdatePreferences(patch: PreferencesPatch) {
-  const email = (await getServerSession())?.user?.email;
+  const email = await getSessionEmail();
   const user = email
     ? await prisma.user.findUnique({ where: { email }, select: { id: true } })
     : null;
