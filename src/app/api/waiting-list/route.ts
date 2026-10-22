@@ -1,30 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
-import { object, string } from "zod";
+import { z } from "zod";
 
 import ErrorFactory from "@/services/Error/factory";
 
 import prisma from "#/prisma/client";
 
-export async function GET() {
-  const waitingList = await prisma?.waitingListDesktop.findMany();
+const WaitingListSchema = z.object({ email: z.string().trim().toLowerCase().email().max(254) });
 
-  return NextResponse.json(
-    {
-      message: "success",
-      response: true,
-      waitingList,
-    },
-    { status: 200 }
-  );
-}
-
+/**
+ * Adds an email to the desktop waiting list. There's no GET: the list is
+ * read from the database, never through the API (it used to be public).
+ * The answer is the same whether the email was already there or not, so
+ * it doesn't tell who signed up.
+ */
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-
-  const WaitingListSchema = object({
-    email: string().email(),
-  });
-
+  const body = await req.json().catch(() => null);
   const validate = WaitingListSchema.safeParse(body);
 
   if (!validate.success) {
@@ -38,35 +28,17 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const existInWaitingList = await prisma?.waitingListDesktop.findUnique({
-    where: {
-      email: validate.data.email,
-    },
-  });
+  try {
+    const { email } = validate.data;
+    await prisma.waitingListDesktop.upsert({ where: { email }, create: { email }, update: {} });
 
-  if (existInWaitingList) {
+    return NextResponse.json({ message: "success", response: true }, { status: 200 });
+  } catch (error) {
+    // eslint-disable-next-line no-console -- server log for failed sign-ups
+    console.error("[api/waiting-list]", error);
     return NextResponse.json(
-      {
-        message: "success",
-        response: true,
-        user: existInWaitingList,
-      },
-      { status: 200 }
+      { error: ErrorFactory.createError("InternalServer"), response: false },
+      { status: 500 }
     );
   }
-
-  const addIntoWaitingList = await prisma?.waitingListDesktop.create({
-    data: {
-      email: validate.data.email,
-    },
-  });
-
-  return NextResponse.json(
-    {
-      message: "success",
-      response: true,
-      user: addIntoWaitingList,
-    },
-    { status: 200 }
-  );
 }
