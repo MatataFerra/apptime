@@ -55,10 +55,14 @@ export async function GET(req: NextRequest) {
     const { only } = parsedSearchParams.data;
     const onlyParam = only ? only.split(",") : [];
 
+    // Your own user by id (the session's email can be stale); admins can
+    // ask for anyone by email.
+    const emailParam = searchParams.get(QUERY_PARAMS.EMAIL);
+    const where =
+      checkToken.role === "ADMIN" && emailParam ? { email: emailParam } : { id: checkToken.id };
+
     const user = await prisma.user.findUnique({
-      where: {
-        email: parsedSearchParams?.data?.email ?? "",
-      },
+      where,
       include: {
         // The client expects user.shifts.hourly / user.shifts.production (UserType),
         // so include the shift lists, not just the Shifts row.

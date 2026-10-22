@@ -36,12 +36,14 @@ function query(state: Awaited<ReturnType<typeof prefetchUserData>>["state"], key
 
 describe("prefetchUserData", () => {
   test("seeds user, hourly and production from one query", async () => {
-    getSession.mockResolvedValueOnce({ user: { email: "ana@example.com" } });
+    getSession.mockResolvedValueOnce({ user: { id: "u1", email: "ana@example.com" } });
     findUnique.mockResolvedValueOnce(dbUser);
 
     const { state, profile } = await prefetchUserData();
 
     expect(findUnique).toHaveBeenCalledTimes(1);
+    // By id: the email in the session cookie cache can be stale.
+    expect(findUnique.mock.calls[0][0].where).toEqual({ id: "u1" });
     expect(query(state, ["user", "ana@example.com"]).user.name).toBe("Ana");
     expect(query(state, ["hourly"]).hourly[0].taxes[0].name).toBe("PAYE");
     expect(query(state, ["production"]).production).toHaveLength(1);
@@ -49,7 +51,7 @@ describe("prefetchUserData", () => {
   });
 
   test("dates arrive as strings, like the API sends them", async () => {
-    getSession.mockResolvedValueOnce({ user: { email: "ana@example.com" } });
+    getSession.mockResolvedValueOnce({ user: { id: "u1", email: "ana@example.com" } });
     findUnique.mockResolvedValueOnce(dbUser);
 
     const { state } = await prefetchUserData();
@@ -58,7 +60,7 @@ describe("prefetchUserData", () => {
   });
 
   test("never selects the password", async () => {
-    getSession.mockResolvedValueOnce({ user: { email: "ana@example.com" } });
+    getSession.mockResolvedValueOnce({ user: { id: "u1", email: "ana@example.com" } });
     findUnique.mockResolvedValueOnce(dbUser);
 
     await prefetchUserData();
@@ -70,7 +72,7 @@ describe("prefetchUserData", () => {
     getSession.mockResolvedValueOnce(null);
     expect((await prefetchUserData()).state.queries).toHaveLength(0);
 
-    getSession.mockResolvedValueOnce({ user: { email: "ana@example.com" } });
+    getSession.mockResolvedValueOnce({ user: { id: "u1", email: "ana@example.com" } });
     findUnique.mockRejectedValueOnce(new Error("db down"));
     const down = await prefetchUserData();
     expect(down.state.queries).toHaveLength(0);

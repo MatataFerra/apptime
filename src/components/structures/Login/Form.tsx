@@ -15,6 +15,7 @@ import Loader from "@/components/ui/Loader";
 
 import { authClient } from "@/utils/auth/client";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
+import { safeRedirectPath } from "@/utils/helpers/safeRedirect";
 
 export default function FormLogin() {
   const searchParams = useSearchParams();
@@ -51,9 +52,7 @@ export default function FormLogin() {
         if (!error) {
           // Full load, so the server renders with the new session.
           // Only same-site paths are followed.
-          const redirect = searchParams.get("redirect");
-          const sameSite = redirect?.startsWith("/") && !redirect.startsWith("//");
-          window.location.assign(sameSite ? redirect! : PATH_NAMES.HOME);
+          window.location.assign(safeRedirectPath(searchParams.get("redirect"), PATH_NAMES.HOME));
           return;
         }
         if (error) {

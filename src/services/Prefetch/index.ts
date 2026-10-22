@@ -8,9 +8,9 @@ import "server-only";
 import prisma from "#/prisma/client";
 
 /** The signed-in user with shifts (and their taxes), profile and config. Never the password. */
-async function findUserForClient(email: string) {
+async function findUserForClient(id: string) {
   return prisma.user.findUnique({
-    where: { email },
+    where: { id },
     select: {
       id: true,
       email: true,
@@ -51,10 +51,12 @@ export async function prefetchUserData() {
   const queryClient = new QueryClient();
   const session = await getSession();
   const email = session?.user.email;
+  const userId = session?.user.id;
   let profile: { name: string; email: string; image: string | null } | null = null;
 
-  if (email) {
-    const user = await findUserForClient(email).catch(() => null);
+  if (email && userId) {
+    // By id: the email in the session cookie cache can be stale.
+    const user = await findUserForClient(userId).catch(() => null);
 
     if (user) {
       const data = asJson(user);

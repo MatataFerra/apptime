@@ -20,14 +20,14 @@ function withUses<T extends { hourly: { id: number }[]; production: { id: number
 export async function GET(req: NextRequest) {
   const checkToken = (await getRequestSession(req))?.user ?? null;
 
-  if (!checkToken?.email) {
+  if (!checkToken?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   // The user's own taxes and contributions. Removed ones stay on the
   // shifts that used them but are no longer offered.
   const query = {
-    where: { user: { email: checkToken.email }, archived: false },
+    where: { userId: checkToken.id, archived: false },
     orderBy: { name: "asc" as const },
     include: { hourly: { select: { id: true } }, production: { select: { id: true } } },
   };

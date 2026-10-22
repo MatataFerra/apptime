@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import SalaryItems, { startsOnOrAfter } from "@/services/SalaryItems";
 
-import { getSessionEmail } from "@/utils/auth/session";
+import { getSessionUserId } from "@/utils/auth/session";
 import { revalidateSettingsPage, revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
 
 import prisma from "#/prisma/client";
@@ -31,9 +31,9 @@ const UpdateSchema = z
 const RemoveSchema = z.object({ kind: Kind, id: z.number().int().positive() }).strict();
 
 async function sessionUserId() {
-  const email = await getSessionEmail();
-  if (!email) return null;
-  const user = await prisma.user.findUnique({ where: { email }, select: { id: true } });
+  const id = await getSessionUserId();
+  if (!id) return null;
+  const user = await prisma.user.findUnique({ where: { id }, select: { id: true } });
   return user?.id ?? null;
 }
 
