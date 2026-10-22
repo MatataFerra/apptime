@@ -1,4 +1,4 @@
-import type { Profile, User } from "@prisma/client";
+import type { User } from "@prisma/client";
 
 import ApiBase from "@/services/Api/Base";
 
@@ -63,22 +63,6 @@ class ApiService extends ApiBase {
     const response: ApiResponse<User> = await this.put({
       endpoint: `${API_ENDPOINTS.USER}/${user.id}`,
       body: user,
-      hasEnvUrl,
-    });
-
-    return response;
-  }
-
-  static async createProfile({
-    profile,
-    hasEnvUrl,
-  }: {
-    profile: Omit<Profile, "id">;
-    hasEnvUrl?: boolean;
-  }) {
-    const response = await this.post({
-      endpoint: API_ENDPOINTS.PROFILE,
-      body: profile,
       hasEnvUrl,
     });
 

@@ -1,89 +1,23 @@
-import { z } from "zod";
-
 import ApiBase from "@/services/Api/Base";
-
-import { HourlyCreateSchema, ProductionCreateSchema } from "@/types";
 
 import { API_ENDPOINTS } from "@/utils/constants/endpoints";
 
-type ProductionSchema = z.infer<typeof ProductionCreateSchema>;
-type HourlySchema = z.infer<typeof HourlyCreateSchema>;
-type ShiftTypes = ProductionSchema | HourlySchema;
-
+/** Shift routes the client still calls; creating and editing go through server actions. */
 class ApiShift extends ApiBase {
   constructor() {
     super();
   }
 
-  static async updateHourly({
-    body,
-    id,
-  }: {
-    body: Partial<HourlySchema>;
-    id: number | null | undefined;
-  }) {
-    const response = await this.put({
-      endpoint: `${API_ENDPOINTS.SHIFT}/${id}`,
-      body,
-    });
-    return response;
-  }
-
-  static async updateShift({
-    body,
-    id,
-  }: {
-    body: Partial<ShiftTypes>;
-    id: number | null | undefined;
-  }) {
-    const response = await this.put({
-      endpoint: `${API_ENDPOINTS.SHIFT}/${id}`,
-      body,
-    });
-    return response;
-  }
-
-  static async createHourly({ body }: { body: HourlySchema }) {
-    const response = await this.post({
-      endpoint: `${API_ENDPOINTS.SHIFT}/hourly`,
-      body,
-    });
-    return response;
-  }
-
-  static async createProduction({ body }: { body: ProductionSchema }) {
-    const response = await this.post({
-      endpoint: `${API_ENDPOINTS.SHIFT}`,
-      body,
-    });
-    return response;
-  }
-
-  static async createShift({ body }: { body: ShiftTypes }) {
-    const response = await this.post({
-      endpoint: `${API_ENDPOINTS.SHIFT}`,
-      body,
-    });
-    return response;
-  }
-
-  static async deleteShift({ id }: { id: number }) {
-    const response = await this.delete({
-      endpoint: `${API_ENDPOINTS.SHIFT}/${id}`,
-    });
-    return response;
-  }
-
   static async deleteHourly({ id }: { id: number }) {
     const response = await this.delete({
-      endpoint: `${API_ENDPOINTS.SHIFT}/hourly/${id}`,
+      endpoint: `${API_ENDPOINTS.HOURLY}/${id}`,
     });
     return response;
   }
 
   static async deleteProduction({ id }: { id: number }) {
     const response = await this.delete({
-      endpoint: `${API_ENDPOINTS.SHIFT}/production/${id}`,
+      endpoint: `${API_ENDPOINTS.PRODUCTION}/${id}`,
     });
     return response;
   }
