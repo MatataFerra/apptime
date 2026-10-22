@@ -101,6 +101,23 @@ model Verification {
   @@index([identifier])
 }
 
+/// Better Auth: request counts per IP and endpoint (rateLimit.storage =
+/// "database"), so the limit holds across serverless instances.
+model RateLimit {
+  id          String @id
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+}
+
+/// Our own limits for server actions that call Better Auth directly
+/// (auth.api skips Better Auth's limiter), e.g. the reset password email.
+model ActionRateLimit {
+  key         String   @id
+  count       Int
+  windowStart DateTime
+}
+
 model Profile {
   id        Int     @id @default(autoincrement())
   firstName String

@@ -114,6 +114,11 @@ export const auth = betterAuth({
     },
   },
 
+  // In the database, not in memory: on Vercel each instance had its own
+  // counts, so the limit barely held. Defaults: 100 per 10 s, sign-in and
+  // sign-up 3 per 10 s, password reset 3 per minute, per IP.
+  rateLimit: { storage: "database" },
+
   // Sets cookies from server actions (sign in/out called on the server).
   plugins: [nextCookies()],
 });
