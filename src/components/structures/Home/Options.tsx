@@ -21,6 +21,11 @@ function Options() {
         description="Your rates and deductions"
         path={PATH_NAMES.TAXES}
       />
+      <HomeCardOption
+        title="Employers"
+        description="Where you work and their details"
+        path={PATH_NAMES.EMPLOYERS}
+      />
     </div>
   );
 }

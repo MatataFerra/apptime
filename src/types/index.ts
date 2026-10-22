@@ -78,3 +78,23 @@ export type SavedSalaryItem = {
 };
 
 export type SalaryItems = { contributions: SavedSalaryItem[]; taxes: SavedSalaryItem[] };
+
+/** A saved employer as the API sends it (dates as ISO strings). */
+export type SavedEmployer = {
+  id: number;
+  name: string;
+  taxId: string | null;
+  address: string | null;
+  city: string | null;
+  postcode: string | null;
+  country: string | null;
+  industry: string | null;
+  contactName: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  defaultRate: number | null;
+  defaultCurrency: string | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+};

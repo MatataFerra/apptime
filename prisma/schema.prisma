@@ -50,6 +50,7 @@ model User {
   config             Config?
   taxes              Tax[]
   contributions      Contribution[]
+  employers          Employer[]
 }
 
 /// Better Auth: one row per signed-in device.
@@ -109,6 +110,36 @@ model Profile {
   country   String?
   user      User?   @relation(fields: [userId], references: [id])
   userId    String? @unique
+}
+
+/// A place the user works for. Its details are what visa and tax forms ask
+/// for (e.g. proof of the 88 days of specified work in Australia).
+model Employer {
+  id              Int      @id @default(autoincrement())
+  name            String
+  /// Business or tax number: ABN, CUIT, Steuernummer…
+  taxId           String?
+  address         String?
+  city            String?
+  postcode        String?
+  country         String?
+  industry        String?
+  contactName     String?
+  contactEmail    String?
+  contactPhone    String?
+  /// Prefilled on new shifts for this employer.
+  defaultRate     Float?
+  /// ISO 4217 code. Null: the user's default currency (Config.currency).
+  defaultCurrency String?
+  notes           String?
+  /// Hidden from the list and pickers; kept for the shifts that use it.
+  archived        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Production {
