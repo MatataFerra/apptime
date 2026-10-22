@@ -18,6 +18,14 @@ export async function getRequestSession(req: Request) {
   return auth.api.getSession({ headers: req.headers });
 }
 
+/**
+ * Id of the user signed in on this request, or null. Route handlers must
+ * check it themselves: the proxy doesn't run on /api.
+ */
+export async function getRequestUserId(req: Request) {
+  return (await getRequestSession(req))?.user.id ?? null;
+}
+
 /** Email of the signed-in user, or null. */
 export async function getSessionEmail() {
   return (await getSession())?.user.email ?? null;

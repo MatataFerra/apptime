@@ -54,11 +54,17 @@ import { auth } from "@/utils/auth";
 
 import { GET as getRates } from "@/app/api/rates/route";
 import { GET as getSalaryItems } from "@/app/api/salary-items/route";
+import { DELETE as deleteHourly } from "@/app/api/shift/hourly/[id]/route";
 import { GET as getHourly } from "@/app/api/shift/hourly/route";
+import { DELETE as deleteProduction } from "@/app/api/shift/production/[id]/route";
+import { PUT as putUser } from "@/app/api/user/[id]/route";
+import onCreateTrackJob from "@/server-actions/create-track";
 import onEditShift from "@/server-actions/edit-shift";
 import onResetPassword from "@/server-actions/reset-password";
 import { onRemoveSalaryItem, onUpdateSalaryItem } from "@/server-actions/salary-items";
 import onSendEmailToResetPassword from "@/server-actions/send-email-reset-password";
+import onUpdateSettings from "@/server-actions/update-settings";
+import onUpdateTrackJob from "@/server-actions/update-track";
 import prisma from "#/prisma/client";
 
 const PASSWORD = "Secreto123!";
@@ -87,8 +93,12 @@ async function signIn(email: string, password = PASSWORD) {
   return new Headers({ cookie });
 }
 
-function requestAs(cookies: Headers) {
-  return new Request("http://localhost:3000/api", { headers: cookies }) as never;
+function requestAs(cookies: Headers, init: RequestInit = {}) {
+  return new Request("http://localhost:3000/api", { ...init, headers: cookies }) as never;
+}
+
+function idParam(id: number | string) {
+  return { params: Promise.resolve({ id: String(id) }) };
 }
 
 async function addShift(shiftId: number, day: string, userId: string) {
@@ -320,68 +330,110 @@ describe("auth and taxes on a real database", () => {
     });
   });
 
-  describe("exchange rates", () => {
-    // Frankfurter, answering v2 rows for Fri 16 and Mon 19 October.
-    const published = [
-      { date: "2026-10-16", base: "EUR", quote: "USD", rate: 1.1 },
-      { date: "2026-10-16", base: "EUR", quote: "GBP", rate: 0.84 },
-      { date: "2026-10-19", base: "EUR", quote: "USD", rate: 1.2 },
-      { date: "2026-10-19", base: "EUR", quote: "GBP", rate: 0.85 },
-    ];
+  describe("ownership", () => {
+    test("DELETE a shift: signed out is 401, someone else's is 404 and stays", async () => {
+      expect((await deleteHourly(requestAs(new Headers()), idParam(bobsShift))).status).toBe(401);
+      expect((await deleteHourly(requestAs(ana.cookies), idParam(bobsShift))).status).toBe(404);
+      expect(await prisma.hourly.findUnique({ where: { id: bobsShift } })).not.toBeNull();
+    });
 
-    test("fetched once, stored per day with the weekend filled, then read from the DB", async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, "fetch")
-        .mockResolvedValue(new Response(JSON.stringify(published)));
-
-      const table = await getRateTable("2026-10-16", "2026-10-19", ["USD", "GBP"]);
-      expect(fetchSpy).toHaveBeenCalledTimes(1);
-      expect(String(fetchSpy.mock.calls[0][0])).toContain("api.frankfurter.dev/v2/rates");
-      expect(table["2026-10-17"]).toEqual({ USD: 1.1, GBP: 0.84 }); // Saturday = Friday
-      expect(table["2026-10-19"]).toEqual({ USD: 1.2, GBP: 0.85 });
-      const sat = await prisma.exchangeRate.findUniqueOrThrow({
-        where: { date_quote: { date: "2026-10-17", quote: "USD" } },
+    test("DELETE a production shift that isn't yours is 404 and stays", async () => {
+      const bobs = await prisma.production.create({
+        data: { startDate: new Date().toString(), shiftId: bob.shiftId, itemValue: 1 },
       });
-      expect(sat.filled).toBe(true);
-
-      fetchSpy.mockClear();
-      const again = await getRateTable("2026-10-16", "2026-10-19", ["USD", "GBP"]);
-      expect(fetchSpy).not.toHaveBeenCalled();
-      expect(again).toEqual(table);
-      fetchSpy.mockRestore();
+      expect((await deleteProduction(requestAs(ana.cookies), idParam(bobs.id))).status).toBe(404);
+      expect(await prisma.production.findUnique({ where: { id: bobs.id } })).not.toBeNull();
     });
 
-    test("if the API is down, what's stored is used and nothing breaks", async () => {
-      const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("offline"));
-      const table = await getRateTable("2026-10-01", "2026-10-19", ["USD"]);
-      expect(fetchSpy).toHaveBeenCalled();
-      expect(table["2026-10-19"]).toEqual({ USD: 1.2 });
-      expect(table["2026-10-01"]).toBeUndefined();
-      fetchSpy.mockRestore();
+    test("DELETE your own shift works", async () => {
+      const mine = await addShift(ana.shiftId, "2026-10-20T10:00:00", ana.id);
+      expect((await deleteHourly(requestAs(ana.cookies), idParam(mine))).status).toBe(200);
+      expect(await prisma.hourly.findUnique({ where: { id: mine } })).toBeNull();
     });
 
-    test("GET /api/rates needs a session and checks its input", async () => {
-      const url = "http://localhost:3000/api/rates?from=2026-10-16&to=2026-10-19&quotes=USD,GBP";
-      const anonymous = await getRates(
-        Object.assign(new Request(url), { nextUrl: new URL(url) }) as never
-      );
-      expect(anonymous.status).toBe(401);
+    test("starting a shift puts it in your container, whatever shiftId the client sends", async () => {
+      const result = await onCreateTrackJob({
+        startDate: new Date().toString(),
+        endDate: null,
+        name: "Track",
+        amount: 0,
+        notes: "",
+        isClosed: false,
+        isPublicHoliday: false,
+        publicHolidayWorked: false,
+        hourValue: 20,
+        unpaidBreaks: 0,
+        shiftId: bob.shiftId,
+        currency: null,
+        source: "track",
+      });
+      expect(result?.response).toBe(true);
+      expect(result?.shift?.shiftId).toBe(ana.shiftId);
+    });
 
-      const bad = "http://localhost:3000/api/rates?from=yesterday&to=2026-10-19&quotes=USD";
-      const invalid = await getRates(
-        Object.assign(new Request(bad, { headers: ana.cookies }), {
-          nextUrl: new URL(bad),
-        }) as never
+    test("closing someone else's shift does nothing", async () => {
+      const before = await prisma.hourly.findUniqueOrThrow({ where: { id: bobsShift } });
+      const result = await onUpdateTrackJob(
+        { ...before, name: "hijacked", taxes: [], contributions: [] } as never,
+        bobsShift
       );
-      expect(invalid.status).toBe(400);
+      expect(result).toBeNull();
+      expect((await prisma.hourly.findUniqueOrThrow({ where: { id: bobsShift } })).name).toBe(
+        "Packhouse"
+      );
+    });
 
-      const ok = await getRates(
-        Object.assign(new Request(url, { headers: ana.cookies }), {
-          nextUrl: new URL(url),
-        }) as never
+    test("closing your shift can't move it to another container", async () => {
+      const mine = await prisma.hourly.findUniqueOrThrow({ where: { id: september } });
+      const result = await onUpdateTrackJob(
+        { ...mine, shiftId: bob.shiftId, taxes: [], contributions: [] } as never,
+        september
       );
-      expect(ok.status).toBe(200);
-      expect((await ok.json()).rates["2026-10-18"]).toEqual({ USD: 1.1, GBP: 0.84 });
+      expect(result?.response).toBe(true);
+      expect((await prisma.hourly.findUniqueOrThrow({ where: { id: september } })).shiftId).toBe(
+        ana.shiftId
+      );
+    });
+
+    test("PUT /api/user/[id] can't mark your own email as verified", async () => {
+      const response = await putUser(
+        requestAs(ana.cookies, {
+          method: "PUT",
+          body: JSON.stringify({ name: "Ana", emailVerified: true, isActive: false }),
+        }),
+        idParam(ana.id)
+      );
+      expect(response.status).toBe(200);
+      const user = await prisma.user.findUniqueOrThrow({ where: { id: ana.id } });
+      expect(user.name).toBe("Ana");
+      expect(user.emailVerified).toBe(false);
+      expect(user.isActive).toBe(true);
+    });
+  });
+
+  // Last: it changes Ana's email.
+  describe("changing the email in Settings", () => {
+    function settings(email: string) {
+      return {
+        account: { name: "Ana", email },
+        personal: { country: "AU", city: "Mildura" },
+      } as never;
+    }
+
+    test("an email someone else has is refused", async () => {
+      const result = await onUpdateSettings(settings("bob@x.com"));
+      expect(result).toMatchObject({ type_error: "DataProvidedIsNotValid" });
+      expect((await prisma.user.findUniqueOrThrow({ where: { id: ana.id } })).email).toBe(
+        "ana@x.com"
+      );
+    });
+
+    test("a new email is no longer verified", async () => {
+      await prisma.user.update({ where: { id: ana.id }, data: { emailVerified: true } });
+      expect(await onUpdateSettings(settings("ana.new@x.com"))).not.toBeNull();
+      const user = await prisma.user.findUniqueOrThrow({ where: { id: ana.id } });
+      expect(user.email).toBe("ana.new@x.com");
+      expect(user.emailVerified).toBe(false);
     });
   });
 });

@@ -1,130 +1,49 @@
-import { Prisma, Production } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 import ErrorFactory from "@/services/Error/factory";
-import ShiftService from "@/services/Shift";
 
-import { ProductionUpdateSchema, RouteParams } from "@/types";
+import { RouteParams } from "@/types";
 
-import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
+import { getRequestUserId } from "@/utils/auth/session";
 
 import prisma from "#/prisma/client";
 
-export async function PUT(req: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
-  const body: Production = await req.json();
-  const parsedBody = ProductionUpdateSchema.safeParse(body);
-
-  if (!parsedBody.success) {
-    return NextResponse.json(
-      {
-        error: ErrorFactory.createError("DataProvidedIsNotValid", {
-          error: parsedBody.error,
-        }),
-        response: false,
-      },
-      { status: 400 }
-    );
-  }
-
-  try {
-    const buildShift = new ShiftService(body)
-      .closeShift()
-      .checkPublicHoliday()
-      .differenceInMinsBetweenStartAndEnd()
-      .build<Production>();
-
-    const updatedShift: Production = await prisma.production.update({
-      where: {
-        id: Number(id),
-      },
-      data: buildShift,
-    });
-
-    if (!updatedShift) {
-      return NextResponse.json(
-        {
-          error: ErrorFactory.createError("ShiftNotFound"),
-          response: false,
-        },
-        { status: 404 }
-      );
-    }
-
-    revalidateShiftPages();
-
-    return NextResponse.json(
-      {
-        message: "success",
-        response: true,
-        shift: updatedShift,
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return NextResponse.json(
-        {
-          error: ErrorFactory.createError("PrismaClientUpdateRecord"),
-          response: false,
-        },
-        { status: 408 }
-      );
-    }
-    return NextResponse.json(
-      {
-        error: ErrorFactory.createError("InternalServer"),
-        response: false,
-      },
-      { status: 500 }
-    );
-  }
-}
-
+/** Deletes one of the signed-in user's production shifts. Someone else's is "not found". */
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
-  try {
-    const deletedShift: Production = await prisma.production.delete({
-      where: {
-        id: Number(id),
-      },
-    });
+  const userId = await getRequestUserId(req);
 
-    if (!deletedShift) {
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized", response: false }, { status: 401 });
+  }
+
+  const id = Number((await params).id);
+
+  if (!Number.isInteger(id) || id <= 0) {
+    return NextResponse.json(
+      { error: ErrorFactory.createError("ShiftNotFound"), response: false },
+      { status: 404 }
+    );
+  }
+
+  try {
+    const owned = await prisma.production.findFirst({ where: { id, shift: { userId } } });
+
+    if (!owned) {
       return NextResponse.json(
-        {
-          error: ErrorFactory.createError("ShiftNotFound"),
-          response: false,
-        },
+        { error: ErrorFactory.createError("ShiftNotFound"), response: false },
         { status: 404 }
       );
     }
 
+    const deletedShift = await prisma.production.delete({ where: { id: owned.id } });
+
     return NextResponse.json(
-      {
-        message: "success",
-        response: true,
-        shift: deletedShift,
-      },
+      { message: "success", response: true, shift: deletedShift },
       { status: 200 }
     );
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return NextResponse.json(
-        {
-          error: ErrorFactory.createError("CustomError", {
-            error: error.meta,
-          }),
-          response: false,
-        },
-        { status: 408 }
-      );
-    }
+  } catch {
     return NextResponse.json(
-      {
-        error: ErrorFactory.createError("InternalServer"),
-        response: false,
-      },
+      { error: ErrorFactory.createError("InternalServer"), response: false },
       { status: 500 }
     );
   }
