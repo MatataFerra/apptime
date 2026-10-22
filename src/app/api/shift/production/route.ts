@@ -76,14 +76,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!checkToken.email) {
+  if (!checkToken.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   // One query, no transaction: it's a read, and an interactive transaction
   // over Turso could hit Prisma's 5 s timeout.
   const production = await prisma.production.findMany({
-    where: { shift: { user: { email: checkToken.email } } },
+    where: { shift: { userId: checkToken.id } },
     include: { taxes: true },
   });
 

@@ -10,6 +10,7 @@ import Footer from "@/components/ui/Footer";
 
 import { authClient } from "@/utils/auth/client";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
+import { safeRedirectPath } from "@/utils/helpers/safeRedirect";
 
 interface Props extends Omit<React.HTMLAttributes<HTMLElement>, "className"> {
   classes?: CSSClassNames;
@@ -22,7 +23,7 @@ function LoginFooter({ classes, idForm = "form" }: Props) {
   function onGoogleAuth() {
     authClient.signIn.social({
       provider: "google",
-      callbackURL: params.get("redirect") ?? PATH_NAMES.HOME,
+      callbackURL: safeRedirectPath(params.get("redirect"), PATH_NAMES.HOME),
     });
   }
   return (

@@ -1,7 +1,10 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { Resend } from "resend";
+
+import PasswordService from "@/services/Auth/password";
 
 import { EmailTemplate } from "@/components/ui/EmailTemplate";
 
@@ -19,6 +22,14 @@ function localeFromResetUrl(url: string) {
     return "en";
   }
 }
+
+/** Endpoints that set a password, and the body field it comes in. */
+const PASSWORD_FIELD_BY_PATH: Record<string, string> = {
+  "/sign-up/email": "password",
+  "/reset-password": "newPassword",
+  "/change-password": "newPassword",
+  "/set-password": "newPassword",
+};
 
 const baseURL = process.env.BETTER_AUTH_URL ?? process.env.NEXTAUTH_URL;
 
@@ -61,6 +72,18 @@ export const auth = betterAuth({
       });
       if (error) throw new Error(`Reset email failed: ${error.message}`);
     },
+  },
+
+  // Same password rules as the register and reset forms, enforced here too:
+  // the forms are only the client, and /api/auth/* can be called directly.
+  hooks: {
+    before: createAuthMiddleware(async (ctx) => {
+      const field = PASSWORD_FIELD_BY_PATH[ctx.path];
+      const password = field ? (ctx.body as Record<string, unknown> | undefined)?.[field] : null;
+      if (typeof password === "string" && !new PasswordService(password).validPassword().valid) {
+        throw new APIError("BAD_REQUEST", { message: "Password is not valid" });
+      }
+    }),
   },
 
   socialProviders: {

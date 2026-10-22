@@ -33,3 +33,12 @@ export function toClientSession(session: Awaited<ReturnType<typeof getSession>>)
   const { id, email, name, image, role } = session.user;
   return { user: { id, email, name, image: image ?? null, role: role ?? "USER" } };
 }
+
+/**
+ * Id of the signed-in user, or null. Look users up by id, not by email: the
+ * id never changes, while the email in the 5-minute session cookie cache
+ * can be stale right after the user changes it.
+ */
+export async function getSessionUserId() {
+  return (await getSession())?.user.id ?? null;
+}

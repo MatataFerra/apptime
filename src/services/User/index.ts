@@ -116,8 +116,11 @@ class UserService {
     >
   ) {
     const session = await getSession();
+    if (!session) return null;
+
+    // By id: the email in the session cookie cache can be stale.
     const user = await UserService.findUniqueUser({
-      email: session?.user.email ?? "",
+      id: session.user.id,
       shifts,
       profile,
       config,

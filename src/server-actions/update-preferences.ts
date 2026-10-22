@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { getSessionEmail } from "@/utils/auth/session";
+import { getSessionUserId } from "@/utils/auth/session";
 import { WEEK_DAYS } from "@/utils/constants";
 import { CURRENCIES } from "@/utils/constants/currencies";
 import { revalidateSettingsPage, revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
@@ -28,9 +28,9 @@ const PreferencesSchema = z
 export type PreferencesPatch = z.infer<typeof PreferencesSchema>;
 
 export default async function onUpdatePreferences(patch: PreferencesPatch) {
-  const email = await getSessionEmail();
-  const user = email
-    ? await prisma.user.findUnique({ where: { email }, select: { id: true } })
+  const userId = await getSessionUserId();
+  const user = userId
+    ? await prisma.user.findUnique({ where: { id: userId }, select: { id: true } })
     : null;
   if (!user) return { ok: false as const, error: "Not signed in" };
 
