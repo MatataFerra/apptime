@@ -11,11 +11,10 @@ import { join } from "path";
 import { beforeAll, describe, expect, test, vi } from "vitest";
 
 const env = vi.hoisted(() => {
-   
   const { mkdtempSync } = require("fs");
   const { tmpdir } = require("os");
   const { join } = require("path");
-   
+
   const url = `file:${join(mkdtempSync(join(tmpdir(), "apptime-")), "test.db")}`;
   // Read by prisma/client.ts and the auth config when first imported.
   process.env.TURSO_ON = "true";
@@ -48,10 +47,12 @@ vi.mock("resend", () => ({
   },
 }));
 
+import { getRateTable } from "@/services/ExchangeRates";
 import HourlyService from "@/services/Shift/Hourly";
 
 import { auth } from "@/utils/auth";
 
+import { GET as getRates } from "@/app/api/rates/route";
 import { GET as getSalaryItems } from "@/app/api/salary-items/route";
 import { GET as getHourly } from "@/app/api/shift/hourly/route";
 import onEditShift from "@/server-actions/edit-shift";
@@ -316,6 +317,71 @@ describe("auth and taxes on a real database", () => {
         archived: true,
       });
       expect(await ratesOf(october)).toEqual(["Income tax 5"]);
+    });
+  });
+
+  describe("exchange rates", () => {
+    // Frankfurter, answering v2 rows for Fri 16 and Mon 19 October.
+    const published = [
+      { date: "2026-10-16", base: "EUR", quote: "USD", rate: 1.1 },
+      { date: "2026-10-16", base: "EUR", quote: "GBP", rate: 0.84 },
+      { date: "2026-10-19", base: "EUR", quote: "USD", rate: 1.2 },
+      { date: "2026-10-19", base: "EUR", quote: "GBP", rate: 0.85 },
+    ];
+
+    test("fetched once, stored per day with the weekend filled, then read from the DB", async () => {
+      const fetchSpy = vi
+        .spyOn(globalThis, "fetch")
+        .mockResolvedValue(new Response(JSON.stringify(published)));
+
+      const table = await getRateTable("2026-10-16", "2026-10-19", ["USD", "GBP"]);
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(String(fetchSpy.mock.calls[0][0])).toContain("api.frankfurter.dev/v2/rates");
+      expect(table["2026-10-17"]).toEqual({ USD: 1.1, GBP: 0.84 }); // Saturday = Friday
+      expect(table["2026-10-19"]).toEqual({ USD: 1.2, GBP: 0.85 });
+      const sat = await prisma.exchangeRate.findUniqueOrThrow({
+        where: { date_quote: { date: "2026-10-17", quote: "USD" } },
+      });
+      expect(sat.filled).toBe(true);
+
+      fetchSpy.mockClear();
+      const again = await getRateTable("2026-10-16", "2026-10-19", ["USD", "GBP"]);
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(again).toEqual(table);
+      fetchSpy.mockRestore();
+    });
+
+    test("if the API is down, what's stored is used and nothing breaks", async () => {
+      const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("offline"));
+      const table = await getRateTable("2026-10-01", "2026-10-19", ["USD"]);
+      expect(fetchSpy).toHaveBeenCalled();
+      expect(table["2026-10-19"]).toEqual({ USD: 1.2 });
+      expect(table["2026-10-01"]).toBeUndefined();
+      fetchSpy.mockRestore();
+    });
+
+    test("GET /api/rates needs a session and checks its input", async () => {
+      const url = "http://localhost:3000/api/rates?from=2026-10-16&to=2026-10-19&quotes=USD,GBP";
+      const anonymous = await getRates(
+        Object.assign(new Request(url), { nextUrl: new URL(url) }) as never
+      );
+      expect(anonymous.status).toBe(401);
+
+      const bad = "http://localhost:3000/api/rates?from=yesterday&to=2026-10-19&quotes=USD";
+      const invalid = await getRates(
+        Object.assign(new Request(bad, { headers: ana.cookies }), {
+          nextUrl: new URL(bad),
+        }) as never
+      );
+      expect(invalid.status).toBe(400);
+
+      const ok = await getRates(
+        Object.assign(new Request(url, { headers: ana.cookies }), {
+          nextUrl: new URL(url),
+        }) as never
+      );
+      expect(ok.status).toBe(200);
+      expect((await ok.json()).rates["2026-10-18"]).toEqual({ USD: 1.1, GBP: 0.84 });
     });
   });
 });
