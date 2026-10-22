@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 import { useQueryClient } from "@tanstack/react-query";
@@ -15,6 +16,7 @@ import type { ProductionType, UserType } from "@/types";
 import Footer from "@/components/structures/Dashboard/Table/Dialog/Edit/Footer";
 import Taxes from "@/components/structures/Dashboard/Table/Dialog/Edit/Taxes";
 import { useTaxesHandlerDelete } from "@/components/structures/Dashboard/Table/Dialog/store/taxesHandlerDelete";
+import EmployerSelect from "@/components/structures/ShiftForms/EmployerSelect";
 import HolidayChoice, {
   fromHolidayValue,
   toHolidayValue,
@@ -61,6 +63,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { setStep } = useTableStore((state) => state);
+  const [employerId, setEmployerId] = useState(shift.employerId ?? null);
   const { taxesToDelete, rateChanges, reset } = useTaxesHandlerDelete((state) => state);
 
   function onHandleEdit(data: EditProductionShiftForm) {
@@ -83,6 +86,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
       isPublicHoliday,
       publicHolidayWorked,
       name,
+      employerId,
     };
 
     // Check if user made any changes
@@ -190,6 +194,11 @@ function TableDialogEditProduction({ shift, user }: Props) {
         type="checkbox"
         hidden
         {...register("publicHolidayWorked", { value: shift.publicHolidayWorked })}
+      />
+      <EmployerSelect
+        value={employerId}
+        onChange={(employer) => setEmployerId(employer?.id ?? null)}
+        classes="mt-0 mb-0"
       />
       <HolidayChoice
         value={toHolidayValue(isPublicHoliday, publicHolidayWorked)}

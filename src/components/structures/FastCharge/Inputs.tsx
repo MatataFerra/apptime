@@ -14,6 +14,7 @@ import type { FastChargeInputs } from "@/types/forms";
 import { observer } from "@/components/structures/SalaryItems/observer";
 import CurrencySelect from "@/components/structures/ShiftForms/CurrencySelect";
 import DatalistShiftNames from "@/components/structures/ShiftForms/Datalist";
+import EmployerSelect from "@/components/structures/ShiftForms/EmployerSelect";
 import HolidayChoice, {
   fromHolidayValue,
   toHolidayValue,
@@ -51,7 +52,14 @@ function Inputs() {
   const {
     setValues: setStoreValue,
     reset: resetStoreValues,
-    values: { startDate, finishDate, finishTime, startTime, currency: shiftCurrency },
+    values: {
+      startDate,
+      finishDate,
+      finishTime,
+      startTime,
+      currency: shiftCurrency,
+      employerId: shiftEmployerId,
+    },
     setIsFormReady,
     setDialogState,
   } = useFastChargeStore((state) => state);
@@ -200,6 +208,7 @@ function Inputs() {
       taxes,
       contributions,
       currency: shiftCurrency ?? null,
+      employerId: shiftEmployerId ?? null,
     };
 
     Toast({
@@ -279,6 +288,7 @@ function Inputs() {
           id: lastId + 1,
           startDate: parseData.startDate,
           currency: parseData.currency,
+          employerId: parseData.employerId,
           endDate: parseData.endDate,
           name: parseData.name,
           hourValue: parseData.hourValue,
@@ -405,6 +415,20 @@ function Inputs() {
             }}
           />
         </Stack>
+        <EmployerSelect
+          value={shiftEmployerId}
+          onChange={(employer) => {
+            setStoreValue({ employerId: employer?.id ?? null });
+            if (!employer) return;
+            // Their usual rate and currency, as a starting point.
+            if (employer.defaultRate != null) {
+              const rate = String(employer.defaultRate);
+              setValue("hour-value", rate, { shouldDirty: true });
+              setStoreValue({ hourValue: rate });
+            }
+            if (employer.defaultCurrency) setStoreValue({ currency: employer.defaultCurrency });
+          }}
+        />
         <Input
           containerClasses="flex-1"
           classes="h-full"

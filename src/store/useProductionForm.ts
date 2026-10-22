@@ -13,6 +13,8 @@ interface Production {
     name?: string;
     /** null: the Settings currency */
     currency?: string | null;
+    /** null: no employer */
+    employerId?: number | null;
   };
 
   errors: {
@@ -65,6 +67,7 @@ export const useProductionForm = create<Production>((set, get) => ({
     publicHolidayWorked: false,
     unpaidBreaks: "",
     currency: null,
+    employerId: null,
   },
 
   errors: {

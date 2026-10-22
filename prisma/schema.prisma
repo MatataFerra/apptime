@@ -29,28 +29,28 @@ model Shift {
 }
 
 model User {
-  id                 String         @id @default(cuid())
-  email              String         @unique
+  id            String         @id @default(cuid())
+  email         String         @unique
   /// Better Auth: true once the email is confirmed (it was a date before).
-  emailVerified      Boolean        @default(false)
-  image              String?
-  name               String
-  type_account       String         @default("CREDENTIALS")
-  role               String         @default("USER")
-  online             Boolean        @default(false)
-  formCompleted      Boolean        @default(false)
-  isActive           Boolean        @default(true)
-  createdAt          DateTime       @default(now())
-  updatedAt          DateTime       @default(now()) @updatedAt
+  emailVerified Boolean        @default(false)
+  image         String?
+  name          String
+  type_account  String         @default("CREDENTIALS")
+  role          String         @default("USER")
+  online        Boolean        @default(false)
+  formCompleted Boolean        @default(false)
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @default(now()) @updatedAt
   /// Login methods (password, Google), managed by Better Auth.
-  accounts           Account[]
-  sessions           Session[]
-  shifts             Shift?
-  profile            Profile?
-  config             Config?
-  taxes              Tax[]
-  contributions      Contribution[]
-  employers          Employer[]
+  accounts      Account[]
+  sessions      Session[]
+  shifts        Shift?
+  profile       Profile?
+  config        Config?
+  taxes         Tax[]
+  contributions Contribution[]
+  employers     Employer[]
 }
 
 /// Better Auth: one row per signed-in device.
@@ -132,7 +132,7 @@ model Profile {
 /// A place the user works for. Its details are what visa and tax forms ask
 /// for (e.g. proof of the 88 days of specified work in Australia).
 model Employer {
-  id              Int      @id @default(autoincrement())
+  id              Int          @id @default(autoincrement())
   name            String
   /// Business or tax number: ABN, CUIT, Steuernummer…
   taxId           String?
@@ -150,11 +150,13 @@ model Employer {
   defaultCurrency String?
   notes           String?
   /// Hidden from the list and pickers; kept for the shifts that use it.
-  archived        Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @default(now()) @updatedAt
+  archived        Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @default(now()) @updatedAt
   userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hourly          Hourly[]
+  production      Production[]
 
   @@index([userId])
 }
@@ -174,9 +176,14 @@ model Production {
   /// ISO 4217 code. Null: the user's default currency (Config.currency).
   currency            String?
   shiftId             Int?
+  /// Who the shift was for. Null: not set. Deleting the employer unlinks it.
+  employerId          Int?
   taxes               Tax[]
   contributions       Contribution[]
   shift               Shift?         @relation(fields: [shiftId], references: [id])
+  employer            Employer?      @relation(fields: [employerId], references: [id], onDelete: SetNull)
+
+  @@index([employerId])
 }
 
 model Hourly {
@@ -196,9 +203,14 @@ model Hourly {
   /// Where the shift was logged: "track" (live clock) or "fast" (Fast charge). Null: before this existed.
   source              String?
   shiftId             Int?
+  /// Who the shift was for. Null: not set. Deleting the employer unlinks it.
+  employerId          Int?
   taxes               Tax[]
   contributions       Contribution[]
   shift               Shift?         @relation(fields: [shiftId], references: [id])
+  employer            Employer?      @relation(fields: [employerId], references: [id], onDelete: SetNull)
+
+  @@index([employerId])
 }
 
 model Tax {
@@ -248,13 +260,11 @@ model Config {
   user         User?   @relation(fields: [userId], references: [id])
 }
 
-
 model WaitingListDesktop {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   createdAt DateTime @default(now())
 }
-
 
 /// Exchange rates per day, EUR based (Frankfurter). One row per calendar
 /// day and currency: weekends and holidays repeat the last published rate

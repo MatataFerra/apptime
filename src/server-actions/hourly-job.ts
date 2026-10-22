@@ -2,6 +2,7 @@
 
 import type { Hourly } from "@prisma/client";
 
+import { ownEmployerId } from "@/services/Employer/owned";
 import ShiftService from "@/services/Shift";
 import HourlyService from "@/services/Shift/Hourly";
 import UserService from "@/services/User";
@@ -21,6 +22,10 @@ export default async function onCreateHourlyShift(data: FastChargeInputsParsed) 
     return null;
   }
 
+  // Someone else's employer is refused, not silently dropped.
+  const employerId = await ownEmployerId(currentUser.id, data.employerId ?? null);
+  if (employerId === false) return null;
+
   const shift = new ShiftService({
     startDate: data.startDate,
     endDate: data.endDate,
@@ -34,6 +39,7 @@ export default async function onCreateHourlyShift(data: FastChargeInputsParsed) 
     unpaidBreaks: data.unpaidBreaks,
     shiftId: currentUser.shifts?.id,
     currency: data.currency ?? null,
+    employerId: employerId ?? null,
     source: "fast",
   })
     .closeShift()

@@ -365,6 +365,7 @@ describe("auth and taxes on a real database", () => {
         unpaidBreaks: 0,
         shiftId: bob.shiftId,
         currency: null,
+        employerId: null,
         source: "track",
       });
       expect(result?.response).toBe(true);

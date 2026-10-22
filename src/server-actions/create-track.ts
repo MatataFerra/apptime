@@ -2,6 +2,7 @@
 
 import type { Hourly } from "@prisma/client";
 
+import { ownEmployerId } from "@/services/Employer/owned";
 import ShiftService from "@/services/Shift";
 import UserService from "@/services/User";
 
@@ -24,7 +25,14 @@ export default async function onCreateTrackJob(data: Omit<Hourly, "id">) {
 
   if (!parsedBody.success) return null;
 
-  const shiftTransform = new ShiftService({ ...parsedBody.data, shiftId: ownShiftId })
+  const employerId = await ownEmployerId(currentUser.id, parsedBody.data.employerId ?? null);
+  if (employerId === false) return null;
+
+  const shiftTransform = new ShiftService({
+    ...parsedBody.data,
+    employerId: employerId ?? null,
+    shiftId: ownShiftId,
+  })
     .checkPublicHoliday()
     .build<Hourly>();
 

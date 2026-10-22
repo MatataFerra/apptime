@@ -58,17 +58,27 @@ export async function onUpdateEmployer(id: number, input: EmployerInput) {
 }
 
 /**
- * Removes an employer. Shifts can't point at one yet, so it's deleted;
- * once they can, used ones will be archived instead.
+ * Removes an employer. One with shifts is archived instead: it leaves the
+ * list and the pickers, and its shifts keep saying who they were for.
  */
 export async function onRemoveEmployer(id: number) {
   const userId = await sessionUserId();
   if (!userId) return { ok: false as const, error: "Not signed in" };
   if (!IdSchema.safeParse(id).success) return { ok: false as const, error: "Not found" };
 
-  const { count } = await prisma.employer.deleteMany({ where: { id, userId } });
-  if (count === 0) return { ok: false as const, error: "Not found" };
+  const employer = await prisma.employer.findFirst({
+    where: { id, userId, archived: false },
+    select: { _count: { select: { hourly: true, production: true } } },
+  });
+  if (!employer) return { ok: false as const, error: "Not found" };
+
+  const used = employer._count.hourly + employer._count.production > 0;
+  if (used) {
+    await prisma.employer.updateMany({ where: { id, userId }, data: { archived: true } });
+  } else {
+    await prisma.employer.deleteMany({ where: { id, userId } });
+  }
 
   revalidate();
-  return { ok: true as const };
+  return { ok: true as const, archived: used };
 }

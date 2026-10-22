@@ -29,6 +29,7 @@ describe("ShiftService", () => {
       publicHolidayWorked: false,
       shiftId: 1,
       currency: null,
+      employerId: null,
     };
 
     const HOURLY_SHIFT_MOCK: Hourly = {
@@ -45,6 +46,7 @@ describe("ShiftService", () => {
       unpaidBreaks: 0,
       shiftId: 1,
       currency: null,
+      employerId: null,
       source: null,
     };
 
@@ -97,6 +99,7 @@ describe("ShiftService", () => {
         unpaidBreaks: 0,
         shiftId: 1,
         currency: null,
+        employerId: null,
         source: null,
       });
     });
@@ -138,6 +141,7 @@ describe("ShiftService", () => {
         ...shiftMock.shift,
         shiftId: 1,
         currency: null,
+        employerId: null,
         startDate: now.toString(),
         unpaidBreaks: 30,
         endDate: addMinutes(now, DIFFERENCE_SHIFT).toString(),
@@ -158,6 +162,7 @@ describe("ShiftService", () => {
         unpaidBreaks: 60,
         shiftId: 1,
         currency: null,
+        employerId: null,
       };
 
       const shift = new ShiftService({ ...mock }).differenceInMinsBetweenStartAndEnd().build();
@@ -201,6 +206,7 @@ describe("ShiftService", () => {
         ...shiftMock.shift,
         shiftId: 1,
         currency: null,
+        employerId: null,
         source: null,
         startDate: now.toString(),
         endDate: addMinutes(now, 480).toString(),
@@ -226,6 +232,7 @@ describe("ShiftService", () => {
         unpaidBreaks: 30,
         shiftId: 1,
         currency: null,
+        employerId: null,
       };
 
       const shift = new ShiftService({ ...mock })

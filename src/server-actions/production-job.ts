@@ -2,6 +2,7 @@
 
 import type { Production } from "@prisma/client";
 
+import { ownEmployerId } from "@/services/Employer/owned";
 import ShiftService from "@/services/Shift";
 import ProductionService from "@/services/Shift/Production";
 import UserService from "@/services/User";
@@ -21,6 +22,10 @@ export default async function onCreateProductionShift(data: ProductionInputsPars
     return null;
   }
 
+  // Someone else's employer is refused, not silently dropped.
+  const employerId = await ownEmployerId(currentUser.id, data.employerId ?? null);
+  if (employerId === false) return null;
+
   const shift = new ShiftService({
     startDate: data.startDate,
     endDate: data.endDate,
@@ -30,6 +35,7 @@ export default async function onCreateProductionShift(data: ProductionInputsPars
     isPublicHoliday: data.isPublicHoliday,
     publicHolidayWorked: data.publicHolidayWorked,
     currency: data.currency ?? null,
+    employerId: employerId ?? null,
     amount: 0,
     isClosed: true,
     notes: "",

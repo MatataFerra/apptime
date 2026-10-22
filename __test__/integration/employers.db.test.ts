@@ -38,7 +38,11 @@ vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 import { auth } from "@/utils/auth";
 
 import { GET as getEmployers } from "@/app/api/employers/route";
+import onCreateTrackJob from "@/server-actions/create-track";
+import onEditShift from "@/server-actions/edit-shift";
 import { onCreateEmployer, onRemoveEmployer, onUpdateEmployer } from "@/server-actions/employers";
+import onCreateHourlyShift from "@/server-actions/hourly-job";
+import onCreateProductionShift from "@/server-actions/production-job";
 import prisma from "#/prisma/client";
 
 const PASSWORD = "Secreto123!";
@@ -141,7 +145,7 @@ describe("employers on a real database", () => {
     expect(asAna.status).toBe(200);
     expect(asAna.body.employers.map((e: { name: string }) => e.name)).toEqual(["Sunny Farms"]);
     expect(asAna.body.employers[0]).not.toHaveProperty("userId");
-    expect(asAna.body.employers[0]).not.toHaveProperty("archived");
+    expect(asAna.body.employers[0]).toMatchObject({ archived: false, shifts: 0 });
 
     const asBob = await listAs(bob.cookies);
     expect(asBob.body.employers.map((e: { name: string }) => e.name)).toEqual(["Bob's Vineyard"]);
@@ -189,11 +193,150 @@ describe("employers on a real database", () => {
     expect(await prisma.employer.count({ where: { name: "Ghost" } })).toBe(0);
   });
 
+  describe("shifts and employers", () => {
+    let packhouse: number;
+    let bobsEmployer: number;
+
+    function fastShift(employerId: number | null) {
+      return {
+        startDate: new Date("2026-10-20T08:00:00").toString(),
+        endDate: new Date("2026-10-20T16:00:00").toString(),
+        hourValue: 30,
+        name: "Packing",
+        isPublicHoliday: false,
+        isWorked: false,
+        unpaidBreaks: 30,
+        taxes: [],
+        contributions: [],
+        currency: null,
+        employerId,
+      };
+    }
+
+    beforeAll(async () => {
+      env.headers = bob.cookies;
+      const bobs = await onCreateEmployer({ name: "Bob's Orchard" });
+      env.headers = ana.cookies;
+      const ours = await onCreateEmployer({ name: "Packhouse Co", defaultRate: 30 });
+      if (!bobs.ok || !ours.ok) throw new Error("setup");
+      bobsEmployer = bobs.id;
+      packhouse = ours.id;
+    });
+
+    test("a Fast shift saves one of the user's employers", async () => {
+      env.headers = ana.cookies;
+      const result = await onCreateHourlyShift(fastShift(packhouse));
+      expect(result?.response).toBe(true);
+      const id = (result?.createShift as { id: number }).id;
+      expect((await prisma.hourly.findUniqueOrThrow({ where: { id } })).employerId).toBe(packhouse);
+    });
+
+    test("a production and a tracked shift save it too", async () => {
+      env.headers = ana.cookies;
+      const production = await onCreateProductionShift({
+        startDate: new Date("2026-10-21T08:00:00").toString(),
+        endDate: new Date("2026-10-21T12:00:00").toString(),
+        name: "Picking",
+        itemValue: 2,
+        itemQuantity: 50,
+        isPublicHoliday: false,
+        publicHolidayWorked: false,
+        taxes: [],
+        contributions: [],
+        currency: null,
+        employerId: packhouse,
+      });
+      expect(production?.response).toBe(true);
+
+      const track = await onCreateTrackJob({
+        startDate: new Date("2026-10-22T08:00:00").toString(),
+        endDate: null,
+        name: "Packing",
+        amount: 0,
+        notes: "",
+        isClosed: false,
+        isPublicHoliday: false,
+        publicHolidayWorked: false,
+        hourValue: 30,
+        unpaidBreaks: 30,
+        shiftId: null,
+        currency: null,
+        employerId: packhouse,
+        source: "track",
+      });
+      expect(track?.shift?.employerId).toBe(packhouse);
+    });
+
+    test("someone else's employer is refused and nothing is saved", async () => {
+      env.headers = ana.cookies;
+      const before = await prisma.hourly.count();
+      expect(await onCreateHourlyShift(fastShift(bobsEmployer))).toBeNull();
+      expect(
+        await onCreateTrackJob({
+          startDate: new Date("2026-10-23T08:00:00").toString(),
+          endDate: null,
+          name: null,
+          amount: 0,
+          notes: "",
+          isClosed: false,
+          isPublicHoliday: false,
+          publicHolidayWorked: false,
+          hourValue: 30,
+          unpaidBreaks: 0,
+          shiftId: null,
+          currency: null,
+          employerId: bobsEmployer,
+          source: "track",
+        })
+      ).toBeNull();
+      expect(await prisma.hourly.count()).toBe(before);
+    });
+
+    test("editing a shift can clear its employer, but not point it at someone else's", async () => {
+      env.headers = ana.cookies;
+      const shift = await prisma.hourly.findFirstOrThrow({
+        where: { employerId: packhouse, source: "fast" },
+        include: { taxes: true },
+      });
+
+      expect(await onEditShift({ ...shift, employerId: bobsEmployer } as never, [])).toBeNull();
+      expect((await prisma.hourly.findUniqueOrThrow({ where: { id: shift.id } })).employerId).toBe(
+        packhouse
+      );
+
+      expect(await onEditShift({ ...shift, employerId: null } as never, [])).not.toBeNull();
+      expect(
+        (await prisma.hourly.findUniqueOrThrow({ where: { id: shift.id } })).employerId
+      ).toBeNull();
+    });
+
+    test("removing an employer with shifts archives it; its shifts keep it", async () => {
+      env.headers = ana.cookies;
+      expect(await onRemoveEmployer(packhouse)).toMatchObject({ ok: true, archived: true });
+
+      const saved = await prisma.employer.findUniqueOrThrow({ where: { id: packhouse } });
+      expect(saved.archived).toBe(true);
+      expect(await prisma.production.count({ where: { employerId: packhouse } })).toBe(1);
+
+      const listed = (await listAs(ana.cookies)).body.employers.find(
+        (e: { id: number }) => e.id === packhouse
+      );
+      expect(listed).toMatchObject({ archived: true, shifts: 2 });
+
+      // Already removed: a second remove finds nothing.
+      expect(await onRemoveEmployer(packhouse)).toMatchObject({ ok: false });
+    });
+  });
+
   test("removes an employer", async () => {
     env.headers = ana.cookies;
     expect(await onRemoveEmployer(farm)).toMatchObject({ ok: true });
     expect(await prisma.employer.findUnique({ where: { id: farm } })).toBeNull();
-    expect((await listAs(ana.cookies)).body.employers).toEqual([]);
+    // Only the archived one from the shift tests is left.
+    const left = (await listAs(ana.cookies)).body.employers;
+    expect(left.map((e: { name: string; archived: boolean }) => [e.name, e.archived])).toEqual([
+      ["Packhouse Co", true],
+    ]);
   });
 
   test("deleting a user deletes their employers", async () => {
