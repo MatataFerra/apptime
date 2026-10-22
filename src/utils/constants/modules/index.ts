@@ -1,5 +1,6 @@
 import {
   ArrowLeftRight,
+  Building2,
   Calculator,
   ChartColumn,
   type LucideIcon,
@@ -64,6 +65,7 @@ export const MODULES: Record<string, { theme: ModuleTheme; icon: LucideIcon }> =
   [PATH_NAMES.COMPARE]: { theme: "insight", icon: ArrowLeftRight },
   [PATH_NAMES.DASHBOARD]: { theme: "insight", icon: ChartColumn },
   [PATH_NAMES.TAXES]: { theme: "insight", icon: Receipt },
+  [PATH_NAMES.EMPLOYERS]: { theme: "insight", icon: Building2 },
   [PATH_NAMES.SETTINGS]: { theme: "neutral", icon: Settings },
 };
 

@@ -13,6 +13,7 @@ export const PATH_NAMES = {
   COMPARE: "/compare",
   SETTINGS: "/settings",
   TAXES: "/taxes",
+  EMPLOYERS: "/employers",
   RESET_PASSWORD: "/forgot-password",
   RESET_TOKEN: "/reset",
   RESET_SUCCESS: "/success",

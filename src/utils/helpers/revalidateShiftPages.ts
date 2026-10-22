@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 export const SHIFT_PAGES = ["/[locale]/(home)", "/[locale]/(home)/dashboard"] as const;
 export const SETTINGS_PAGE = "/[locale]/(home)/settings";
 export const TAXES_PAGE = "/[locale]/(home)/taxes";
+export const EMPLOYERS_PAGE = "/[locale]/(home)/employers";
 
 /** Pages that show shift data: Home (week, month) and the Dashboard. */
 export function revalidateShiftPages() {

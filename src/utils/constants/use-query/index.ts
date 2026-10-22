@@ -3,4 +3,5 @@ export const USE_QUERY_KEYS = {
   HOURLY: "hourly",
   PRODUCTION: "production",
   SALARY: "salary",
+  EMPLOYERS: "employers",
 } as const;
