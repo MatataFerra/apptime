@@ -20,6 +20,7 @@
     "prisma:seed": "dotenv -e .env.local -- prisma db seed",
     "prisma:studio": "dotenv -e .env.local -- prisma studio --browser none",
     "turso:shell": "bash ./scripts/turso.sh",
+    "turso:migrate-dev": "bash ./scripts/turso-dev.sh",
     "test": "dotenv -e .env.local -- vitest",
     "test:ci": "vitest",
     "test:e2e": "dotenv -e .env.testing -- playwright test",

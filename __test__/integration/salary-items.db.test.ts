@@ -47,10 +47,12 @@ vi.mock("resend", () => ({
   },
 }));
 
+import { getRateTable } from "@/services/ExchangeRates";
 import HourlyService from "@/services/Shift/Hourly";
 
 import { auth } from "@/utils/auth";
 
+import { GET as getRates } from "@/app/api/rates/route";
 import { GET as getSalaryItems } from "@/app/api/salary-items/route";
 import { DELETE as deleteHourly } from "@/app/api/shift/hourly/[id]/route";
 import { GET as getHourly } from "@/app/api/shift/hourly/route";
