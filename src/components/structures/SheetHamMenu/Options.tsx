@@ -12,6 +12,7 @@ const LOG_WORK: DrawerOption[] = [
   { id: "track-time", label: "Track", dataTestId: "track-time", url: "/track" },
   { id: "fast-charge", label: "Fast charge", dataTestId: "fast-charge", url: "/fast-charge" },
   { id: "production-job", label: "Production", dataTestId: "production-job", url: "/production" },
+  { id: "employers", label: "Employers", dataTestId: "employers", url: "/employers" },
 ];
 
 const MONEY: DrawerOption[] = [

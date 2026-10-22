@@ -10,4 +10,5 @@ export const API_ENDPOINTS = {
   TAX: `/api/tax`,
   CONTRIBUTIONS: `/api/contributions`,
   SALARY_ITEMS: `/api/salary-items`,
+  EMPLOYERS: `/api/employers`,
 } as const;
