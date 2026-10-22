@@ -2,6 +2,7 @@
 
 import type { Hourly } from "@prisma/client";
 import isEmpty from "lodash/isEmpty";
+import omit from "lodash/omit";
 
 import ShiftService from "@/services/Shift";
 import HourlyService from "@/services/Shift/Hourly";
@@ -12,6 +13,7 @@ import type { TrackInputs } from "@/types/forms";
 import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
 
 import type { ContributionElement, TaxElement } from "@/store/useTaxOrContributionStore";
+import prisma from "#/prisma/client";
 
 type UpdateTrackData = Partial<TrackInputs> & {
   taxes: TaxElement[];
@@ -25,15 +27,20 @@ export default async function onUpdateTrackJob(data: UpdateTrackData, shiftId: n
     return null;
   }
 
-  if (currentUser.shifts?.id === null) {
-    return null;
-  }
+  const ownShiftId = currentUser.shifts?.id;
+  if (!ownShiftId || !shiftId || isEmpty(data)) return null;
 
-  if (!shiftId) return null;
+  // Only the user's own shift can be closed; someone else's id is "not found".
+  const owned = await prisma.hourly
+    .findFirst({ where: { id: shiftId, shift: { userId: currentUser.id } }, select: { id: true } })
+    .catch(() => null);
+  if (!owned) return null;
 
+  // Which row it is and whose container it's in come from the server, not the client.
   const prepareShift = {
-    ...data,
-    id: data?.id,
+    ...omit(data, ["id", "shiftId", "shift"]),
+    id: owned.id,
+    shiftId: ownShiftId,
     isClosed: true,
   };
   const shift = new ShiftService(prepareShift)
@@ -63,14 +70,12 @@ export default async function onUpdateTrackJob(data: UpdateTrackData, shiftId: n
     });
 
   try {
-    if (isEmpty(data)) return null;
-
     const hourlyService = new HourlyService(shift);
 
     await hourlyService.addContributions(contributionsFromLocal, currentUser.id);
     await hourlyService.addtaxes(taxesFromLocal, currentUser.id);
 
-    const response = await hourlyService.update(data.id!);
+    const response = await hourlyService.update(owned.id);
 
     revalidateShiftPages();
 

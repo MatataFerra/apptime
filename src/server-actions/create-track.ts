@@ -16,16 +16,17 @@ export default async function onCreateTrackJob(data: Omit<Hourly, "id">) {
     return null;
   }
 
-  if (currentUser.shifts?.id === null) {
-    return null;
-  }
+  // The shift goes into the signed-in user's container, whatever the client sent.
+  const ownShiftId = currentUser.shifts?.id;
+  if (!ownShiftId) return null;
 
   const parsedBody = HourlyCreateSchema.safeParse(data);
 
   if (!parsedBody.success) return null;
-  if (!parsedBody?.data?.shiftId) return null;
 
-  const shiftTransform = new ShiftService(parsedBody.data).checkPublicHoliday().build<Hourly>();
+  const shiftTransform = new ShiftService({ ...parsedBody.data, shiftId: ownShiftId })
+    .checkPublicHoliday()
+    .build<Hourly>();
 
   try {
     const shift = await new ShiftService(shiftTransform).create<Hourly>();

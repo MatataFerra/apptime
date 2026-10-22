@@ -9,6 +9,15 @@ import { getRequestSession } from "@/utils/auth/session";
 
 import prisma from "#/prisma/client";
 
+/**
+ * What users may change about themselves. Role, account type, status and
+ * emailVerified are not self-service: a self-verified email would let a
+ * Google sign-in with that address link into this account.
+ */
+function selfServiceFields({ name, image, online, formCompleted }: Partial<User>) {
+  return { name, image, online, formCompleted };
+}
+
 export async function PUT(req: NextRequest, { params }: RouteParams) {
   const { id } = await params;
   const session = await getRequestSession(req);
@@ -55,10 +64,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       where: {
         id: user.id,
       },
-      data: isAdmin
-        ? parsedBody.data
-        : // Role, account type and status are not self-service.
-          { ...parsedBody.data, role: undefined, type_account: undefined, isActive: undefined },
+      data: isAdmin ? parsedBody.data : selfServiceFields(parsedBody.data),
     });
 
     return NextResponse.json(
