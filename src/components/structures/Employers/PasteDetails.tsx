@@ -2,7 +2,12 @@
 
 import { useId, useState } from "react";
 
-import { parseEmployerText, type PastedEmployer, type PasteField } from "@/services/Employer/paste";
+import {
+  parseEmployerText,
+  PASTE_FIELDS,
+  type PastedEmployer,
+  type PasteField,
+} from "@/services/Employer/paste";
 
 import Button from "@/components/ui/Button";
 
@@ -35,7 +40,10 @@ function PasteDetails({
   const [text, setText] = useState("");
   const id = useId();
   const { fields, guessed } = parseEmployerText(text);
-  const found = Object.entries(fields) as [PasteField, string][];
+  // In the form's order, not the order they were found in.
+  const found = PASTE_FIELDS.filter((field) => fields[field]).map(
+    (field) => [field, fields[field] as string] as const
+  );
 
   return (
     <div className="flex flex-col gap-3">
