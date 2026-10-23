@@ -7,7 +7,7 @@
       "esnext"
     ],
     "types": [
-      "@testing-library/jest-dom",
+      "@testing-library/jest-dom/vitest",
       "@testing-library/react",
       "node"
     ],
