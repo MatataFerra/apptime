@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-
 import { SheetClose } from "@/components/ui/Sheet";
 
 import { MODULE_THEMES, MODULES } from "@/utils/constants/modules";
 import { cn } from "@/utils/helpers/styleMerger";
+
+import { Link, usePathname } from "@/i18n/navigation";
 
 type Option = {
   id: string;

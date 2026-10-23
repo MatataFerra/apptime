@@ -3,12 +3,14 @@
 import { useMemo } from "react";
 
 import { format, isSameDay } from "date-fns";
+import { useTranslations } from "next-intl";
 
 import { formatHours, summarizePeriod, summarizeWeek, weekStartsOnIndex } from "@/services/Summary";
 
 import Skeleton from "@/components/ui/Skeleton";
 
 import { cn } from "@/utils/helpers/styleMerger";
+import useDateLocale from "@/hooks/useDateLocale";
 import useMoney from "@/hooks/useMoney";
 import useShiftsInCurrency from "@/hooks/useShiftsInCurrency";
 import useUser from "@/hooks/useUser";
@@ -20,6 +22,8 @@ import useUser from "@/hooks/useUser";
  */
 function WeekSummary() {
   const { data: user } = useUser();
+  const t = useTranslations("home.week");
+  const locale = useDateLocale();
   const {
     allHourly,
     allProduction,
@@ -61,44 +65,45 @@ function WeekSummary() {
 
   return (
     <section
-      aria-label="This week"
+      aria-label={t("title")}
       className="flex flex-col gap-4 rounded-xl bg-surface-inverse px-4.5 pt-4.5 pb-4 text-ink-inverse"
     >
       <div className="flex items-baseline justify-between text-[0.8125rem] text-ink-inverse/70">
-        <span>This week</span>
+        <span>{t("title")}</span>
         <span>
-          {format(week.from, "EEE d")} to {format(week.to, "EEE d")}
+          {t("range", {
+            from: format(week.from, "EEE d", { locale }),
+            to: format(week.to, "EEE d", { locale }),
+          })}
         </span>
       </div>
 
       <dl className="grid grid-cols-3 gap-2">
         <div className="flex flex-col-reverse gap-0.5">
-          <dt className="text-xs text-ink-inverse/70">earned</dt>
+          <dt className="text-xs text-ink-inverse/70">{t("earned")}</dt>
           <dd className="figure text-[1.875rem] leading-none text-live">
             {money(week.earned, { cents: week.earned < 1000 })}
           </dd>
         </div>
         <div className="flex flex-col-reverse gap-0.5">
-          <dt className="text-xs text-ink-inverse/70">worked</dt>
+          <dt className="text-xs text-ink-inverse/70">{t("worked")}</dt>
           <dd className="figure text-[1.875rem] leading-none">{formatHours(worked.minutes)}</dd>
         </div>
         <div className="flex flex-col-reverse gap-0.5">
-          <dt className="text-xs text-ink-inverse/70">
-            {worked.shifts === 1 ? "shift" : "shifts"}
-          </dt>
+          <dt className="text-xs text-ink-inverse/70">{t("shifts", { count: worked.shifts })}</dt>
           <dd className="figure text-[1.875rem] leading-none">{worked.shifts}</dd>
         </div>
       </dl>
 
-      <ol className="grid h-14 grid-cols-7 items-end gap-1.5" aria-label="Earnings per day">
+      <ol className="grid h-14 grid-cols-7 items-end gap-1.5" aria-label={t("per_day")}>
         {week.days.map((day, i) => {
           const total = day.hourly + day.production;
           // Worked, but only in another currency: a neutral bar, not a money one.
           const otherOnly = total === 0 && worked.days[i].hourly + worked.days[i].production > 0;
           const isToday = isSameDay(day.date, today);
           const height = total > 0 ? Math.max(12, Math.round((total / max) * 100)) : 0;
-          const label = `${format(day.date, "EEEE")}: ${
-            total > 0 ? money(total) : otherOnly ? "shifts in another currency" : "no shifts"
+          const label = `${format(day.date, "EEEE", { locale })}: ${
+            total > 0 ? money(total) : otherOnly ? t("other_currency") : t("no_shifts")
           }`;
 
           return (
@@ -145,7 +150,7 @@ function WeekSummary() {
                 )}
                 aria-hidden="true"
               >
-                {format(day.date, "EEEEE")}
+                {format(day.date, "EEEEE", { locale })}
               </span>
             </li>
           );
@@ -153,16 +158,17 @@ function WeekSummary() {
       </ol>
       {convertedFrom.length > 0 ? (
         <p className="text-xs text-ink-inverse/60">
-          Includes shifts in {convertedFrom.join(", ")} converted at each day&apos;s rate.
+          {t("converted", { currencies: convertedFrom.join(", ") })}
         </p>
       ) : null}
       {otherEarnings.length > 0 ? (
         <p className="text-xs text-ink-inverse/70">
-          Earned in {headline}. Also this week:{" "}
-          {otherEarnings
-            .map((other) => `${money(other.earned, { currency: other.code })} (${other.code})`)
-            .join(", ")}
-          .
+          {t("also_earned", {
+            currency: headline,
+            others: otherEarnings
+              .map((other) => `${money(other.earned, { currency: other.code })} (${other.code})`)
+              .join(", "),
+          })}
         </p>
       ) : null}
     </section>

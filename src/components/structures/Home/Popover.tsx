@@ -12,7 +12,7 @@ function PopoverHome() {
     <Popover>
       <PopoverTrigger
         className="flex size-8 items-center justify-center rounded-full text-ink-subtle transition-colors hover:text-ink"
-        aria-label="state shift info"
+        aria-label={t("popover_label")}
       >
         <CircleHelp className="size-4" strokeWidth={1.75} aria-hidden="true" />
       </PopoverTrigger>

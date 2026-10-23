@@ -13,13 +13,13 @@ import { Inputs, SuscribeSchema } from "@/types";
 import Loader from "@/components/ui/Loader";
 
 function Suscribe() {
-  const t = useTranslations("no-mobile");
+  const t = useTranslations("no_mobile");
 
   const mutation = useMutation({
     mutationFn: api.createWaitingList.bind(api),
     onError: (_) => {
       setError("email", {
-        message: "Something went wrong, please try again later.",
+        message: t("subscription.error"),
       });
     },
   });
@@ -68,13 +68,13 @@ function Suscribe() {
           noValidate
         >
           <label htmlFor="waitlist-email" className="sr-only">
-            Email
+            {t("subscription.email_label")}
           </label>
           <input
             id="waitlist-email"
             type="email"
             autoComplete="email"
-            placeholder="username@email.com"
+            placeholder={t("subscription.placeholder")}
             aria-invalid={!!errors.email}
             className="h-12 w-full rounded-xl border border-white/15 bg-white/8 px-4 text-[0.9375rem] text-ink-inverse outline-hidden transition-colors placeholder:text-ink-inverse/45 focus:border-live"
             {...register("email")}
@@ -85,7 +85,7 @@ function Suscribe() {
             className="flex h-12 items-center gap-2 rounded-xl bg-live px-5 text-[0.9375rem] font-semibold text-surface-inverse transition-transform active:scale-95 disabled:opacity-60"
           >
             {mutation.isPending ? <Loader.spinner bg="text-ink/30" spinColor="fill-ink" /> : null}
-            Notify Me
+            {t("subscription.submit")}
           </button>
         </form>
       )}

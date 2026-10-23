@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import Image from "@/components/ui/Image";
 
 function initials(name?: string | null, email?: string | null) {
@@ -12,8 +14,10 @@ type Props = {
 
 /** Who is signed in, at the top of the side menu. Falls back to a plain title. */
 function UserInfo({ user }: Props) {
+  const t = useTranslations("nav");
+
   if (!user) {
-    return <span className="text-[0.9375rem] font-semibold text-ink">Menu</span>;
+    return <span className="text-[0.9375rem] font-semibold text-ink">{t("menu")}</span>;
   }
 
   return (
@@ -30,7 +34,7 @@ function UserInfo({ user }: Props) {
       )}
       <span className="flex min-w-0 flex-col">
         <span className="truncate text-[0.9375rem] font-semibold">
-          {user.name || "Your account"}
+          {user.name || t("your_account")}
         </span>
         <span className="truncate text-[0.8125rem] font-normal text-ink-inverse/70">
           {user.email}

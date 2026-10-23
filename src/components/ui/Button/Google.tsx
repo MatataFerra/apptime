@@ -18,7 +18,7 @@ function GoogleButton({ onGoogleAuth, ...props }: Props) {
     >
       <Img
         src="/assets/google-logo.webp"
-        alt="Google logo"
+        alt=""
         classes="absolute left-0 ml-4"
         width={30}
         height={30}

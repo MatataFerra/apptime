@@ -3,9 +3,8 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 
 import { LoginInputs } from "@/types";
 
@@ -16,6 +15,8 @@ import Loader from "@/components/ui/Loader";
 import { authClient } from "@/utils/auth/client";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 import { safeRedirectPath } from "@/utils/helpers/safeRedirect";
+
+import { Link } from "@/i18n/navigation";
 
 export default function FormLogin() {
   const searchParams = useSearchParams();
@@ -28,8 +29,8 @@ export default function FormLogin() {
     formState: { errors },
   } = useForm<LoginInputs>();
   const [loading, setLoading] = useState(false);
-  const locale = useLocale();
-  const t = useTranslations("login");
+  const t = useTranslations("auth.login");
+  const tf = useTranslations("auth.fields");
 
   function onSubmit({ email, password }: LoginInputs) {
     setLoading(true);
@@ -87,21 +88,23 @@ export default function FormLogin() {
       >
         <section className="flex flex-col gap-6 self-center">
           <header className="flex flex-col gap-1">
-            <h1 className="font-display text-3xl font-semibold tracking-tight text-ink">Log in</h1>
-            <p className="text-sm text-ink-muted">Your hours and pay, right where you left them.</p>
+            <h1 className="font-display text-3xl font-semibold tracking-tight text-ink">
+              {t("title")}
+            </h1>
+            <p className="text-sm text-ink-muted">{t("subtitle")}</p>
           </header>
           <fieldset className="flex flex-col gap-4">
             <Input
               variant="default"
               type="email"
-              label="Email"
+              label={tf("email")}
               basis="basis-0"
               isError={!!errors.password?.message?.trim()}
               {...register("email")}
             />
             <Input
               type="password"
-              label="Password"
+              label={tf("password")}
               basis="basis-0"
               isError={!!errors.password?.message?.trim()}
               description={errors.password?.message}
@@ -111,15 +114,15 @@ export default function FormLogin() {
           <div className="flex items-center justify-between text-sm">
             <Link
               className="font-medium text-accent underline-offset-4 hover:underline"
-              href={`/${locale}${PATH_NAMES.REGISTER}`}
+              href={PATH_NAMES.REGISTER}
             >
-              Register an account
+              {t("register_link")}
             </Link>
             <Link
               className="text-ink-muted underline-offset-4 hover:underline"
-              href={`/${locale}${PATH_NAMES.RESET_PASSWORD}`}
+              href={PATH_NAMES.RESET_PASSWORD}
             >
-              Forgot password?
+              {t("forgot_link")}
             </Link>
           </div>
         </section>

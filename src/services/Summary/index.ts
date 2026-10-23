@@ -195,12 +195,19 @@ export function runningShiftEarnings(
   });
 }
 
+type MoneyFormat = { cents?: boolean; currency?: string; locale?: string };
+
 /**
  * Money in a given ISO 4217 currency. With cents, the currency's own
  * minor units apply (USD 2, JPY 0); `cents: false` rounds to whole units.
+ * `locale` sets the separators and symbol position ("en": $1,234.50,
+ * "es": 1234,50 US$).
  */
-export function formatMoney(value: number, { cents = true, currency = "USD" } = {}) {
-  return new Intl.NumberFormat("en-US", {
+export function formatMoney(
+  value: number,
+  { cents = true, currency = "USD", locale = "en-US" }: MoneyFormat = {}
+) {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
     ...(cents ? {} : { minimumFractionDigits: 0, maximumFractionDigits: 0 }),
@@ -208,8 +215,8 @@ export function formatMoney(value: number, { cents = true, currency = "USD" } = 
 }
 
 /** Short axis labels: $1.4K, €900. */
-export function formatMoneyCompact(value: number, currency = "USD") {
-  return new Intl.NumberFormat("en-US", {
+export function formatMoneyCompact(value: number, currency = "USD", locale = "en-US") {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
     notation: "compact",

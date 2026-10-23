@@ -13,7 +13,7 @@ import { LogoMark } from "@/components/ui/Logo";
 import { MODULE_THEMES, type ModuleTheme } from "@/utils/constants/modules";
 import { cn } from "@/utils/helpers/styleMerger";
 
-const FEATURES: { key: string; theme: ModuleTheme; icon: typeof Timer }[] = [
+const FEATURES: { key: "track" | "pieces" | "pay"; theme: ModuleTheme; icon: typeof Timer }[] = [
   { key: "track", theme: "track", icon: Timer },
   { key: "pieces", theme: "production", icon: Package },
   { key: "pay", theme: "insight", icon: ChartColumn },
@@ -32,7 +32,7 @@ function readOrigin() {
  * so this explains it and hands the link over with a QR code.
  */
 function Compatibility() {
-  const t = useTranslations("no-mobile");
+  const t = useTranslations("no_mobile");
   const url = useSyncExternalStore(subscribeToNothing, readOrigin, () => "");
 
   return (

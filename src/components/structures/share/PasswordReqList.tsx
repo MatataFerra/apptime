@@ -1,9 +1,10 @@
+import { useTranslations } from "next-intl";
+
 import type { PassedErrors } from "@/types";
 
 import Icon from "@/components/ui/Icons";
 
 import { PASSWORD } from "@/utils/constants";
-import { generateRandomID } from "@/utils/helpers/generateRandomID";
 
 interface Props {
   errors: PassedErrors;
@@ -11,14 +12,14 @@ interface Props {
 }
 
 function List({ errors, password }: Props) {
+  const t = useTranslations("auth.password_rules");
+
   return (
     <ul className="flex list-none flex-col gap-1.5 text-sm">
-      {Object.entries(PASSWORD.PASSWORD_REQUIREMENTS).map((reqs) => {
-        const [type, requirement] = reqs as [type: keyof PassedErrors, requirement: string];
-
+      {(Object.keys(PASSWORD.PASSWORD_REQUIREMENTS) as (keyof PassedErrors)[]).map((type) => {
         return (
           <li
-            key={generateRandomID()}
+            key={type}
             className={`flex items-center gap-2 ${
               password?.length > 0
                 ? !errors[type]
@@ -28,7 +29,7 @@ function List({ errors, password }: Props) {
             }`}
           >
             <Icon.check width={15} height={15} fill="currentColor" />
-            {requirement}
+            {t(type)}
           </li>
         );
       })}

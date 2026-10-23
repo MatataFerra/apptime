@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Repeat, Zap } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { repeatableFastCharge } from "@/services/Repeat";
 import ShiftService from "@/services/Shift";
@@ -15,6 +16,7 @@ import { effectiveRate } from "@/components/structures/SalaryItems/TaxPicker";
 import ShiftReviewDialog from "@/components/structures/share/ShiftReviewDialog";
 
 import { invalidateShiftQueries } from "@/utils/helpers/invalidateShiftQueries";
+import useDateLocale from "@/hooks/useDateLocale";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
 import useMoney from "@/hooks/useMoney";
 
@@ -22,16 +24,21 @@ import onCreateHourlyShift from "@/server-actions/hourly-job";
 
 const FORM_ID = "repeat-fast-charge";
 
-function time(date: Date) {
-  return format(date, "h:mm a");
-}
-
 /**
  * "Same as last time?" — logs the last Fast charge again for today, with
  * the same hours, rate, breaks and taxes, after a review.
  */
 function RepeatFastCharge() {
   const format$ = useMoney();
+  const t = useTranslations("home.repeat");
+  const ts = useTranslations("shift");
+  const locale = useDateLocale();
+  function time(date: Date) {
+    return format(date, "p", { locale });
+  }
+  function dateTime(date: Date) {
+    return format(date, "EEE d MMM, p", { locale });
+  }
   // In the shift's own currency.
   function money(value: number) {
     return format$(value, { currency: last?.currency });
@@ -61,7 +68,7 @@ function RepeatFastCharge() {
   const gross = new ShiftService(draft).calculateEarnings();
   const afterTaxes = gross * (1 - effectiveRate(taxes) / 100);
   const minutes = (end.valueOf() - start.valueOf()) / 60000 - (last.unpaidBreaks ?? 0);
-  const lastDay = format(new Date(last.startDate), "EEEE");
+  const lastDay = format(new Date(last.startDate), "EEEE", { locale });
 
   async function onSave(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -88,21 +95,21 @@ function RepeatFastCharge() {
     if (response?.response) {
       Toast({
         type: "success",
-        message: "Shift saved",
-        description: `${last.name || "Your shift"} for today.`,
+        message: ts("saved"),
+        description: t("saved_description", { name: last.name || ts("your_shift") }),
       });
     } else {
       Toast({
         type: "error",
-        message: "Couldn't save the shift",
-        description: "Please try again.",
+        message: ts("save_failed"),
+        description: ts("try_again"),
       });
     }
   }
 
   return (
     <section
-      aria-label="Repeat your last Fast charge"
+      aria-label={t("label")}
       data-testid="repeat-fast-charge"
       className="flex flex-col gap-3 rounded-xl bg-fast-soft p-4 text-fast-ink"
     >
@@ -111,13 +118,19 @@ function RepeatFastCharge() {
           <Zap className="size-5" strokeWidth={2} aria-hidden="true" />
         </span>
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="text-[0.8125rem] font-medium opacity-80">Same as {lastDay}?</span>
+          <span className="text-[0.8125rem] font-medium opacity-80">
+            {t("same_as", { day: lastDay })}
+          </span>
           <span className="truncate text-[0.9375rem] font-semibold">
-            {last.name || "Fast charge"}
+            {last.name || t("fallback_name")}
           </span>
           <span className="truncate text-[0.8125rem] opacity-80">
-            {time(start)} – {time(end)} · {formatHours(Math.max(0, minutes))} at{" "}
-            {money(last.hourValue)}/h
+            {t("summary", {
+              start: time(start),
+              end: time(end),
+              hours: formatHours(Math.max(0, minutes)),
+              rate: money(last.hourValue),
+            })}
           </span>
         </div>
       </div>
@@ -132,13 +145,16 @@ function RepeatFastCharge() {
           gross={gross}
           afterTaxes={afterTaxes}
           taxes={taxes}
-          tags={["Repeated", "Regular day"]}
+          tags={[ts("tags.repeated"), ts("tags.regular_day")]}
           rows={[
-            { label: "Job", value: last.name || "–" },
-            { label: "Start", value: format(start, "EEE d MMM, h:mm a") },
-            { label: "Finish", value: format(end, "EEE d MMM, h:mm a") },
-            { label: "Unpaid breaks", value: `${last.unpaidBreaks ?? 0} min` },
-            { label: "Hourly rate", value: money(last.hourValue) },
+            { label: ts("fields.job"), value: last.name || "–" },
+            { label: ts("fields.start"), value: dateTime(start) },
+            { label: ts("fields.finish"), value: dateTime(end) },
+            {
+              label: ts("fields.unpaid_breaks"),
+              value: ts("minutes", { count: last.unpaidBreaks ?? 0 }),
+            },
+            { label: ts("fields.hourly_rate"), value: money(last.hourValue) },
           ]}
         >
           <button
@@ -147,7 +163,7 @@ function RepeatFastCharge() {
             className="flex h-11 w-full items-center justify-center gap-1.5 rounded-xl bg-fast px-3.5 text-sm font-semibold text-on-module transition-transform active:scale-[0.98] disabled:opacity-60"
           >
             <Repeat className="size-4" aria-hidden="true" />
-            Log it for today
+            {t("log_today")}
           </button>
         </ShiftReviewDialog>
       </form>

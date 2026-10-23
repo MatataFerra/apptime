@@ -1,4 +1,5 @@
 import { LogOut } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import Button from "@/components/ui/Button";
 
@@ -7,6 +8,8 @@ type Props = {
 };
 
 function Logout({ handleLogout }: Props) {
+  const t = useTranslations("nav");
+
   return (
     <Button
       type="button"
@@ -16,7 +19,7 @@ function Logout({ handleLogout }: Props) {
       onClick={handleLogout}
     >
       <LogOut className="size-4.5" aria-hidden="true" />
-      Log out
+      {t("log_out")}
     </Button>
   );
 }

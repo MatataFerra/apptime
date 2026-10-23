@@ -1,20 +1,24 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 import { MODULE_THEMES, MODULES } from "@/utils/constants/modules";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 import { cn } from "@/utils/helpers/styleMerger";
 
+import { Link } from "@/i18n/navigation";
+
 const ITEMS = [
-  { path: PATH_NAMES.TRACK, title: "Track" },
-  { path: PATH_NAMES.FAST_CHARGE, title: "Fast charge" },
-  { path: PATH_NAMES.PRODUCTION, title: "Production" },
-];
+  { path: PATH_NAMES.TRACK, key: "track" },
+  { path: PATH_NAMES.FAST_CHARGE, key: "fast_charge" },
+  { path: PATH_NAMES.PRODUCTION, key: "production" },
+] as const;
 
 /** The three ways to log work, each in its module colour. */
 function Features() {
+  const t = useTranslations("modules");
+
   return (
     <div className="grid w-full grid-cols-3 gap-3">
-      {ITEMS.map(({ path, title }) => {
+      {ITEMS.map(({ path, key }) => {
         const { theme, icon: Icon } = MODULES[path];
         const colors = MODULE_THEMES[theme];
 
@@ -30,7 +34,7 @@ function Features() {
             )}
           >
             <Icon className="size-6" strokeWidth={1.75} aria-hidden="true" />
-            <span className="text-[0.9375rem] font-semibold">{title}</span>
+            <span className="text-[0.9375rem] font-semibold">{t(`${key}.title`)}</span>
           </Link>
         );
       })}

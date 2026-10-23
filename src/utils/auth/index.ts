@@ -6,18 +6,21 @@ import { Resend } from "resend";
 
 import PasswordService from "@/services/Auth/password";
 
+import type { Locale } from "@/types";
+
 import { EmailTemplate } from "@/components/ui/EmailTemplate";
 
-import { SUPPORTED_LOCALES } from "@/utils/constants";
+import { isLocale } from "@/utils/helpers/locale";
 
+import { translatorFor } from "@/i18n/translator";
 import prisma from "#/prisma/client";
 
 /** Locale of the page that asked for the reset, from the redirect it passed. */
-function localeFromResetUrl(url: string) {
+function localeFromResetUrl(url: string): Locale {
   try {
     const callback = new URL(url).searchParams.get("callbackURL") ?? "";
     const locale = callback.split("/").filter(Boolean)[0];
-    return (SUPPORTED_LOCALES as readonly string[]).includes(locale) ? locale : "en";
+    return isLocale(locale) ? locale : "en";
   } catch {
     return "en";
   }
@@ -60,7 +63,8 @@ export const auth = betterAuth({
       const { error } = await resend.emails.send({
         from: `CasualApp Team <resetpassword@${process.env.RESEND_SENDER}>`,
         to: user.email,
-        subject: process.env.RESEND_SUBJECT ?? "Reset your CasualApp password",
+        subject:
+          process.env.RESEND_SUBJECT ?? translatorFor(locale)("email.reset_password.subject"),
         // Links to our own page (/{locale}/reset/{token}), which calls resetPassword.
         react: EmailTemplate({
           firstName: user.name,

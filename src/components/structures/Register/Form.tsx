@@ -4,8 +4,7 @@ import { useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 
 import Toast from "@/services/Toast";
@@ -23,6 +22,8 @@ import { MAX_ATTEMPTS_TO_REGISTER } from "@/utils/constants";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 import usePasswordErrors from "@/hooks/usePasswordErrors";
 
+import { getPathname, useRouter } from "@/i18n/navigation";
+
 const RegisterSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
@@ -35,7 +36,9 @@ type RegisterInputs = {
 
 function RegisterForm() {
   const router = useRouter();
-  const t = useTranslations("register");
+  const t = useTranslations("auth.register");
+  const tf = useTranslations("auth.fields");
+  const locale = useLocale();
 
   const { handleSubmit, register, setFocus, control } = useForm<RegisterInputs>({
     resolver: zodResolver(RegisterSchema),
@@ -92,7 +95,7 @@ function RegisterForm() {
       });
 
       // Full load, so the server renders with the new session.
-      window.location.assign(PATH_NAMES.HOME);
+      window.location.assign(getPathname({ href: PATH_NAMES.HOME, locale }));
     },
 
     onSettled() {
@@ -113,7 +116,7 @@ function RegisterForm() {
       // Block the button
       updateButtonBloqued();
       return Toast({
-        message: t("max_attemps_to_register"),
+        message: t("max_attempts"),
         type: "error",
         duration: 2000,
       });
@@ -141,13 +144,13 @@ function RegisterForm() {
       >
         <header className="flex flex-col gap-1">
           <h1 className="font-display text-3xl font-semibold tracking-tight text-ink">
-            Create your account
+            {t("title")}
           </h1>
-          <p className="text-sm text-ink-muted">Start logging shifts in under a minute.</p>
+          <p className="text-sm text-ink-muted">{t("subtitle")}</p>
         </header>
         <Stack spacing={4} orientation="vertical">
-          <Input basis="basis-0" type="email" label="Email" {...register("email")} />
-          <Input basis="basis-0" type="password" label="Password" {...register("password")} />
+          <Input basis="basis-0" type="email" label={tf("email")} {...register("email")} />
+          <Input basis="basis-0" type="password" label={tf("password")} {...register("password")} />
         </Stack>
         <List errors={passedErrors} password={passwordWatched} />
       </Form>
