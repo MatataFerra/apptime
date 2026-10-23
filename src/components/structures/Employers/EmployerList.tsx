@@ -41,7 +41,7 @@ function Details({ employer }: { employer: SavedEmployer }) {
       "Address",
       [
         employer.address,
-        [employer.postcode, employer.city].filter(Boolean).join(" "),
+        [employer.city, employer.region, employer.postcode].filter(Boolean).join(" "),
         employer.country,
       ]
         .filter(Boolean)

@@ -2,13 +2,19 @@
 
 import { type ReactNode, useId, useState } from "react";
 
+import { ClipboardPaste, Search } from "lucide-react";
+
+import type { PastedEmployer, PasteField } from "@/services/Employer/paste";
 import { type EmployerData, EmployerInputSchema, fieldErrors } from "@/services/Employer/schema";
 
 import type { SavedEmployer } from "@/types";
 
+import AbnLookup from "@/components/structures/Employers/AbnLookup";
+import PasteDetails from "@/components/structures/Employers/PasteDetails";
 import Button from "@/components/ui/Button";
 
 import { CURRENCIES, currencySymbol } from "@/utils/constants/currencies";
+import { cn } from "@/utils/helpers/styleMerger";
 import { useCurrency } from "@/hooks/useMoney";
 
 type Errors = Partial<Record<keyof EmployerData, string>>;
@@ -22,6 +28,7 @@ const TEXT_FIELDS = [
   "industry",
   "address",
   "city",
+  "region",
   "postcode",
   "country",
   "contactName",
@@ -45,6 +52,38 @@ function Group({ title, children }: { title: string; children: ReactNode }) {
       <legend className="mb-1 text-[0.8125rem] font-semibold text-ink-muted">{title}</legend>
       {children}
     </fieldset>
+  );
+}
+
+type Helper = "abn" | "paste" | null;
+
+/** One of the two ways to fill the form faster. */
+function HelperTab({
+  active,
+  icon,
+  children,
+  onClick,
+}: {
+  active: boolean;
+  icon: ReactNode;
+  children: ReactNode;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onClick}
+      className={cn(
+        "flex h-10 items-center justify-center gap-2 rounded-xl border text-[0.8125rem] font-semibold transition-colors",
+        active
+          ? "border-accent bg-accent-soft text-accent"
+          : "border-border-strong text-ink-muted hover:bg-surface-sunken hover:text-ink"
+      )}
+    >
+      {icon}
+      {children}
+    </button>
   );
 }
 
@@ -73,8 +112,26 @@ function EmployerForm({
   );
   const [currency, setCurrency] = useState(employer?.defaultCurrency ?? "");
   const [errors, setErrors] = useState<Errors>({});
+  const [helper, setHelper] = useState<Helper>(null);
+  // Filled in by a helper and not edited since: highlighted until checked.
+  const [filled, setFilled] = useState<Set<TextField>>(new Set());
+  const [guessed, setGuessed] = useState<Set<TextField>>(new Set());
   const baseId = useId();
   const shown = { ...serverErrors, ...errors };
+
+  function fill(values: PastedEmployer, guesses: PasteField[] = []) {
+    const entries = Object.entries(values).filter(([, v]) => v?.trim()) as [TextField, string][];
+    setText((current) => ({ ...current, ...Object.fromEntries(entries) }));
+    setFilled(new Set(entries.map(([field]) => field)));
+    setGuessed(new Set(guesses));
+    setHelper(null);
+  }
+
+  function edited(name: TextField) {
+    if (!filled.has(name)) return;
+    setFilled((current) => new Set([...current].filter((f) => f !== name)));
+    setGuessed((current) => new Set([...current].filter((f) => f !== name)));
+  }
 
   function field(
     name: TextField,
@@ -83,9 +140,12 @@ function EmployerForm({
   ) {
     const id = `${baseId}-${name}`;
     const error = shown[name];
+    const guess = guessed.has(name) && !error;
+    // Hint and error sit outside the label so they don't become the field's name.
+    const describedBy = error ? `${id}-error` : guess ? `${id}-hint` : undefined;
     return (
-      <label htmlFor={id} className="flex flex-col gap-1 text-[0.8125rem] text-ink-muted">
-        {label}
+      <div className="flex flex-col gap-1 text-[0.8125rem] text-ink-muted">
+        <label htmlFor={id}>{label}</label>
         <input
           id={id}
           name={name}
@@ -93,16 +153,24 @@ function EmployerForm({
           inputMode={props.inputMode}
           value={text[name]}
           aria-invalid={error ? true : undefined}
-          aria-describedby={error ? `${id}-error` : undefined}
-          onChange={(e) => setText((current) => ({ ...current, [name]: e.target.value }))}
-          className={FIELD}
+          aria-describedby={describedBy}
+          onChange={(e) => {
+            setText((current) => ({ ...current, [name]: e.target.value }));
+            edited(name);
+          }}
+          className={cn(FIELD, filled.has(name) && "border-accent bg-accent-soft/40")}
         />
+        {guess ? (
+          <span id={`${id}-hint`} className="text-[0.75rem] text-ink-muted">
+            Guessed from the text: check it
+          </span>
+        ) : null}
         {error ? (
           <span id={`${id}-error`} className="text-[0.8125rem] text-destructive">
             {error}
           </span>
         ) : null}
-      </label>
+      </div>
     );
   }
 
@@ -129,6 +197,53 @@ function EmployerForm({
         onSave(parsed.data);
       }}
     >
+      <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-2 gap-2">
+          <HelperTab
+            active={helper === "abn"}
+            icon={<Search className="size-4" aria-hidden="true" />}
+            onClick={() => setHelper((h) => (h === "abn" ? null : "abn"))}
+          >
+            Look up ABN
+          </HelperTab>
+          <HelperTab
+            active={helper === "paste"}
+            icon={<ClipboardPaste className="size-4" aria-hidden="true" />}
+            onClick={() => setHelper((h) => (h === "paste" ? null : "paste"))}
+          >
+            Paste details
+          </HelperTab>
+        </div>
+
+        {helper === "abn" ? (
+          <AbnLookup
+            onUse={(values, legalName) => {
+              fill(values);
+              // Forms sometimes ask for the legal name: keep it in the notes.
+              if (legalName !== values.name) {
+                setText((current) =>
+                  current.notes.includes(legalName)
+                    ? current
+                    : {
+                        ...current,
+                        notes: [current.notes.trim(), `Legal name: ${legalName}`]
+                          .filter(Boolean)
+                          .join("\n"),
+                      }
+                );
+              }
+            }}
+          />
+        ) : null}
+        {helper === "paste" ? <PasteDetails current={text} onFill={fill} /> : null}
+
+        {filled.size > 0 && !helper ? (
+          <p className="rounded-xl bg-accent-soft/40 px-3 py-2 text-[0.8125rem] text-ink">
+            The highlighted fields were filled in for you. Check them before saving.
+          </p>
+        ) : null}
+      </div>
+
       <Group title="Business">
         {field("name", "Name")}
         <div className="grid grid-cols-2 gap-2">
@@ -143,7 +258,10 @@ function EmployerForm({
           {field("city", "City or town")}
           {field("postcode", "Postcode")}
         </div>
-        {field("country", "Country")}
+        <div className="grid grid-cols-2 gap-2">
+          {field("region", "State or region")}
+          {field("country", "Country")}
+        </div>
       </Group>
 
       <Group title="Contact">

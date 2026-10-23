@@ -86,6 +86,7 @@ export type SavedEmployer = {
   taxId: string | null;
   address: string | null;
   city: string | null;
+  region: string | null;
   postcode: string | null;
   country: string | null;
   industry: string | null;

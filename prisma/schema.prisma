@@ -138,6 +138,8 @@ model Employer {
   taxId           String?
   address         String?
   city            String?
+  /// State, province or Bundesland: QLD, Buenos Aires, Bayern…
+  region          String?
   postcode        String?
   country         String?
   industry        String?

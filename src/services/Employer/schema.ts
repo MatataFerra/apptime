@@ -22,6 +22,7 @@ export const EmployerInputSchema = z
     taxId: optional(40),
     address: optional(160),
     city: optional(80),
+    region: optional(80),
     postcode: optional(20),
     country: optional(80),
     industry: optional(80),
