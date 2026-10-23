@@ -156,6 +156,33 @@ describe("employers on a real database", () => {
     expect(status).toBe(401);
   });
 
+  test("a lookup's source is saved, and an edit without a new lookup keeps it", async () => {
+    env.headers = ana.cookies;
+    const at = new Date(Date.now() - 60_000).toISOString();
+    const created = await onCreateEmployer({
+      name: "Kiwi Orchards",
+      country: "New Zealand",
+      source: { registry: "nzbn", at },
+    });
+    if (!created.ok) throw new Error("create");
+
+    const saved = await prisma.employer.findUniqueOrThrow({ where: { id: created.id } });
+    expect(saved).toMatchObject({ sourceRegistry: "nzbn", sourcedAt: new Date(at) });
+
+    expect((await onUpdateEmployer(created.id, { name: "Kiwi Orchards Ltd" })).ok).toBe(true);
+    expect(await prisma.employer.findUniqueOrThrow({ where: { id: created.id } })).toMatchObject({
+      name: "Kiwi Orchards Ltd",
+      sourceRegistry: "nzbn",
+    });
+
+    const listed = (await listAs(ana.cookies)).body.employers.find(
+      (e: { id: number }) => e.id === created.id
+    );
+    expect(listed).toMatchObject({ sourceRegistry: "nzbn", sourcedAt: new Date(at).toISOString() });
+
+    await onRemoveEmployer(created.id);
+  });
+
   test("updates an employer and clears the fields left empty", async () => {
     env.headers = ana.cookies;
     const result = await onUpdateEmployer(farm, {

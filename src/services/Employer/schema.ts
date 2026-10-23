@@ -45,17 +45,39 @@ export const EmployerInputSchema = z
       .transform((value) => value || null)
       .refine((value) => value === null || isCurrency(value), "Pick a currency"),
     notes: optional(500),
+    /**
+     * Set by a register lookup, not typed: which register and when. Left out
+     * on edit, the saved one stays; it can't be cleared from the form.
+     */
+    source: z
+      .object({
+        registry: z.enum(["abr", "nzbn", "vies"]),
+        // A lookup made in this form: not in the future, not days old.
+        at: z
+          .string()
+          .datetime()
+          .refine((value) => {
+            const age = Date.now() - new Date(value).getTime();
+            return age > -5 * 60_000 && age < 24 * 60 * 60_000;
+          }, "Search again"),
+      })
+      .strict()
+      .optional(),
   })
-  .strict();
+  .strict()
+  .transform(({ source, ...employer }) => ({
+    ...employer,
+    ...(source && { sourceRegistry: source.registry, sourcedAt: new Date(source.at) }),
+  }));
 
 export type EmployerInput = z.input<typeof EmployerInputSchema>;
 export type EmployerData = z.output<typeof EmployerInputSchema>;
 
 /** First error per field, for the form. */
 export function fieldErrors(error: z.ZodError) {
-  const errors: Partial<Record<keyof EmployerData, string>> = {};
+  const errors: Partial<Record<keyof EmployerInput, string>> = {};
   for (const issue of error.issues) {
-    const field = issue.path[0] as keyof EmployerData | undefined;
+    const field = issue.path[0] as keyof EmployerInput | undefined;
     if (field && !errors[field]) errors[field] = issue.message;
   }
   return errors;

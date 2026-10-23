@@ -61,4 +61,28 @@ describe("EmployerInputSchema", () => {
       EmployerInputSchema.safeParse({ name: "Sunny Farms", userId: "someone-else" }).success
     ).toBe(false);
   });
+
+  test("a register lookup is saved as which register and when", () => {
+    const at = new Date(Date.now() - 60_000).toISOString();
+    const parsed = EmployerInputSchema.parse({ name: "Kiwi", source: { registry: "nzbn", at } });
+    expect(parsed).toMatchObject({ sourceRegistry: "nzbn", sourcedAt: new Date(at) });
+    expect(parsed).not.toHaveProperty("source");
+
+    // Left out (an edit without a new lookup): nothing to overwrite.
+    expect(EmployerInputSchema.parse({ name: "Kiwi" })).not.toHaveProperty("sourceRegistry");
+  });
+
+  test("the source can't be made up: unknown register, future or old dates, extra keys", () => {
+    const now = Date.now();
+    const bad = [
+      { registry: "acme", at: new Date(now).toISOString() },
+      { registry: "nzbn", at: new Date(now + 60 * 60_000).toISOString() },
+      { registry: "nzbn", at: new Date(now - 3 * 24 * 60 * 60_000).toISOString() },
+      { registry: "nzbn", at: "yesterday" },
+      { registry: "nzbn", at: new Date(now).toISOString(), text: "Data sourced from me" },
+    ];
+    for (const source of bad) {
+      expect(EmployerInputSchema.safeParse({ name: "Kiwi", source }).success).toBe(false);
+    }
+  });
 });

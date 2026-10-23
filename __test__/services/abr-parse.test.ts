@@ -5,9 +5,9 @@ import {
   isValidAbn,
   parseAbnDetails,
   parseMatchingNames,
-  tidyName,
   unwrapJsonp,
-} from "@/services/Abr/parse";
+} from "@/services/Registry/abr/parse";
+import { tidyName } from "@/services/Registry/text";
 
 describe("ABN checksum", () => {
   test("accepts valid ABNs with or without spaces", () => {
@@ -145,5 +145,8 @@ describe("tidyName", () => {
     );
     expect(tidyName("O'BRIEN NSW ORCHARDS")).toBe("O'brien NSW Orchards");
     expect(tidyName("McDonald Farms")).toBe("McDonald Farms");
+    expect(tidyName("VIGNOBLES DU SUD SARL")).toBe("Vignobles du Sud SARL");
+    expect(tidyName("BÄCKEREI MÜLLER GMBH & CO. KG")).toBe("Bäckerei Müller GmbH & Co. KG");
+    expect(tidyName("DE LA HUERTA S.L.")).toBe("De la Huerta S.L.");
   });
 });

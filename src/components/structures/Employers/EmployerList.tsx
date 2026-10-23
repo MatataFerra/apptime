@@ -5,7 +5,8 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
 
-import type { EmployerData } from "@/services/Employer/schema";
+import type { EmployerInput } from "@/services/Employer/schema";
+import { attribution, isRegistryId } from "@/services/Registry/registries";
 import Toast from "@/services/Toast";
 
 import type { SavedEmployer } from "@/types";
@@ -22,7 +23,7 @@ import useMoney from "@/hooks/useMoney";
 
 import { onCreateEmployer, onRemoveEmployer, onUpdateEmployer } from "@/server-actions/employers";
 
-type FieldErrors = Partial<Record<keyof EmployerData, string>>;
+type FieldErrors = Partial<Record<keyof EmployerInput, string>>;
 
 /** "Farming · Bundaberg, Australia · 12 shifts" */
 function summary(employer: SavedEmployer) {
@@ -59,6 +60,10 @@ function Details({ employer }: { employer: SavedEmployer }) {
     ["Notes", employer.notes],
   ];
   const filled = rows.filter((row): row is [string, string] => !!row[1]);
+  const source =
+    employer.sourceRegistry && employer.sourcedAt && isRegistryId(employer.sourceRegistry)
+      ? attribution(employer.sourceRegistry, employer.sourcedAt)
+      : null;
 
   if (filled.length === 0) {
     return (
@@ -69,14 +74,17 @@ function Details({ employer }: { employer: SavedEmployer }) {
   }
 
   return (
-    <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 px-4 pb-4 text-[0.8125rem]">
-      {filled.map(([label, value]) => (
-        <div key={label} className="contents">
-          <dt className="text-ink-muted">{label}</dt>
-          <dd className="min-w-0 break-words text-ink">{value}</dd>
-        </div>
-      ))}
-    </dl>
+    <div className="flex flex-col gap-3 px-4 pb-4">
+      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-[0.8125rem]">
+        {filled.map(([label, value]) => (
+          <div key={label} className="contents">
+            <dt className="text-ink-muted">{label}</dt>
+            <dd className="min-w-0 break-words text-ink">{value}</dd>
+          </div>
+        ))}
+      </dl>
+      {source ? <p className="text-[0.75rem] text-ink-subtle">{source}</p> : null}
+    </div>
   );
 }
 
@@ -94,7 +102,7 @@ function EmployerRow({
   const meta = summary(employer);
   const detailsId = `employer-${employer.id}-details`;
 
-  async function save(data: EmployerData) {
+  async function save(data: EmployerInput) {
     setBusy(true);
     const result = await onUpdateEmployer(employer.id, data).catch(() => null);
     setBusy(false);
@@ -230,7 +238,7 @@ function EmployerList() {
     await queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.EMPLOYERS] });
   }
 
-  async function create(data: EmployerData) {
+  async function create(data: EmployerInput) {
     setBusy(true);
     const result = await onCreateEmployer(data).catch(() => null);
     setBusy(false);

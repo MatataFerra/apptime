@@ -96,6 +96,9 @@ export type SavedEmployer = {
   defaultRate: number | null;
   defaultCurrency: string | null;
   notes: string | null;
+  /** Register the details came from and when ("Data sourced from the …"). */
+  sourceRegistry: string | null;
+  sourcedAt: string | null;
   /** Removed by the user but still named on old shifts. */
   archived: boolean;
   /** Shifts logged for it (hourly + production). */

@@ -151,6 +151,10 @@ model Employer {
   /// ISO 4217 code. Null: the user's default currency (Config.currency).
   defaultCurrency String?
   notes           String?
+  /// Register the details came from ("abr", "nzbn", "vies") and when it was
+  /// searched: shown as "Data sourced from the …" (MBIE requires it for NZBN).
+  sourceRegistry  String?
+  sourcedAt       DateTime?
   /// Hidden from the list and pickers; kept for the shifts that use it.
   archived        Boolean      @default(false)
   createdAt       DateTime     @default(now())

@@ -2,14 +2,18 @@
 
 import { type ReactNode, useId, useState } from "react";
 
-import { ClipboardPaste, Search } from "lucide-react";
+import { ClipboardPaste, Database, Search } from "lucide-react";
 
+import { currencyForCountry } from "@/services/Employer/currency";
 import type { PastedEmployer, PasteField } from "@/services/Employer/paste";
-import { type EmployerData, EmployerInputSchema, fieldErrors } from "@/services/Employer/schema";
+import { type EmployerInput, EmployerInputSchema, fieldErrors } from "@/services/Employer/schema";
+import { attribution, defaultRegistry, isRegistryId } from "@/services/Registry/registries";
 
 import type { SavedEmployer } from "@/types";
 
-import AbnLookup from "@/components/structures/Employers/AbnLookup";
+import BusinessLookup, {
+  type BusinessSource,
+} from "@/components/structures/Employers/BusinessLookup";
 import PasteDetails from "@/components/structures/Employers/PasteDetails";
 import Button from "@/components/ui/Button";
 
@@ -17,7 +21,7 @@ import { CURRENCIES, currencySymbol } from "@/utils/constants/currencies";
 import { cn } from "@/utils/helpers/styleMerger";
 import { useCurrency } from "@/hooks/useMoney";
 
-type Errors = Partial<Record<keyof EmployerData, string>>;
+type Errors = Partial<Record<keyof EmployerInput, string>>;
 
 const FIELD =
   "h-11 w-full rounded-xl border border-border-strong bg-surface px-3 text-[0.9375rem] text-ink outline-hidden focus:border-accent aria-invalid:border-destructive";
@@ -55,7 +59,7 @@ function Group({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-type Helper = "abn" | "paste" | null;
+type Helper = "lookup" | "paste" | null;
 
 /** One of the two ways to fill the form faster. */
 function HelperTab({
@@ -103,7 +107,7 @@ function EmployerForm({
   /** Field errors the server sent back. */
   serverErrors?: Errors;
   onCancel: () => void;
-  onSave: (data: EmployerData) => void;
+  onSave: (data: EmployerInput) => void;
 }) {
   const settingsCurrency = useCurrency();
   const [text, setText] = useState(() => initialText(employer));
@@ -116,6 +120,14 @@ function EmployerForm({
   // Filled in by a helper and not edited since: highlighted until checked.
   const [filled, setFilled] = useState<Set<TextField>>(new Set());
   const [guessed, setGuessed] = useState<Set<TextField>>(new Set());
+  const [currencyFilled, setCurrencyFilled] = useState(false);
+  // A lookup made in this form; until then, the one saved with the employer.
+  const [source, setSource] = useState<BusinessSource | null>(null);
+  const shownSource =
+    source ??
+    (employer?.sourceRegistry && employer.sourcedAt && isRegistryId(employer.sourceRegistry)
+      ? { registry: employer.sourceRegistry, at: employer.sourcedAt }
+      : null);
   const baseId = useId();
   const shown = { ...serverErrors, ...errors };
 
@@ -124,6 +136,10 @@ function EmployerForm({
     setText((current) => ({ ...current, ...Object.fromEntries(entries) }));
     setFilled(new Set(entries.map(([field]) => field)));
     setGuessed(new Set(guesses));
+    // An employer in New Zealand pays in NZD, one in Germany in EUR…
+    const paidIn = currencyForCountry(values.country);
+    if (paidIn) setCurrency(paidIn);
+    setCurrencyFilled(!!paidIn);
     setHelper(null);
   }
 
@@ -184,27 +200,31 @@ function EmployerForm({
       noValidate
       onSubmit={(e) => {
         e.preventDefault();
-        const parsed = EmployerInputSchema.safeParse({
+        const input: EmployerInput = {
           ...text,
           defaultRate: rate.trim() === "" ? null : Number(rate),
           defaultCurrency: currency || null,
-        });
+          // Only a new lookup is sent; the saved source stays as it is.
+          ...(source && { source }),
+        };
+        const parsed = EmployerInputSchema.safeParse(input);
         if (!parsed.success) {
           setErrors(fieldErrors(parsed.error));
           return;
         }
         setErrors({});
-        onSave(parsed.data);
+        // The input, not the parsed output: the server checks it again.
+        onSave(input);
       }}
     >
       <div className="flex flex-col gap-3">
         <div className="grid grid-cols-2 gap-2">
           <HelperTab
-            active={helper === "abn"}
+            active={helper === "lookup"}
             icon={<Search className="size-4" aria-hidden="true" />}
-            onClick={() => setHelper((h) => (h === "abn" ? null : "abn"))}
+            onClick={() => setHelper((h) => (h === "lookup" ? null : "lookup"))}
           >
-            Look up ABN
+            Look up business
           </HelperTab>
           <HelperTab
             active={helper === "paste"}
@@ -215,12 +235,15 @@ function EmployerForm({
           </HelperTab>
         </div>
 
-        {helper === "abn" ? (
-          <AbnLookup
-            onUse={(values, legalName) => {
+        {helper === "lookup" ? (
+          <BusinessLookup
+            // Starts on the register that fits the country typed, else the currency.
+            initial={defaultRegistry(text.country, currency || settingsCurrency)}
+            onUse={(values, legalName, from) => {
               fill(values);
+              setSource(from);
               // Forms sometimes ask for the legal name: keep it in the notes.
-              if (legalName !== values.name) {
+              if (legalName && legalName !== values.name) {
                 setText((current) =>
                   current.notes.includes(legalName)
                     ? current
@@ -237,7 +260,17 @@ function EmployerForm({
         ) : null}
         {helper === "paste" ? <PasteDetails current={text} onFill={fill} /> : null}
 
-        {filled.size > 0 && !helper ? (
+        {shownSource ? (
+          <p
+            data-testid="employer-source"
+            className="flex items-start gap-2 rounded-xl border border-border px-3 py-2 text-[0.75rem] text-ink-muted"
+          >
+            <Database className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
+            {attribution(shownSource.registry, shownSource.at)}
+          </p>
+        ) : null}
+
+        {(filled.size > 0 || currencyFilled) && !helper ? (
           <p className="rounded-xl bg-accent-soft/40 px-3 py-2 text-[0.8125rem] text-ink">
             The highlighted fields were filled in for you. Check them before saving.
           </p>
@@ -304,8 +337,11 @@ function EmployerForm({
             <select
               id={currencyId}
               value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
-              className={FIELD}
+              onChange={(e) => {
+                setCurrency(e.target.value);
+                setCurrencyFilled(false);
+              }}
+              className={cn(FIELD, currencyFilled && "border-accent bg-accent-soft/40")}
             >
               <option value="">{settingsCurrency} (Settings)</option>
               {CURRENCIES.map((c) => (
