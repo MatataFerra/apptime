@@ -1,973 +1,1534 @@
 {
-  "definition": {
-    "openapi": "3.0.0",
-    "info": {
-      "title": "App Time API",
-      "version": "1.0",
-      "description": "Api for manage data in the app time "
+  "openapi": "3.0.3",
+  "info": {
+    "title": "CasualApp API",
+    "version": "2.0.0",
+    "description": "REST endpoints of CasualApp (app-time). Mutations (creating and editing shifts, employers, taxes, settings) go through Next.js server actions and are not part of this API.\n\nEvery endpoint except `POST /waiting-list` needs a signed-in session: the Better Auth session cookie set by `/api/auth/*`. Without it they answer 401. Data is always scoped to the signed-in user."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Local"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Handled by Better Auth"
     },
-    "paths": {
-      "/user": {
-        "get": {
-          "summary": "Returns a list of users",
-          "description": "This resource represents a list of users in the system. Each user is identified by a numeric `id`.",
-          "tags": [
-            "User"
-          ],
-          "parameters": [
-            {
-              "name": "profile",
-              "in": "query",
-              "required": false,
-              "description": "boolean to add profile info",
-              "schema": {
-                "type": "boolean",
-                "example": false,
-                "default": false
-              }
-            },
-            {
-              "name": "shifts",
-              "in": "query",
-              "required": false,
-              "description": "boolean to add shifts info",
-              "schema": {
-                "type": "boolean",
-                "example": false,
-                "default": false
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "A JSON array of user info with their shifts",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "$ref": "#/components/schemas/UserSuccessResponse"
-                  }
-                }
-              }
-            },
-            "400": {
-              "summary": "User not found",
-              "description": "Returns a 400 error if the user is not found",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            },
-            "500": {
-              "summary": "Internal server error",
-              "description": "Returns a 500 error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "post": {
-          "requestBody": {
+    {
+      "name": "User"
+    },
+    {
+      "name": "Shifts"
+    },
+    {
+      "name": "Employers"
+    },
+    {
+      "name": "Salary items"
+    },
+    {
+      "name": "Exchange rates"
+    },
+    {
+      "name": "Waiting list"
+    }
+  ],
+  "security": [
+    {
+      "sessionCookie": []
+    }
+  ],
+  "paths": {
+    "/auth/{path}": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Better Auth endpoints",
+        "security": [],
+        "description": "Catch-all handler for Better Auth (`toNextJsHandler`): email/password sign-in and sign-up, Google OAuth and callback, sign-out, session, password reset. See https://www.better-auth.com/docs/concepts/api for each route. Rate limited per IP and endpoint (stored in the database).",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "path",
             "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          },
-          "summary": "Create one user by ID and return the created user",
-          "description": "Send a JSON with the properties you want to create",
-          "tags": [
-            "User"
-          ],
-          "responses": {
-            "200": {
-              "description": "Success operation",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "$ref": "#/components/schemas/UserSuccessResponse"
-                  }
-                }
-              }
+            "schema": {
+              "type": "string"
             },
-            "400": {
-              "summary": "One field must be provided",
-              "description": "Returns a 400 error if the user doesn't provide a valid Body",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            }
+            "example": "get-session"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Depends on the Better Auth endpoint"
+          },
+          "429": {
+            "description": "Rate limited"
           }
         }
       },
-      "/user/{id}": {
-        "get": {
-          "summary": "Returns one user by ID",
-          "description": "The user is identified by a numeric `ID`.",
-          "tags": [
-            "User"
-          ],
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "description": "ID of user",
-              "schema": {
-                "type": "integer",
-                "minimum": 1,
-                "example": 5
-              }
-            },
-            {
-              "name": "profile",
-              "in": "query",
-              "required": false,
-              "description": "boolean to add profile info",
-              "schema": {
-                "type": "boolean",
-                "example": false,
-                "default": false
-              }
-            },
-            {
-              "name": "shifts",
-              "in": "query",
-              "required": false,
-              "description": "boolean to add shifts info",
-              "schema": {
-                "type": "boolean",
-                "example": false,
-                "default": false
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "A JSON object of user info with their shifts",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "$ref": "#/components/schemas/UserSuccessResponse"
-                  }
-                }
-              }
-            },
-            "400": {
-              "summary": "User not found",
-              "description": "Returns a 400 error if the user is not found",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            },
-            "500": {
-              "summary": "Internal server error",
-              "description": "Returns a 500 error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "put": {
-          "requestBody": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Better Auth endpoints",
+        "security": [],
+        "description": "See GET. For example `sign-in/email`, `sign-up/email`, `sign-in/social`, `sign-out`, `request-password-reset`, `reset-password`.",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "path",
             "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
+            "schema": {
+              "type": "string"
+            },
+            "example": "sign-in/email"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Depends on the Better Auth endpoint"
           },
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "description": "ID of user",
-              "schema": {
-                "type": "integer",
-                "minimum": 1,
-                "example": 5
-              }
-            }
-          ],
-          "summary": "Update one user by ID and return the updated user",
-          "description": "Send a JSON object with the properties you want to update, and the server will update the user and return the updated user.",
-          "tags": [
-            "User"
-          ],
-          "responses": {
-            "200": {
-              "description": "an updated user",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "$ref": "#/components/schemas/UserSuccessResponse"
-                  }
-                }
-              }
-            },
-            "400": {
-              "summary": "One field must be provided",
-              "description": "Returns a 400 error if the user doesn't provide a valid Body",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/shift": {
-        "get": {
-          "summary": "Returns a list of shifts for one user by ID",
-          "description": "Each user by `id` has a list of shifts.",
-          "tags": [
-            "Shift"
-          ],
-          "parameters": [
-            {
-              "name": "userId",
-              "in": "query",
-              "required": false,
-              "description": "numeric ID of user",
-              "schema": {
-                "type": "integer",
-                "example": 12
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "A JSON array of shift info about the user",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "$ref": "#/components/schemas/ShiftSuccessResponse"
-                  }
-                }
-              }
-            },
-            "400": {
-              "summary": "No shift founded for that user",
-              "description": "Returns a 400 error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            },
-            "500": {
-              "summary": "Internal server error",
-              "description": "Returns a 500 error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "post": {
-          "summary": "Returns a list of shifts for one user by ID",
-          "description": "Each user by `id` has a list of shifts.",
-          "tags": [
-            "Shift"
-          ],
-          "parameters": [
-            {
-              "name": "userId",
-              "in": "query",
-              "required": false,
-              "description": "numeric ID of user",
-              "schema": {
-                "type": "integer",
-                "example": 12
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Shift has been created and its info is returned",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "$ref": "#/components/schemas/ShiftSuccessCreatedResponse"
-                  }
-                }
-              }
-            },
-            "400": {
-              "summary": "Prisma error",
-              "description": "Returns a 400 error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            },
-            "500": {
-              "summary": "Internal server error",
-              "description": "Returns a 500 error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/shift/{id}": {
-        "put": {
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "$ref": "#/components/schemas/Shift"
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "description": "ID of shift",
-              "schema": {
-                "type": "integer",
-                "minimum": 1,
-                "example": 5
-              }
-            }
-          ],
-          "summary": "Update one shift by ID and return the updated shift",
-          "description": "Send a JSON object with the properties you want to update, and the server will update the shift and return the updated shift.",
-          "tags": [
-            "Shift"
-          ],
-          "responses": {
-            "200": {
-              "description": "Shift has been updated and its info is returned",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "$ref": "#/components/schemas/ShiftSuccessCreatedResponse"
-                  }
-                }
-              }
-            },
-            "400": {
-              "summary": "Zod error",
-              "description": "Returns a 400 error if the user doesn't provide a valid Body",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            },
-            "408": {
-              "summary": "Prisma client error",
-              "description": "Returns a 408 error if prisma detect an invalid id or it doesn't was provided",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            },
-            "404": {
-              "summary": "Shift not found",
-              "description": "Returns a 404 error if the shift is not found",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            },
-            "500": {
-              "summary": "Internal server error",
-              "description": "Returns a 500 error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/profile": {
-        "get": {
-          "summary": "Return the profile for one user by ID",
-          "description": "Each user by `id` has a profile.",
-          "tags": [
-            "Profile"
-          ],
-          "parameters": [
-            {
-              "name": "userId",
-              "in": "query",
-              "required": false,
-              "description": "numeric ID of user",
-              "schema": {
-                "type": "integer",
-                "example": 12
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "A JSON profile info about the user",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "$ref": "#/components/schemas/ProfileSuccessResponse"
-                  }
-                }
-              }
-            },
-            "400": {
-              "summary": "Query nor provided",
-              "description": "Returns a 400 error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            },
-            "404": {
-              "summary": "User has no profile",
-              "description": "Returns a 404 error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            },
-            "500": {
-              "summary": "Internal server error",
-              "description": "Returns a 500 error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "post": {
-          "summary": "Create a new profile for one user by ID",
-          "description": "Each user by `id` has an unique profile.",
-          "tags": [
-            "Profile"
-          ],
-          "parameters": [
-            {
-              "name": "userId",
-              "in": "query",
-              "required": false,
-              "description": "numeric ID of user",
-              "schema": {
-                "type": "integer",
-                "example": 12
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Profile has been created and its info is returned",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "$ref": "#/components/schemas/ProfileSuccessResponse"
-                  }
-                }
-              }
-            },
-            "400": {
-              "summary": "Zod error or user already has a profile",
-              "description": "Returns a 400 error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            },
-            "404": {
-              "summary": "User not found",
-              "description": "Returns a 404 error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            },
-            "500": {
-              "summary": "Internal server error",
-              "description": "Returns a 500 error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/profile/{id}": {
-        "put": {
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "$ref": "#/components/schemas/Profile"
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "description": "ID of profile to update",
-              "schema": {
-                "type": "integer",
-                "minimum": 1,
-                "example": 5
-              }
-            }
-          ],
-          "summary": "Update the profile for one user by ID",
-          "description": "Send a JSON object with the properties you want to update, and the server will update the profile and return the updated profile.",
-          "tags": [
-            "Profile"
-          ],
-          "responses": {
-            "200": {
-              "description": "Profile has been updated and its info is returned",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "$ref": "#/components/schemas/ProfileSuccessResponse"
-                  }
-                }
-              }
-            },
-            "400": {
-              "summary": "Zod error",
-              "description": "Returns a 400 error if the user doesn't provide a valid Body",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            },
-            "404": {
-              "summary": "Prisma client error",
-              "description": "Returns a 404 error if prisma detect an invalid id or it doesn't was provided",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            },
-            "500": {
-              "summary": "Internal server error",
-              "description": "Returns a 500 error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "dashboard": {
-        "get": {
-          "summary": "Get the dashboard info",
-          "description": "Returns the dashboard info",
-          "tags": [
-            "Dashboard"
-          ],
-          "parameters": [
-            {
-              "name": "userId",
-              "in": "query",
-              "required": false,
-              "description": "numeric ID of user",
-              "schema": {
-                "type": "integer",
-                "example": 12
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Dashboard info is returned",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "$ref": "#/components/schemas/DashboardSuccessResponse"
-                  }
-                }
-              }
-            },
-            "404": {
-              "summary": "User not found error or QueryNotProvided error",
-              "description": "Returns a 404 error if user not found or if the user doesn't provide a valid query",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            },
-            "500": {
-              "summary": "Internal server error",
-              "description": "Returns a 500 error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            }
+          "429": {
+            "description": "Rate limited"
           }
         }
       }
     },
-    "servers": [
-      {
-        "url": "http://localhost:3000/api",
-        "description": "Development server"
-      }
-    ],
-    "security": [],
-    "components": {
-      "schemas": {
-        "User": {
-          "type": "object",
-          "required": [
-            "email",
-            "password"
-          ],
-          "properties": {
-            "id": {
-              "type": "number",
-              "readOnly": true
-            },
-            "formCompleted": {
-              "type": "boolean"
-            },
-            "lastname": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "online": {
-              "type": "boolean"
-            },
-            "password": {
+    "/user": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "The signed-in user",
+        "description": "Returns your own user (looked up by session id). Admins can pass `email` to read any user. The password is never returned.",
+        "parameters": [
+          {
+            "name": "shifts",
+            "in": "query",
+            "schema": {
               "type": "string",
-              "format": "password"
+              "enum": [
+                "true",
+                "false"
+              ],
+              "default": "false"
             },
-            "email": {
+            "description": "Include `shifts` with its `hourly` and `production` lists"
+          },
+          {
+            "name": "profile",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "default": "false"
+            },
+            "description": "Include `profile`"
+          },
+          {
+            "name": "config",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "default": "false"
+            },
+            "description": "Include `config` (settings)"
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "schema": {
               "type": "string",
               "format": "email"
             },
-            "shifts": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/Shift"
+            "description": "Admins only. Ignored for other users"
+          },
+          {
+            "name": "only",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "id,name,email",
+            "description": "Comma-separated user fields to return. `shifts` and `profile` are kept when included"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "response": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/UserWithRelations"
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "response",
+                    "user"
+                  ]
+                }
               }
+            }
+          },
+          "400": {
+            "description": "Invalid query, or user not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServer"
+          }
+        }
+      }
+    },
+    "/user/{id}": {
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Update a user",
+        "description": "You can only update yourself, and only `name`, `image`, `online` and `formCompleted`; other fields are ignored. Admins can update any user and any field except setting `role` to ADMIN.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
             },
-            "profile": {
-              "type": "object",
-              "$ref": "#/components/schemas/Profile"
+            "description": "User id (cuid)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdate"
+              }
             }
           }
         },
-        "Shift": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "number",
-              "readOnly": true
-            },
-            "amount": {
-              "type": "number"
-            },
-            "endDate": {
-              "type": "string"
-            },
-            "isClosed": {
-              "type": "boolean"
-            },
-            "isHoliday": {
-              "type": "boolean"
-            },
-            "notes": {
-              "type": "string"
-            },
-            "startDate": {
-              "type": "string"
-            },
-            "userId": {
-              "type": "number",
-              "readOnly": true
+        "responses": {
+          "200": {
+            "description": "The updated user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "response": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "response",
+                    "user"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid body, or user not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in, or not your user and not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Prisma rejected the fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServer"
+          }
+        }
+      }
+    },
+    "/shift/hourly": {
+      "get": {
+        "tags": [
+          "Shifts"
+        ],
+        "summary": "Your hourly shifts",
+        "responses": {
+          "200": {
+            "description": "Hourly shifts with their taxes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "response": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "hourly": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/HourlyWithTaxes"
+                      }
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "response",
+                    "hourly"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/shift/hourly/{id}": {
+      "delete": {
+        "tags": [
+          "Shifts"
+        ],
+        "summary": "Delete one of your hourly shifts",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
             }
           }
-        },
-        "Profile": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "number",
-              "readOnly": true
-            },
-            "endHour": {
-              "type": "number"
-            },
-            "extraNightShiftPay": {
-              "type": "number"
-            },
-            "holidayPay": {
-              "type": "boolean"
-            },
-            "holidayPayRate": {
-              "type": "number"
-            },
-            "hourlyRate": {
-              "type": "number"
-            },
-            "nightShift": {
-              "type": "boolean"
-            },
-            "userId": {
-              "type": "number",
-              "readOnly": true
+        ],
+        "responses": {
+          "200": {
+            "description": "The deleted shift",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "response": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "shift": {
+                      "$ref": "#/components/schemas/Hourly"
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "response",
+                    "shift"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/ShiftNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServer"
+          }
+        }
+      }
+    },
+    "/shift/production": {
+      "get": {
+        "tags": [
+          "Shifts"
+        ],
+        "summary": "Your production (piece-rate) shifts",
+        "responses": {
+          "200": {
+            "description": "Production shifts with their taxes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "response": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "production": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProductionWithTaxes"
+                      }
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "response",
+                    "production"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/shift/production/{id}": {
+      "delete": {
+        "tags": [
+          "Shifts"
+        ],
+        "summary": "Delete one of your production shifts",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
             }
           }
-        },
-        "Error": {
-          "type": "object",
-          "properties": {
-            "error": {
-              "type": "object",
-              "properties": {
-                "message": {
-                  "type": "string"
-                },
-                "cause": {
-                  "type": "string"
-                },
-                "type_error": {
-                  "type": "string"
+        ],
+        "responses": {
+          "200": {
+            "description": "The deleted shift",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "response": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "shift": {
+                      "$ref": "#/components/schemas/Production"
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "response",
+                    "shift"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/ShiftNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServer"
+          }
+        }
+      }
+    },
+    "/employers": {
+      "get": {
+        "tags": [
+          "Employers"
+        ],
+        "summary": "Your employers",
+        "description": "Sorted A to Z. Archived employers are included (old shifts still show their name); `shifts` is how many hourly and production shifts use each one.",
+        "responses": {
+          "200": {
+            "description": "Employers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "response": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "employers": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EmployerWithCount"
+                      }
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "response",
+                    "employers"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/SomethingWentWrong"
+          }
+        }
+      }
+    },
+    "/salary-items": {
+      "get": {
+        "tags": [
+          "Salary items"
+        ],
+        "summary": "Your taxes and contributions",
+        "description": "Only non-archived items, sorted by name. `uses` is how many shifts use each item.",
+        "responses": {
+          "200": {
+            "description": "Taxes and contributions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "response": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "salaryItems": {
+                      "type": "object",
+                      "required": [
+                        "contributions",
+                        "taxes"
+                      ],
+                      "properties": {
+                        "contributions": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/SalaryItemWithUses"
+                          }
+                        },
+                        "taxes": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/SalaryItemWithUses"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "response",
+                    "salaryItems"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/SomethingWentWrong"
+          }
+        }
+      }
+    },
+    "/rates": {
+      "get": {
+        "tags": [
+          "Exchange rates"
+        ],
+        "summary": "Daily exchange rates (EUR based)",
+        "description": "One rate per calendar day and currency, from Frankfurter (ECB). Weekends and holidays repeat the last published rate. `from` is clamped to 1999-01-04 and `to` to today. Response is cached privately for an hour.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2026-10-01"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2026-10-23"
+          },
+          {
+            "name": "quotes",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z]{3}(,[A-Za-z]{3}){0,9}$"
+            },
+            "example": "USD,AUD",
+            "description": "1 to 10 ISO 4217 codes, comma-separated"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rates per day",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "example": "private, max-age=3600"
                 }
               }
             },
-            "response": {
-              "type": "boolean",
-              "default": false
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateTable"
+                }
+              }
             }
-          }
-        },
-        "UserSuccessResponse": {
-          "type": "object",
-          "properties": {
-            "message": {
-              "type": "string"
-            },
-            "response": {
-              "type": "boolean",
-              "default": true
-            },
-            "user": {
-              "type": "object",
-              "$ref": "#/components/schemas/User"
+          },
+          "400": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid query"
+                    }
+                  }
+                }
+              }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
           }
-        },
-        "ShiftSuccessResponse": {
-          "type": "object",
-          "properties": {
-            "message": {
-              "type": "string"
-            },
-            "response": {
-              "type": "boolean",
-              "default": true
-            },
-            "shift": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/Shift"
+        }
+      }
+    },
+    "/waiting-list": {
+      "post": {
+        "tags": [
+          "Waiting list"
+        ],
+        "summary": "Join the desktop waiting list",
+        "security": [],
+        "description": "Public. The answer is the same whether the email was already on the list or not.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 254
+                  }
+                }
               }
             }
           }
         },
-        "ShiftSuccessCreatedResponse": {
-          "type": "object",
-          "properties": {
-            "message": {
-              "type": "string"
-            },
-            "response": {
-              "type": "boolean",
-              "default": true
-            },
-            "shift": {
-              "type": "object",
-              "$ref": "#/components/schemas/Shift"
+        "responses": {
+          "200": {
+            "description": "Added (or already there)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "response": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
             }
-          }
-        },
-        "ProfileSuccessResponse": {
-          "type": "object",
-          "properties": {
-            "message": {
-              "type": "string"
-            },
-            "response": {
-              "type": "boolean",
-              "default": true
-            },
-            "shift": {
-              "type": "object",
-              "$ref": "#/components/schemas/Profile"
+          },
+          "400": {
+            "description": "Invalid email. The exception is returned at the top level, not under `error`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Exception"
+                }
+              }
             }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServer"
           }
-        },
-        "DashboardSuccessResponse": {
-          "type": "object",
-          "properties": {
-            "message": {
-              "type": "string"
-            },
-            "response": {
-              "type": "boolean",
-              "default": true
-            },
-            "data": {
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "sessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "better-auth.session_token",
+        "description": "Better Auth session cookie. Prefixed with `__Secure-` over HTTPS."
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Not signed in",
+        "content": {
+          "application/json": {
+            "schema": {
               "type": "object",
               "properties": {
-                "shiftsLen": {
-                  "type": "number"
+                "error": {
+                  "type": "string",
+                  "example": "Unauthorized"
                 },
-                "hoursWorked": {
-                  "type": "number"
-                },
-                "averageHoursWorkedPerDay": {
-                  "type": "number"
-                },
-                "hourValue": {
-                  "type": "number"
-                },
-                "lastDayRegistered": {
-                  "type": "string"
-                },
-                "getPaidInWeek": {
-                  "type": "number"
+                "response": {
+                  "type": "boolean",
+                  "example": false
                 }
               }
             }
           }
         }
+      },
+      "SomethingWentWrong": {
+        "description": "Server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Something went wrong"
+                },
+                "response": {
+                  "type": "boolean",
+                  "example": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "ShiftNotFound": {
+        "description": "The shift doesn't exist or isn't yours",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "InternalServer": {
+        "description": "Server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
       }
     },
-    "securitySchemes": {
-      "basicAuth": {
-        "type": "http",
-        "scheme": "basic"
+    "schemas": {
+      "Exception": {
+        "type": "object",
+        "required": [
+          "message",
+          "type_error"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Data provided is not valid"
+          },
+          "cause": {
+            "type": "string"
+          },
+          "type_error": {
+            "type": "string",
+            "example": "DataProvidedIsNotValid",
+            "enum": [
+              "UserNotFound",
+              "UserAlreadyExists",
+              "UserNotAllowed",
+              "BodyNotProvided",
+              "InternalServer",
+              "PrismaClientFields",
+              "PrismaClientUpdateRecord",
+              "ProfileAlreadyExists",
+              "ProfileNotFound",
+              "QueryNotProvided",
+              "ShiftNotFound",
+              "PasswordIsNotValid",
+              "DataProvidedIsNotValid",
+              "CustomError"
+            ]
+          },
+          "fields": {
+            "type": "array",
+            "description": "Only for DataProvidedIsNotValid: the Zod issues",
+            "items": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                },
+                "input": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "integer"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "info": {
+            "description": "Only for InternalServer: the original error, if any"
+          }
+        }
       },
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
+      "ErrorResponse": {
+        "type": "object",
+        "required": [
+          "error",
+          "response"
+        ],
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/Exception"
+          },
+          "response": {
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "clx0abc123"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "image": {
+            "type": "string",
+            "nullable": true,
+            "example": "/assets/avatar.svg"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type_account": {
+            "type": "string",
+            "enum": [
+              "CREDENTIALS",
+              "OAUTH"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "USER",
+              "ADMIN",
+              "SUPER_USER"
+            ]
+          },
+          "online": {
+            "type": "boolean"
+          },
+          "formCompleted": {
+            "type": "boolean"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UserWithRelations": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/User"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "shifts": {
+                "type": "object",
+                "nullable": true,
+                "description": "With `shifts=true`",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "hourly": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Hourly"
+                    }
+                  },
+                  "production": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Production"
+                    }
+                  }
+                }
+              },
+              "profile": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Profile"
+                  }
+                ],
+                "nullable": true,
+                "description": "With `profile=true`"
+              },
+              "config": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Config"
+                  }
+                ],
+                "nullable": true,
+                "description": "With `config=true`"
+              }
+            }
+          }
+        ]
+      },
+      "UserUpdate": {
+        "type": "object",
+        "minProperties": 1,
+        "description": "Any subset of User. Non-admins: only name, image, online and formCompleted are applied.",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string",
+            "nullable": true
+          },
+          "online": {
+            "type": "boolean"
+          },
+          "formCompleted": {
+            "type": "boolean"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "type_account": {
+            "type": "string",
+            "enum": [
+              "CREDENTIALS",
+              "OAUTH"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "USER",
+              "SUPER_USER"
+            ]
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Profile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "userId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "Config": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "weekStartsOn": {
+            "type": "string",
+            "example": "monday"
+          },
+          "currency": {
+            "type": "string",
+            "example": "USD"
+          },
+          "hourValue": {
+            "type": "number",
+            "nullable": true
+          },
+          "unpaidBreaks": {
+            "type": "number",
+            "nullable": true
+          },
+          "holidayPay": {
+            "type": "number",
+            "example": 8
+          },
+          "theme": {
+            "type": "string",
+            "enum": [
+              "system",
+              "light",
+              "dark"
+            ]
+          },
+          "userId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "Hourly": {
+        "type": "object",
+        "required": [
+          "id",
+          "startDate",
+          "hourValue"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "startDate": {
+            "type": "string",
+            "description": "ISO date-time, stored as text"
+          },
+          "endDate": {
+            "type": "string",
+            "nullable": true,
+            "description": "ISO date-time; null while the shift is running"
+          },
+          "amount": {
+            "type": "number",
+            "nullable": true
+          },
+          "isPublicHoliday": {
+            "type": "boolean"
+          },
+          "publicHolidayWorked": {
+            "type": "boolean"
+          },
+          "isClosed": {
+            "type": "boolean"
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true,
+            "description": "ISO 4217. Null: the user's default currency (Config.currency)",
+            "example": "AUD"
+          },
+          "shiftId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "employerId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Null: no employer set"
+          },
+          "hourValue": {
+            "type": "number",
+            "example": 30.5
+          },
+          "unpaidBreaks": {
+            "type": "number",
+            "nullable": true,
+            "description": "Hours"
+          },
+          "source": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "track",
+              "fast",
+              null
+            ],
+            "description": "Where it was logged. Null: before this existed"
+          }
+        }
+      },
+      "Production": {
+        "type": "object",
+        "required": [
+          "id",
+          "startDate"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "startDate": {
+            "type": "string",
+            "description": "ISO date-time, stored as text"
+          },
+          "endDate": {
+            "type": "string",
+            "nullable": true,
+            "description": "ISO date-time; null while the shift is running"
+          },
+          "amount": {
+            "type": "number",
+            "nullable": true
+          },
+          "isPublicHoliday": {
+            "type": "boolean"
+          },
+          "publicHolidayWorked": {
+            "type": "boolean"
+          },
+          "isClosed": {
+            "type": "boolean"
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true,
+            "description": "ISO 4217. Null: the user's default currency (Config.currency)",
+            "example": "AUD"
+          },
+          "shiftId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "employerId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Null: no employer set"
+          },
+          "itemValue": {
+            "type": "number",
+            "nullable": true,
+            "description": "Pay per item"
+          },
+          "itemQuantity": {
+            "type": "number",
+            "nullable": true
+          }
+        }
+      },
+      "HourlyWithTaxes": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Hourly"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "taxes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SalaryItem"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ProductionWithTaxes": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Production"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "taxes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SalaryItem"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "SalaryItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "value",
+          "archived"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string",
+            "example": "PAYG"
+          },
+          "value": {
+            "type": "number",
+            "description": "Percentage",
+            "example": 15
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "userId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "SalaryItemWithUses": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SalaryItem"
+          },
+          {
+            "type": "object",
+            "required": [
+              "uses"
+            ],
+            "properties": {
+              "uses": {
+                "type": "integer"
+              }
+            }
+          }
+        ]
+      },
+      "Employer": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "archived"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "taxId": {
+            "type": "string",
+            "nullable": true,
+            "description": "ABN, NZBN, VAT, CUIT…"
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "region": {
+            "type": "string",
+            "nullable": true,
+            "description": "State, province or Bundesland"
+          },
+          "postcode": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "industry": {
+            "type": "string",
+            "nullable": true
+          },
+          "contactName": {
+            "type": "string",
+            "nullable": true
+          },
+          "contactEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "contactPhone": {
+            "type": "string",
+            "nullable": true
+          },
+          "defaultRate": {
+            "type": "number",
+            "nullable": true,
+            "description": "Prefilled on new shifts"
+          },
+          "defaultCurrency": {
+            "type": "string",
+            "nullable": true,
+            "description": "ISO 4217. Null: the user's default currency"
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "sourceRegistry": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "abr",
+              "nzbn",
+              "vies",
+              null
+            ],
+            "description": "Register the details came from"
+          },
+          "sourcedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "EmployerWithCount": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Employer"
+          },
+          {
+            "type": "object",
+            "required": [
+              "shifts"
+            ],
+            "properties": {
+              "shifts": {
+                "type": "integer",
+                "description": "Hourly + production shifts"
+              }
+            }
+          }
+        ]
+      },
+      "RateTable": {
+        "type": "object",
+        "required": [
+          "base",
+          "rates"
+        ],
+        "properties": {
+          "base": {
+            "type": "string",
+            "enum": [
+              "EUR"
+            ]
+          },
+          "rates": {
+            "type": "object",
+            "description": "Day (YYYY-MM-DD) → currency → units per 1 EUR",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            },
+            "example": {
+              "2026-10-22": {
+                "USD": 1.1228,
+                "AUD": 1.7012
+              }
+            }
+          }
+        }
       }
     }
   }
