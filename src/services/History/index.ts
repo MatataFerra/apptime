@@ -6,6 +6,7 @@ import {
   startOfMonth,
   startOfWeek,
 } from "date-fns";
+import type { Locale as DateLocale } from "date-fns/locale";
 
 import Pay from "@/services/Pay";
 import { shiftEarnings, shiftMinutes } from "@/services/Summary";
@@ -82,7 +83,11 @@ export function historyEntries(
  * Entries grouped by calendar month (newest first), with each month's
  * total per currency. `fallback` is the currency of shifts saved without one.
  */
-export function groupByMonth(entries: HistoryEntry[], fallback = "USD"): MonthGroup[] {
+export function groupByMonth(
+  entries: HistoryEntry[],
+  fallback = "USD",
+  locale?: DateLocale
+): MonthGroup[] {
   const groups = new Map<
     string,
     { label: string; sums: Map<string, number>; entries: HistoryEntry[] }
@@ -90,7 +95,7 @@ export function groupByMonth(entries: HistoryEntry[], fallback = "USD"): MonthGr
   for (const entry of entries) {
     const key = format(entry.date, "yyyy-MM");
     const group = groups.get(key) ?? {
-      label: format(startOfMonth(entry.date), "MMMM yyyy"),
+      label: format(startOfMonth(entry.date), "LLLL yyyy", { locale }),
       sums: new Map<string, number>(),
       entries: [],
     };
@@ -114,7 +119,12 @@ export type WeekPoint = { label: string; start: Date; hourly: number; production
 /** Earnings per week for the last `weeks` weeks (oldest first), split by kind. */
 export function weeklyEarnings(
   entries: HistoryEntry[],
-  { weeks = 12, now = new Date(), weekStartsOn = 1 as 0 | 1 } = {}
+  {
+    weeks = 12,
+    now = new Date(),
+    weekStartsOn = 1 as 0 | 1,
+    locale,
+  }: { weeks?: number; now?: Date; weekStartsOn?: 0 | 1; locale?: DateLocale } = {}
 ): WeekPoint[] {
   const thisWeek = startOfWeek(now, { weekStartsOn });
 
@@ -127,7 +137,7 @@ export function weeklyEarnings(
     }
 
     return {
-      label: format(start, "d MMM"),
+      label: format(start, "d MMM", { locale }),
       start,
       hourly: sum("hourly"),
       production: sum("production"),
@@ -138,7 +148,10 @@ export function weeklyEarnings(
 export type CumulativePoint = { label: string; date: Date; hourly: number; production: number };
 
 /** Running totals per kind, one point per day with shifts (oldest first). */
-export function cumulativeEarnings(entries: HistoryEntry[]): CumulativePoint[] {
+export function cumulativeEarnings(
+  entries: HistoryEntry[],
+  locale?: DateLocale
+): CumulativePoint[] {
   const byDay = new Map<number, { hourly: number; production: number }>();
   for (const e of entries) {
     const day = startOfDay(e.date).valueOf();
@@ -156,7 +169,7 @@ export function cumulativeEarnings(entries: HistoryEntry[]): CumulativePoint[] {
       production += totals.production;
       const date = new Date(day);
       return {
-        label: format(date, "d MMM"),
+        label: format(date, "d MMM", { locale }),
         date,
         hourly: round(hourly),
         production: round(production),

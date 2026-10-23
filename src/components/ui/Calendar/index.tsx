@@ -8,12 +8,17 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import { buttonVariants } from "@/components/ui/buttonShadcn";
 
 import { cn } from "@/utils/helpers/styleMerger";
+import useDateLocale from "@/hooks/useDateLocale";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
 function Calendar({ className, classNames, showOutsideDays = true, ...props }: CalendarProps) {
+  // Month and weekday names in the app's language (a `locale` prop still wins).
+  const locale = useDateLocale();
+
   return (
     <DayPicker
+      locale={locale}
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{

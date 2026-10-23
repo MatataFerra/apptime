@@ -5,12 +5,14 @@ import { type DateRange } from "react-day-picker";
 
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
+import { useTranslations } from "next-intl";
 
 import { ButtonShadCn } from "@/components/ui/buttonShadcn";
 import { Calendar } from "@/components/ui/Calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
 
 import { cn } from "@/utils/helpers/styleMerger";
+import useDateLocale from "@/hooks/useDateLocale";
 
 import { useRangeSelected } from "@/store/useRangeSelected";
 
@@ -21,6 +23,8 @@ interface DateRangePickerProps extends Omit<HTMLAttributes<HTMLDivElement>, "cla
 
 function DateRangePicker({ classes, onDatesSelected }: DateRangePickerProps) {
   const { setIsRangeSelected, setDate, date } = useRangeSelected((state) => state);
+  const t = useTranslations("dashboard.history");
+  const locale = useDateLocale();
 
   useEffect(() => {
     if (date?.from && date?.to) {
@@ -46,13 +50,13 @@ function DateRangePicker({ classes, onDatesSelected }: DateRangePickerProps) {
             {date?.from ? (
               date.to ? (
                 <>
-                  {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
+                  {format(date.from, "PP", { locale })} - {format(date.to, "PP", { locale })}
                 </>
               ) : (
-                format(date.from, "LLL dd, y")
+                format(date.from, "PP", { locale })
               )
             ) : (
-              <span>Pick a date</span>
+              <span>{t("pick_date")}</span>
             )}
           </ButtonShadCn>
         </PopoverTrigger>

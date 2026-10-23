@@ -3,10 +3,13 @@
 import { useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
+import { useTranslations } from "next-intl";
+
 import Input from "@/components/ui/Input";
 
+import { currencySymbol } from "@/utils/constants/currencies";
 import { cn } from "@/utils/helpers/styleMerger";
-import useMoney from "@/hooks/useMoney";
+import useMoney, { useCurrency } from "@/hooks/useMoney";
 import useUser from "@/hooks/useUser";
 
 type IncomesInputs = {
@@ -32,6 +35,8 @@ function round(n: number) {
 
 function Calculator() {
   const money = useMoney();
+  const t = useTranslations("estimate");
+  const symbol = currencySymbol(useCurrency());
   const { data: user } = useUser();
   // Settings' defaults: holiday pay % and the usual hourly rate.
   const defaultHolidayRate = user?.config?.holidayPay ?? DEFAULT_HOLIDAY_PAY_RATE;
@@ -83,40 +88,40 @@ function Calculator() {
         className="flex flex-col gap-3.5 rounded-3xl bg-surface-inverse p-5 text-ink-inverse"
       >
         <div className="flex flex-col gap-1.5 text-sm text-ink-inverse/70">
-          <p>You&apos;d earn, before tax</p>
+          <p>{t("earn")}</p>
           <p className="figure text-[4rem] leading-[0.95] text-live" data-testid="estimate-total">
             {money(result.total)}
           </p>
         </div>
         <dl className="flex flex-col gap-2 border-t border-ink-inverse/15 pt-3 text-sm">
           <div className="flex justify-between">
-            <dt className="text-ink-inverse/70">Paid time per day</dt>
+            <dt className="text-ink-inverse/70">{t("paid_time")}</dt>
             <dd className="tabular-nums">{paidLabel}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-ink-inverse/70">Base pay</dt>
+            <dt className="text-ink-inverse/70">{t("base_pay")}</dt>
             <dd className="tabular-nums">{money(result.base)}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-ink-inverse/70">Holiday pay, {result.holidayRate}%</dt>
+            <dt className="text-ink-inverse/70">
+              {t("holiday_pay_rate", { rate: result.holidayRate })}
+            </dt>
             <dd className="tabular-nums">{money(result.holiday)}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-ink-inverse/70">
-              Per day, for {days} {days === 1 ? "day" : "days"}
-            </dt>
+            <dt className="text-ink-inverse/70">{t("per_day", { days })}</dt>
             <dd className="tabular-nums">{money(result.perDay)}</dd>
           </div>
         </dl>
       </section>
 
       <section className="flex flex-col gap-3.5 rounded-xl border border-border bg-surface p-4">
-        <h2 className="text-[0.9375rem] font-semibold">Time</h2>
+        <h2 className="text-[0.9375rem] font-semibold">{t("time")}</h2>
         <div className="grid grid-cols-2 gap-2.5">
           <Input
             type="number"
             inputMode="numeric"
-            label="Hours a day"
+            label={t("hours_a_day")}
             measure="h"
             min={0}
             max={24}
@@ -125,7 +130,7 @@ function Calculator() {
           <Input
             type="number"
             inputMode="numeric"
-            label="Minutes"
+            label={t("minutes")}
             measure="min"
             min={0}
             max={59}
@@ -133,7 +138,7 @@ function Calculator() {
           />
         </div>
         <fieldset className="flex flex-col gap-1.5">
-          <legend className="mb-1.5 text-sm font-medium text-ink">Days</legend>
+          <legend className="mb-1.5 text-sm font-medium text-ink">{t("days")}</legend>
           <div className="grid grid-cols-7 gap-1.5">
             {DAY_OPTIONS.map((n) => (
               <button
@@ -156,12 +161,12 @@ function Calculator() {
       </section>
 
       <section className="flex flex-col gap-3.5 rounded-xl border border-border bg-surface p-4">
-        <h2 className="text-[0.9375rem] font-semibold">Pay</h2>
+        <h2 className="text-[0.9375rem] font-semibold">{t("pay")}</h2>
         <Input
           type="number"
           inputMode="decimal"
-          label="Hourly rate"
-          measure="$"
+          label={t("hourly_rate")}
+          measure={symbol}
           measurePlace="left"
           min={0}
           step="0.01"
@@ -171,7 +176,7 @@ function Calculator() {
           <Input
             type="number"
             inputMode="decimal"
-            label="Holiday pay"
+            label={t("holiday_pay")}
             measure="%"
             placeholder={String(defaultHolidayRate)}
             min={0}
@@ -180,14 +185,14 @@ function Calculator() {
           <Input
             type="number"
             inputMode="numeric"
-            label="Unpaid breaks"
+            label={t("unpaid_breaks")}
             measure="min"
             min={0}
             {...register("unpaid-breaks")}
           />
         </div>
         <p className="text-[0.8125rem] text-ink-muted">
-          Leave holiday pay empty to use {defaultHolidayRate}%.
+          {t("holiday_hint", { rate: defaultHolidayRate })}
         </p>
       </section>
     </div>

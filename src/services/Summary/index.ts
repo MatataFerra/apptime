@@ -224,6 +224,17 @@ export function formatMoneyCompact(value: number, currency = "USD", locale = "en
   }).format(value);
 }
 
+/**
+ * Width in px for a chart's money axis: room for the longest tick label
+ * ("$12.5K", "12,5 mil US$"), whose length depends on the language.
+ */
+export function moneyAxisWidth(max: number, currency = "USD", locale = "en-US") {
+  // The top tick is rounded up from the largest value.
+  const label = formatMoneyCompact(Math.max(1, max) * 1.25, currency, locale);
+  // ~6.5px per character at the 11px tick size, plus the tick's own margin.
+  return Math.max(40, Math.ceil(label.length * 6.5) + 14);
+}
+
 export function formatHours(minutes: number) {
   const hours = minutes / 60;
   return `${Number.isInteger(hours) ? hours : hours.toFixed(1)}h`;

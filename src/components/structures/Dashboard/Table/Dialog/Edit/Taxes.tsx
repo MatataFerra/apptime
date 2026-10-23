@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { useTranslations } from "next-intl";
+
 import Toast from "@/services/Toast";
 
 import type { HourlyType, ProductionType } from "@/types";
@@ -22,11 +24,12 @@ function RateEditor({ tax, onDone }: { tax: ShiftTax; onDone: () => void }) {
   const { rateChanges, setRate, clearRate } = useTaxesHandlerDelete((state) => state);
   const pending = rateChanges.find((c) => c.id === tax.id);
   const [draft, setDraft] = useState(String(pending?.value ?? tax.value));
+  const t = useTranslations("dashboard.taxes");
 
   function commit() {
     const value = Number(draft);
     if (draft.trim() === "" || !Number.isFinite(value) || value < 0 || value > 100) {
-      Toast({ type: "error", message: "Enter a rate between 0 and 100", duration: 1500 });
+      Toast({ type: "error", message: t("rate_range"), duration: 1500 });
       return;
     }
     if (value === Number(tax.value)) clearRate(tax.id);
@@ -44,7 +47,7 @@ function RateEditor({ tax, onDone }: { tax: ShiftTax; onDone: () => void }) {
           min={0}
           max={100}
           step="any"
-          aria-label={`New rate for ${tax.name}`}
+          aria-label={t("new_rate", { name: tax.name })}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => {
@@ -59,7 +62,7 @@ function RateEditor({ tax, onDone }: { tax: ShiftTax; onDone: () => void }) {
         <span className="text-xs text-ink-muted">%</span>
       </span>
       <Button type="button" variant="ghost" size="sm" classes="w-auto" onClick={commit}>
-        OK
+        {t("ok")}
       </Button>
     </span>
   );
@@ -69,6 +72,7 @@ function Taxes({ shift }: Props) {
   const { taxesToDelete, rateChanges, addTaxToDelete, restoreTax, clearRate } =
     useTaxesHandlerDelete((state) => state);
   const [editing, setEditing] = useState<number | null>(null);
+  const t = useTranslations("dashboard.taxes");
 
   return (
     <ul className="flex flex-col gap-2">
@@ -102,7 +106,7 @@ function Taxes({ shift }: Props) {
                 )}
               </span>
               {changed ? (
-                <span className="text-xs text-ink-muted">Only for this shift</span>
+                <span className="text-xs text-ink-muted">{t("only_this_shift")}</span>
               ) : tax.description ? (
                 <span className="truncate text-xs text-ink-muted">{tax.description}</span>
               ) : null}
@@ -116,10 +120,10 @@ function Taxes({ shift }: Props) {
                 classes="w-auto"
                 onClick={() => {
                   restoreTax(tax.id);
-                  Toast({ type: "plain", message: "Tax kept", duration: 1500 });
+                  Toast({ type: "plain", message: t("kept"), duration: 1500 });
                 }}
               >
-                Undo
+                {t("undo")}
               </Button>
             ) : editing === tax.id ? (
               <RateEditor tax={tax} onDone={() => setEditing(null)} />
@@ -133,7 +137,7 @@ function Taxes({ shift }: Props) {
                     classes="w-auto"
                     onClick={() => clearRate(tax.id)}
                   >
-                    Undo
+                    {t("undo")}
                   </Button>
                 ) : (
                   <Button
@@ -143,7 +147,7 @@ function Taxes({ shift }: Props) {
                     classes="w-auto"
                     onClick={() => setEditing(tax.id)}
                   >
-                    Change %
+                    {t("change_rate")}
                   </Button>
                 )}
                 <Button
@@ -155,13 +159,13 @@ function Taxes({ shift }: Props) {
                     addTaxToDelete(tax);
                     Toast({
                       type: "plain",
-                      message: "Tax will be removed",
-                      description: "Save changes to apply it.",
+                      message: t("will_remove"),
+                      description: t("save_to_apply"),
                       duration: 1500,
                     });
                   }}
                 >
-                  Remove
+                  {t("remove")}
                 </Button>
               </span>
             )}

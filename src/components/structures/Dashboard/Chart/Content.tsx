@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { cumulativeEarnings, historyEntries, weeklyEarnings } from "@/services/History";
 import { weekStartsOnIndex } from "@/services/Summary";
 
@@ -7,11 +9,14 @@ import SeasonChart from "@/components/structures/Dashboard/Charts/SeasonChart";
 import WeeklyChart from "@/components/structures/Dashboard/Charts/WeeklyChart";
 import Skeleton from "@/components/ui/Skeleton";
 
+import useDateLocale from "@/hooks/useDateLocale";
 import useShiftsInCurrency from "@/hooks/useShiftsInCurrency";
 import useUser from "@/hooks/useUser";
 
 function Content() {
   const { data: user } = useUser();
+  const t = useTranslations("dashboard.charts");
+  const locale = useDateLocale();
   const { hourly, production, currency, isLoading } = useShiftsInCurrency();
 
   if (isLoading) {
@@ -28,7 +33,7 @@ function Content() {
   if (!entries.length) {
     return (
       <p className="rounded-xl border border-dashed border-border-strong p-6 text-center text-sm text-ink-muted">
-        Your charts show up after your first saved shift.
+        {t("empty")}
       </p>
     );
   }
@@ -37,8 +42,8 @@ function Content() {
 
   return (
     <div className="flex flex-col gap-4">
-      <WeeklyChart data={weeklyEarnings(entries, { weekStartsOn })} currency={currency} />
-      <SeasonChart data={cumulativeEarnings(entries)} currency={currency} />
+      <WeeklyChart data={weeklyEarnings(entries, { weekStartsOn, locale })} currency={currency} />
+      <SeasonChart data={cumulativeEarnings(entries, locale)} currency={currency} />
     </div>
   );
 }

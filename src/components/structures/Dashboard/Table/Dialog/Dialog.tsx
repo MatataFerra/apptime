@@ -6,6 +6,7 @@ import type { Hourly, Production } from "@prisma/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import api from "@/services/Api/Shift";
 import Toast from "@/services/Toast";
@@ -28,6 +29,7 @@ import {
 
 import { invalidateShiftQueries } from "@/utils/helpers/invalidateShiftQueries";
 import useDashboard from "@/hooks/useDashboard";
+import useDateLocale from "@/hooks/useDateLocale";
 
 import { useTableStore } from "@/store/useTableStore";
 
@@ -55,6 +57,8 @@ function TableDialog({
   const { reset } = useTaxesHandlerDelete((state) => state);
   const queryClient = useQueryClient();
   const router = useRouter();
+  const t = useTranslations("dashboard.dialog");
+  const locale = useDateLocale();
 
   const { mutate } = useMutation({
     mutationFn: (type === "hourly"
@@ -66,7 +70,7 @@ function TableDialog({
     onMutate: () => {
       Toast({
         type: "loading",
-        message: "Deleting shift...",
+        message: t("deleting"),
         duration: Infinity,
       });
     },
@@ -74,7 +78,7 @@ function TableDialog({
     onSuccess: () => {
       Toast({
         type: "success",
-        message: "Shift deleted successfully!",
+        message: t("deleted"),
         duration: 2000,
       });
     },
@@ -111,7 +115,7 @@ function TableDialog({
               <DialogHeader className="text-left">
                 <DialogTitle>{shift.name || title}</DialogTitle>
                 <DialogDescription>
-                  {format(new Date(shift.startDate), "EEEE d MMMM yyyy")}
+                  {format(new Date(shift.startDate), "PPPP", { locale })}
                 </DialogDescription>
               </DialogHeader>
               {content}
@@ -125,7 +129,7 @@ function TableDialog({
                       classes="w-full"
                       onClick={() => setConfirmDelete(false)}
                     >
-                      Keep it
+                      {t("keep")}
                     </Button>
                     <Button
                       type="button"
@@ -137,7 +141,7 @@ function TableDialog({
                         mutate({ id: shift.id });
                       }}
                     >
-                      Delete shift
+                      {t("confirm_delete")}
                     </Button>
                   </>
                 ) : (
@@ -149,7 +153,7 @@ function TableDialog({
                       classes="w-full text-destructive"
                       onClick={() => setConfirmDelete(true)}
                     >
-                      Delete
+                      {t("delete")}
                     </Button>
                     <Button
                       type="button"
@@ -158,7 +162,7 @@ function TableDialog({
                       classes="w-full"
                       onClick={() => setStep("edit")}
                     >
-                      Edit
+                      {t("edit")}
                     </Button>
                   </>
                 )}
@@ -167,8 +171,8 @@ function TableDialog({
           ) : (
             <>
               <DialogHeader className="text-left">
-                <DialogTitle>Edit shift</DialogTitle>
-                <DialogDescription>You can edit the shift details here.</DialogDescription>
+                <DialogTitle>{t("edit_title")}</DialogTitle>
+                <DialogDescription>{t("edit_description")}</DialogDescription>
               </DialogHeader>
               <TableDialogEditShift shift={shift} user={user} />
             </>

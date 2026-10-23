@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { Hourly, Production } from "@prisma/client";
 import { format } from "date-fns";
 import { ChevronRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import {
   groupByMonth,
@@ -20,6 +21,7 @@ import Skeleton from "@/components/ui/Skeleton";
 
 import { cn } from "@/utils/helpers/styleMerger";
 import useDashboard from "@/hooks/useDashboard";
+import useDateLocale from "@/hooks/useDateLocale";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
 import useMoney, { useCurrency } from "@/hooks/useMoney";
 import useProductionShifts from "@/hooks/useProductionShifts";
@@ -29,23 +31,23 @@ import { useDashProductionStore } from "@/store/useDashProductionStore";
 
 type Filter = "all" | ShiftKind;
 
-const FILTERS: { value: Filter; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "hourly", label: "Per hour" },
-  { value: "production", label: "Per piece" },
-];
+const FILTERS: Filter[] = ["all", "hourly", "production"];
 
-function detail(entry: HistoryEntry, money: (value: number) => string) {
+type Translate = ReturnType<typeof useTranslations<"dashboard.history">>;
+
+function detail(entry: HistoryEntry, money: (value: number) => string, t: Translate) {
   if (entry.kind === "hourly") {
     const rate = (entry.shift as Hourly).hourValue;
-    return `${formatHours(entry.minutes)} · ${money(rate)}/h`;
+    return t("hourly_detail", { hours: formatHours(entry.minutes), rate: money(rate) });
   }
   const { itemQuantity, itemValue } = entry.shift as Production;
-  return `${itemQuantity ?? 0} pieces × ${money(itemValue ?? 0)}`;
+  return t("pieces_detail", { count: itemQuantity ?? 0, value: money(itemValue ?? 0) });
 }
 
 function HistoryRow({ entry }: { entry: HistoryEntry }) {
   const format$ = useMoney();
+  const t = useTranslations("dashboard.history");
+  const locale = useDateLocale();
   // Each shift in its own currency.
   function money(value: number) {
     return format$(value, { currency: entry.currency });
@@ -57,7 +59,7 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
 
   return (
     <TableDialog
-      title={isHourly ? "Hourly shift" : "Per piece shift"}
+      title={isHourly ? t("hourly_shift") : t("piece_shift")}
       shift={entry.shift as Hourly | Production}
       type={entry.kind}
       delete={store.delete}
@@ -76,21 +78,21 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
           )}
         >
           <span className="text-[0.6875rem] font-semibold uppercase">
-            {format(entry.date, "EEE")}
+            {format(entry.date, "EEE", { locale })}
           </span>
           <span className="figure text-[1.375rem] leading-none">{format(entry.date, "d")}</span>
         </span>
 
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="truncate text-[0.9375rem] font-semibold text-ink">
-            {entry.name || (isHourly ? "Hourly shift" : "Per piece shift")}
+            {entry.name || (isHourly ? t("hourly_shift") : t("piece_shift"))}
           </span>
           <span className="truncate text-[0.8125rem] text-ink-muted">
-            {isHourly ? "Per hour" : "Per piece"} · {detail(entry, money)}
+            {isHourly ? t("filters.hourly") : t("filters.production")} · {detail(entry, money, t)}
           </span>
           {entry.holiday ? (
             <span className="mt-0.5 w-fit rounded-full bg-fast-soft px-2 py-0.5 text-[0.6875rem] font-semibold text-fast-ink">
-              {entry.holiday === "worked" ? "Holiday, worked 1.5×" : "Holiday, day off"}
+              {entry.holiday === "worked" ? t("holiday_worked") : t("holiday_off")}
             </span>
           ) : null}
         </span>
@@ -101,7 +103,7 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
           </span>
           {entry.afterTaxes < entry.earned - 0.005 ? (
             <span className="text-xs text-ink-muted tabular-nums">
-              {money(entry.afterTaxes)} net
+              {t("net", { amount: money(entry.afterTaxes) })}
             </span>
           ) : null}
         </span>
@@ -118,6 +120,8 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
 function ShiftHistory() {
   const money = useMoney();
   const currency = useCurrency();
+  const t = useTranslations("dashboard.history");
+  const locale = useDateLocale();
   const [filter, setFilter] = useState<Filter>("all");
   const { isDateFiltered } = useDashboard();
   const { data: hourlyData, isLoading: loadingHourly } = useHourlyShifts();
@@ -140,33 +144,33 @@ function ShiftHistory() {
   const entries = historyEntries(hourly, productions).filter(
     (e) => filter === "all" || e.kind === filter
   );
-  const months = groupByMonth(entries, currency);
+  const months = groupByMonth(entries, currency, locale);
 
   return (
     <div className="flex flex-col gap-4">
-      <div role="radiogroup" aria-label="Shift type" className="flex gap-2">
+      <div role="radiogroup" aria-label={t("filter_label")} className="flex gap-2">
         {FILTERS.map((f) => (
           <button
-            key={f.value}
+            key={f}
             type="button"
             role="radio"
-            aria-checked={filter === f.value}
-            onClick={() => setFilter(f.value)}
+            aria-checked={filter === f}
+            onClick={() => setFilter(f)}
             className={cn(
               "h-9 rounded-full border px-3.5 text-sm font-medium transition-colors",
-              filter === f.value
+              filter === f
                 ? "border-transparent bg-primary text-primary-foreground"
                 : "border-border-strong bg-surface text-ink hover:bg-surface-sunken"
             )}
           >
-            {f.label}
+            {t(`filters.${f}`)}
           </button>
         ))}
       </div>
 
       {months.length === 0 ? (
         <p className="rounded-xl border border-dashed border-border-strong p-6 text-center text-sm text-ink-muted">
-          {isDateFiltered ? "No shifts in those dates." : "No shifts saved yet."}
+          {isDateFiltered ? t("empty_filtered") : t("empty")}
         </p>
       ) : (
         months.map((month) => (
@@ -174,7 +178,7 @@ function ShiftHistory() {
             <header className="flex items-baseline justify-between px-1">
               <h3 className="text-sm font-semibold text-ink">{month.label}</h3>
               <span className="text-sm text-ink-muted tabular-nums">
-                {month.entries.length} {month.entries.length === 1 ? "shift" : "shifts"} ·{" "}
+                {t("shifts", { count: month.entries.length })} ·{" "}
                 {month.totals.map((t, i) => (
                   <span key={t.currency} className="font-semibold text-ink">
                     {i > 0 ? " + " : ""}
