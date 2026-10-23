@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+import { tidyName } from "../text";
+import type { BusinessDetails, BusinessMatch } from "../types";
+
 /*
   Parsing for the ABN Lookup JSON services (abr.business.gov.au/json).
   No network here, so it can be tested on its own; the fetch is in ./index.ts.
@@ -166,21 +169,46 @@ export function parseMatchingNames(raw: unknown, max = 8): AbrResult<AbnMatch[]>
   return { ok: true, data: matches };
 }
 
-const KEEP_UPPER = new Set(["ABN", "ACN", "NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT"]);
-const SMALL = new Set(["and", "of", "the", "for", "in", "on", "at"]);
+/** ABR answer -> the shape the form uses. */
+export function abnToBusiness(details: AbnDetails): BusinessDetails {
+  const legalName = tidyName(details.entityName);
+  return {
+    registry: "abr",
+    id: details.abn,
+    active: details.status ? details.status.toLowerCase() === "active" : null,
+    status: details.status,
+    statusSince: details.statusSince,
+    legalName,
+    names: [...new Set([...details.businessNames.map(tidyName), legalName])],
+    fields: {
+      taxId: details.abn,
+      region: details.state ?? undefined,
+      postcode: details.postcode ?? undefined,
+      country: "Australia",
+    },
+    facts: [
+      ...(details.entityType ? [{ label: "Type", value: details.entityType }] : []),
+      ...(details.state || details.postcode
+        ? [
+            {
+              label: "Location",
+              value: [details.state, details.postcode].filter(Boolean).join(" "),
+            },
+          ]
+        : []),
+      {
+        label: "GST",
+        value: details.gstSince ? `Registered since ${details.gstSince}` : "Not registered",
+      },
+    ],
+    note: "The register has no street address: add it yourself.",
+  };
+}
 
-/**
- * "SUNNY FARMS PTY LTD" -> "Sunny Farms Pty Ltd". The register stores most
- * names in capitals; mixed-case names are left as they are.
- */
-export function tidyName(name: string) {
-  const trimmed = name.trim();
-  if (trimmed !== trimmed.toUpperCase()) return trimmed;
-  let index = 0;
-  return trimmed.toLowerCase().replace(/[\p{L}\p{N}']+/gu, (word) => {
-    const first = index++ === 0;
-    if (KEEP_UPPER.has(word.toUpperCase())) return word.toUpperCase();
-    if (!first && SMALL.has(word)) return word;
-    return word.charAt(0).toUpperCase() + word.slice(1);
-  });
+export function abnMatchesToBusiness(matches: AbnMatch[]): BusinessMatch[] {
+  return matches.map((m) => ({
+    id: m.abn,
+    name: tidyName(m.name),
+    detail: [m.state, m.postcode].filter(Boolean).join(" ") || null,
+  }));
 }

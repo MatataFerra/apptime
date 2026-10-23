@@ -6,10 +6,11 @@ import { ClipboardPaste, Search } from "lucide-react";
 
 import type { PastedEmployer, PasteField } from "@/services/Employer/paste";
 import { type EmployerData, EmployerInputSchema, fieldErrors } from "@/services/Employer/schema";
+import { defaultRegistry } from "@/services/Registry/registries";
 
 import type { SavedEmployer } from "@/types";
 
-import AbnLookup from "@/components/structures/Employers/AbnLookup";
+import BusinessLookup from "@/components/structures/Employers/BusinessLookup";
 import PasteDetails from "@/components/structures/Employers/PasteDetails";
 import Button from "@/components/ui/Button";
 
@@ -55,7 +56,7 @@ function Group({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-type Helper = "abn" | "paste" | null;
+type Helper = "lookup" | "paste" | null;
 
 /** One of the two ways to fill the form faster. */
 function HelperTab({
@@ -200,11 +201,11 @@ function EmployerForm({
       <div className="flex flex-col gap-3">
         <div className="grid grid-cols-2 gap-2">
           <HelperTab
-            active={helper === "abn"}
+            active={helper === "lookup"}
             icon={<Search className="size-4" aria-hidden="true" />}
-            onClick={() => setHelper((h) => (h === "abn" ? null : "abn"))}
+            onClick={() => setHelper((h) => (h === "lookup" ? null : "lookup"))}
           >
-            Look up ABN
+            Look up business
           </HelperTab>
           <HelperTab
             active={helper === "paste"}
@@ -215,12 +216,14 @@ function EmployerForm({
           </HelperTab>
         </div>
 
-        {helper === "abn" ? (
-          <AbnLookup
+        {helper === "lookup" ? (
+          <BusinessLookup
+            // Starts on the register that fits the country typed, else the currency.
+            initial={defaultRegistry(text.country, currency || settingsCurrency)}
             onUse={(values, legalName) => {
               fill(values);
               // Forms sometimes ask for the legal name: keep it in the notes.
-              if (legalName !== values.name) {
+              if (legalName && legalName !== values.name) {
                 setText((current) =>
                   current.notes.includes(legalName)
                     ? current

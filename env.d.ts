@@ -25,6 +25,8 @@ export const envSchema = z.object({
   RESEND_SUBJECT: z.string(),
   /** ABN Lookup web services GUID (free, abr.business.gov.au/Tools/WebServices). Unset: lookup off. */
   ABR_GUID: z.string().optional(),
+  /** NZBN API subscription key (free, portal.api.business.govt.nz). Unset: NZ lookup off. */
+  NZBN_API_KEY: z.string().optional(),
 });
 
 declare global {

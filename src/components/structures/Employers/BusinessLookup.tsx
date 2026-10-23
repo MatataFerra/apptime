@@ -4,65 +4,58 @@ import { useId, useState } from "react";
 
 import { AlertTriangle, Search } from "lucide-react";
 
-import { type AbnDetails, type AbnMatch, tidyName } from "@/services/Abr/parse";
 import type { PastedEmployer } from "@/services/Employer/paste";
+import { REGISTRIES, REGISTRY_ORDER } from "@/services/Registry/registries";
+import type { BusinessDetails, BusinessMatch, RegistryId } from "@/services/Registry/types";
 
 import Button from "@/components/ui/Button";
 
 import { cn } from "@/utils/helpers/styleMerger";
 
-import { onLookupAbn } from "@/server-actions/abn-lookup";
+import { onLookupBusiness } from "@/server-actions/business-lookup";
 
-/** "2000-07-01" -> "1 Jul 2000"; anything else as it came. */
-function day(value: string | null) {
-  if (!value) return null;
-  const date = new Date(`${value}T12:00:00`);
-  return isNaN(date.valueOf())
-    ? value
-    : date.toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" });
+export type UseBusiness = (fields: PastedEmployer, legalName: string | null) => void;
+
+/** ISO dates inside a line -> "1 Jul 2000". */
+function readableDates(value: string) {
+  return value.replace(/\b(\d{4}-\d{2}-\d{2})\b/g, (iso) => {
+    const date = new Date(`${iso}T12:00:00`);
+    return isNaN(date.valueOf())
+      ? iso
+      : date.toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" });
+  });
 }
 
-/** What the register knows, as form fields, plus the legal name for the notes. */
-function toFields(details: AbnDetails, name: string): PastedEmployer {
-  return {
-    name,
-    taxId: details.abn,
-    region: details.state ?? undefined,
-    postcode: details.postcode ?? undefined,
-    country: "Australia",
-  };
-}
-
-function Details({
-  details,
-  onUse,
-}: {
-  details: AbnDetails;
-  onUse: (fields: PastedEmployer, legalName: string) => void;
-}) {
-  const names = [...new Set([...details.businessNames, details.entityName].map(tidyName))];
-  const [name, setName] = useState(names[0]);
-  const legalName = tidyName(details.entityName);
-  const active = details.status?.toLowerCase() === "active";
+function Details({ details, onUse }: { details: BusinessDetails; onUse: UseBusiness }) {
+  const info = REGISTRIES[details.registry];
+  const [name, setName] = useState<string | null>(details.names[0] ?? null);
   const groupId = useId();
+  const f = details.fields;
 
-  const rows: [string, string | null][] = [
-    ["ABN", details.abn],
-    ["Legal name", legalName],
-    ["Type", details.entityType],
-    ["Location", [details.state, details.postcode].filter(Boolean).join(" ") || null],
-    ["GST", details.gstSince ? `Registered since ${day(details.gstSince)}` : "Not registered"],
+  const rows: [string, string | null | undefined][] = [
+    [info.idLabel, details.id],
+    ["Legal name", details.legalName],
+    ...details.facts.map((fact) => [fact.label, fact.value] as [string, string]),
+    [
+      "Address",
+      [f.address, [f.city, f.region, f.postcode].filter(Boolean).join(" ")]
+        .filter(Boolean)
+        .join(", "),
+    ],
+    ["Industry", f.industry],
+    ["Email", f.contactEmail],
+    ["Phone", f.contactPhone],
   ];
 
   return (
     <div className="flex flex-col gap-3">
-      {!active ? (
+      {details.active === false ? (
         <p className="flex items-start gap-2 rounded-xl bg-destructive-soft px-3 py-2.5 text-[0.8125rem] text-destructive">
           <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
           <span>
-            This ABN is {details.status?.toLowerCase() ?? "not active"}
-            {details.statusSince ? ` since ${day(details.statusSince)}` : ""}. Check with the
-            employer before using it on a visa or tax form.
+            This {info.idLabel} is {details.status?.toLowerCase() ?? "not active"}
+            {details.statusSince ? ` since ${readableDates(details.statusSince)}` : ""}. Check with
+            the employer before using it on a visa or tax form.
           </span>
         </p>
       ) : null}
@@ -73,17 +66,17 @@ function Details({
           .map(([label, value]) => (
             <div key={label} className="contents">
               <dt className="text-ink-muted">{label}</dt>
-              <dd className="min-w-0 break-words text-ink">{value}</dd>
+              <dd className="min-w-0 break-words text-ink">{readableDates(value)}</dd>
             </div>
           ))}
       </dl>
 
-      {names.length > 1 ? (
+      {details.names.length > 1 ? (
         <fieldset className="flex flex-col gap-1.5">
           <legend className="mb-1 text-[0.8125rem] text-ink-muted">
             Which name do you know it by?
           </legend>
-          {names.map((option) => (
+          {details.names.map((option) => (
             <label
               key={option}
               className="flex items-center gap-2 rounded-lg px-1 py-1 text-[0.875rem] text-ink"
@@ -101,15 +94,13 @@ function Details({
         </fieldset>
       ) : null}
 
-      <p className="text-[0.8125rem] text-ink-subtle">
-        The register has no street address: add it yourself.
-      </p>
+      {details.note ? <p className="text-[0.8125rem] text-ink-subtle">{details.note}</p> : null}
 
       <Button
         type="button"
         size="md"
         classes="w-full"
-        onClick={() => onUse(toFields(details, name), legalName)}
+        onClick={() => onUse({ ...details.fields, ...(name && { name }) }, details.legalName)}
       >
         Use these details
       </Button>
@@ -118,25 +109,34 @@ function Details({
 }
 
 /**
- * Finds a business on the Australian Business Register by ABN or name and
- * hands its details to the form.
+ * Finds a business in a public register (Australia's ABR, New Zealand's
+ * NZBN, the EU's VIES) and hands its details to the form.
  */
-function AbnLookup({ onUse }: { onUse: (fields: PastedEmployer, legalName: string) => void }) {
+function BusinessLookup({ initial, onUse }: { initial: RegistryId; onUse: UseBusiness }) {
+  const [registry, setRegistry] = useState<RegistryId>(initial);
   const [query, setQuery] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [matches, setMatches] = useState<AbnMatch[] | null>(null);
-  const [details, setDetails] = useState<AbnDetails | null>(null);
+  const [matches, setMatches] = useState<BusinessMatch[] | null>(null);
+  const [details, setDetails] = useState<BusinessDetails | null>(null);
   const inputId = useId();
+  const info = REGISTRIES[registry];
+
+  function pick(next: RegistryId) {
+    setRegistry(next);
+    setError(null);
+    setMatches(null);
+    setDetails(null);
+  }
 
   async function run(value: string) {
     setBusy(true);
     setError(null);
     setDetails(null);
-    const result = await onLookupAbn(value).catch(() => null);
+    const result = await onLookupBusiness(registry, value).catch(() => null);
     setBusy(false);
 
-    if (!result) return setError("The ABN Lookup didn't answer, try again later");
+    if (!result) return setError("The register didn't answer, try again later");
     if (!result.ok) return setError(result.error);
     if (result.kind === "details") {
       setMatches(null);
@@ -148,15 +148,36 @@ function AbnLookup({ onUse }: { onUse: (fields: PastedEmployer, legalName: strin
 
   return (
     <div className="flex flex-col gap-3">
+      <div role="radiogroup" aria-label="Register" className="flex flex-wrap gap-1.5">
+        {REGISTRY_ORDER.map((id) => (
+          <button
+            key={id}
+            type="button"
+            role="radio"
+            aria-checked={registry === id}
+            onClick={() => pick(id)}
+            className={cn(
+              "h-8 rounded-full border px-3 text-[0.8125rem] font-semibold transition-colors",
+              registry === id
+                ? "border-ink bg-ink text-surface"
+                : "border-border-strong text-ink-muted hover:text-ink"
+            )}
+          >
+            {REGISTRIES[id].label}
+          </button>
+        ))}
+      </div>
+
       <label htmlFor={inputId} className="flex flex-col gap-1 text-[0.8125rem] text-ink-muted">
-        ABN or business name
+        {info.inputLabel}
         <span className="flex gap-2">
           <input
             id={inputId}
             value={query}
             enterKeyHint="search"
             autoComplete="off"
-            placeholder="51 824 753 556 or Sunny Farms"
+            autoCapitalize={registry === "vies" ? "characters" : undefined}
+            placeholder={info.placeholder}
             onChange={(e) => setQuery(e.target.value)}
             // Inside the employer form: Enter searches instead of saving.
             onKeyDown={(e) => {
@@ -184,23 +205,21 @@ function AbnLookup({ onUse }: { onUse: (fields: PastedEmployer, legalName: strin
       {error ? <p className="text-[0.8125rem] text-destructive">{error}</p> : null}
 
       {details ? (
-        <Details details={details} onUse={onUse} />
+        <Details key={details.id} details={details} onUse={onUse} />
       ) : matches && matches.length > 0 ? (
         <ul className="flex flex-col divide-y divide-border rounded-xl border border-border">
           {matches.map((match) => (
-            <li key={match.abn}>
+            <li key={match.id}>
               <button
                 type="button"
                 disabled={busy}
-                onClick={() => run(match.abn)}
-                className={cn(
-                  "flex w-full flex-col gap-0.5 px-3 py-2.5 text-left transition-colors hover:bg-surface-sunken"
-                )}
+                onClick={() => run(match.id)}
+                className="flex w-full flex-col gap-0.5 px-3 py-2.5 text-left transition-colors hover:bg-surface-sunken"
               >
-                <span className="text-[0.875rem] text-ink">{tidyName(match.name)}</span>
+                <span className="text-[0.875rem] text-ink">{match.name}</span>
                 <span className="text-[0.75rem] text-ink-muted tabular-nums">
-                  ABN {match.abn}
-                  {match.state ? ` · ${match.state} ${match.postcode ?? ""}` : ""}
+                  {info.idLabel} {match.id}
+                  {match.detail ? ` · ${match.detail}` : ""}
                 </span>
               </button>
             </li>
@@ -208,11 +227,9 @@ function AbnLookup({ onUse }: { onUse: (fields: PastedEmployer, legalName: strin
         </ul>
       ) : null}
 
-      <p className="text-[0.75rem] text-ink-subtle">
-        From ABN Lookup, Australian Business Register.
-      </p>
+      <p className="text-[0.75rem] text-ink-subtle">{info.source}</p>
     </div>
   );
 }
 
-export default AbnLookup;
+export default BusinessLookup;

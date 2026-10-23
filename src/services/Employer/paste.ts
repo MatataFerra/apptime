@@ -1,4 +1,4 @@
-import { formatAbn, isValidAbn } from "@/services/Abr/parse";
+import { formatAbn, isValidAbn } from "@/services/Registry/abr/parse";
 
 /*
   Pasted text (an email signature, a payslip header, a job ad) -> employer

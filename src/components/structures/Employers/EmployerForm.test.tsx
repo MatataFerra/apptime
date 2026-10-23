@@ -3,20 +3,21 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 vi.mock("@/hooks/useMoney", () => ({ useCurrency: () => "AUD" }));
-vi.mock("@/server-actions/abn-lookup", () => ({
-  onLookupAbn: vi.fn(async () => ({
+vi.mock("@/server-actions/business-lookup", () => ({
+  onLookupBusiness: vi.fn(async () => ({
     ok: true,
     kind: "details",
     details: {
-      abn: "51 824 753 556",
+      registry: "abr",
+      id: "51 824 753 556",
+      active: false,
       status: "Cancelled",
       statusSince: "2024-01-01",
-      entityName: "SUNNY HOLDINGS PTY LTD",
-      businessNames: ["SUNNY FARMS"],
-      entityType: "Australian Private Company",
-      state: "QLD",
-      postcode: "4670",
-      gstSince: null,
+      legalName: "Sunny Holdings Pty Ltd",
+      names: ["Sunny Farms", "Sunny Holdings Pty Ltd"],
+      fields: { taxId: "51 824 753 556", region: "QLD", postcode: "4670", country: "Australia" },
+      facts: [{ label: "Type", value: "Australian Private Company" }],
+      note: "The register has no street address: add it yourself.",
     },
   })),
 }));
@@ -64,10 +65,10 @@ describe("EmployerForm helpers", () => {
     );
   });
 
-  test("ABN lookup: warns on a cancelled ABN and keeps the legal name in the notes", async () => {
+  test("business lookup: warns on a cancelled ABN and keeps the legal name in the notes", async () => {
     const { user } = setup();
 
-    await user.click(screen.getByRole("button", { name: /look up abn/i }));
+    await user.click(screen.getByRole("button", { name: /look up business/i }));
     await user.type(screen.getByLabelText(/abn or business name/i), "51824753556{Enter}");
 
     expect(await screen.findByText(/this abn is cancelled/i)).toBeInTheDocument();

@@ -5,9 +5,9 @@ import {
   isValidAbn,
   parseAbnDetails,
   parseMatchingNames,
-  tidyName,
   unwrapJsonp,
-} from "@/services/Abr/parse";
+} from "@/services/Registry/abr/parse";
+import { tidyName } from "@/services/Registry/text";
 
 describe("ABN checksum", () => {
   test("accepts valid ABNs with or without spaces", () => {
