@@ -14,7 +14,6 @@
     "eslint:fix": "pnpm eslint . --fix",
     "ts-lint": "tsc --noEmit --incremental --watch",
     "coverage": "vitest --coverage",
-    "compose": "docker compose -f \"docker-compose.yml\" up -d --build --remove-orphans",
     "prisma:migrate": "bash ./scripts/prisma-migrate.sh",
     "prisma:push": "dotenv -e .env.local -- prisma db push",
     "prisma:seed": "dotenv -e .env.local -- prisma db seed",
