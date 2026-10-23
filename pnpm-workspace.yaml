@@ -1,7 +1,7 @@
 packages:
+  - '.'
 
 engineStrict: true
-  - '.'
 
 allowBuilds:
   '@parcel/watcher': true
