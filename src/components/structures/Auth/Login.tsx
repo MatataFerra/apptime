@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import Button from "@/components/ui/Button";
 
 type Props = {
@@ -5,6 +7,8 @@ type Props = {
 };
 
 function Login({ handleLogin }: Props) {
+  const t = useTranslations("nav");
+
   return (
     <Button
       type="button"
@@ -13,7 +17,7 @@ function Login({ handleLogin }: Props) {
       classes="w-full rounded-2xl"
       onClick={handleLogin}
     >
-      Log in
+      {t("log_in")}
     </Button>
   );
 }

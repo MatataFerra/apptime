@@ -1,13 +1,14 @@
 import type { ReactNode } from "react";
 
 import { ChevronRight } from "lucide-react";
-import Link from "next/link";
 
 import { type CSSClassNames } from "@/types";
 
 import { MODULE_THEMES, MODULES } from "@/utils/constants/modules";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 import { cn } from "@/utils/helpers/styleMerger";
+
+import { Link } from "@/i18n/navigation";
 
 type Props = {
   title?: string;

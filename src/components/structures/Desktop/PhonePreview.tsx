@@ -1,4 +1,5 @@
 import { Package, Timer, Zap } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { LogoMark } from "@/components/ui/Logo";
 
@@ -14,6 +15,9 @@ const BARS = [
 
 /** A static picture of the Home screen inside a phone frame. Decorative. */
 function PhonePreview() {
+  const t = useTranslations("no_mobile.preview");
+  const tm = useTranslations("modules");
+
   return (
     <div aria-hidden="true" className="relative hidden justify-self-center lg:block">
       <div className="w-[310px] rotate-[3deg] rounded-[48px] bg-surface-inverse p-3 shadow-[0_40px_80px_-30px_rgb(20_33_28/0.55)]">
@@ -31,30 +35,30 @@ function PhonePreview() {
 
           <div className="flex items-end justify-between">
             <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-ink-muted">Sunday, October</span>
+              <span className="text-xs text-ink-muted">{t("date")}</span>
               <span className="display-title text-[3.25rem] leading-[0.85] text-ink">18</span>
             </div>
             <span className="mb-1 max-w-[7rem] text-right text-xs text-ink-muted">
-              Hi Sam, this is week 42.
+              {t("greeting")}
             </span>
           </div>
 
           <div className="flex items-center gap-2.5 rounded-2xl bg-track px-3 py-2.5 text-white">
             <span className="size-2 rounded-full bg-live" />
             <span className="flex flex-1 flex-col">
-              <span className="text-[0.625rem] text-white/75">On the clock since 8:00 AM</span>
+              <span className="text-[0.625rem] text-white/75">{t("since")}</span>
               <span className="figure text-lg leading-none">
                 3<span className="text-[0.6em] text-white/60">h</span>24
                 <span className="text-[0.6em] text-white/60">m</span>
               </span>
             </span>
             <span className="rounded-full bg-white/15 px-2.5 py-1 text-[0.625rem] font-semibold">
-              Open
+              {t("open")}
             </span>
           </div>
 
           <div className="flex flex-col gap-3 rounded-2xl bg-surface-inverse p-3.5 text-ink-inverse">
-            <span className="text-[0.625rem] text-ink-inverse/70">This week</span>
+            <span className="text-[0.625rem] text-ink-inverse/70">{t("this_week")}</span>
             <div className="grid grid-cols-3">
               <span className="figure text-xl leading-none text-live">$612</span>
               <span className="figure text-xl leading-none">26h</span>
@@ -80,9 +84,13 @@ function PhonePreview() {
 
           <div className="grid grid-cols-3 gap-2">
             {[
-              { icon: Timer, label: "Track", cls: "bg-track-soft text-track-ink" },
-              { icon: Zap, label: "Fast charge", cls: "bg-fast-soft text-fast-ink" },
-              { icon: Package, label: "Production", cls: "bg-production-soft text-production-ink" },
+              { icon: Timer, label: tm("track.title"), cls: "bg-track-soft text-track-ink" },
+              { icon: Zap, label: tm("fast_charge.title"), cls: "bg-fast-soft text-fast-ink" },
+              {
+                icon: Package,
+                label: tm("production.title"),
+                cls: "bg-production-soft text-production-ink",
+              },
             ].map(({ icon: Icon, label, cls }) => (
               <span
                 key={label}

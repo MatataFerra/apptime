@@ -1,11 +1,172 @@
 {
-  "no-mobile": {
-    "navigation": {},
-    "subscription": {
-      "notify_message": "¿Quieres que te avisemos cuando la versión de escritorio esté disponible?",
-      "success_message": "¡Gracias por suscribirte!",
-      "title": "La versión de escritorio está en camino"
+  "metadata": {
+    "title": "CasualApp",
+    "description": "Registra tus horas y mira cuánto ganas, turno a turno."
+  },
+  "modules": {
+    "track": { "title": "Turno en vivo" },
+    "fast_charge": { "title": "Carga rápida" },
+    "production": { "title": "Producción" },
+    "employers": { "title": "Empleadores", "description": "Dónde trabajas y sus datos" },
+    "dashboard": { "title": "Panel" },
+    "estimate": { "title": "Estimar", "description": "Cuánto paga un período de trabajo" },
+    "compare": { "title": "Comparar", "description": "Por pieza o por hora" },
+    "taxes": { "title": "Impuestos", "description": "Tus tasas y deducciones" },
+    "settings": { "title": "Ajustes" }
+  },
+  "nav": {
+    "main": "Principal",
+    "menu": "Menú",
+    "open_menu": "Abrir menú",
+    "description": "Este es el menú principal, desde aquí puedes ir a las distintas secciones de la app.",
+    "home_label": "CasualApp, inicio",
+    "your_account": "Tu cuenta",
+    "log_in": "Iniciar sesión",
+    "log_out": "Cerrar sesión",
+    "groups": {
+      "log_work": "Registrar trabajo",
+      "your_money": "Tu dinero",
+      "account": "Cuenta"
+    }
+  },
+  "validation": {
+    "required": "Este campo es obligatorio",
+    "invalid_value": "Este valor no es válido",
+    "invalid_email": "El email no es válido",
+    "min_chars": "Al menos {min} caracteres",
+    "max_chars": "Como máximo {max} caracteres",
+    "min_number": "Debe ser {min} o más",
+    "max_number": "Debe ser {max} o menos"
+  },
+  "errors": {
+    "generic": "Algo salió mal, por favor intenta de nuevo",
+    "too_many_attempts": "Demasiados intentos. Intenta de nuevo en un rato.",
+    "email_not_sent": "No pudimos enviar el email. Intenta de nuevo.",
+    "password_invalid": "La contraseña no es válida",
+    "reset_link_invalid": "El enlace venció o no es válido. Pide uno nuevo."
+  },
+  "auth": {
+    "go_home": "Volver al inicio",
+    "fields": {
+      "email": "Email",
+      "password": "Contraseña",
+      "confirm_password": "Confirmar contraseña"
     },
+    "login": {
+      "title": "Iniciar sesión",
+      "subtitle": "Tus horas y tu paga, donde las dejaste.",
+      "submit": "Entrar",
+      "register_link": "Crear una cuenta",
+      "forgot_link": "¿Olvidaste tu contraseña?",
+      "wrong_password": "Usuario o contraseña incorrectos"
+    },
+    "register": {
+      "title": "Crea tu cuenta",
+      "subtitle": "Empieza a registrar turnos en menos de un minuto.",
+      "submit": "Registrarme",
+      "login_link": "Iniciar sesión",
+      "invalid_body": "Ocurrió un error durante el registro, por favor intenta de nuevo",
+      "user_already_exist": "El usuario ya existe",
+      "successful": "Cuenta creada, te llevamos a la app",
+      "max_attempts": "Demasiados intentos, espera un momento antes de volver a intentar"
+    },
+    "forgot": {
+      "email_label": "Ingresa tu email",
+      "email_placeholder": "usuario@gmail.com",
+      "submit": "Enviar email para restablecer la contraseña",
+      "email_sent": "Email enviado",
+      "success": "Te enviamos el email, revisa tu bandeja de entrada."
+    },
+    "reset": {
+      "submit": "Restablecer contraseña",
+      "mismatch": "Las contraseñas no coinciden",
+      "success": "Tu contraseña se actualizó"
+    },
+    "password_rules": {
+      "CAPITAL_LETTER": "Al menos 1 mayúscula",
+      "ONE_NUMBER": "Al menos 1 número",
+      "MIN_LENGTH": "Al menos 8 caracteres",
+      "SPECIAL_CHAR": "Al menos 1 carácter especial"
+    }
+  },
+  "email": {
+    "reset_password": {
+      "subject": "Restablece tu contraseña de CasualApp",
+      "greeting": "¡Hola, {name}!",
+      "intro": "Pediste restablecer tu contraseña de CasualApp. Si no fuiste tú,",
+      "ignore": "ignora este email y cambia tu contraseña.",
+      "cta": "Haz clic en el enlace para elegir una contraseña nueva. Funciona durante una hora."
+    }
+  },
+  "shift": {
+    "saved": "Turno guardado",
+    "save_failed": "No se pudo guardar el turno",
+    "try_again": "Por favor intenta de nuevo.",
+    "your_shift": "Tu turno",
+    "minutes": "{count} min",
+    "fields": {
+      "job": "Trabajo",
+      "start": "Inicio",
+      "finish": "Fin",
+      "unpaid_breaks": "Descansos no pagos",
+      "hourly_rate": "Pago por hora"
+    },
+    "tags": {
+      "repeated": "Repetido",
+      "regular_day": "Día normal"
+    }
+  },
+  "home": {
+    "popover": "Cuando el estado es offline, significa que el usuario todavía no inició ningún turno",
+    "popover_label": "Información del estado del turno",
+    "month_earned": "{amount} este mes",
+    "header": {
+      "greeting_name": "Hola {name}, esta es la semana {week}.",
+      "greeting": "Bienvenido, esta es la semana {week}."
+    },
+    "sections": {
+      "modules": "Módulos",
+      "log_work": "Registrar trabajo",
+      "see_money": "Mira tu dinero"
+    },
+    "theme": {
+      "to_light": "Cambiar a modo claro",
+      "to_dark": "Cambiar a modo oscuro"
+    },
+    "week": {
+      "title": "Esta semana",
+      "range": "{from} a {to}",
+      "earned": "ganado",
+      "worked": "trabajado",
+      "shifts": "{count, plural, one {turno} other {turnos}}",
+      "per_day": "Ganancias por día",
+      "other_currency": "turnos en otra moneda",
+      "no_shifts": "sin turnos",
+      "converted": "Incluye turnos en {currencies} convertidos al tipo de cambio de cada día.",
+      "also_earned": "Ganado en {currency}. También esta semana: {others}."
+    },
+    "live": {
+      "in_progress": "Turno en curso",
+      "open_track": "Turno en curso, {hours} horas {mins} minutos. Abrir Turno en vivo",
+      "since": "Trabajando desde las {time}",
+      "so_far": "{amount} hasta ahora",
+      "hourly_shift": "Turno por hora",
+      "saving": "Guardando tu turno…",
+      "confirm": "¿Terminar este turno?",
+      "keep_going": "Seguir",
+      "finish_at": "Terminar a las {time}",
+      "finish": "Terminar turno"
+    },
+    "repeat": {
+      "label": "Repetir tu última carga rápida",
+      "same_as": "¿Igual que el {day}?",
+      "fallback_name": "Carga rápida",
+      "summary": "{start} – {end} · {hours} a {rate}/h",
+      "log_today": "Registrarlo para hoy",
+      "saved_description": "{name} para hoy."
+    }
+  },
+  "no_mobile": {
     "badge": "Solo móvil, por ahora",
     "eyebrow": "Hecha para tu teléfono",
     "title": "Tu temporada, en tu bolsillo.",
@@ -18,23 +179,22 @@
     "feature_pieces": "Registra trabajo por pieza",
     "feature_pieces_hint": "Bins, bandejas, hileras",
     "feature_pay": "Sabe cuánto cobras",
-    "feature_pay_hint": "Con impuestos descontados"
-  },
-  "login": {
-    "wrong_password": "User or password are not valid",
-    "account": {
-      "has_account": "Don't you have an account?",
-      "register": "register"
+    "feature_pay_hint": "Con impuestos descontados",
+    "subscription": {
+      "title": "La versión de escritorio está en camino",
+      "notify_message": "¿Quieres que te avisemos cuando la versión de escritorio esté disponible?",
+      "success_message": "¡Gracias por suscribirte!",
+      "email_label": "Email",
+      "placeholder": "usuario@email.com",
+      "submit": "Avisarme",
+      "error": "Algo salió mal, por favor intenta más tarde."
+    },
+    "preview": {
+      "date": "Domingo, octubre",
+      "greeting": "Hola Sam, esta es la semana 42.",
+      "since": "Trabajando desde las 8:00",
+      "open": "Abrir",
+      "this_week": "Esta semana"
     }
-  },
-  "register": {
-    "invalid_body": "An error ocurr during the registration, please try again",
-    "user_already_exist": "User already exist",
-    "successful": "User created succefully, will be redirected to main page",
-    "unexpected_error_after_register": "Something happend with the redirection, please try login again",
-    "max_attemps_to_register": "You have been tried to much times, please wait to try another time"
-  },
-  "home": {
-    "popover": "When state is offline it means that the user doesn't start any shift yet"
   }
 }

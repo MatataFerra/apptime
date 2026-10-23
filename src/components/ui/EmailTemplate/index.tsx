@@ -1,28 +1,29 @@
+import type { Locale } from "@/types";
+
+import { translatorFor } from "@/i18n/translator";
+
 interface EmailTemplateProps {
   firstName: string;
   url: string;
-  locale: string;
+  locale: Locale;
   endpoint: string;
   token: string;
 }
 
+/** The password reset email, in the language of the page that asked for it. */
 export function EmailTemplate({ firstName, url, locale, endpoint, token }: EmailTemplateProps) {
+  const t = translatorFor(locale);
+  const link = `${url}${locale}/${endpoint}/${token}`;
+
   return (
     <div>
-      <h1>Hello, {firstName}!</h1>
+      <h1>{t("email.reset_password.greeting", { name: firstName })}</h1>
       <p>
-        You have requested reset your password for CasualApp, if you have not asked for a password{" "}
-        <strong>please ignore this email and change your password</strong>
+        {t("email.reset_password.intro")} <strong>{t("email.reset_password.ignore")}</strong>
       </p>
-      <p>
-        Please click in the following link to change your password. The link will be able for a few
-        hours
-      </p>
-      <a href={`${url}${locale}/${endpoint}/${token}`}>
-        <span>
-          {url}
-          {locale}/{endpoint}/{token}
-        </span>
+      <p>{t("email.reset_password.cta")}</p>
+      <a href={link}>
+        <span>{link}</span>
       </a>
     </div>
   );

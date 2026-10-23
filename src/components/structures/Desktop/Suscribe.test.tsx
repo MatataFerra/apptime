@@ -12,6 +12,8 @@ import createFetchMock from "vitest-fetch-mock";
 
 import Suscribe from "@/components/structures/Desktop/Suscribe";
 
+import ZodI18n from "@/providers/ZodI18n";
+
 const fetchMocker = createFetchMock(vi);
 fetchMocker.enableMocks();
 
@@ -19,7 +21,7 @@ describe("Suscribe Component", () => {
   const useRouter = vi.spyOn(require("next/router"), "useRouter");
   const queryClient = new QueryClient();
 
-  function Providers({ children, locale = "en" }: { children: React.ReactNode; locale: string }) {
+  function Providers({ children, locale = "en" }: { children: React.ReactNode; locale: "en" | "es" }) {
     const messages = require(`../../../../messages/${locale}.json`);
     useRouter.mockImplementationOnce(() => ({
       query: { locale: locale },
@@ -28,6 +30,7 @@ describe("Suscribe Component", () => {
     return (
       <QueryClientProvider client={queryClient}>
         <NextIntlClientProvider messages={messages} locale={locale}>
+          <ZodI18n />
           {children}
         </NextIntlClientProvider>
       </QueryClientProvider>

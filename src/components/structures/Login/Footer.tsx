@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { CSSClassNames } from "@/types";
 
@@ -19,6 +20,7 @@ interface Props extends Omit<React.HTMLAttributes<HTMLElement>, "className"> {
 
 function LoginFooter({ classes, idForm = "form" }: Props) {
   const params = useSearchParams();
+  const t = useTranslations("auth.login");
 
   function onGoogleAuth() {
     authClient.signIn.social({
@@ -29,7 +31,7 @@ function LoginFooter({ classes, idForm = "form" }: Props) {
   return (
     <Footer classes={classes}>
       <Button type="submit" variant="black" classes="w-full text-base" form={idForm}>
-        Login
+        {t("submit")}
       </Button>
       <GoogleButton onGoogleAuth={() => {}} disabled />
     </Footer>

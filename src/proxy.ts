@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import i18n from "@/services/i18n";
-import { decideAccess } from "@/services/Router/access";
+import { decideAccess, localeOf } from "@/services/Router/access";
 import ut from "@/services/Utilities";
 
 import { auth } from "@/utils/auth";
@@ -22,7 +22,14 @@ export default async function proxy(req: NextRequest) {
       (await auth.api.getSession({ headers: req.headers }).catch(() => null))?.user ?? null,
   });
 
-  if (decision.type === "next") return NextResponse.next();
+  if (decision.type === "next") {
+    // next-intl reads the locale of server components and server actions
+    // from this header (its own middleware would set it; this proxy does).
+    const headers = new Headers(req.headers);
+    const locale = localeOf(req.nextUrl.pathname);
+    if (locale) headers.set("X-NEXT-INTL-LOCALE", locale);
+    return NextResponse.next({ request: { headers } });
+  }
 
   const url = req.nextUrl.clone();
   url.pathname = decision.pathname;

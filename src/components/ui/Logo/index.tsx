@@ -1,9 +1,11 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 import { cn } from "@/utils/helpers/styleMerger";
+
+import { Link } from "@/i18n/navigation";
 
 interface Props {
   withText?: boolean;
@@ -36,10 +38,12 @@ export function LogoMark({ className }: { className?: string }) {
 }
 
 function Logo({ withText, classes }: Props) {
+  const t = useTranslations("nav");
+
   return (
     <Link
       href={PATH_NAMES.HOME}
-      aria-label="CasualApp, home"
+      aria-label={t("home_label")}
       className={cn("flex items-center gap-1.5 rounded-md text-ink select-none", classes)}
     >
       <LogoMark className="size-7" />

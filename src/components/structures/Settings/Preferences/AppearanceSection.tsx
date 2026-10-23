@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 
-import { usePathname, useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 
 import { SUPPORTED_LOCALES } from "@/utils/constants";
+import { isLocale } from "@/utils/helpers/locale";
 import {
   applyTheme,
   isThemePreference,
@@ -16,6 +16,7 @@ import usePreferences from "@/hooks/usePreferences";
 
 import { Row, Section } from "./Section";
 import Segmented from "./Segmented";
+import { usePathname, useRouter } from "@/i18n/navigation";
 
 const LANGUAGES: Record<(typeof SUPPORTED_LOCALES)[number], string> = {
   en: "English",
@@ -39,9 +40,10 @@ function AppearanceSection() {
   }
 
   function onLanguage(next: string) {
-    if (next === locale) return;
-    const rest = pathname.replace(new RegExp(`^/(${SUPPORTED_LOCALES.join("|")})(?=/|$)`), "");
-    router.replace(`/${next}${rest || ""}`);
+    if (next === locale || !isLocale(next)) return;
+    // Same page in the other language; also saves the choice (NEXT_LOCALE
+    // cookie) so links and visits without a locale keep it.
+    router.replace(pathname, { locale: next });
   }
 
   return (

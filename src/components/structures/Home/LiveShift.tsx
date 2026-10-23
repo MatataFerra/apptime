@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { ChevronRight, LoaderCircle, Square } from "lucide-react";
-import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { useInterval } from "usehooks-ts";
 
 import { runningShiftEarnings } from "@/services/Summary";
@@ -12,6 +12,8 @@ import { PATH_NAMES } from "@/utils/constants/pathnames";
 import useFinishShift from "@/hooks/useFinishShift";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
 import useMoney from "@/hooks/useMoney";
+
+import { Link } from "@/i18n/navigation";
 
 function elapsed(start: Date, now: Date) {
   const minutes = Math.max(0, Math.floor((now.valueOf() - start.valueOf()) / 60000));
@@ -24,6 +26,8 @@ function elapsed(start: Date, now: Date) {
  */
 function LiveShift() {
   const money = useMoney();
+  const t = useTranslations("home.live");
+  const locale = useLocale();
   const { data: hourly } = useHourlyShifts();
   const { finish, finishing } = useFinishShift();
   const [now, setNow] = useState(() => new Date());
@@ -43,17 +47,20 @@ function LiveShift() {
 
   const { hours, mins } = elapsed(start, now);
   const earned = runningShiftEarnings(running, now);
-  const startedAt = start.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  function clock(date: Date) {
+    return date.toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit" });
+  }
+  const startedAt = clock(start);
 
   return (
     <section
       data-testid="live-shift"
-      aria-label="Shift in progress"
+      aria-label={t("in_progress")}
       className="flex flex-col gap-3 rounded-xl bg-track p-4 text-on-module shadow-float"
     >
       <Link
         href={PATH_NAMES.TRACK}
-        aria-label={`Shift in progress, ${hours} hours ${mins} minutes. Open Track`}
+        aria-label={t("open_track", { hours, mins })}
         className="group flex items-center gap-3.5 rounded-xl"
       >
         <span className="relative flex size-2.5 shrink-0" aria-hidden="true">
@@ -63,7 +70,7 @@ function LiveShift() {
 
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="text-[0.8125rem] font-medium text-on-module/75">
-            On the clock since {startedAt}
+            {t("since", { time: startedAt })}
           </span>
           <span className="flex items-baseline gap-2.5">
             <span className="figure text-[1.75rem] leading-none">
@@ -74,8 +81,8 @@ function LiveShift() {
             </span>
             <span className="truncate text-sm text-on-module/80">
               {earned > 0
-                ? `${money(earned, { currency: running.currency })} so far`
-                : running.name || "Hourly shift"}
+                ? t("so_far", { amount: money(earned, { currency: running.currency }) })
+                : running.name || t("hourly_shift")}
             </span>
           </span>
         </span>
@@ -95,16 +102,16 @@ function LiveShift() {
             className="size-4 animate-spin motion-reduce:animate-none"
             aria-hidden="true"
           />
-          Saving your shift…
+          {t("saving")}
         </div>
       ) : confirming ? (
-        <div className="grid grid-cols-2 gap-2" role="group" aria-label="Finish this shift?">
+        <div className="grid grid-cols-2 gap-2" role="group" aria-label={t("confirm")}>
           <button
             type="button"
             onClick={() => setConfirming(false)}
             className="h-11 rounded-xl bg-on-module/15 text-sm font-semibold transition-colors hover:bg-on-module/25"
           >
-            Keep going
+            {t("keep_going")}
           </button>
           <button
             type="button"
@@ -114,7 +121,7 @@ function LiveShift() {
             }}
             className="h-11 rounded-xl bg-surface text-sm font-semibold text-ink transition-transform active:scale-[0.98]"
           >
-            {`Finish at ${now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`}
+            {t("finish_at", { time: clock(now) })}
           </button>
         </div>
       ) : (
@@ -127,7 +134,7 @@ function LiveShift() {
           className="flex h-11 items-center justify-center gap-2 rounded-xl bg-on-module/15 text-sm font-semibold transition-colors hover:bg-on-module/25"
         >
           <Square className="size-3.5 fill-current" aria-hidden="true" />
-          Finish shift
+          {t("finish")}
         </button>
       )}
     </section>

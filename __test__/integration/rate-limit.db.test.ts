@@ -154,7 +154,7 @@ describe("rate limiting on a real database", () => {
       env.emails.length = 0;
       expect(await onSendEmailToResetPassword("ana@x.com", "en")).toEqual({
         response: false,
-        message: "Too many attempts. Please try again in a while.",
+        error: "too_many_attempts",
       });
       expect(env.emails).toHaveLength(0);
     });

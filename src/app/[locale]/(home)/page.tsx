@@ -12,5 +12,5 @@ export default async function Home(props: PageProps<"/[locale]">) {
     return redirect(PATH_NAMES.HOME);
   }
 
-  return <Content params={{ locale }} />;
+  return <Content />;
 }

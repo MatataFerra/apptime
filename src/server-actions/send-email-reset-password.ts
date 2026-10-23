@@ -4,6 +4,8 @@ import { headers } from "next/headers";
 
 import { clientIp, consumeRateLimit } from "@/services/RateLimit";
 
+import type { ActionResult } from "@/types/i18n";
+
 import { auth } from "@/utils/auth";
 import { isLocale } from "@/utils/helpers/locale";
 
@@ -15,17 +17,17 @@ import { isLocale } from "@/utils/helpers/locale";
 const PER_EMAIL = { window: 60 * 60, max: 3 };
 const PER_IP = { window: 60 * 60, max: 10 };
 
-const TOO_MANY = {
-  response: false,
-  message: "Too many attempts. Please try again in a while.",
-} as const;
+const TOO_MANY: ActionResult = { response: false, error: "too_many_attempts" };
 
 /**
  * Starts a password reset with Better Auth. The email (sent from the auth
  * config through Resend) links to /{locale}/reset/{token}. The answer is
  * the same whether or not the email has an account.
  */
-export default async function onSendEmailToResetPassword(email: string, locale?: string) {
+export default async function onSendEmailToResetPassword(
+  email: string,
+  locale?: string
+): Promise<ActionResult> {
   try {
     const address = String(email ?? "")
       .trim()
@@ -40,10 +42,10 @@ export default async function onSendEmailToResetPassword(email: string, locale?:
     await auth.api.requestPasswordReset({
       body: { email: address, redirectTo: `/${locale && isLocale(locale) ? locale : "en"}/reset` },
     });
-    return { response: true, message: "Email sent" };
+    return { response: true };
   } catch (error) {
     // eslint-disable-next-line no-console -- server log for failed resets
     console.error("[send-email-reset-password]", error);
-    return { response: false, message: "We couldn't send the email. Please try again." };
+    return { response: false, error: "email_not_sent" };
   }
 }

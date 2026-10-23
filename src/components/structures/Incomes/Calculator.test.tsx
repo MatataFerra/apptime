@@ -1,7 +1,8 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import IncomesCalculator from "./Calculator";
+import { renderWithIntl } from "#/__test__/utils/intl";
 
 // The calculator reads Settings (currency, holiday pay, rate) from the user.
 const user = vi.hoisted(() => ({ current: null as null | { config: Record<string, unknown> } }));
@@ -17,12 +18,12 @@ describe("IncomesCalculator", () => {
   });
 
   test("renders the component", () => {
-    render(<IncomesCalculator />);
+    renderWithIntl(<IncomesCalculator />);
     expect(screen.getByLabelText("Hours a day")).toBeInTheDocument();
   });
 
   test("can change the hours", () => {
-    render(<IncomesCalculator />);
+    renderWithIntl(<IncomesCalculator />);
     const hoursInput = screen.getByLabelText("Hours a day");
 
     fireEvent.change(hoursInput, { target: { value: "8" } });
@@ -30,7 +31,7 @@ describe("IncomesCalculator", () => {
   });
 
   test("calculates the income correctly", () => {
-    render(<IncomesCalculator />);
+    renderWithIntl(<IncomesCalculator />);
 
     fireEvent.change(screen.getByLabelText("Hours a day"), { target: { value: "8" } });
     fireEvent.change(screen.getByLabelText("Hourly rate"), { target: { value: "10" } });
@@ -41,7 +42,7 @@ describe("IncomesCalculator", () => {
   });
 
   test("uses the default holiday pay when the field is empty", () => {
-    render(<IncomesCalculator />);
+    renderWithIntl(<IncomesCalculator />);
 
     fireEvent.change(screen.getByLabelText("Hours a day"), { target: { value: "8" } });
     fireEvent.change(screen.getByLabelText("Hourly rate"), { target: { value: "25" } });
@@ -52,13 +53,13 @@ describe("IncomesCalculator", () => {
   });
 
   test("displays default holiday pay rate", () => {
-    render(<IncomesCalculator />);
+    renderWithIntl(<IncomesCalculator />);
     expect(screen.getByLabelText("Holiday pay")).toHaveValue(8);
   });
 
   test("starts from the holiday pay and rate saved in Settings", () => {
     user.current = { config: { holidayPay: 12, hourValue: 30, currency: "USD" } };
-    render(<IncomesCalculator />);
+    renderWithIntl(<IncomesCalculator />);
     expect(screen.getByLabelText("Holiday pay")).toHaveValue(12);
     expect(screen.getByLabelText(/hourly rate/i)).toHaveValue(30);
   });

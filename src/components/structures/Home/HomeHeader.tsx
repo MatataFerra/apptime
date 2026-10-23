@@ -1,22 +1,20 @@
 "use client";
 
 import { format, getISOWeek } from "date-fns";
-import { enUS, es } from "date-fns/locale";
-
-import type { Locale } from "@/types";
+import { useTranslations } from "next-intl";
 
 import { shortEmail } from "@/utils/helpers/shortEmail";
+import useDateLocale from "@/hooks/useDateLocale";
 import useUser from "@/hooks/useUser";
 
 import ThemeToggle from "./ThemeToggle";
 
-const LOCALES = { en: enUS, es } as const;
-
 /** Today's date as the headline, with a short greeting. */
-function HomeHeader({ locale = "en" }: { locale?: Locale }) {
+function HomeHeader() {
   const { data: user } = useUser();
+  const t = useTranslations("home.header");
   const now = new Date();
-  const dateLocale = LOCALES[locale as keyof typeof LOCALES] ?? enUS;
+  const dateLocale = useDateLocale();
 
   const name = user?.name
     ? user.name.split(" ")[0].trim()
@@ -35,8 +33,9 @@ function HomeHeader({ locale = "en" }: { locale?: Locale }) {
       <div className="flex flex-col items-end gap-3 self-stretch">
         <ThemeToggle />
         <p className="mt-auto mb-1.5 max-w-[11rem] text-right text-[0.9375rem] text-pretty text-ink-muted">
-          {name ? `Hi ${name}, ` : "Welcome, "}
-          this is week {getISOWeek(now)}.
+          {name
+            ? t("greeting_name", { name, week: getISOWeek(now) })
+            : t("greeting", { week: getISOWeek(now) })}
         </p>
       </div>
     </header>

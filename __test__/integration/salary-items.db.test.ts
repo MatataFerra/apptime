@@ -184,10 +184,7 @@ describe("auth and taxes on a real database", () => {
 
     test("password reset: email with our link, then the new password works", async () => {
       env.emails.length = 0;
-      expect(await onSendEmailToResetPassword("bob@x.com", "es")).toEqual({
-        response: true,
-        message: "Email sent",
-      });
+      expect(await onSendEmailToResetPassword("bob@x.com", "es")).toEqual({ response: true });
       expect(env.emails).toHaveLength(1);
       // The link goes to our own page, in the language the user was using.
       const token = env.emails[0].html.match(/localhost:3000\/es\/reset\/([A-Za-z0-9_-]+)/)?.[1];

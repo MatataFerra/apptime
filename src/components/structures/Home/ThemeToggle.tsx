@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { Moon, Sun } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { applyTheme } from "@/utils/theme";
 import usePreferences from "@/hooks/usePreferences";
@@ -17,6 +18,7 @@ function isDark() {
  */
 function ThemeToggle() {
   const { save } = usePreferences();
+  const t = useTranslations("home.theme");
   const [dark, setDark] = useState(isDark);
 
   function toggle() {
@@ -30,7 +32,7 @@ function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+      aria-label={dark ? t("to_light") : t("to_dark")}
       aria-pressed={dark}
       className="flex size-10 items-center justify-center rounded-full border border-border bg-surface text-ink transition-colors hover:bg-surface-sunken"
     >

@@ -1,11 +1,172 @@
 {
-  "no-mobile": {
-    "navigation": {},
-    "subscription": {
-      "notify_message": "Do you want to get notice when the app is available for desktop?",
-      "success_message": "Thank you for subscribing!",
-      "title": "Desktop is on the way"
+  "metadata": {
+    "title": "CasualApp",
+    "description": "Track your hours and see what you earn, shift by shift."
+  },
+  "modules": {
+    "track": { "title": "Track" },
+    "fast_charge": { "title": "Fast charge" },
+    "production": { "title": "Production" },
+    "employers": { "title": "Employers", "description": "Where you work and their details" },
+    "dashboard": { "title": "Dashboard" },
+    "estimate": { "title": "Estimate", "description": "What a stretch of work pays" },
+    "compare": { "title": "Compare", "description": "Per piece or per hour" },
+    "taxes": { "title": "Taxes", "description": "Your rates and deductions" },
+    "settings": { "title": "Settings" }
+  },
+  "nav": {
+    "main": "Main",
+    "menu": "Menu",
+    "open_menu": "Open menu",
+    "description": "This is the main menu, you can navigate to different sections of the app.",
+    "home_label": "CasualApp, home",
+    "your_account": "Your account",
+    "log_in": "Log in",
+    "log_out": "Log out",
+    "groups": {
+      "log_work": "Log work",
+      "your_money": "Your money",
+      "account": "Account"
+    }
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalid_value": "This value isn't valid",
+    "invalid_email": "Email is not valid",
+    "min_chars": "At least {min} characters",
+    "max_chars": "At most {max} characters",
+    "min_number": "Must be {min} or more",
+    "max_number": "Must be {max} or less"
+  },
+  "errors": {
+    "generic": "Something went wrong, please try again",
+    "too_many_attempts": "Too many attempts. Please try again in a while.",
+    "email_not_sent": "We couldn't send the email. Please try again.",
+    "password_invalid": "Password is not valid",
+    "reset_link_invalid": "The link expired or isn't valid. Ask for a new one."
+  },
+  "auth": {
+    "go_home": "Go back to home",
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "confirm_password": "Confirm password"
     },
+    "login": {
+      "title": "Log in",
+      "subtitle": "Your hours and pay, right where you left them.",
+      "submit": "Login",
+      "register_link": "Register an account",
+      "forgot_link": "Forgot password?",
+      "wrong_password": "User or password are not valid"
+    },
+    "register": {
+      "title": "Create your account",
+      "subtitle": "Start logging shifts in under a minute.",
+      "submit": "Register",
+      "login_link": "Login",
+      "invalid_body": "Something went wrong while registering, please try again",
+      "user_already_exist": "This user already exists",
+      "successful": "Account created, taking you to the app",
+      "max_attempts": "Too many attempts, please wait before trying again"
+    },
+    "forgot": {
+      "email_label": "Please enter your email",
+      "email_placeholder": "username@gmail.com",
+      "submit": "Send email to reset password",
+      "email_sent": "Email sent",
+      "success": "The email has been sent, please check your inbox."
+    },
+    "reset": {
+      "submit": "Reset password",
+      "mismatch": "Passwords don't match",
+      "success": "Your password has been updated"
+    },
+    "password_rules": {
+      "CAPITAL_LETTER": "At least 1 uppercase letter",
+      "ONE_NUMBER": "At least 1 number",
+      "MIN_LENGTH": "At least 8 characters",
+      "SPECIAL_CHAR": "At least 1 special character"
+    }
+  },
+  "email": {
+    "reset_password": {
+      "subject": "Reset your CasualApp password",
+      "greeting": "Hello, {name}!",
+      "intro": "You asked to reset your CasualApp password. If it wasn't you,",
+      "ignore": "please ignore this email and change your password.",
+      "cta": "Click the link below to choose a new password. It works for one hour."
+    }
+  },
+  "shift": {
+    "saved": "Shift saved",
+    "save_failed": "Couldn't save the shift",
+    "try_again": "Please try again.",
+    "your_shift": "Your shift",
+    "minutes": "{count} min",
+    "fields": {
+      "job": "Job",
+      "start": "Start",
+      "finish": "Finish",
+      "unpaid_breaks": "Unpaid breaks",
+      "hourly_rate": "Hourly rate"
+    },
+    "tags": {
+      "repeated": "Repeated",
+      "regular_day": "Regular day"
+    }
+  },
+  "home": {
+    "popover": "When state is offline it means that the user doesn't start any shift yet",
+    "popover_label": "Shift state info",
+    "month_earned": "{amount} this month",
+    "header": {
+      "greeting_name": "Hi {name}, this is week {week}.",
+      "greeting": "Welcome, this is week {week}."
+    },
+    "sections": {
+      "modules": "Modules",
+      "log_work": "Log work",
+      "see_money": "See your money"
+    },
+    "theme": {
+      "to_light": "Switch to light mode",
+      "to_dark": "Switch to dark mode"
+    },
+    "week": {
+      "title": "This week",
+      "range": "{from} to {to}",
+      "earned": "earned",
+      "worked": "worked",
+      "shifts": "{count, plural, one {shift} other {shifts}}",
+      "per_day": "Earnings per day",
+      "other_currency": "shifts in another currency",
+      "no_shifts": "no shifts",
+      "converted": "Includes shifts in {currencies} converted at each day's rate.",
+      "also_earned": "Earned in {currency}. Also this week: {others}."
+    },
+    "live": {
+      "in_progress": "Shift in progress",
+      "open_track": "Shift in progress, {hours} hours {mins} minutes. Open Track",
+      "since": "On the clock since {time}",
+      "so_far": "{amount} so far",
+      "hourly_shift": "Hourly shift",
+      "saving": "Saving your shift…",
+      "confirm": "Finish this shift?",
+      "keep_going": "Keep going",
+      "finish_at": "Finish at {time}",
+      "finish": "Finish shift"
+    },
+    "repeat": {
+      "label": "Repeat your last Fast charge",
+      "same_as": "Same as {day}?",
+      "fallback_name": "Fast charge",
+      "summary": "{start} – {end} · {hours} at {rate}/h",
+      "log_today": "Log it for today",
+      "saved_description": "{name} for today."
+    }
+  },
+  "no_mobile": {
     "badge": "Mobile only, for now",
     "eyebrow": "Made for your phone",
     "title": "Your season, tracked from your pocket.",
@@ -18,23 +179,22 @@
     "feature_pieces": "Log piece work",
     "feature_pieces_hint": "Bins, trays, rows",
     "feature_pay": "Know your pay",
-    "feature_pay_hint": "Taxes taken off"
-  },
-  "login": {
-    "wrong_password": "User or password are not valid",
-    "account": {
-      "has_account": "Don't you have an account?",
-      "register": "register"
+    "feature_pay_hint": "Taxes taken off",
+    "subscription": {
+      "title": "Desktop is on the way",
+      "notify_message": "Do you want to get notice when the app is available for desktop?",
+      "success_message": "Thank you for subscribing!",
+      "email_label": "Email",
+      "placeholder": "username@email.com",
+      "submit": "Notify Me",
+      "error": "Something went wrong, please try again later."
+    },
+    "preview": {
+      "date": "Sunday, October",
+      "greeting": "Hi Sam, this is week 42.",
+      "since": "On the clock since 8:00 AM",
+      "open": "Open",
+      "this_week": "This week"
     }
-  },
-  "register": {
-    "invalid_body": "An error ocurr during the registration, please try again",
-    "user_already_exist": "User already exist",
-    "successful": "User created succefully, will be redirected to main page",
-    "unexpected_error_after_register": "Something happend with the redirection, please try login again",
-    "max_attemps_to_register": "You have been tried to much times, please wait to try another time"
-  },
-  "home": {
-    "popover": "When state is offline it means that the user doesn't start any shift yet"
   }
 }

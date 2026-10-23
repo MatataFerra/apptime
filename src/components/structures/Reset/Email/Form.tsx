@@ -3,8 +3,7 @@
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 
 import Toast from "@/services/Toast";
@@ -15,6 +14,7 @@ import Stack from "@/components/ui/Stack";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
+import { useRouter } from "@/i18n/navigation";
 import onSendEmailToResetPassword from "@/server-actions/send-email-reset-password";
 
 const RegisterSchema = z.object({
@@ -28,6 +28,8 @@ type ResetInputs = {
 function ResetForm() {
   const router = useRouter();
   const locale = useLocale();
+  const t = useTranslations("auth.forgot");
+  const te = useTranslations("errors");
   const {
     handleSubmit,
     register,
@@ -39,20 +41,10 @@ function ResetForm() {
 
   async function onSubmit(data: ResetInputs) {
     onSendEmailToResetPassword(data.email, locale).then((res) => {
-      if (!res) {
+      if (!res?.response) {
         Toast({
           type: "error",
-          message: "Something went wrong, please try again",
-          duration: 3000,
-        });
-
-        return;
-      }
-
-      if (!res.response) {
-        Toast({
-          type: "error",
-          message: res.message ?? "Something went wrong, please try again",
+          message: te(res?.error ?? "generic"),
           duration: 3000,
         });
 
@@ -61,7 +53,7 @@ function ResetForm() {
 
       Toast({
         type: "success",
-        message: res.message ?? "All good!",
+        message: t("email_sent"),
         duration: 1500,
       });
 
@@ -81,8 +73,8 @@ function ResetForm() {
           <Input
             basis="basis-0"
             type="email"
-            label="Please enter your email"
-            placeholder="username@gmail.com"
+            label={t("email_label")}
+            placeholder={t("email_placeholder")}
             isError={!!errors["email"]?.message}
             {...register("email")}
           />

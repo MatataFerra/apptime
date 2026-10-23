@@ -261,7 +261,8 @@ const SearchParamsSchema = z.object({
 */
 
 const SuscribeSchema = z.object({
-  email: z.string().email({ message: "Email is not valid" }),
+  // Message from the active language (providers/ZodI18n).
+  email: z.string().email(),
 });
 
 /* 

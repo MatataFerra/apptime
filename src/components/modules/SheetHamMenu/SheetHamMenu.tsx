@@ -4,8 +4,8 @@ import type { PropsWithChildren } from "react";
 
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import dynamic from "next/dynamic";
-import { usePathname, useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
+import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import Login from "@/components/structures/Auth/Login";
 import Logout from "@/components/structures/Auth/Logout";
@@ -27,6 +27,8 @@ import { useAuthSession } from "@/providers/Session";
 import { signOutAndLeave } from "@/utils/auth/client";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
+import { useRouter } from "@/i18n/navigation";
+
 type Props = {};
 
 const Ham = dynamic(() => import("@/components/structures/share/Ham"), {
@@ -36,8 +38,9 @@ const Ham = dynamic(() => import("@/components/structures/share/Ham"), {
 
 function SheetHamMenu({ children }: PropsWithChildren<Props>) {
   const router = useRouter();
+  // With the locale, so login comes back to this same page and language.
   const path = usePathname();
-  const locale = useLocale();
+  const t = useTranslations("nav");
   const { isSignedIn } = useAuthSession();
 
   function handleLogout() {
@@ -45,7 +48,7 @@ function SheetHamMenu({ children }: PropsWithChildren<Props>) {
   }
 
   function handleLogin() {
-    router.push(`/${locale}${PATH_NAMES.LOGIN}?redirect=${path}`);
+    router.push(`${PATH_NAMES.LOGIN}?redirect=${encodeURIComponent(path)}`);
   }
   return (
     <Sheet>
@@ -67,9 +70,7 @@ function SheetHamMenu({ children }: PropsWithChildren<Props>) {
             <div>{children}</div>
           </SheetTitle>
           <SheetDescription>
-            <VisuallyHidden.Root>
-              This is the main menu, you can navigate to different sections of the app.
-            </VisuallyHidden.Root>
+            <VisuallyHidden.Root>{t("description")}</VisuallyHidden.Root>
           </SheetDescription>
         </SheetHeader>
         <Options />
