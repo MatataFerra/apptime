@@ -132,7 +132,7 @@ describe("employers on a real database", () => {
     const result = await onCreateEmployer({ name: "", contactEmail: "nope" });
     expect(result).toMatchObject({
       ok: false,
-      fields: { name: "Add a name", contactEmail: "Check the email" },
+      fields: { name: "employer_name_required", contactEmail: "employer_email_invalid" },
     });
     expect(await prisma.employer.count({ where: { userId: ana.id } })).toBe(1);
   });
@@ -206,9 +206,9 @@ describe("employers on a real database", () => {
     env.headers = bob.cookies;
     expect(await onUpdateEmployer(farm, { name: "Mine now" })).toMatchObject({
       ok: false,
-      error: "Not found",
+      error: "not_found",
     });
-    expect(await onRemoveEmployer(farm)).toMatchObject({ ok: false, error: "Not found" });
+    expect(await onRemoveEmployer(farm)).toMatchObject({ ok: false, error: "not_found" });
     expect((await prisma.employer.findUniqueOrThrow({ where: { id: farm } })).name).toBe(
       "Sunny Farms Pty Ltd"
     );

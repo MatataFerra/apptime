@@ -113,13 +113,13 @@ describe("onLookupBusiness", () => {
 
   test("needs a session, the register's key, a valid register and quota", async () => {
     mocks.session = null;
-    expect(await onLookupBusiness("abr", "Sunny")).toEqual({ ok: false, error: "Not signed in" });
+    expect(await onLookupBusiness("abr", "Sunny")).toEqual({ ok: false, error: "not_signed_in" });
     mocks.session = { user: { id: "u1" } };
 
     delete process.env.NZBN_API_KEY;
     expect(await onLookupBusiness("nzbn", "Kiwi")).toMatchObject({
       ok: false,
-      error: expect.stringMatching(/New Zealand lookup isn't available/),
+      error: "lookup_unavailable",
     });
 
     expect(await onLookupBusiness("xx" as never, "Sunny")).toMatchObject({ ok: false });
@@ -127,7 +127,7 @@ describe("onLookupBusiness", () => {
     mocks.allowed = false;
     expect(await onLookupBusiness("abr", "Sunny")).toMatchObject({
       ok: false,
-      error: expect.stringMatching(/Too many/),
+      error: "lookup_rate_limited",
     });
     expect(fetchMock).not.toHaveBeenCalled();
   });
@@ -136,7 +136,7 @@ describe("onLookupBusiness", () => {
     answer("oops", 500);
     expect(await onLookupBusiness("vies", "FR40303265045")).toEqual({
       ok: false,
-      error: "The register didn't answer, try again later",
+      error: "lookup_failed",
     });
   });
 });

@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 
 import { Lock, LogOut, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import Toast from "@/services/Toast";
 
@@ -19,6 +20,9 @@ function DataSection() {
   const [confirmation, setConfirmation] = useState("");
   const [busy, setBusy] = useState(false);
   const confirmId = useId();
+  const t = useTranslations("settings.data");
+  const te = useTranslations("errors");
+  const word = t("confirm_word");
 
   async function onDelete() {
     setBusy(true);
@@ -30,34 +34,35 @@ function DataSection() {
     setBusy(false);
     Toast({
       type: "error",
-      message: "Couldn't delete the account",
-      description: result?.error ?? "Please try again.",
+      message: t("delete_failed"),
+      description: te(result?.ok === false ? result.error : "generic"),
     });
   }
 
   return (
-    <Section title="Your data">
+    <Section title={t("title")}>
       {/* Export is a Premium feature; shiftsToCsv (services/Export) is ready for it. */}
-      <Row label="Export shifts" hint="A CSV file for Excel or Sheets. Coming with Premium.">
+      <Row label={t("export")} hint={t("export_hint")}>
         <span className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-surface-sunken px-3 text-[0.8125rem] font-semibold text-ink-muted">
           <Lock className="size-3.5" aria-hidden="true" />
           Premium
         </span>
       </Row>
-      <Row label="Log out" hint="On this device.">
+      <Row label={t("log_out")} hint={t("log_out_hint")}>
         <Button type="button" variant="outline" size="sm" onClick={() => signOutAndLeave("/")}>
           <LogOut className="size-4" aria-hidden="true" />
-          Log out
+          {t("log_out")}
         </Button>
       </Row>
 
       {deleting ? (
         <div className="flex flex-col gap-3 bg-destructive-soft/60 px-4 py-4">
-          <p className="text-[0.9375rem] font-semibold text-destructive">
-            This deletes your account and every shift. It can&apos;t be undone.
-          </p>
+          <p className="text-[0.9375rem] font-semibold text-destructive">{t("delete_warning")}</p>
           <label htmlFor={confirmId} className="text-sm text-ink">
-            Type <span className="font-semibold">delete</span> to confirm
+            {t.rich("type_to_confirm", {
+              word,
+              strong: (chunks) => <span className="font-semibold">{chunks}</span>,
+            })}
           </label>
           <input
             id={confirmId}
@@ -78,22 +83,22 @@ function DataSection() {
                 setConfirmation("");
               }}
             >
-              Keep my account
+              {t("keep")}
             </Button>
             <Button
               type="button"
               variant="danger"
               size="md"
               classes="w-full"
-              disabled={busy || confirmation.trim().toLowerCase() !== "delete"}
+              disabled={busy || confirmation.trim().toLowerCase() !== word}
               onClick={onDelete}
             >
-              {busy ? "Deleting…" : "Delete forever"}
+              {busy ? t("deleting") : t("delete_forever")}
             </Button>
           </div>
         </div>
       ) : (
-        <Row label="Delete account" hint="Your account and all your shifts.">
+        <Row label={t("delete_account")} hint={t("delete_account_hint")}>
           <Button
             type="button"
             variant="ghost"
@@ -102,7 +107,7 @@ function DataSection() {
             onClick={() => setDeleting(true)}
           >
             <Trash2 className="size-4" aria-hidden="true" />
-            Delete
+            {t("delete")}
           </Button>
         </Row>
       )}

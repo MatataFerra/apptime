@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 
 import { AlertTriangle, Search } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 
 import { currencyForCountry } from "@/services/Employer/currency";
 import type { PastedEmployer } from "@/services/Employer/paste";
@@ -12,6 +13,7 @@ import type { BusinessDetails, BusinessMatch, RegistryId } from "@/services/Regi
 import Button from "@/components/ui/Button";
 
 import { cn } from "@/utils/helpers/styleMerger";
+import useErrorMessage from "@/hooks/useErrorMessage";
 
 import { onLookupBusiness } from "@/server-actions/business-lookup";
 
@@ -25,12 +27,12 @@ export type UseBusiness = (
 ) => void;
 
 /** ISO dates inside a line -> "1 Jul 2000". */
-function readableDates(value: string) {
+function readableDates(value: string, locale: string) {
   return value.replace(/\b(\d{4}-\d{2}-\d{2})\b/g, (iso) => {
     const date = new Date(`${iso}T12:00:00`);
     return isNaN(date.valueOf())
       ? iso
-      : date.toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" });
+      : date.toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" });
   });
 }
 
@@ -44,24 +46,28 @@ function Details({
   onUse: UseBusiness;
 }) {
   const info = REGISTRIES[details.registry];
+  const t = useTranslations("employers.lookup");
+  const tf = useTranslations("employers.fields");
+  const locale = useLocale();
+  const idLabel = t(`registries.${details.registry}.id_label`);
   const [name, setName] = useState<string | null>(details.names[0] ?? null);
   const groupId = useId();
   const f = details.fields;
 
   const rows: [string, string | null | undefined][] = [
-    [info.idLabel, details.id],
-    ["Legal name", details.legalName],
+    [idLabel, details.id],
+    [t("legal_name"), details.legalName],
     ...details.facts.map((fact) => [fact.label, fact.value] as [string, string]),
     [
-      "Address",
+      tf("address"),
       [f.address, [f.city, f.region, f.postcode].filter(Boolean).join(" ")]
         .filter(Boolean)
         .join(", "),
     ],
-    ["Industry", f.industry],
-    ["Email", f.contactEmail],
-    ["Phone", f.contactPhone],
-    ["Pays in", currencyForCountry(f.country)],
+    [tf("industry"), f.industry],
+    [tf("contactEmail"), f.contactEmail],
+    [tf("contactPhone"), f.contactPhone],
+    [t("pays_in"), currencyForCountry(f.country)],
   ];
 
   return (
@@ -70,9 +76,16 @@ function Details({
         <p className="flex items-start gap-2 rounded-xl bg-destructive-soft px-3 py-2.5 text-[0.8125rem] text-destructive">
           <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
           <span>
-            This {info.idLabel} is {details.status?.toLowerCase() ?? "not active"}
-            {details.statusSince ? ` since ${readableDates(details.statusSince)}` : ""}. Check with
-            the employer before using it on a visa or tax form.
+            {details.statusSince
+              ? t("inactive_since", {
+                  id: idLabel,
+                  status: details.status?.toLowerCase() ?? t("not_active"),
+                  since: readableDates(details.statusSince, locale),
+                })
+              : t("inactive", {
+                  id: idLabel,
+                  status: details.status?.toLowerCase() ?? t("not_active"),
+                })}
           </span>
         </p>
       ) : null}
@@ -83,16 +96,14 @@ function Details({
           .map(([label, value]) => (
             <div key={label} className="contents">
               <dt className="text-ink-muted">{label}</dt>
-              <dd className="min-w-0 break-words text-ink">{readableDates(value)}</dd>
+              <dd className="min-w-0 break-words text-ink">{readableDates(value, locale)}</dd>
             </div>
           ))}
       </dl>
 
       {details.names.length > 1 ? (
         <fieldset className="flex flex-col gap-1.5">
-          <legend className="mb-1 text-[0.8125rem] text-ink-muted">
-            Which name do you know it by?
-          </legend>
+          <legend className="mb-1 text-[0.8125rem] text-ink-muted">{t("which_name")}</legend>
           {details.names.map((option) => (
             <label
               key={option}
@@ -126,7 +137,7 @@ function Details({
           })
         }
       >
-        Use these details
+        {t("use")}
       </Button>
     </div>
   );
@@ -147,6 +158,8 @@ function BusinessLookup({ initial, onUse }: { initial: RegistryId; onUse: UseBus
   );
   const inputId = useId();
   const info = REGISTRIES[registry];
+  const t = useTranslations("employers.lookup");
+  const errorMessage = useErrorMessage();
 
   function pick(next: RegistryId) {
     setRegistry(next);
@@ -162,19 +175,21 @@ function BusinessLookup({ initial, onUse }: { initial: RegistryId; onUse: UseBus
     const result = await onLookupBusiness(registry, value).catch(() => null);
     setBusy(false);
 
-    if (!result) return setError("The register didn't answer, try again later");
-    if (!result.ok) return setError(result.error);
+    if (!result) return setError(errorMessage("lookup_failed"));
+    if (!result.ok) {
+      return setError(errorMessage(result.error, { register: t(`registries.${registry}.label`) }));
+    }
     if (result.kind === "details") {
       setMatches(null);
       return setDetails({ data: result.details, searchedAt: result.searchedAt });
     }
-    if (result.matches.length === 0) setError("No businesses with that name");
+    if (result.matches.length === 0) setError(t("no_matches"));
     setMatches(result.matches);
   }
 
   return (
     <div className="flex flex-col gap-3">
-      <div role="radiogroup" aria-label="Register" className="flex flex-wrap gap-1.5">
+      <div role="radiogroup" aria-label={t("register")} className="flex flex-wrap gap-1.5">
         {REGISTRY_ORDER.map((id) => (
           <button
             key={id}
@@ -189,13 +204,13 @@ function BusinessLookup({ initial, onUse }: { initial: RegistryId; onUse: UseBus
                 : "border-border-strong text-ink-muted hover:text-ink"
             )}
           >
-            {REGISTRIES[id].label}
+            {t(`registries.${id}.label`)}
           </button>
         ))}
       </div>
 
       <label htmlFor={inputId} className="flex flex-col gap-1 text-[0.8125rem] text-ink-muted">
-        {info.inputLabel}
+        {t(`registries.${registry}.input_label`)}
         <span className="flex gap-2">
           <input
             id={inputId}
@@ -219,7 +234,7 @@ function BusinessLookup({ initial, onUse }: { initial: RegistryId; onUse: UseBus
             variant="white"
             classes="h-11 shrink-0"
             disabled={busy || !query.trim()}
-            aria-label="Search the register"
+            aria-label={t("search")}
             onClick={() => run(query)}
           >
             <Search className="size-4" aria-hidden="true" />
@@ -227,7 +242,7 @@ function BusinessLookup({ initial, onUse }: { initial: RegistryId; onUse: UseBus
         </span>
       </label>
 
-      {busy ? <p className="text-[0.8125rem] text-ink-muted">Looking it up…</p> : null}
+      {busy ? <p className="text-[0.8125rem] text-ink-muted">{t("searching")}</p> : null}
       {error ? <p className="text-[0.8125rem] text-destructive">{error}</p> : null}
 
       {details ? (
@@ -249,7 +264,7 @@ function BusinessLookup({ initial, onUse }: { initial: RegistryId; onUse: UseBus
               >
                 <span className="text-[0.875rem] text-ink">{match.name}</span>
                 <span className="text-[0.75rem] text-ink-muted tabular-nums">
-                  {info.idLabel} {match.id}
+                  {t(`registries.${registry}.id_label`)} {match.id}
                   {match.detail ? ` · ${match.detail}` : ""}
                 </span>
               </button>
@@ -259,7 +274,9 @@ function BusinessLookup({ initial, onUse }: { initial: RegistryId; onUse: UseBus
       ) : null}
 
       {!details ? (
-        <p className="text-[0.75rem] text-ink-subtle">Searches the {info.registerName}.</p>
+        <p className="text-[0.75rem] text-ink-subtle">
+          {t("searches", { register: info.registerName })}
+        </p>
       ) : null}
     </div>
   );

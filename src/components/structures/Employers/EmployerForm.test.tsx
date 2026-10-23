@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
@@ -25,9 +25,11 @@ vi.mock("@/server-actions/business-lookup", () => ({
 
 import EmployerForm from "@/components/structures/Employers/EmployerForm";
 
+import { renderWithIntl } from "#/__test__/utils/intl";
+
 function setup() {
   const onSave = vi.fn();
-  render(<EmployerForm busy={false} onCancel={() => {}} onSave={onSave} />);
+  renderWithIntl(<EmployerForm busy={false} onCancel={() => {}} onSave={onSave} />);
   return { onSave, user: userEvent.setup() };
 }
 

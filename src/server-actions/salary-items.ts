@@ -53,16 +53,16 @@ function revalidate() {
  */
 export async function onUpdateSalaryItem(input: z.input<typeof UpdateSchema>) {
   const userId = await sessionUserId();
-  if (!userId) return { ok: false as const, error: "Not signed in" };
+  if (!userId) return { ok: false as const, error: "not_signed_in" };
 
   const parsed = UpdateSchema.safeParse(input);
-  if (!parsed.success) return { ok: false as const, error: "Check the name and rate" };
+  if (!parsed.success) return { ok: false as const, error: "check_name_rate" };
   const { kind, id, name, value, from } = parsed.data;
   const description = parsed.data.description || null;
 
   // Filtered by owner: someone else's id is "not found".
   const current = await model(kind).findFirst({ where: { id, userId } });
-  if (!current) return { ok: false as const, error: "Not found" };
+  if (!current) return { ok: false as const, error: "not_found" };
 
   const sameRate = current.name === name && Number(current.value) === value;
 
@@ -105,14 +105,14 @@ export async function onUpdateSalaryItem(input: z.input<typeof UpdateSchema>) {
  */
 export async function onRemoveSalaryItem(input: z.input<typeof RemoveSchema>) {
   const userId = await sessionUserId();
-  if (!userId) return { ok: false as const, error: "Not signed in" };
+  if (!userId) return { ok: false as const, error: "not_signed_in" };
 
   const parsed = RemoveSchema.safeParse(input);
-  if (!parsed.success) return { ok: false as const, error: "Invalid item" };
+  if (!parsed.success) return { ok: false as const, error: "invalid_value" };
   const { kind, id } = parsed.data;
 
   const item = await model(kind).findFirst({ where: { id, userId }, select: { id: true } });
-  if (!item) return { ok: false as const, error: "Not found" };
+  if (!item) return { ok: false as const, error: "not_found" };
 
   const used = (await SalaryItems.uses(kind, id)) > 0;
   if (used) {

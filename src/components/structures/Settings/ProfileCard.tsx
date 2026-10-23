@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import Skeleton from "@/components/ui/Skeleton";
 
 import useUser from "@/hooks/useUser";
@@ -13,6 +15,7 @@ function initials(name?: string | null, email?: string | null) {
 /** Who is signed in, at the top of Settings. */
 function ProfileCard() {
   const { data: user, isLoading } = useUser();
+  const t = useTranslations("nav");
 
   if (isLoading) return <Skeleton classes="h-22 w-full rounded-xl" />;
   if (!user) return null;
@@ -27,7 +30,7 @@ function ProfileCard() {
       </span>
       <div className="flex min-w-0 flex-col gap-0.5">
         <span className="truncate text-[1.0625rem] font-semibold">
-          {user.name || "Your account"}
+          {user.name || t("your_account")}
         </span>
         <span className="truncate text-sm text-ink-inverse/70">{user.email}</span>
       </div>

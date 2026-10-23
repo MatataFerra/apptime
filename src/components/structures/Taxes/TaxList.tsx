@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import Toast from "@/services/Toast";
 
@@ -15,6 +16,7 @@ import Button from "@/components/ui/Button";
 import Skeleton from "@/components/ui/Skeleton";
 
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
+import useErrorMessage from "@/hooks/useErrorMessage";
 import useSalaryItems from "@/hooks/useSalaryItems";
 
 import {
@@ -34,10 +36,6 @@ type Draft = {
 function today() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-
-function shifts(count: number) {
-  return count === 1 ? "1 shift" : `${count} shifts`;
 }
 
 const FIELD =
@@ -64,6 +62,7 @@ function ItemEditor({
   const dateId = useId();
   const [scope, setScope] = useState<"all" | "from">("from");
   const [fromDay, setFromDay] = useState(today);
+  const t = useTranslations("taxes");
 
   const rate = Number(value);
   const validRate = value.trim() !== "" && Number.isFinite(rate) && rate >= 0 && rate <= 100;
@@ -90,7 +89,7 @@ function ItemEditor({
     >
       <div className="grid grid-cols-[1fr_7rem] gap-2">
         <label htmlFor={nameId} className="flex flex-col gap-1 text-[0.8125rem] text-ink-muted">
-          Name
+          {t("fields.name")}
           <input
             id={nameId}
             value={name}
@@ -100,7 +99,7 @@ function ItemEditor({
           />
         </label>
         <label htmlFor={valueId} className="flex flex-col gap-1 text-[0.8125rem] text-ink-muted">
-          Rate
+          {t("fields.rate")}
           <span className="flex h-11 items-center gap-1 rounded-xl border border-border-strong bg-surface px-3 focus-within:border-accent">
             <input
               id={valueId}
@@ -118,7 +117,7 @@ function ItemEditor({
         </label>
       </div>
       <label htmlFor={noteId} className="flex flex-col gap-1 text-[0.8125rem] text-ink-muted">
-        Note (optional)
+        {t("fields.note")}
         <input
           id={noteId}
           value={description}
@@ -131,15 +130,15 @@ function ItemEditor({
       {askScope ? (
         <div className="flex flex-col gap-2.5 rounded-xl bg-warning-soft px-3 py-3">
           <p className="text-[0.8125rem] font-medium text-ink">
-            {shifts(item.uses)} use it. Which ones get the change?
+            {t("scope_question", { count: item.uses })}
           </p>
           <Segmented
-            label="Apply the change to"
+            label={t("scope_label")}
             value={scope}
             onChange={setScope}
             options={[
-              { value: "from", label: "From a date" },
-              { value: "all", label: "All shifts" },
+              { value: "from", label: t("scope_from") },
+              { value: "all", label: t("scope_all") },
             ]}
           />
           {scope === "from" ? (
@@ -147,7 +146,7 @@ function ItemEditor({
               htmlFor={dateId}
               className="flex items-center justify-between gap-3 text-[0.8125rem] text-ink"
             >
-              Shifts from
+              {t("shifts_from")}
               <input
                 id={dateId}
                 type="date"
@@ -158,19 +157,17 @@ function ItemEditor({
             </label>
           ) : null}
           <p role="status" className="text-[0.8125rem] text-ink-muted">
-            {scope === "from"
-              ? "Earlier shifts keep the current rate. New shifts use the new one."
-              : "Every shift, past ones included, uses the new values. Use this to fix a mistake."}
+            {scope === "from" ? t("scope_from_hint") : t("scope_all_hint")}
           </p>
         </div>
       ) : null}
 
       <div className="grid grid-cols-2 gap-2">
         <Button type="button" variant="ghost" size="md" classes="w-full" onClick={onCancel}>
-          Cancel
+          {t("cancel")}
         </Button>
         <Button type="submit" size="md" classes="w-full" disabled={!valid || !validDay || busy}>
-          {busy ? "Saving…" : "Save"}
+          {busy ? t("saving") : t("save")}
         </Button>
       </div>
     </form>
@@ -188,20 +185,22 @@ function ItemRow({
 }) {
   const [mode, setMode] = useState<"view" | "edit" | "remove">("view");
   const [busy, setBusy] = useState(false);
+  const t = useTranslations("taxes");
+  const errorMessage = useErrorMessage();
 
   async function save(draft: Draft) {
     setBusy(true);
     const result = await onUpdateSalaryItem({ kind, id: item.id, ...draft }).catch(() => null);
     setBusy(false);
     if (!result?.ok) {
-      Toast({ type: "error", message: "Couldn't save", description: result?.error });
+      Toast({ type: "error", message: t("save_failed"), description: errorMessage(result?.error) });
       return;
     }
     if (result.moved !== null) {
       Toast({
         type: "success",
-        message: "Rate updated",
-        description: `${shifts(result.moved)} from that date use the new rate.`,
+        message: t("rate_updated"),
+        description: t("moved", { count: result.moved }),
       });
     }
     await onChanged();
@@ -213,7 +212,11 @@ function ItemRow({
     const result = await onRemoveSalaryItem({ kind, id: item.id }).catch(() => null);
     setBusy(false);
     if (!result?.ok) {
-      Toast({ type: "error", message: "Couldn't remove it", description: result?.error });
+      Toast({
+        type: "error",
+        message: t("remove_failed"),
+        description: errorMessage(result?.error),
+      });
       return;
     }
     await onChanged();
@@ -227,14 +230,11 @@ function ItemRow({
     return (
       <div className="flex flex-col gap-3 px-4 py-4">
         <p className="text-[0.9375rem] text-ink">
-          Remove <span className="font-semibold">{item.name}</span>?{" "}
-          {item.uses > 0
-            ? `You won't see it when you save new shifts. ${
-                item.uses === 1
-                  ? "The shift that already has it keeps it"
-                  : `The ${item.uses} shifts that already have it keep it`
-              }, so their pay doesn't change.`
-            : "No shift uses it."}
+          {t.rich("remove_question", {
+            name: item.name,
+            strong: (chunks) => <span className="font-semibold">{chunks}</span>,
+          })}{" "}
+          {item.uses > 0 ? t("remove_used", { count: item.uses }) : t("remove_unused")}
         </p>
         <div className="grid grid-cols-2 gap-2">
           <Button
@@ -244,7 +244,7 @@ function ItemRow({
             classes="w-full"
             onClick={() => setMode("view")}
           >
-            Keep it
+            {t("keep")}
           </Button>
           <Button
             type="button"
@@ -254,7 +254,7 @@ function ItemRow({
             disabled={busy}
             onClick={remove}
           >
-            {busy ? "Removing…" : "Remove"}
+            {busy ? t("removing") : t("remove")}
           </Button>
         </div>
       </div>
@@ -271,14 +271,14 @@ function ItemRow({
           </span>
         </span>
         <span className="truncate text-[0.8125rem] text-ink-muted">
-          {[item.description, item.uses > 0 ? `Used in ${shifts(item.uses)}` : "Not used yet"]
+          {[item.description, item.uses > 0 ? t("used_in", { count: item.uses }) : t("not_used")]
             .filter(Boolean)
             .join(" · ")}
         </span>
       </div>
       <button
         type="button"
-        aria-label={`Edit ${item.name}`}
+        aria-label={t("edit_label", { name: item.name })}
         onClick={() => setMode("edit")}
         className="flex size-10 shrink-0 items-center justify-center rounded-xl text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink"
       >
@@ -286,7 +286,7 @@ function ItemRow({
       </button>
       <button
         type="button"
-        aria-label={`Remove ${item.name}`}
+        aria-label={t("remove_label", { name: item.name })}
         onClick={() => setMode("remove")}
         className="flex size-10 shrink-0 items-center justify-center rounded-xl text-ink-muted transition-colors hover:bg-destructive-soft hover:text-destructive"
       >
@@ -302,6 +302,7 @@ function TaxList() {
   const { data, isLoading } = useSalaryItems();
   const taxes = data?.salaryItems?.taxes ?? [];
   const contributions = data?.salaryItems?.contributions ?? [];
+  const t = useTranslations("taxes");
 
   // Shift totals depend on the rates, so the shift lists refetch too.
   async function refresh() {
@@ -315,8 +316,8 @@ function TaxList() {
   if (isLoading) return <Skeleton classes="h-40 w-full rounded-xl" />;
 
   const groups = [
-    { kind: "tax" as const, title: "Taxes", items: taxes },
-    { kind: "contribution" as const, title: "Contributions", items: contributions },
+    { kind: "tax" as const, title: t("my_taxes"), items: taxes },
+    { kind: "contribution" as const, title: t("my_contributions"), items: contributions },
   ].filter((group) => group.kind === "tax" || group.items.length > 0);
 
   return (
@@ -324,15 +325,11 @@ function TaxList() {
       {groups.map((group) => (
         <Section
           key={group.kind}
-          title={`My ${group.title.toLowerCase()}`}
-          description={
-            group.kind === "tax" ? "The ones you can pick when you save a shift." : undefined
-          }
+          title={group.title}
+          description={group.kind === "tax" ? t("taxes_description") : undefined}
         >
           {group.items.length === 0 ? (
-            <p className="px-4 py-4 text-[0.9375rem] text-ink-muted">
-              None yet. Add one when you save a shift and it shows up here.
-            </p>
+            <p className="px-4 py-4 text-[0.9375rem] text-ink-muted">{t("empty")}</p>
           ) : (
             group.items.map((item) => (
               <ItemRow key={item.id} item={item} kind={group.kind} onChanged={refresh} />

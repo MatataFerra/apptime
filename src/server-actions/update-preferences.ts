@@ -32,10 +32,10 @@ export default async function onUpdatePreferences(patch: PreferencesPatch) {
   const user = userId
     ? await prisma.user.findUnique({ where: { id: userId }, select: { id: true } })
     : null;
-  if (!user) return { ok: false as const, error: "Not signed in" };
+  if (!user) return { ok: false as const, error: "not_signed_in" };
 
   const parsed = PreferencesSchema.safeParse(patch);
-  if (!parsed.success) return { ok: false as const, error: "Invalid value" };
+  if (!parsed.success) return { ok: false as const, error: "invalid_value" };
 
   const config = await prisma.config.upsert({
     where: { userId: user.id },
