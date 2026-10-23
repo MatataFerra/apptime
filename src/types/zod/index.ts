@@ -37,6 +37,8 @@ const BaseShiftSchema = z.object({
   shiftId: z.number().nullable(),
   /** ISO 4217; null means the user's default currency. */
   currency: z.string().length(3).nullable().optional(),
+  /** Who the shift was for; null means none. Ownership is checked on the server. */
+  employerId: z.number().int().positive().nullable().optional(),
 });
 
 const ProductionShiftSchema = BaseShiftSchema.merge(

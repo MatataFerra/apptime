@@ -14,6 +14,7 @@ import type { ProductionInputs } from "@/types/forms";
 import { observer } from "@/components/structures/SalaryItems/observer";
 import CurrencySelect from "@/components/structures/ShiftForms/CurrencySelect";
 import DatalistShiftNames from "@/components/structures/ShiftForms/Datalist";
+import EmployerSelect from "@/components/structures/ShiftForms/EmployerSelect";
 import HolidayChoice, {
   fromHolidayValue,
   toHolidayValue,
@@ -49,6 +50,7 @@ function Inputs() {
     setDialogState,
   } = useProductionForm((state) => state);
   const shiftCurrency = useProductionForm((state) => state.values.currency);
+  const shiftEmployerId = useProductionForm((state) => state.values.employerId);
   const defaultCurrency = useCurrency();
 
   /*
@@ -145,6 +147,7 @@ function Inputs() {
       taxes,
       contributions,
       currency: shiftCurrency ?? null,
+      employerId: shiftEmployerId ?? null,
     };
 
     Toast({
@@ -224,6 +227,7 @@ function Inputs() {
           id: lastId + 1,
           startDate: parseData.startDate,
           currency: parseData.currency,
+          employerId: parseData.employerId,
           endDate: parseData.endDate,
           name: parseData.name,
           amount: 0,
@@ -348,6 +352,14 @@ function Inputs() {
             }}
           />
         </Stack>
+        <EmployerSelect
+          value={shiftEmployerId}
+          onChange={(employer) => {
+            setStoreValues({ employerId: employer?.id ?? null });
+            // Their currency as a starting point (the rate is per hour, not per item).
+            if (employer?.defaultCurrency) setStoreValues({ currency: employer.defaultCurrency });
+          }}
+        />
         <Stack grid cols={2} as="fieldset" classes="w-full">
           <Input
             classes="h-full"

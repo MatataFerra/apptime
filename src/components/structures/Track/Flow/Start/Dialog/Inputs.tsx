@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import CurrencySelect from "@/components/structures/ShiftForms/CurrencySelect";
+import EmployerSelect from "@/components/structures/ShiftForms/EmployerSelect";
 import PublicHolidayDropdown from "@/components/structures/Track/Flow/Start/Dialog/Dropdown";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
@@ -33,7 +34,7 @@ function ShiftStartInputs() {
   const { data, setData, setErrors } = useShiftData((state) => state);
   const { data: user } = useUser();
   const defaultCurrency = useCurrency();
-  const { register, control } = useForm({
+  const { register, control, setValue } = useForm({
     resolver: zodResolver(InputsSchema),
     defaultValues: {
       // The rate from Settings, if one is saved.
@@ -62,6 +63,18 @@ function ShiftStartInputs() {
 
   return (
     <>
+      <EmployerSelect
+        value={data.employerId}
+        onChange={(employer) => {
+          setData({ employerId: employer?.id ?? null });
+          if (!employer) return;
+          // Their usual rate and currency, as a starting point.
+          if (employer.defaultRate != null) {
+            setValue("hourValue", String(employer.defaultRate), { shouldDirty: true });
+          }
+          if (employer.defaultCurrency) setData({ currency: employer.defaultCurrency });
+        }}
+      />
       <Stack orientation="horizontal" alignItems="center" wrap>
         <Input
           data-testid="hourValue"

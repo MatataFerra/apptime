@@ -24,10 +24,12 @@ import { onCreateEmployer, onRemoveEmployer, onUpdateEmployer } from "@/server-a
 
 type FieldErrors = Partial<Record<keyof EmployerData, string>>;
 
-/** "Farming · Bundaberg, Australia" */
+/** "Farming · Bundaberg, Australia · 12 shifts" */
 function summary(employer: SavedEmployer) {
   const place = [employer.city, employer.country].filter(Boolean).join(", ");
-  return [employer.industry, place].filter(Boolean).join(" · ");
+  const shifts =
+    employer.shifts > 0 ? `${employer.shifts} shift${employer.shifts === 1 ? "" : "s"}` : null;
+  return [employer.industry, place, shifts].filter(Boolean).join(" · ");
 }
 
 /** The saved details, label and value, skipping empty ones. */
@@ -134,6 +136,12 @@ function EmployerRow({
         <p className="text-[0.9375rem] text-ink">
           Remove <span className="font-semibold">{employer.name}</span> and its details?
         </p>
+        {employer.shifts > 0 ? (
+          <p className="text-[0.8125rem] text-ink-muted">
+            {employer.shifts === 1 ? "Its shift keeps" : `Its ${employer.shifts} shifts keep`} its
+            name; it just won&apos;t be offered for new ones.
+          </p>
+        ) : null}
         <div className="grid grid-cols-2 gap-2">
           <Button
             type="button"

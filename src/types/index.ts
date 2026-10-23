@@ -95,6 +95,10 @@ export type SavedEmployer = {
   defaultRate: number | null;
   defaultCurrency: string | null;
   notes: string | null;
+  /** Removed by the user but still named on old shifts. */
+  archived: boolean;
+  /** Shifts logged for it (hourly + production). */
+  shifts: number;
   createdAt: string;
   updatedAt: string;
 };

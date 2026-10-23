@@ -65,6 +65,8 @@ export type FastChargeInputsParsed = {
   contributions: ContributionElement[] | [];
   /** ISO 4217; null means the user's default currency. */
   currency?: string | null;
+  /** Who the shift was for; null means none. */
+  employerId?: number | null;
 };
 
 // Production Form
@@ -81,6 +83,8 @@ export type ProductionInputsParsed = {
   contributions: ContributionElement[] | [];
   /** ISO 4217; null means the user's default currency. */
   currency?: string | null;
+  /** Who the shift was for; null means none. */
+  employerId?: number | null;
 };
 
 // Track Form

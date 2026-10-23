@@ -35,6 +35,7 @@ export const useShiftData = create(
         unpaidBreaks: 0,
         shiftId: null,
         currency: null,
+        employerId: null,
         source: "track",
       },
       errors: false,

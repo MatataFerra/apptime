@@ -4,6 +4,7 @@ import type { Hourly } from "@prisma/client";
 import isEmpty from "lodash/isEmpty";
 import omit from "lodash/omit";
 
+import { ownEmployerId } from "@/services/Employer/owned";
 import ShiftService from "@/services/Shift";
 import HourlyService from "@/services/Shift/Hourly";
 import UserService from "@/services/User";
@@ -36,9 +37,14 @@ export default async function onUpdateTrackJob(data: UpdateTrackData, shiftId: n
     .catch(() => null);
   if (!owned) return null;
 
+  // Sent back with the shift: still has to be one of the user's employers.
+  const employerId = await ownEmployerId(currentUser.id, data.employerId);
+  if (employerId === false) return null;
+
   // Which row it is and whose container it's in come from the server, not the client.
   const prepareShift = {
-    ...omit(data, ["id", "shiftId", "shift"]),
+    ...omit(data, ["id", "shiftId", "shift", "employer", "employerId"]),
+    ...(employerId !== undefined && { employerId }),
     id: owned.id,
     shiftId: ownShiftId,
     isClosed: true,

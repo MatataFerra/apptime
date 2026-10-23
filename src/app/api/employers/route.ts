@@ -4,7 +4,11 @@ import { getRequestSession } from "@/utils/auth/session";
 
 import prisma from "#/prisma/client";
 
-/** The signed-in user's employers, A to Z. Archived ones are left out. */
+/**
+ * The signed-in user's employers, A to Z, with how many shifts each has.
+ * Archived ones come too, so old shifts can still show their name; the
+ * list and the pickers leave them out.
+ */
 export async function GET(req: NextRequest) {
   const userId = (await getRequestSession(req))?.user.id ?? null;
 
@@ -13,11 +17,16 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const employers = await prisma.employer.findMany({
-      where: { userId, archived: false },
+    const rows = await prisma.employer.findMany({
+      where: { userId },
       orderBy: { name: "asc" },
-      omit: { userId: true, archived: true },
+      omit: { userId: true },
+      include: { _count: { select: { hourly: true, production: true } } },
     });
+    const employers = rows.map(({ _count, ...employer }) => ({
+      ...employer,
+      shifts: _count.hourly + _count.production,
+    }));
 
     return NextResponse.json({ employers, response: true, message: "success" });
   } catch (error) {
