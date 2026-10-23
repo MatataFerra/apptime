@@ -28,8 +28,8 @@ type Provider = {
 };
 
 const TIMEOUT = 8000;
-// A business's details rarely change: a day of cache saves calls.
-const CACHE = { next: { revalidate: 60 * 60 * 24 } };
+// Not cached: the time shown as "searched at" has to be when the data was fetched.
+const CACHE = { cache: "no-store" as const };
 
 async function getJson(url: string, headers?: Record<string, string>) {
   const response = await fetch(url, { ...CACHE, headers, signal: AbortSignal.timeout(TIMEOUT) });
@@ -128,7 +128,7 @@ const vies: Provider = {
 const PROVIDERS: Record<RegistryId, Provider> = { abr, nzbn, vies };
 
 export type LookupOutcome =
-  | { ok: true; kind: "details"; details: BusinessDetails }
+  | { ok: true; kind: "details"; details: BusinessDetails; searchedAt: string }
   | { ok: true; kind: "matches"; matches: BusinessMatch[] }
   | { ok: false; error: string };
 
@@ -151,7 +151,9 @@ export async function runQuery(
   const provider = PROVIDERS[registry];
   if (query.kind === "id") {
     const result = await provider.lookup(query.value);
-    return result.ok ? { ok: true, kind: "details", details: result.data } : result;
+    return result.ok
+      ? { ok: true, kind: "details", details: result.data, searchedAt: new Date().toISOString() }
+      : result;
   }
   const result = await provider.search!(query.value);
   return result.ok ? { ok: true, kind: "matches", matches: result.data } : result;
