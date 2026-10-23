@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 
 import { AlertTriangle, Search } from "lucide-react";
 
+import { currencyForCountry } from "@/services/Employer/currency";
 import type { PastedEmployer } from "@/services/Employer/paste";
 import { REGISTRIES, REGISTRY_ORDER } from "@/services/Registry/registries";
 import type { BusinessDetails, BusinessMatch, RegistryId } from "@/services/Registry/types";
@@ -45,6 +46,7 @@ function Details({ details, onUse }: { details: BusinessDetails; onUse: UseBusin
     ["Industry", f.industry],
     ["Email", f.contactEmail],
     ["Phone", f.contactPhone],
+    ["Pays in", currencyForCountry(f.country)],
   ];
 
   return (

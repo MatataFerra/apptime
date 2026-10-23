@@ -83,4 +83,24 @@ describe("EmployerForm helpers", () => {
       "Legal name: Sunny Holdings Pty Ltd"
     );
   });
+
+  test("filling a New Zealand employer switches the currency to NZD", async () => {
+    const { user, onSave } = setup();
+
+    await user.click(screen.getByRole("button", { name: /paste details/i }));
+    await user.click(screen.getByLabelText(/paste anything/i));
+    await user.paste("Kiwi Orchards Limited\n45 Orchard Road\nHastings\nNew Zealand");
+    // The preview says which currency it'll set.
+    expect(screen.getByText("Currency", { selector: "dt" }).nextSibling).toHaveTextContent("NZD");
+    await user.click(screen.getByRole("button", { name: /^fill \d+ fields?/i }));
+
+    const currency = screen.getByLabelText("Currency") as HTMLSelectElement;
+    expect(currency.value).toBe("NZD");
+    expect(currency.className).toMatch(/bg-accent-soft/);
+
+    await user.click(screen.getByRole("button", { name: /add employer/i }));
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({ country: "New Zealand", defaultCurrency: "NZD" })
+    );
+  });
 });

@@ -4,6 +4,7 @@ import { type ReactNode, useId, useState } from "react";
 
 import { ClipboardPaste, Search } from "lucide-react";
 
+import { currencyForCountry } from "@/services/Employer/currency";
 import type { PastedEmployer, PasteField } from "@/services/Employer/paste";
 import { type EmployerData, EmployerInputSchema, fieldErrors } from "@/services/Employer/schema";
 import { defaultRegistry } from "@/services/Registry/registries";
@@ -117,6 +118,7 @@ function EmployerForm({
   // Filled in by a helper and not edited since: highlighted until checked.
   const [filled, setFilled] = useState<Set<TextField>>(new Set());
   const [guessed, setGuessed] = useState<Set<TextField>>(new Set());
+  const [currencyFilled, setCurrencyFilled] = useState(false);
   const baseId = useId();
   const shown = { ...serverErrors, ...errors };
 
@@ -125,6 +127,10 @@ function EmployerForm({
     setText((current) => ({ ...current, ...Object.fromEntries(entries) }));
     setFilled(new Set(entries.map(([field]) => field)));
     setGuessed(new Set(guesses));
+    // An employer in New Zealand pays in NZD, one in Germany in EUR…
+    const paidIn = currencyForCountry(values.country);
+    if (paidIn) setCurrency(paidIn);
+    setCurrencyFilled(!!paidIn);
     setHelper(null);
   }
 
@@ -240,7 +246,7 @@ function EmployerForm({
         ) : null}
         {helper === "paste" ? <PasteDetails current={text} onFill={fill} /> : null}
 
-        {filled.size > 0 && !helper ? (
+        {(filled.size > 0 || currencyFilled) && !helper ? (
           <p className="rounded-xl bg-accent-soft/40 px-3 py-2 text-[0.8125rem] text-ink">
             The highlighted fields were filled in for you. Check them before saving.
           </p>
@@ -307,8 +313,11 @@ function EmployerForm({
             <select
               id={currencyId}
               value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
-              className={FIELD}
+              onChange={(e) => {
+                setCurrency(e.target.value);
+                setCurrencyFilled(false);
+              }}
+              className={cn(FIELD, currencyFilled && "border-accent bg-accent-soft/40")}
             >
               <option value="">{settingsCurrency} (Settings)</option>
               {CURRENCIES.map((c) => (

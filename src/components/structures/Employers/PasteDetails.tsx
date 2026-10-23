@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 
+import { currencyForCountry } from "@/services/Employer/currency";
 import {
   parseEmployerText,
   PASTE_FIELDS,
@@ -85,6 +86,12 @@ function PasteDetails({
                 </div>
               );
             })}
+            {currencyForCountry(fields.country) ? (
+              <div className="contents">
+                <dt className="text-ink-muted">Currency</dt>
+                <dd className="text-ink">{currencyForCountry(fields.country)}</dd>
+              </div>
+            ) : null}
           </dl>
           <Button
             type="button"
