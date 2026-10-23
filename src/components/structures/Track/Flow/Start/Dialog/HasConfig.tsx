@@ -2,6 +2,7 @@
 
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { History } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import StartButton from "@/components/structures/Track/Flow/Start/Button";
 import Dropdown from "@/components/structures/Track/Flow/Start/Dialog/Dropdown";
@@ -11,12 +12,15 @@ import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
 
 import useEmployers from "@/hooks/useEmployers";
+import useMoney from "@/hooks/useMoney";
 
 import { useShiftData } from "@/store/useShiftData";
 
 function ShiftStartHasConfigStep() {
   const { setStep, data } = useShiftData((state) => state);
   const { byId } = useEmployers();
+  const t = useTranslations("track.start");
+  const money = useMoney();
   const employer = data.employerId != null ? byId.get(data.employerId) : undefined;
 
   return (
@@ -28,14 +32,12 @@ function ShiftStartHasConfigStep() {
               <History className="size-5" strokeWidth={1.75} aria-hidden="true" />
             </span>
             <Text as="span" classes="font-display text-lg leading-tight font-semibold">
-              Use your last shift settings?
+              {t("last_config_title")}
             </Text>
           </Stack>
         </DialogTitle>
         <DialogDescription>
-          <VisuallyHidden.Root>
-            A previous shift configuration was found. Do you want to use it?
-          </VisuallyHidden.Root>
+          <VisuallyHidden.Root>{t("last_config_description")}</VisuallyHidden.Root>
         </DialogDescription>
       </DialogHeader>
       <Stack orientation="vertical" alignItems="center">
@@ -56,7 +58,11 @@ function ShiftStartHasConfigStep() {
                 d="M1 5.917 5.724 10.5 15 1.5"
               />
             </svg>
-            <span>Hour value: ${data.hourValue}</span>
+            <span>
+              {t("hour_value_item", {
+                value: money(Number(data.hourValue ?? 0), { currency: data.currency }),
+              })}
+            </span>
           </li>
           <li className="flex items-center space-x-1">
             <svg
@@ -74,7 +80,7 @@ function ShiftStartHasConfigStep() {
                 d="M1 5.917 5.724 10.5 15 1.5"
               />
             </svg>
-            <span>Unpaid breaks: {data.unpaidBreaks}</span>
+            <span>{t("unpaid_breaks_item", { value: data.unpaidBreaks ?? 0 })}</span>
           </li>
           {employer ? (
             <li className="flex items-center space-x-1">
@@ -93,7 +99,7 @@ function ShiftStartHasConfigStep() {
                   d="M1 5.917 5.724 10.5 15 1.5"
                 />
               </svg>
-              <span>Employer: {employer.name}</span>
+              <span>{t("employer_item", { name: employer.name })}</span>
             </li>
           ) : null}
         </ul>
@@ -105,9 +111,9 @@ function ShiftStartHasConfigStep() {
           classes="w-full p-2 text-sm active:shadow-button-inner"
           onClick={() => setStep("ShiftInfo")}
         >
-          Edit
+          {t("edit")}
         </Button>
-        <StartButton title="Start shift" />
+        <StartButton title={t("start")} />
       </Stack>
     </>
   );

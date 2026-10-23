@@ -3,6 +3,7 @@
 import type { PropsWithChildren, ReactNode } from "react";
 
 import { ClipboardCheck } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { effectiveRate } from "@/components/structures/SalaryItems/TaxPicker";
 import Button from "@/components/ui/Button";
@@ -57,6 +58,7 @@ function ShiftReviewDialog({
   children,
 }: PropsWithChildren<Props>) {
   const format$ = useMoney();
+  const t = useTranslations("shift.review");
   function money(value: number) {
     return format$(value, { currency });
   }
@@ -78,8 +80,8 @@ function ShiftReviewDialog({
             <ClipboardCheck className="size-5.5" strokeWidth={1.75} aria-hidden="true" />
           </span>
           <div className="flex flex-col gap-0.5">
-            <DialogTitle>Check your shift</DialogTitle>
-            <DialogDescription>Nothing is saved until you confirm.</DialogDescription>
+            <DialogTitle>{t("title")}</DialogTitle>
+            <DialogDescription>{t("description")}</DialogDescription>
           </div>
         </DialogHeader>
 
@@ -88,17 +90,19 @@ function ShiftReviewDialog({
           className="flex flex-col gap-3 rounded-xl bg-surface-inverse p-4 text-ink-inverse"
         >
           <div className="flex flex-col gap-1">
-            <span className="text-[0.8125rem] text-ink-inverse/70">You&apos;ll earn</span>
+            <span className="text-[0.8125rem] text-ink-inverse/70">{t("earn")}</span>
             <span className="figure text-[2.75rem] leading-none text-live">{money(gross)}</span>
           </div>
           {hasTaxes ? (
             <dl className="flex flex-col gap-1.5 border-t border-ink-inverse/15 pt-3 text-sm">
               <div className="flex justify-between">
-                <dt className="text-ink-inverse/70">Taxes, {effectiveRate(taxes)}%</dt>
+                <dt className="text-ink-inverse/70">
+                  {t("taxes_rate", { rate: effectiveRate(taxes) })}
+                </dt>
                 <dd className="tabular-nums">−{money(Math.max(0, gross - afterTaxes))}</dd>
               </div>
               <div className="flex justify-between font-semibold">
-                <dt>After taxes</dt>
+                <dt>{t("after_taxes")}</dt>
                 <dd className="tabular-nums">{money(afterTaxes)}</dd>
               </div>
             </dl>
@@ -129,7 +133,7 @@ function ShiftReviewDialog({
 
         {hasTaxes ? (
           <div className="flex flex-col gap-2">
-            <h3 className="text-[0.8125rem] font-medium text-ink-muted">Taxes</h3>
+            <h3 className="text-[0.8125rem] font-medium text-ink-muted">{t("taxes")}</h3>
             <ul className="flex flex-wrap gap-2">
               {taxes.map((tax) => (
                 <li
@@ -146,7 +150,7 @@ function ShiftReviewDialog({
         <DialogFooter className="grid grid-cols-2 gap-2.5 sm:space-x-0">
           <DialogClose asChild>
             <Button type="button" variant="outline" size="lg" classes="w-full">
-              Edit
+              {t("edit")}
             </Button>
           </DialogClose>
           <Button
@@ -155,7 +159,7 @@ function ShiftReviewDialog({
             form={formId}
             classes={cn("w-full text-on-module hover:opacity-90", colors.strong)}
           >
-            Save shift
+            {t("save")}
           </Button>
         </DialogFooter>
       </DialogContent>

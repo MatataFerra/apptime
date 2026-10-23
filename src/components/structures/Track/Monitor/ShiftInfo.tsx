@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { useLocale, useTranslations } from "next-intl";
 import { useInterval } from "usehooks-ts";
 
 import DateHumanizer from "@/services/Date";
@@ -18,6 +19,8 @@ import useTrack from "@/hooks/useTrack";
  */
 function ShiftTrackInfo() {
   const money = useMoney();
+  const t = useTranslations("track.monitor");
+  const locale = useLocale();
   const { user, isShiftActive, isClosing, shiftUnclosed } = useTrack();
   const [now, setNow] = useState(() => new Date());
   const running = isShiftActive && !isClosing && !!shiftUnclosed.shift?.startDate;
@@ -31,8 +34,8 @@ function ShiftTrackInfo() {
     .sort((a, b) => new Date(a.startDate).valueOf() - new Date(b.startDate).valueOf())
     .at(-1);
   const lastLabel = lastClosed?.startDate
-    ? new DateHumanizer("long").humanizeDate(new Date(lastClosed.startDate))
-    : "None yet";
+    ? new DateHumanizer("long").humanizeDate(new Date(lastClosed.startDate), { locale })
+    : t("none_yet");
 
   if (running) {
     const elapsed = ShiftService.differenceInHHmm(shiftUnclosed.shift?.startDate ?? "", "").diff;
@@ -45,7 +48,7 @@ function ShiftTrackInfo() {
           <div
             className="h-2 overflow-hidden rounded-full bg-ink-inverse/12"
             role="progressbar"
-            aria-label="Shift length compared with your usual shift"
+            aria-label={t("progress")}
             aria-valuenow={progress}
             aria-valuemin={0}
             aria-valuemax={100}
@@ -58,13 +61,13 @@ function ShiftTrackInfo() {
         ) : null}
         <dl className="grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-0.5">
-            <dt className="text-xs text-ink-inverse/60">This shift so far</dt>
+            <dt className="text-xs text-ink-inverse/60">{t("so_far")}</dt>
             <dd className="figure text-[1.625rem] leading-tight text-live">
               {money(earned, { currency: shiftUnclosed.shift?.currency })}
             </dd>
           </div>
           <div className="flex flex-col gap-0.5">
-            <dt className="text-xs text-ink-inverse/60">Usual shift</dt>
+            <dt className="text-xs text-ink-inverse/60">{t("usual")}</dt>
             <dd className="figure text-[1.625rem] leading-tight">
               {usual ? formatHours(usual) : "–"}
             </dd>
@@ -77,12 +80,12 @@ function ShiftTrackInfo() {
   return (
     <dl className="grid grid-cols-2 gap-3 border-t border-ink-inverse/15 pt-4">
       <div className="flex flex-col gap-0.5">
-        <dt className="text-xs text-ink-inverse/60">Last shift</dt>
+        <dt className="text-xs text-ink-inverse/60">{t("last")}</dt>
         <dd className="text-sm font-medium">{lastLabel}</dd>
       </div>
       <div className="flex flex-col gap-0.5">
-        <dt className="text-xs text-ink-inverse/60">Usual shift</dt>
-        <dd className="text-sm font-medium">{usual ? formatHours(usual) : "After 3 shifts"}</dd>
+        <dt className="text-xs text-ink-inverse/60">{t("usual")}</dt>
+        <dd className="text-sm font-medium">{usual ? formatHours(usual) : t("after_three")}</dd>
       </div>
     </dl>
   );

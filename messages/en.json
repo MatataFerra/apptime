@@ -4,15 +4,40 @@
     "description": "Track your hours and see what you earn, shift by shift."
   },
   "modules": {
-    "track": { "title": "Track" },
-    "fast_charge": { "title": "Fast charge" },
-    "production": { "title": "Production" },
-    "employers": { "title": "Employers", "description": "Where you work and their details" },
-    "dashboard": { "title": "Dashboard" },
-    "estimate": { "title": "Estimate", "description": "What a stretch of work pays" },
-    "compare": { "title": "Compare", "description": "Per piece or per hour" },
-    "taxes": { "title": "Taxes", "description": "Your rates and deductions" },
-    "settings": { "title": "Settings" }
+    "track": {
+      "title": "Track",
+      "subtitle": "Run the clock while you work."
+    },
+    "fast_charge": {
+      "title": "Fast charge",
+      "subtitle": "Log a finished shift in one go."
+    },
+    "production": {
+      "title": "Production",
+      "subtitle": "Get paid per bin, box or piece."
+    },
+    "employers": {
+      "title": "Employers",
+      "description": "Where you work and their details"
+    },
+    "dashboard": {
+      "title": "Dashboard"
+    },
+    "estimate": {
+      "title": "Estimate",
+      "description": "What a stretch of work pays"
+    },
+    "compare": {
+      "title": "Compare",
+      "description": "Per piece or per hour"
+    },
+    "taxes": {
+      "title": "Taxes",
+      "description": "Your rates and deductions"
+    },
+    "settings": {
+      "title": "Settings"
+    }
   },
   "nav": {
     "main": "Main",
@@ -109,12 +134,65 @@
       "start": "Start",
       "finish": "Finish",
       "unpaid_breaks": "Unpaid breaks",
-      "hourly_rate": "Hourly rate"
+      "hourly_rate": "Hourly rate",
+      "job_name": "Name of your job",
+      "time_worked": "Time worked",
+      "pieces": "Pieces",
+      "holiday_pay": "Holiday pay",
+      "item_value": "Value per item",
+      "item_value_hint": "Per bin, box or piece",
+      "quantity": "Quantity",
+      "paid_in": "Paid in",
+      "employer": "Employer",
+      "add_employer": "Add one",
+      "no_employer": "None",
+      "removed": "(removed)"
     },
     "tags": {
       "repeated": "Repeated",
-      "regular_day": "Regular day"
-    }
+      "regular_day": "Regular day",
+      "public_holiday": "Public holiday",
+      "worked_holiday": "Worked the holiday"
+    },
+    "processing": "Your request is being processed",
+    "please_wait": "Please wait a moment...",
+    "created": "Shift created successfully",
+    "minutes_unit": "min.",
+    "review": {
+      "title": "Check your shift",
+      "description": "Nothing is saved until you confirm.",
+      "earn": "You'll earn",
+      "taxes_rate": "Taxes, {rate}%",
+      "after_taxes": "After taxes",
+      "taxes": "Taxes",
+      "edit": "Edit",
+      "save": "Save shift"
+    },
+    "check_dates": "Check the dates",
+    "check_dates_description": "The shift couldn't be created with these dates.",
+    "errors": {
+      "finish_before_start": "Finish date must be after start date",
+      "finish_time_before_start": "Finish time must be after start time",
+      "finish_invalid": "Finish date is invalid",
+      "time_invalid": "Invalid time",
+      "name_invalid": "Your title is not valid"
+    },
+    "holiday": {
+      "question": "What kind of day was it?",
+      "none": {
+        "label": "Regular day",
+        "hint": "Normal rate"
+      },
+      "worked": {
+        "label": "Public holiday, worked",
+        "hint": "Paid at 1.5×"
+      },
+      "off": {
+        "label": "Public holiday, day off",
+        "hint": "Paid, not worked"
+      }
+    },
+    "review_button": "Review shift"
   },
   "home": {
     "popover": "When state is offline it means that the user doesn't start any shift yet",
@@ -195,6 +273,107 @@
       "since": "On the clock since 8:00 AM",
       "open": "Open",
       "this_week": "This week"
+    }
+  },
+  "track": {
+    "errors": {
+      "title": "Error",
+      "tracker": "An error occurred while trying to load the tracker.",
+      "button": "Error loading button"
+    },
+    "monitor": {
+      "on": "On the clock",
+      "off": "Off the clock",
+      "status": "Status",
+      "started": "Started {time}",
+      "elapsed": "{hours} hours {mins} minutes",
+      "idle_hint": "No shift running. Press Start shift when you clock in.",
+      "none_tracked": "No shift is being tracked",
+      "progress": "Shift length compared with your usual shift",
+      "so_far": "This shift so far",
+      "usual": "Usual shift",
+      "last": "Last shift",
+      "none_yet": "None yet",
+      "after_three": "After 3 shifts"
+    },
+    "start": {
+      "trigger": "Start Shift",
+      "start": "Start shift",
+      "save_and_start": "Save config & start",
+      "creating": "Shift is being created",
+      "started": "Shift started",
+      "error": "Error creating shift, please try again",
+      "holiday_question": "Is a public holiday?",
+      "holiday_yes": "Yes! I want money 🤑",
+      "holiday_no": "No, just regular day",
+      "last_config_title": "Use your last shift settings?",
+      "last_config_description": "A previous shift configuration was found. Do you want to use it?",
+      "hour_value_item": "Hour value: {value}",
+      "unpaid_breaks_item": "Unpaid breaks: {value}",
+      "employer_item": "Employer: {name}",
+      "edit": "Edit",
+      "set_title": "Set shift before start",
+      "set_description": "Please fill in the following details to start your shift"
+    },
+    "taxes": {
+      "title": "Taxes for this shift",
+      "description": "They're applied when you finish the shift.",
+      "done": "Done"
+    },
+    "tools": {
+      "notes": "Notes",
+      "taxes": "Taxes"
+    },
+    "finish": {
+      "closing": "Closing shift",
+      "saving": "Saving your hours…",
+      "saved_description": "Nice work, it's in your history.",
+      "failed": "Couldn't finish the shift"
+    }
+  },
+  "notes": {
+    "title": "Shift notes",
+    "started_at": "Shift started at {time}",
+    "empty_description": "Add notes to this shift",
+    "saved_badge": "Saved",
+    "saved": "Note saved",
+    "saved_description": "It's attached to this shift.",
+    "cancel": "Cancel",
+    "save": "Save note",
+    "job_name": "Job name",
+    "job_name_placeholder": "Packhouse, apple picking…",
+    "note": "Note",
+    "placeholder": "Breaks you took, overtime, who you worked with…",
+    "too_short": "Write at least {min} characters",
+    "private": "Only you can see this."
+  },
+  "tax_picker": {
+    "title": "Taxes",
+    "subtitle": "Optional. Taken off this shift's pay.",
+    "total_label": "{rate}% taken off in total",
+    "saved_title": "Your taxes",
+    "tap_hint": "Tap to add or remove",
+    "search": "Search your taxes",
+    "no_match": "No saved tax matches “{search}”.",
+    "new_title": "New for this shift",
+    "remove": "Remove {name}",
+    "using_saved": "Using your saved \"{name}\"",
+    "using_saved_description": "{rate}% from your previous shifts.",
+    "empty": "No taxes yet. Add the ones on your payslip, like income tax; next time they're one tap away.",
+    "new": "New tax",
+    "add": "Add tax",
+    "cancel": "Cancel",
+    "fields": {
+      "name": "Name",
+      "name_placeholder": "Income tax",
+      "rate": "Rate",
+      "note": "Note (optional)",
+      "note_placeholder": "As shown on your payslip"
+    },
+    "errors": {
+      "name_required": "Give it a name",
+      "rate_range": "Between 0 and 100",
+      "already_added": "Already added"
     }
   }
 }

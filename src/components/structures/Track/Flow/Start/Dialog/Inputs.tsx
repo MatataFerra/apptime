@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { z } from "zod";
 
 import CurrencySelect from "@/components/structures/ShiftForms/CurrencySelect";
@@ -18,22 +19,17 @@ import useUser from "@/hooks/useUser";
 
 import { useShiftData } from "@/store/useShiftData";
 
+// Required-field messages come from the active language (providers/ZodI18n).
 const InputsSchema = z.object({
-  hourValue: z
-    .string()
-    .min(1)
-    .refine((value) => !!value, {
-      message: "Hour value is required",
-    }),
-  unpaidBreaks: z.string().refine((value) => !!value, {
-    message: "Unpaid breaks is required",
-  }),
+  hourValue: z.string().min(1),
+  unpaidBreaks: z.string().min(1),
 });
 
 function ShiftStartInputs() {
   const { data, setData, setErrors } = useShiftData((state) => state);
   const { data: user } = useUser();
   const defaultCurrency = useCurrency();
+  const t = useTranslations("shift.fields");
   const { register, control, setValue } = useForm({
     resolver: zodResolver(InputsSchema),
     defaultValues: {
@@ -78,7 +74,7 @@ function ShiftStartInputs() {
       <Stack orientation="horizontal" alignItems="center" wrap>
         <Input
           data-testid="hourValue"
-          description="Hour value"
+          description={t("hourly_rate")}
           measure={currencySymbol(data.currency || defaultCurrency)}
           type="number"
           required
@@ -86,7 +82,7 @@ function ShiftStartInputs() {
           {...register("hourValue", {})}
         />
         <Input
-          description="Unpaid Breaks"
+          description={t("unpaid_breaks")}
           type="number"
           min={0}
           max={5}

@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import type { Hourly } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import ShiftService from "@/services/Shift";
 import Toast from "@/services/Toast";
@@ -21,6 +22,8 @@ import { useTrackTaxesOrContributionsStore } from "@/store/useTaxOrContributionS
  */
 function useFinishShift() {
   const queryClient = useQueryClient();
+  const t = useTranslations("track.finish");
+  const ts = useTranslations("shift");
   const { removelocalNote } = useNotes();
   const editedName = useShiftData((state) => state.data.name);
   const {
@@ -42,7 +45,7 @@ function useFinishShift() {
 
     setFinishing(true);
     setIsClosing(true);
-    Toast({ message: "Closing shift", type: "loading", description: "Saving your hours…" });
+    Toast({ message: t("closing"), type: "loading", description: t("saving") });
 
     const prepared = {
       ...shift,
@@ -70,9 +73,9 @@ function useFinishShift() {
       setIsClosing(false);
       removelocalNote();
       Toast({
-        message: "Shift saved",
+        message: ts("saved"),
         type: "success",
-        description: "Nice work, it's in your history.",
+        description: t("saved_description"),
       });
       return true;
     }
@@ -81,9 +84,9 @@ function useFinishShift() {
     updateShiftStatus(true);
     setIsClosing(false);
     Toast({
-      message: "Couldn't finish the shift",
+      message: t("failed"),
       type: "error",
-      description: "Please try again.",
+      description: ts("try_again"),
     });
     return false;
   }

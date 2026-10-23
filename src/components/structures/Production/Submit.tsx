@@ -3,6 +3,7 @@
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { isBefore } from "date-fns";
+import { useTranslations } from "next-intl";
 
 import Dialog from "@/components/structures/Production/Dialog";
 import Box from "@/components/ui/Box";
@@ -18,6 +19,7 @@ function Submit() {
     values: { name },
   } = useProductionForm((state) => state);
   const { setError, setFocus, control, clearErrors } = useFormContext();
+  const t = useTranslations("shift");
   // useWatch, not watch(): the React Compiler would memoize watch() and freeze the value.
   const startDateWatch = useWatch({ control, name: "start-date" });
   const finishDateWatch = useWatch({ control, name: "finish-date" });
@@ -26,7 +28,7 @@ function Submit() {
     if (isBefore(new Date(finishDateWatch), new Date(startDateWatch))) {
       setDialogState(false);
       setError("finish-date", {
-        message: "Finish date must be after start date",
+        message: t("errors.finish_before_start"),
       });
 
       setFocus("finish-date");
@@ -41,7 +43,7 @@ function Submit() {
     // check if name field has white spaces at the beginning
     if (name && regexNameHasWhiteSpacesAtStart.test(name)) {
       setError("name", {
-        message: "Your title is not valid",
+        message: t("errors.name_invalid"),
       });
       setFocus("name");
 
@@ -65,7 +67,7 @@ function Submit() {
           disabled={!isFormReady}
           onClick={() => onOpenDialogAndCheckInputs()}
         >
-          Review shift
+          {t("review_button")}
         </Button>
       </Box>
     </Dialog>

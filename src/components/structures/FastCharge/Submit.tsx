@@ -3,6 +3,7 @@
 import { useFormContext } from "react-hook-form";
 
 import { isBefore, isEqual, isValid } from "date-fns";
+import { useTranslations } from "next-intl";
 
 import Toast from "@/services/Toast";
 
@@ -23,6 +24,16 @@ function Submit() {
   } = useFastChargeStore((state) => state);
 
   const { setError, setFocus, clearErrors } = useFormContext();
+  const t = useTranslations("shift");
+
+  function errorToast() {
+    Toast({
+      type: "error",
+      message: t("check_dates"),
+      description: t("check_dates_description"),
+      duration: 1500,
+    });
+  }
 
   const formatStart = useFormatAndAddTime({
     date: startDate ?? "",
@@ -38,18 +49,13 @@ function Submit() {
     // check if finish date is before than start date
     if (isBefore(new Date(finishDate ?? ""), new Date(startDate ?? ""))) {
       setError("finish-date", {
-        message: "Finish date must be after start date",
+        message: t("errors.finish_before_start"),
       });
       setFocus("finish-date");
 
       setFormError(true);
 
-      Toast({
-        type: "error",
-        message: "Error",
-        description: "An error occurred while creating the shift",
-        duration: 1500,
-      });
+      errorToast();
 
       return;
     }
@@ -57,18 +63,13 @@ function Submit() {
     // check if both dates are same
     if (isEqual(new Date(formatEnd), new Date(formatStart))) {
       setError("finish-time", {
-        message: "Finish time must be after start time",
+        message: t("errors.finish_time_before_start"),
       });
       setFocus("finish-time");
 
       setFormError(true);
 
-      Toast({
-        type: "error",
-        message: "Error",
-        description: "An error occurred while creating the shift",
-        duration: 1500,
-      });
+      errorToast();
 
       return;
     }
@@ -76,18 +77,13 @@ function Submit() {
     // check if finish date is before than start date
     if (isBefore(new Date(formatEnd ?? ""), new Date(formatStart ?? ""))) {
       setError("finish-time", {
-        message: "Finish date must be after start date",
+        message: t("errors.finish_before_start"),
       });
       setFocus("finish-time");
 
       setFormError(true);
 
-      Toast({
-        type: "error",
-        message: "Error",
-        description: "An error occurred while creating the shift",
-        duration: 1500,
-      });
+      errorToast();
 
       return;
     }
@@ -95,21 +91,16 @@ function Submit() {
     // check if date is valid date
     if (!isValid(new Date(formatEnd))) {
       setError("finish-date", {
-        message: "Finish date is invalid",
+        message: t("errors.finish_invalid"),
       });
 
       setError("finish-time", {
-        message: "Invalid time",
+        message: t("errors.time_invalid"),
       });
 
       setFormError(true);
 
-      Toast({
-        type: "error",
-        message: "Error",
-        description: "An error occurred while creating the shift",
-        duration: 1500,
-      });
+      errorToast();
 
       return;
     }
@@ -119,7 +110,7 @@ function Submit() {
     // check if name field has white spaces at the beginning
     if (name && regexNameHasWhiteSpacesAtStart.test(name)) {
       setError("name", {
-        message: "Your title is not valid",
+        message: t("errors.name_invalid"),
       });
       setFocus("name");
 
@@ -143,7 +134,7 @@ function Submit() {
           disabled={!isFormReady}
           onClick={() => onSubmitAndCheckInputs()}
         >
-          Review shift
+          {t("review_button")}
         </Button>
       </Box>
     </Dialog>

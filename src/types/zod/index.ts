@@ -292,26 +292,17 @@ const PasswordSchema = z.object({
   Fast Charge Schema
 */
 
+// Required-field messages come from the active language (providers/ZodI18n).
 const FastChargeFormSchema = z.object({
-  "start-date": z.string().refine((value) => !!value, {
-    message: "Start date must be provided",
-  }),
+  "start-date": z.string().min(1),
 
-  "finish-date": z.string().refine((value) => !!value, {
-    message: "Finish date must be provided",
-  }),
-  "start-time": z.string().refine((value) => !!value, {
-    message: "Start time must be provided",
-  }),
-  "finish-time": z.string().refine((value) => !!value, {
-    message: "Finish time must be provided",
-  }),
+  "finish-date": z.string().min(1),
+  "start-time": z.string().min(1),
+  "finish-time": z.string().min(1),
   name: z.string().nullable(),
   "is-public-holiday": z.boolean(),
   "is-public-holiday-worked": z.boolean(),
-  "hour-value": z.string().refine((value) => !!value, {
-    message: "Hour value must be greater than 0",
-  }),
+  "hour-value": z.string().min(1),
   "unpaid-breaks": z.string().nullable(),
 });
 
@@ -329,12 +320,8 @@ const ProductionJobFormSchema = z.object({
   "start-date": z.string(),
   "finish-date": z.string(),
   name: z.string().nullable(),
-  "item-value": z.string().refine((value) => !!value, {
-    message: "Hour value must be greater than 0",
-  }),
-  "item-quantity": z.string().refine((value) => !!value, {
-    message: "Hour value must be greater than 0",
-  }),
+  "item-value": z.string().min(1),
+  "item-quantity": z.string().min(1),
   "is-public-holiday": z.boolean(),
   "is-worked": z.boolean(),
 });

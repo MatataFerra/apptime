@@ -3,6 +3,7 @@
 import type { PropsWithChildren } from "react";
 
 import { StickyNote } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 
 import Buttons from "@/components/structures/Notes/Buttons";
 import Header from "@/components/structures/Notes/Header";
@@ -20,11 +21,11 @@ import useTrack from "@/hooks/useTrack";
 
 import { useNotes } from "@/store/useNotesStore";
 
-function startedLabel(start?: string | Date | null) {
+function startedLabel(start: string | Date | null | undefined, locale: string) {
   if (!start) return null;
   const date = new Date(start);
   if (isNaN(date.valueOf())) return null;
-  return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  return date.toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit" });
 }
 
 /**
@@ -36,7 +37,8 @@ function Notes({ children }: PropsWithChildren) {
   const {
     shiftUnclosed: { shift },
   } = useTrack();
-  const started = startedLabel(shift?.startDate);
+  const t = useTranslations("notes");
+  const started = startedLabel(shift?.startDate, useLocale());
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -57,15 +59,15 @@ function Notes({ children }: PropsWithChildren) {
           </span>
           <div className="flex min-w-0 flex-1 flex-col">
             <SheetTitle className="text-[1.0625rem] font-semibold text-fast-ink">
-              Shift notes
+              {t("title")}
             </SheetTitle>
             <SheetDescription className="m-0! truncate text-[0.8125rem] text-fast-ink/75">
-              {started ? `Shift started at ${started}` : "Add notes to this shift"}
+              {started ? t("started_at", { time: started }) : t("empty_description")}
             </SheetDescription>
           </div>
           {localNote ? (
             <span className="shrink-0 rounded-full bg-surface/70 px-2.5 py-1 text-xs font-semibold text-fast-ink">
-              Saved
+              {t("saved_badge")}
             </span>
           ) : null}
         </SheetHeader>

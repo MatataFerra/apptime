@@ -2,6 +2,8 @@
 
 import { useCallback } from "react";
 
+import { useLocale, useTranslations } from "next-intl";
+
 import ut from "@/services/Utilities/client";
 
 import PopoverHome from "@/components/structures/Home/Popover";
@@ -13,6 +15,8 @@ function ShiftTextState() {
   const {
     shiftUnclosed: { shift },
   } = useTrack();
+  const t = useTranslations("track.monitor");
+  const locale = useLocale();
 
   const checkCloseShift = useCallback(() => {
     if (typeof shift?.isClosed === "undefined") {
@@ -28,7 +32,7 @@ function ShiftTextState() {
   return (
     <div className="flex w-full items-center justify-between gap-3">
       <Text as="h2" classes="flex items-center gap-2 text-sm text-ink-muted">
-        <span className="sr-only">Status</span>
+        <span className="sr-only">{t("status")}</span>
         <Text
           as="span"
           classes={`inline-flex h-8 items-center gap-2 rounded-full border px-3 text-sm font-semibold ${
@@ -41,13 +45,15 @@ function ShiftTextState() {
             aria-hidden="true"
             className={`size-1.5 rounded-full ${online ? "bg-accent" : "bg-ink-subtle"}`}
           />
-          {online ? "On the clock" : "Off the clock"}
+          {online ? t("on") : t("off")}
         </Text>
         <PopoverHome />
       </Text>
       {online && startedAt && !isNaN(startedAt.valueOf()) ? (
         <span className="text-sm text-ink-muted">
-          Started {startedAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+          {t("started", {
+            time: startedAt.toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit" }),
+          })}
         </span>
       ) : null}
     </div>
