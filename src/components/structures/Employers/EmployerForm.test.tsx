@@ -19,6 +19,7 @@ vi.mock("@/server-actions/business-lookup", () => ({
       facts: [{ label: "Type", value: "Australian Private Company" }],
       note: "The register has no street address: add it yourself.",
     },
+    searchedAt: new Date().toISOString(),
   })),
 }));
 
@@ -66,7 +67,7 @@ describe("EmployerForm helpers", () => {
   });
 
   test("business lookup: warns on a cancelled ABN and keeps the legal name in the notes", async () => {
-    const { user } = setup();
+    const { user, onSave } = setup();
 
     await user.click(screen.getByRole("button", { name: /look up business/i }));
     await user.type(screen.getByLabelText(/abn or business name/i), "51824753556{Enter}");
@@ -81,6 +82,16 @@ describe("EmployerForm helpers", () => {
     );
     expect((screen.getByLabelText("Notes") as HTMLTextAreaElement).value).toBe(
       "Legal name: Sunny Holdings Pty Ltd"
+    );
+
+    // The source and time of the search: shown, not editable, sent with the save.
+    expect(screen.getByTestId("employer-source")).toHaveTextContent(
+      /^Data sourced from the Australian Business Register, \d{1,2} \w{3} \d{4}, \d{2}:\d{2}$/
+    );
+    expect(screen.queryByRole("textbox", { name: /data sourced/i })).toBeNull();
+    await user.click(screen.getByRole("button", { name: /add employer/i }));
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({ source: { registry: "abr", at: expect.any(String) } })
     );
   });
 

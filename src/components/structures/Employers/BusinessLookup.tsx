@@ -6,7 +6,7 @@ import { AlertTriangle, Search } from "lucide-react";
 
 import { currencyForCountry } from "@/services/Employer/currency";
 import type { PastedEmployer } from "@/services/Employer/paste";
-import { REGISTRIES, REGISTRY_ORDER } from "@/services/Registry/registries";
+import { attribution, REGISTRIES, REGISTRY_ORDER } from "@/services/Registry/registries";
 import type { BusinessDetails, BusinessMatch, RegistryId } from "@/services/Registry/types";
 
 import Button from "@/components/ui/Button";
@@ -15,7 +15,14 @@ import { cn } from "@/utils/helpers/styleMerger";
 
 import { onLookupBusiness } from "@/server-actions/business-lookup";
 
-export type UseBusiness = (fields: PastedEmployer, legalName: string | null) => void;
+/** Where the details came from and when, saved with the employer. */
+export type BusinessSource = { registry: RegistryId; at: string };
+
+export type UseBusiness = (
+  fields: PastedEmployer,
+  legalName: string | null,
+  source: BusinessSource
+) => void;
 
 /** ISO dates inside a line -> "1 Jul 2000". */
 function readableDates(value: string) {
@@ -27,7 +34,15 @@ function readableDates(value: string) {
   });
 }
 
-function Details({ details, onUse }: { details: BusinessDetails; onUse: UseBusiness }) {
+function Details({
+  details,
+  searchedAt,
+  onUse,
+}: {
+  details: BusinessDetails;
+  searchedAt: string;
+  onUse: UseBusiness;
+}) {
   const info = REGISTRIES[details.registry];
   const [name, setName] = useState<string | null>(details.names[0] ?? null);
   const groupId = useId();
@@ -98,11 +113,18 @@ function Details({ details, onUse }: { details: BusinessDetails; onUse: UseBusin
 
       {details.note ? <p className="text-[0.8125rem] text-ink-subtle">{details.note}</p> : null}
 
+      <p className="text-[0.75rem] text-ink-muted">{attribution(details.registry, searchedAt)}</p>
+
       <Button
         type="button"
         size="md"
         classes="w-full"
-        onClick={() => onUse({ ...details.fields, ...(name && { name }) }, details.legalName)}
+        onClick={() =>
+          onUse({ ...details.fields, ...(name && { name }) }, details.legalName, {
+            registry: details.registry,
+            at: searchedAt,
+          })
+        }
       >
         Use these details
       </Button>
@@ -120,7 +142,9 @@ function BusinessLookup({ initial, onUse }: { initial: RegistryId; onUse: UseBus
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [matches, setMatches] = useState<BusinessMatch[] | null>(null);
-  const [details, setDetails] = useState<BusinessDetails | null>(null);
+  const [details, setDetails] = useState<{ data: BusinessDetails; searchedAt: string } | null>(
+    null
+  );
   const inputId = useId();
   const info = REGISTRIES[registry];
 
@@ -142,7 +166,7 @@ function BusinessLookup({ initial, onUse }: { initial: RegistryId; onUse: UseBus
     if (!result.ok) return setError(result.error);
     if (result.kind === "details") {
       setMatches(null);
-      return setDetails(result.details);
+      return setDetails({ data: result.details, searchedAt: result.searchedAt });
     }
     if (result.matches.length === 0) setError("No businesses with that name");
     setMatches(result.matches);
@@ -207,7 +231,12 @@ function BusinessLookup({ initial, onUse }: { initial: RegistryId; onUse: UseBus
       {error ? <p className="text-[0.8125rem] text-destructive">{error}</p> : null}
 
       {details ? (
-        <Details key={details.id} details={details} onUse={onUse} />
+        <Details
+          key={details.data.id}
+          details={details.data}
+          searchedAt={details.searchedAt}
+          onUse={onUse}
+        />
       ) : matches && matches.length > 0 ? (
         <ul className="flex flex-col divide-y divide-border rounded-xl border border-border">
           {matches.map((match) => (
@@ -229,7 +258,9 @@ function BusinessLookup({ initial, onUse }: { initial: RegistryId; onUse: UseBus
         </ul>
       ) : null}
 
-      <p className="text-[0.75rem] text-ink-subtle">{info.source}</p>
+      {!details ? (
+        <p className="text-[0.75rem] text-ink-subtle">Searches the {info.registerName}.</p>
+      ) : null}
     </div>
   );
 }

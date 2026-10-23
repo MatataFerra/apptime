@@ -12,8 +12,8 @@ export type RegistryInfo = {
   placeholder: string;
   /** Searching by name works; otherwise only by number. */
   byName: boolean;
-  /** Credit line under the results. */
-  source: string;
+  /** Register name for "Data sourced from the …" (MBIE's required format). */
+  registerName: string;
 };
 
 export const REGISTRIES: Record<RegistryId, RegistryInfo> = {
@@ -24,7 +24,7 @@ export const REGISTRIES: Record<RegistryId, RegistryInfo> = {
     inputLabel: "ABN or business name",
     placeholder: "51 824 753 556 or Sunny Farms",
     byName: true,
-    source: "From ABN Lookup, Australian Business Register.",
+    registerName: "Australian Business Register",
   },
   nzbn: {
     id: "nzbn",
@@ -33,7 +33,7 @@ export const REGISTRIES: Record<RegistryId, RegistryInfo> = {
     inputLabel: "NZBN or business name",
     placeholder: "9429041234567 or Kiwi Orchards",
     byName: true,
-    source: "From the New Zealand Business Number register.",
+    registerName: "New Zealand Business Number Register",
   },
   vies: {
     id: "vies",
@@ -42,7 +42,7 @@ export const REGISTRIES: Record<RegistryId, RegistryInfo> = {
     inputLabel: "EU VAT number, with the country code",
     placeholder: "DE123456789, ES B12345678…",
     byName: false,
-    source: "From VIES, the European Commission's VAT check.",
+    registerName: "European Commission's VAT Information Exchange System (VIES)",
   },
 };
 
@@ -93,4 +93,29 @@ export function defaultRegistry(country?: string | null, currency?: string | nul
   if (currency === "NZD") return "nzbn";
   if (currency === "EUR") return "vies";
   return "abr";
+}
+
+export function isRegistryId(value: unknown): value is RegistryId {
+  return typeof value === "string" && value in REGISTRIES;
+}
+
+/** "23 Oct 2026, 20:45" in the viewer's time zone. */
+export function formatSearchedAt(at: string | Date) {
+  const date = typeof at === "string" ? new Date(at) : at;
+  return date.toLocaleString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  });
+}
+
+/**
+ * "Data sourced from the New Zealand Business Number Register, 23 Oct 2026, 20:45":
+ * the source and the time of the search, as MBIE's API agreement asks.
+ */
+export function attribution(registry: RegistryId, at: string | Date) {
+  return `Data sourced from the ${REGISTRIES[registry].registerName}, ${formatSearchedAt(at)}`;
 }

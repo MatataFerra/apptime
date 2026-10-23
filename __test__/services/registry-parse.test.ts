@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { abnToBusiness, parseAbnDetails } from "@/services/Registry/abr/parse";
 import { isValidNzbn, parseNzbnEntity, parseNzbnSearch } from "@/services/Registry/nzbn/parse";
-import { defaultRegistry } from "@/services/Registry/registries";
+import { attribution, defaultRegistry } from "@/services/Registry/registries";
 import { parseVies, splitVat } from "@/services/Registry/vies/parse";
 
 describe("ABR -> business", () => {
@@ -221,5 +221,15 @@ describe("defaultRegistry", () => {
     expect(defaultRegistry("", "NZD")).toBe("nzbn");
     expect(defaultRegistry(null, "EUR")).toBe("vies");
     expect(defaultRegistry(null, "AUD")).toBe("abr");
+  });
+});
+
+describe("attribution", () => {
+  test("MBIE's format: source, then date and time of the search", () => {
+    const at = new Date(2026, 9, 23, 20, 45);
+    expect(attribution("nzbn", at)).toBe(
+      "Data sourced from the New Zealand Business Number Register, 23 Oct 2026, 20:45"
+    );
+    expect(attribution("abr", at)).toMatch(/^Data sourced from the Australian Business Register, /);
   });
 });
