@@ -189,9 +189,9 @@ describe("VIES", () => {
     expect(result).toMatchObject({
       ok: true,
       data: {
-        legalName: "Vignobles Du Sud Sarl",
+        legalName: "Vignobles du Sud SARL",
         fields: {
-          address: "12 Rue Des Vignes",
+          address: "12 Rue des Vignes",
           postcode: "34000",
           city: "Montpellier",
           country: "France",
