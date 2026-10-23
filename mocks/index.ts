@@ -81,6 +81,7 @@ export const userShiftsMocked: UserType["shifts"] = {
     publicHolidayWorked: false,
     shiftId: 1,
     currency: null,
+    employerId: null,
   })),
   hourly: datesMock.map((date, i) => ({
     startDate: date.toString(),
@@ -99,6 +100,7 @@ export const userShiftsMocked: UserType["shifts"] = {
     unpaidBreaks: 0,
     shiftId: 1,
     currency: null,
+    employerId: null,
     source: null,
   })),
 };
@@ -167,6 +169,7 @@ export const userTestData: UserType = {
         itemQuantity: 40,
         shiftId: 1001,
         currency: null,
+        employerId: null,
         taxes: [
           {
             id: 1,
@@ -220,6 +223,7 @@ export const userTestData: UserType = {
         unpaidBreaks: 1,
         shiftId: 1002,
         currency: null,
+        employerId: null,
         source: null,
         taxes: [
           {

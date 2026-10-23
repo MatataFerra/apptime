@@ -1,8 +1,10 @@
 "use server";
 
 import type { Tax } from "@prisma/client";
+import omit from "lodash/omit";
 import { z } from "zod";
 
+import { ownEmployerId } from "@/services/Employer/owned";
 import SalaryItems from "@/services/SalaryItems";
 import ShiftService from "@/services/Shift";
 import UserService from "@/services/User";
@@ -49,7 +51,14 @@ export default async function onEditShift(
         : await prisma.hourly.findFirst(query);
     if (!owned) return null;
 
-    const buildShift = new ShiftService({ ...data, shiftId: currentUser.shifts.id })
+    const employerId = await ownEmployerId(userId, data.employerId);
+    if (employerId === false) return null;
+
+    const buildShift = new ShiftService({
+      ...omit(data, ["employer", "employerId"]),
+      ...(employerId !== undefined && { employerId }),
+      shiftId: currentUser.shifts.id,
+    })
       .checkPublicHoliday()
       .differenceInMinsBetweenStartAndEnd()
       .closeShift()

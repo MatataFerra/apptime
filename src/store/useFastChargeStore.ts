@@ -13,6 +13,8 @@ interface FastCharge {
     unpaidBreaks?: string;
     /** null: the Settings currency */
     currency?: string | null;
+    /** null: no employer */
+    employerId?: number | null;
   };
 
   errors: {
@@ -62,6 +64,7 @@ export const useFastChargeStore = create<FastCharge>((set, get) => ({
     fastWorked: false,
     unpaidBreaks: "",
     currency: null,
+    employerId: null,
   },
 
   errors: {

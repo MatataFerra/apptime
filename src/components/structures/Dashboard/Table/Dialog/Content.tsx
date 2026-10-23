@@ -9,6 +9,7 @@ import type { ShiftType } from "@/types";
 import { MODULE_THEMES } from "@/utils/constants/modules";
 import { isProductionShift } from "@/utils/helpers/isProductionShift";
 import { cn } from "@/utils/helpers/styleMerger";
+import useEmployers from "@/hooks/useEmployers";
 import useMoney from "@/hooks/useMoney";
 
 type Props = {
@@ -24,6 +25,8 @@ function when(date?: string | null) {
 /** Read-only view of a saved shift: pay first, then the details. */
 function TableDialogContent({ shift }: Props) {
   const format$ = useMoney();
+  const { byId } = useEmployers();
+  const employer = shift.employerId != null ? byId.get(shift.employerId) : undefined;
   // In the shift's own currency.
   function money(value: number) {
     return format$(value, { currency: shift.currency });
@@ -36,6 +39,7 @@ function TableDialogContent({ shift }: Props) {
   const hasTaxes = !isEmpty(shift.taxes);
 
   const rows: { label: string; value: string }[] = [
+    ...(employer ? [{ label: "Employer", value: employer.name }] : []),
     { label: "Start", value: when(shift.startDate) },
     { label: "Finish", value: when(shift.endDate) },
     production

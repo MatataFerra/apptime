@@ -11,6 +11,7 @@ import SetShift from "@/components/structures/Track/Flow/Start/Dialog/SetShift";
 import Trigger from "@/components/structures/Track/Trigger";
 import { Dialog, DialogContent } from "@/components/ui/Dialog";
 
+import useEmployers from "@/hooks/useEmployers";
 import useTrack from "@/hooks/useTrack";
 
 import { useShiftData } from "@/store/useShiftData";
@@ -27,6 +28,7 @@ type Props = {
 function StartDialog({ triggerStatus }: Props) {
   const { step, setData, setStep, setErrors } = useShiftData((state) => state);
   const { user } = useTrack();
+  const { byId } = useEmployers();
   const hasConfig = useMemo(
     () => !isEmpty(ShiftService.getLastConfigShift(user?.shifts?.hourly)),
     [user?.shifts]
@@ -37,13 +39,18 @@ function StartDialog({ triggerStatus }: Props) {
   ) as {
     unpaidBreaks: number;
     hourValue: number;
+    employerId?: number | null;
   };
+  // The last shift's employer, unless it has been removed since.
+  const lastEmployerId =
+    last?.employerId != null && !byId.get(last.employerId)?.archived ? last.employerId : null;
 
   function resetData() {
     setStep("HasConfig");
     setData({
       unpaidBreaks: last?.unpaidBreaks,
       hourValue: last?.hourValue,
+      employerId: lastEmployerId,
     });
   }
 
@@ -57,6 +64,7 @@ function StartDialog({ triggerStatus }: Props) {
               setData({
                 unpaidBreaks: last?.unpaidBreaks,
                 hourValue: last?.hourValue,
+                employerId: lastEmployerId,
               });
             } else {
               setStep("ShiftInfo");

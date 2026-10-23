@@ -17,7 +17,8 @@ function newPrismaClient() {
   const adapter = new PrismaLibSql(
     turso
       ? {
-          url: process.env.NEXT_PUBLIC_TURSO_DATABASE_URL ?? "",
+          // Server-only name; the NEXT_PUBLIC_ one still works until it's renamed.
+          url: process.env.TURSO_DATABASE_URL ?? process.env.NEXT_PUBLIC_TURSO_DATABASE_URL ?? "",
           authToken: process.env.TURSO_AUTH_TOKEN,
         }
       : { url: LOCAL_DATABASE_URL }

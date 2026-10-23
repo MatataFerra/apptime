@@ -4,7 +4,10 @@ import ApiEmployers from "@/services/Api/Employer";
 
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 
-/** The user's employers (not archived), A to Z. */
+/**
+ * The user's employers, A to Z. `employers` leaves out the archived ones
+ * (list and pickers); `byId` has them all, to name the employer of an old shift.
+ */
 function useEmployers() {
   const { data, isLoading } = useQuery({
     queryKey: [USE_QUERY_KEYS.EMPLOYERS],
@@ -12,7 +15,11 @@ function useEmployers() {
     refetchOnWindowFocus: false,
   });
 
-  return { employers: data?.employers ?? [], isLoading };
+  const all = data?.employers ?? [];
+  const employers = all.filter((employer) => !employer.archived);
+  const byId = new Map(all.map((employer) => [employer.id, employer]));
+
+  return { employers, byId, isLoading };
 }
 
 export default useEmployers;

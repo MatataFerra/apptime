@@ -1,4 +1,3 @@
-import bcrypt from "bcryptjs";
 import { isEmpty, isEqual } from "lodash";
 
 import { PASSWORD } from "@/utils/constants";
@@ -122,14 +121,6 @@ class Password {
 
   validPassword() {
     return this.isValid();
-  }
-
-  static async hashPassword(password: string) {
-    return await bcrypt.hash(password, 10);
-  }
-
-  static async comparePassword(password: string, hash: string): Promise<boolean> {
-    return await bcrypt.compare(password, hash);
   }
 
   isSamePassword(password: string, confirmPassword: string): boolean {

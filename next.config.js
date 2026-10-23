@@ -1,6 +1,25 @@
 const withNextIntl = require('next-intl/plugin')('./src/i18n.ts');
 const withBundleAnalyzer = require('@next/bundle-analyzer')()
 
+const isDev = process.env.NODE_ENV === 'development'
+
+/**
+ * Sent with every response. No script-src CSP yet (the theme script is
+ * inline and would need nonces); these directives don't affect scripts.
+ */
+const securityHeaders = [
+  {
+    key: 'Content-Security-Policy',
+    value: "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'",
+  },
+  // Older browsers that don't read frame-ancestors.
+  { key: 'X-Frame-Options', value: 'DENY' },
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=()' },
+  { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains' },
+]
+
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -20,16 +39,27 @@ const nextConfig = {
       port: '',
     }],
     dangerouslyAllowSVG: true,
+    // An optimized SVG can carry scripts: download it instead of rendering
+    // it as a page, and never let it run them (Next's recommended setting).
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  },
+  async headers() {
+    return [{ source: '/:path*', headers: securityHeaders }]
   },
   // VS Code dev tunnels (e.g. d33vz13z-3000.aue.devtunnels.ms). Hosts only:
   // no scheme, no trailing slash. The app's own origin is always allowed.
   allowedDevOrigins: ["*.aue.devtunnels.ms"],
-  experimental: {
-    // Server Actions are stable; their options still live under `experimental`.
-    serverActions: {
-      allowedOrigins: ["*.aue.devtunnels.ms"],
+  // Only in development: in production any *.aue.devtunnels.ms page (anyone
+  // can open one) could call the server actions.
+  ...(isDev && {
+    experimental: {
+      // Server Actions are stable; their options still live under `experimental`.
+      serverActions: {
+        allowedOrigins: ["*.aue.devtunnels.ms"],
+      },
     },
-  },
+  }),
 };
 
 module.exports = 

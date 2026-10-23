@@ -22,7 +22,7 @@ interface HourlyInterface {
   addtaxes(taxes: SalaryItemInput[], userId: string): Promise<HourlyService>;
   build(): Omit<Hourly, "shiftId" | "id">;
   calculateEarnings(): number;
-  getConfig(): Pick<Hourly, "hourValue" | "unpaidBreaks">;
+  getConfig(): Pick<Hourly, "hourValue" | "unpaidBreaks" | "employerId">;
 }
 
 /**
@@ -233,6 +233,8 @@ class HourlyService implements HourlyInterface {
     return {
       hourValue: this.shift.hourValue,
       unpaidBreaks: this.shift.unpaidBreaks,
+      // Shifts cached before the field existed come without it.
+      employerId: this.shift.employerId ?? null,
     };
   }
 
