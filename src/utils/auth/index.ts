@@ -113,7 +113,10 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days, as before
     updateAge: 60 * 60 * 24,
-    cookieCache: { enabled: true, maxAge: 5 * 60 },
+    // How long a revoked session (password reset, deleted account, admin
+    // role removed) can keep working on another device. Shorter means more
+    // database reads; 2 minutes keeps most navigation off Turso.
+    cookieCache: { enabled: true, maxAge: 2 * 60 },
   },
 
   databaseHooks: {

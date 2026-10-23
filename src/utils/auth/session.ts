@@ -26,11 +26,6 @@ export async function getRequestUserId(req: Request) {
   return (await getRequestSession(req))?.user.id ?? null;
 }
 
-/** Email of the signed-in user, or null. */
-export async function getSessionEmail() {
-  return (await getSession())?.user.email ?? null;
-}
-
 /** What the client gets about the session (no tokens). */
 export type ClientSession = {
   user: { id: string; email: string; name: string; image: string | null; role: string };

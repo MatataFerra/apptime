@@ -190,19 +190,6 @@ const UserCreateSchema = UserModelSchema.omit({
   }
 });
 
-const UserCreateSafeAdminSchema = UserModelSchema.omit({
-  id: true,
-})
-  .extend({ password: z.string().min(8).max(128) })
-  .superRefine((values, ctx) => {
-    if (Object.keys(values).length < 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "One field must be provided",
-      });
-    }
-  });
-
 /*
 ===================================================================
 -------------------------Tax---------------------------------------
@@ -406,7 +393,6 @@ export {
   TaxCreateSchema,
   TaxSchema,
   TaxUpdateSchema,
-  UserCreateSafeAdminSchema,
   UserCreateSchema,
   UserModelSchema,
   UserUpdateSchema,

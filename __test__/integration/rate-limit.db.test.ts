@@ -16,7 +16,7 @@ const env = vi.hoisted(() => {
 
   const url = `file:${join(mkdtempSync(join(tmpdir(), "apptime-rl-")), "test.db")}`;
   process.env.TURSO_ON = "true";
-  process.env.NEXT_PUBLIC_TURSO_DATABASE_URL = url;
+  process.env.TURSO_DATABASE_URL = url;
   process.env.TURSO_AUTH_TOKEN = "";
   process.env.BETTER_AUTH_SECRET = "test-secret-that-is-long-enough-1234567890";
   process.env.BETTER_AUTH_URL = "http://localhost:3000";
