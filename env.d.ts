@@ -13,13 +13,12 @@ export const envSchema = z.object({
   /** Set by Vercel: the deployment's own host (previews included). */
   VERCEL_URL: z.string().optional(),
   NEXT_PUBLIC_SHOW_DEVTOOLS: z.string(),
-  NEXT_PUBLIC_TURSO_DATABASE_URL: z.string(),
+  /** libsql:// URL of the Turso database. Server only. */
+  TURSO_DATABASE_URL: z.string().optional(),
+  /** Old name of TURSO_DATABASE_URL, read as a fallback. */
+  NEXT_PUBLIC_TURSO_DATABASE_URL: z.string().optional(),
   TURSO_ON: z.string(),
   STAGING: z.string(),
-  GATEWAY_URL: z.string(),
-  GATEWAY_SECRET: z.string(),
-  GATEWAY_PASSWORD: z.string(),
-  JWT_SECRET: z.string(),
   RESEND_API_KEY: z.string(),
   RESEND_SENDER: z.string(),
   RESEND_SUBJECT: z.string(),
