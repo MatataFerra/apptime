@@ -9,6 +9,19 @@ export type TaxElement = SalaryItemInput & { fromDb?: boolean };
 
 export type ContributionOrTax = ContributionElement | TaxElement;
 
+type SalaryKey = Pick<SalaryItemInput, "name" | "value">;
+
+/**
+ * Two taxes are the same when name *and* rate match, as on the server: a user
+ * can have "Social Security 11%" and "Social Security 8%" side by side.
+ */
+export function sameSalaryItem(a: SalaryKey, b: SalaryKey) {
+  return (
+    a.name.trim().toLowerCase() === b.name.trim().toLowerCase() &&
+    Number(a.value) === Number(b.value)
+  );
+}
+
 type SalaryElement = {
   name: string;
   value: number;
@@ -22,7 +35,7 @@ interface ModuleState {
   type: TypeOfSalaryItem;
   salaryElement: SalaryElement[];
   add: (element: SalaryElement) => void;
-  remove: (name: string) => void;
+  remove: (element: SalaryKey) => void;
   clear: () => void;
   setSalaryItems?: (elements: SalaryElement[]) => void;
 }
@@ -61,8 +74,8 @@ function createModule(moduleName: keyof TaxOrContributionStore, type: TypeOfSala
       salaryElement: [],
       add: (element: ContributionOrTax) => {
         const moduleSalary = get()[moduleName];
-        const existingElement = moduleSalary.salaryElement.find(
-          (e: ContributionOrTax) => e.name === element.name
+        const existingElement = moduleSalary.salaryElement.find((e: ContributionOrTax) =>
+          sameSalaryItem(e, element)
         );
 
         if (!existingElement) {
@@ -75,13 +88,13 @@ function createModule(moduleName: keyof TaxOrContributionStore, type: TypeOfSala
           }));
         }
       },
-      remove: (name: string) => {
+      remove: (element: SalaryKey) => {
         set((state: any) => ({
           ...state,
           [moduleName]: {
             ...state[moduleName],
             salaryElement: state[moduleName].salaryElement.filter(
-              (e: ContributionOrTax) => e.name !== name
+              (e: ContributionOrTax) => !sameSalaryItem(e, element)
             ),
           },
         }));

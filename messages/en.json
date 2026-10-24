@@ -218,6 +218,30 @@
     "kind": {
       "hourly": "Hourly",
       "production": "Per piece"
+    },
+    "batch": {
+      "mode_single": "One shift",
+      "mode_batch": "Several days",
+      "first_start": "First shift starts",
+      "first_finish": "First shift finishes",
+      "night_hint": "Finishing the next day? It repeats as a night shift.",
+      "until": "Repeat until",
+      "weekdays": "On these days",
+      "preview": "{count} of {total} shifts",
+      "shifts": "Shifts",
+      "overlap": "Already logged",
+      "overlap_hint": "{count, plural, one {# day runs into a shift you already logged and won't be saved.} other {# days run into shifts you already logged and won't be saved.}}",
+      "review_button": "{count, plural, =0 {Choose some days} one {Review # shift} other {Review # shifts}}",
+      "save": "{count, plural, one {Save # shift} other {Save # shifts}}",
+      "created": "{count, plural, =0 {No shifts saved} one {# shift saved} other {# shifts saved}}",
+      "skipped": "{count, plural, one {# day skipped: it overlaps a saved shift.} other {# days skipped: they overlap saved shifts.}}",
+      "errors": {
+        "finish_before_start": "The finish must be after the start",
+        "too_long": "A shift can't be longer than 24 hours",
+        "until_before_start": "Pick a date on or after the first shift",
+        "range_too_long": "Up to {max} days at a time",
+        "no_weekdays": "Choose at least one day of the week"
+      }
     }
   },
   "home": {
