@@ -299,36 +299,33 @@ function ShiftHistory() {
 
   return (
     <div className="flex flex-col gap-4">
-      {selecting ? (
-        <SelectionHeader entries={entries} />
-      ) : (
-        <div className="flex flex-wrap items-center gap-2">
-          <div role="radiogroup" aria-label={t("filter_label")} className="flex shrink-0 gap-2">
-            {FILTERS.map((f) => (
-              <button
-                key={f}
-                type="button"
-                role="radio"
-                aria-checked={filter === f}
-                onClick={() => setFilter(f)}
-                className={cn(
-                  "h-9 rounded-full border px-3.5 text-sm font-medium transition-colors",
-                  filter === f
-                    ? "border-transparent bg-primary text-primary-foreground"
-                    : "border-border-strong bg-surface text-ink hover:bg-surface-sunken"
-                )}
-              >
-                {t(`filters.${f}`)}
-              </button>
-            ))}
-          </div>
-          <EmployerFilter
-            value={employer}
-            onChange={setEmployer}
-            counts={countByEmployer(filterEntries(all, { kind: filter }))}
-          />
+      <div className="flex flex-wrap items-center gap-2">
+        <div role="radiogroup" aria-label={t("filter_label")} className="flex shrink-0 gap-2">
+          {FILTERS.map((f) => (
+            <button
+              key={f}
+              type="button"
+              role="radio"
+              aria-checked={filter === f}
+              onClick={() => setFilter(f)}
+              className={cn(
+                "h-9 rounded-full border px-3.5 text-sm font-medium transition-colors",
+                filter === f
+                  ? "border-transparent bg-primary text-primary-foreground"
+                  : "border-border-strong bg-surface text-ink hover:bg-surface-sunken"
+              )}
+            >
+              {t(`filters.${f}`)}
+            </button>
+          ))}
         </div>
-      )}
+        <EmployerFilter
+          value={employer}
+          onChange={setEmployer}
+          counts={countByEmployer(filterEntries(all, { kind: filter }))}
+        />
+      </div>
+      {selecting ? <SelectionHeader visible={entries} all={all} /> : null}
 
       {months.length === 0 ? (
         <p className="rounded-xl border border-dashed border-border-strong p-6 text-center text-sm text-ink-muted">
@@ -344,7 +341,7 @@ function ShiftHistory() {
         ))
       )}
 
-      {selecting && entries.length > 0 ? <SelectionActions entries={entries} /> : null}
+      {selecting && all.length > 0 ? <SelectionActions entries={all} /> : null}
     </div>
   );
 }

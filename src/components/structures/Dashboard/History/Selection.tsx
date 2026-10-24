@@ -70,15 +70,29 @@ export function SelectToggle() {
   );
 }
 
-/** "✕  3 selected   Select all": replaces the filters while selecting. */
-export function SelectionHeader({ entries }: { entries: HistoryEntry[] }) {
+/**
+ * "✕  5 selected · 2 hidden by the filters   Select all", under the filters.
+ * The selection survives filter changes, so shifts can be picked across
+ * employers or types; "Select all" covers what's on screen.
+ */
+export function SelectionHeader({
+  visible,
+  all: everything,
+}: {
+  /** What the filters show. */
+  visible: HistoryEntry[];
+  /** Every shift in the history (the date range still applies). */
+  all: HistoryEntry[];
+}) {
   const t = useTranslations("dashboard.selection");
   const { keys, stop, setMany } = useHistorySelection();
-  const count = entries.filter((e) => keys.has(keyOf(e))).length;
-  const all = entries.length > 0 && count === entries.length;
+  const count = everything.filter((e) => keys.has(keyOf(e))).length;
+  const shown = visible.filter((e) => keys.has(keyOf(e))).length;
+  const hidden = count - shown;
+  const all = visible.length > 0 && shown === visible.length;
 
   return (
-    <div className="flex h-9 items-center justify-between gap-3">
+    <div className="flex min-h-9 items-center justify-between gap-3 rounded-xl bg-accent-soft py-1 pr-1 pl-1">
       <span className="flex items-center gap-2">
         <button
           type="button"
@@ -88,13 +102,18 @@ export function SelectionHeader({ entries }: { entries: HistoryEntry[] }) {
         >
           <X className="size-5" aria-hidden="true" />
         </button>
-        <span className="text-[0.9375rem] font-semibold text-ink" aria-live="polite">
-          {t("selected", { count })}
+        <span className="flex flex-col leading-tight" aria-live="polite">
+          <span className="text-[0.9375rem] font-semibold text-ink">
+            {t("selected", { count })}
+          </span>
+          {hidden > 0 ? (
+            <span className="text-xs text-ink-muted">{t("hidden", { count: hidden })}</span>
+          ) : null}
         </span>
       </span>
       <button
         type="button"
-        onClick={() => setMany(entries.map(keyOf), !all)}
+        onClick={() => setMany(visible.map(keyOf), !all)}
         className="h-9 rounded-full px-3 text-sm font-medium text-accent hover:bg-surface-sunken"
       >
         {all ? t("select_none") : t("select_all")}
@@ -117,7 +136,7 @@ export function SelectionActions({ entries }: { entries: HistoryEntry[] }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editing, setEditing] = useState(false);
 
-  // Only what's on screen counts: a filter change leaves the rest out.
+  // `entries` is the whole history: shifts picked under another filter count too.
   const selected = entries.filter((e) => keys.has(keyOf(e)));
   const ids = idsByKind(selected.map(keyOf));
   const count = selected.length;

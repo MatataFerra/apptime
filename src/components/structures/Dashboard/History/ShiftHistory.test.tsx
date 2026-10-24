@@ -149,7 +149,6 @@ describe("Dashboard history", () => {
   test("selects a month, edits the selection and leaves selection mode", async () => {
     const user = userEvent.setup();
     renderHistory();
-    // Filter first: only what's on screen can be selected.
     await pickEmployer(user, "Berry Farm");
     act(() => useHistorySelection.getState().start());
     await user.click(screen.getByRole("checkbox", { name: /Select October 2026/ }));
@@ -157,8 +156,18 @@ describe("Dashboard history", () => {
 
     await user.click(screen.getByRole("button", { name: "Edit 2" }));
     const drawer = screen.getByRole("dialog");
-    await user.selectOptions(within(drawer).getByLabelText("Employer"), "Kiwi Packhouse");
-    await user.type(within(drawer).getByLabelText(/Hourly rate/), "26");
+
+    // Filtered by employer: the drawer shows it, not "Mixed".
+    const employer = within(drawer).getByRole("button", { name: "Employer: Berry Farm" });
+    await user.click(employer);
+    await user.click(within(drawer).getByRole("option", { name: /Kiwi Packhouse/ }));
+    expect(within(drawer).queryByRole("listbox")).not.toBeInTheDocument();
+
+    // Both hourly shifts in the selection share a rate: it's there to edit.
+    const rate = within(drawer).getByLabelText("Hourly rate") as HTMLInputElement;
+    expect(rate.value).toBe("24");
+    await user.clear(rate);
+    await user.type(rate, "26");
     await user.click(within(drawer).getByRole("button", { name: "Save 2 shifts" }));
 
     expect(mocks.edit).toHaveBeenCalledWith({
@@ -166,6 +175,41 @@ describe("Dashboard history", () => {
       changes: { employerId: 2, hourValue: 26 },
     });
     await vi.waitFor(() => expect(useHistorySelection.getState().active).toBe(false));
+  });
+
+  test("shows Mixed where the shifts differ, and one field open at a time", async () => {
+    const user = userEvent.setup();
+    renderHistory();
+    act(() => useHistorySelection.getState().start());
+    await user.click(screen.getByRole("button", { name: "Select all" }));
+    await user.click(screen.getByRole("button", { name: "Edit 4" }));
+    const drawer = screen.getByRole("dialog");
+
+    expect(within(drawer).getByRole("button", { name: "Employer: Mixed" })).toBeInTheDocument();
+
+    await user.click(within(drawer).getByRole("button", { name: /^Paid in:/ }));
+    expect(within(drawer).getByRole("listbox", { name: "Paid in" })).toBeInTheDocument();
+    await user.click(within(drawer).getByRole("button", { name: "Employer: Mixed" }));
+    expect(within(drawer).getAllByRole("listbox")).toHaveLength(1);
+    expect(within(drawer).getByRole("listbox", { name: "Employer" })).toBeInTheDocument();
+  });
+
+  test("keeps the filters while selecting, and the selection across filter changes", async () => {
+    const user = userEvent.setup();
+    renderHistory();
+    act(() => useHistorySelection.getState().start());
+
+    await pickEmployer(user, "Berry Farm");
+    await user.click(screen.getAllByTestId("history-row")[0]);
+    await pickEmployer(user, "Kiwi Packhouse");
+    await user.click(screen.getAllByTestId("history-row")[0]);
+
+    expect(screen.getByText("2 selected")).toBeInTheDocument();
+    expect(screen.getByText("1 hidden by the filters")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Delete" }));
+    await user.click(screen.getByRole("button", { name: "Delete 2" }));
+    expect(mocks.remove).toHaveBeenCalledWith({ ids: { hourly: [1, 2], production: [] } });
   });
 
   test("an untouched form saves nothing", async () => {
