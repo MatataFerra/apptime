@@ -459,7 +459,6 @@
     "earn": "Ganarías, antes de impuestos",
     "paid_time": "Tiempo pago por día",
     "base_pay": "Pago base",
-    "holiday_pay_rate": "Pago de vacaciones, {rate}%",
     "per_day": "Por día, durante {days, plural, one {# día} other {# días}}",
     "time": "Tiempo",
     "hours_a_day": "Horas por día",
@@ -467,9 +466,12 @@
     "days": "Días",
     "pay": "Pago",
     "hourly_rate": "Pago por hora",
-    "holiday_pay": "Pago de vacaciones",
     "unpaid_breaks": "Descansos no pagos",
-    "holiday_hint": "Deja el pago de vacaciones vacío para usar {rate}%."
+    "earn_net": "Ganarías, después de impuestos",
+    "taxes_rate": "Impuestos, {rate}%",
+    "taxes_subtitle": "Opcional. Se descuentan del total estimado.",
+    "taxes_new_title": "Solo para esta estimación",
+    "taxes_empty": "Todavía no tienes impuestos guardados. Escribe uno para ver cuánto te queda; no se guarda."
   },
   "dashboard": {
     "stats": {

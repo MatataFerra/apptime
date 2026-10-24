@@ -459,7 +459,6 @@
     "earn": "You'd earn, before tax",
     "paid_time": "Paid time per day",
     "base_pay": "Base pay",
-    "holiday_pay_rate": "Holiday pay, {rate}%",
     "per_day": "Per day, for {days, plural, one {# day} other {# days}}",
     "time": "Time",
     "hours_a_day": "Hours a day",
@@ -467,9 +466,12 @@
     "days": "Days",
     "pay": "Pay",
     "hourly_rate": "Hourly rate",
-    "holiday_pay": "Holiday pay",
     "unpaid_breaks": "Unpaid breaks",
-    "holiday_hint": "Leave holiday pay empty to use {rate}%."
+    "earn_net": "You'd earn, after taxes",
+    "taxes_rate": "Taxes, {rate}%",
+    "taxes_subtitle": "Optional. Taken off the estimated total.",
+    "taxes_new_title": "Just for this estimate",
+    "taxes_empty": "You have no saved taxes yet. Type one in to see what's left; it isn't saved."
   },
   "dashboard": {
     "stats": {
