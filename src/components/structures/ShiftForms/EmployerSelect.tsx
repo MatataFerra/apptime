@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 import type { SavedEmployer } from "@/types";
 
@@ -9,6 +9,8 @@ import SelectRow from "@/components/structures/ShiftForms/SelectRow";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 import { cn } from "@/utils/helpers/styleMerger";
 import useEmployers from "@/hooks/useEmployers";
+
+import { Link } from "@/i18n/navigation";
 
 const NONE = "";
 
@@ -28,6 +30,7 @@ function EmployerSelect({
   classes?: string;
 }) {
   const { employers, byId, isLoading } = useEmployers();
+  const t = useTranslations("shift.fields");
   const current = value != null ? byId.get(value) : undefined;
   const options = current?.archived ? [...employers, current] : employers;
 
@@ -37,12 +40,12 @@ function EmployerSelect({
       <div
         className={cn("mt-3 mb-1 flex w-full items-center justify-between gap-3 text-sm", classes)}
       >
-        <span className="text-ink-muted">Employer</span>
+        <span className="text-ink-muted">{t("employer")}</span>
         <Link
           href={PATH_NAMES.EMPLOYERS}
           className="font-semibold text-accent underline-offset-4 hover:underline"
         >
-          Add one
+          {t("add_employer")}
         </Link>
       </div>
     );
@@ -50,16 +53,16 @@ function EmployerSelect({
 
   return (
     <SelectRow
-      label="Employer"
+      label={t("employer")}
       classes={classes}
       value={value != null ? String(value) : NONE}
       onChange={(id) => onChange(id === NONE ? null : (byId.get(Number(id)) ?? null))}
     >
-      <option value={NONE}>None</option>
+      <option value={NONE}>{t("no_employer")}</option>
       {options.map((employer) => (
         <option key={employer.id} value={employer.id}>
           {employer.name}
-          {employer.archived ? " (removed)" : ""}
+          {employer.archived ? ` ${t("removed")}` : ""}
         </option>
       ))}
     </SelectRow>

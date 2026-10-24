@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import { Check, Plus, Receipt, Search, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import Toast from "@/services/Toast";
 
@@ -50,6 +51,7 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
   const { data, isLoading } = useSalaryItems();
   const saved = useMemo(() => data?.salaryItems?.taxes ?? [], [data?.salaryItems?.taxes]);
   const colors = MODULE_THEMES[theme];
+  const t = useTranslations("tax_picker");
 
   const [search, setSearch] = useState("");
   const [creating, setCreating] = useState(false);
@@ -85,11 +87,11 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
     const value = Number(draft.value);
     const nextErrors: typeof errors = {};
 
-    if (!name) nextErrors.name = "Give it a name";
+    if (!name) nextErrors.name = t("errors.name_required");
     if (!draft.value || isNaN(value) || value <= 0 || value > 100) {
-      nextErrors.value = "Between 0 and 100";
+      nextErrors.value = t("errors.rate_range");
     }
-    if (name && isSelected(name)) nextErrors.name = "Already added";
+    if (name && isSelected(name)) nextErrors.name = t("errors.already_added");
 
     if (nextErrors.name || nextErrors.value) {
       setErrors(nextErrors);
@@ -102,8 +104,8 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
       toggleSaved(existing);
       Toast({
         type: "plain",
-        message: `Using your saved "${existing.name}"`,
-        description: `${existing.value}% from your previous shifts.`,
+        message: t("using_saved", { name: existing.name }),
+        description: t("using_saved_description", { rate: existing.value }),
         duration: 2000,
       });
     } else {
@@ -135,17 +137,15 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
           </span>
           <div className="flex flex-col">
             <h2 id="tax-picker-title" className="text-[0.9375rem] font-semibold text-ink">
-              Taxes
+              {t("title")}
             </h2>
-            <p className="text-[0.8125rem] text-ink-muted">
-              Optional. Taken off this shift&apos;s pay.
-            </p>
+            <p className="text-[0.8125rem] text-ink-muted">{t("subtitle")}</p>
           </div>
         </div>
         {salaryElement.length > 0 ? (
           <span
             className="shrink-0 rounded-full bg-destructive-soft px-2.5 py-1 figure text-sm text-destructive"
-            aria-label={`${rate}% taken off in total`}
+            aria-label={t("total_label", { rate })}
           >
             −{rate}%
           </span>
@@ -160,18 +160,18 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
       ) : saved.length > 0 ? (
         <div className="flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
-            <h3 className="text-[0.8125rem] font-medium text-ink-muted">Your taxes</h3>
-            <span className="text-xs text-ink-subtle">Tap to add or remove</span>
+            <h3 className="text-[0.8125rem] font-medium text-ink-muted">{t("saved_title")}</h3>
+            <span className="text-xs text-ink-subtle">{t("tap_hint")}</span>
           </div>
           {saved.length >= SEARCH_FROM ? (
             <label className="flex h-10 items-center gap-2 rounded-xl border border-border-strong bg-surface px-3 text-sm">
               <Search className="size-4 text-ink-subtle" aria-hidden="true" />
-              <span className="sr-only">Search your taxes</span>
+              <span className="sr-only">{t("search")}</span>
               <input
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search your taxes"
+                placeholder={t("search")}
                 className="h-full w-full bg-transparent outline-hidden placeholder:text-ink-subtle"
               />
             </label>
@@ -205,7 +205,7 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
               );
             })}
             {visibleSaved.length === 0 ? (
-              <li className="text-sm text-ink-muted">No saved tax matches “{search}”.</li>
+              <li className="text-sm text-ink-muted">{t("no_match", { search })}</li>
             ) : null}
           </ul>
         </div>
@@ -213,7 +213,7 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
 
       {unsavedSelected.length > 0 ? (
         <div className="flex flex-col gap-2.5">
-          <h3 className="text-[0.8125rem] font-medium text-ink-muted">New for this shift</h3>
+          <h3 className="text-[0.8125rem] font-medium text-ink-muted">{t("new_title")}</h3>
           <ul className="flex flex-wrap gap-2">
             {unsavedSelected.map((tax) => (
               <li
@@ -229,7 +229,7 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
                 <button
                   type="button"
                   onClick={() => remove(tax.name)}
-                  aria-label={`Remove ${tax.name}`}
+                  aria-label={t("remove", { name: tax.name })}
                   className="flex size-8 items-center justify-center rounded-full hover:bg-black/5"
                 >
                   <X className="size-4" aria-hidden="true" />
@@ -245,8 +245,8 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
           <div className="grid grid-cols-[minmax(0,1fr)_7rem] gap-2.5">
             <Input
               name="new-tax-name"
-              label="Name"
-              placeholder="Income tax"
+              label={t("fields.name")}
+              placeholder={t("fields.name_placeholder")}
               value={draft.name}
               autoFocus
               isError={!!errors.name}
@@ -258,7 +258,7 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
             />
             <Input
               name="new-tax-value"
-              label="Rate"
+              label={t("fields.rate")}
               type="number"
               inputMode="decimal"
               placeholder="10.5"
@@ -277,8 +277,8 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
           </div>
           <Input
             name="new-tax-description"
-            label="Note (optional)"
-            placeholder="As shown on your payslip"
+            label={t("fields.note")}
+            placeholder={t("fields.note_placeholder")}
             value={draft.description}
             onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))}
           />
@@ -293,20 +293,17 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
                 setCreating(false);
               }}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button type="button" variant="primary" size="md" classes="w-full" onClick={onAddNew}>
-              Add tax
+              {t("add")}
             </Button>
           </div>
         </div>
       ) : (
         <div className="flex flex-col gap-2">
           {saved.length === 0 && salaryElement.length === 0 && !isLoading ? (
-            <p className="text-sm text-ink-muted">
-              No taxes yet. Add the ones on your payslip, like income tax; next time they&apos;re
-              one tap away.
-            </p>
+            <p className="text-sm text-ink-muted">{t("empty")}</p>
           ) : null}
           <Button
             type="button"
@@ -316,7 +313,7 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
             onClick={() => setCreating(true)}
           >
             <Plus className="size-4" aria-hidden="true" />
-            New tax
+            {t("new")}
           </Button>
         </div>
       )}

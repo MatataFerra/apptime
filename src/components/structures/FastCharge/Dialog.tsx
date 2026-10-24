@@ -2,7 +2,8 @@
 
 import { type PropsWithChildren, useEffect, useMemo } from "react";
 
-import { differenceInMinutes, format } from "date-fns";
+import { differenceInMinutes } from "date-fns";
+import { useTranslations } from "next-intl";
 
 import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
@@ -11,18 +12,15 @@ import ShiftReviewDialog from "@/components/structures/share/ShiftReviewDialog";
 
 import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
 import useMoney from "@/hooks/useMoney";
+import useShortDateTime from "@/hooks/useShortDateTime";
 
 import { useFastChargeStore } from "@/store/useFastChargeStore";
 import { useHourlyTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
 
-function humanize(date?: string | Date | null) {
-  if (!date) return "–";
-  const d = new Date(date);
-  return isNaN(d.valueOf()) ? "–" : format(d, "MMM d, h:mm a");
-}
-
 function DialogHourly({ children }: PropsWithChildren) {
   const money = useMoney();
+  const humanize = useShortDateTime();
+  const t = useTranslations("shift");
   const {
     values: {
       startDate,
@@ -60,9 +58,8 @@ function DialogHourly({ children }: PropsWithChildren) {
 
   const totalTimeWorked = useMemo(() => {
     const getDifference = differenceInMinutes(formatEnd, formatStart);
-    const time = ShiftService.convertDifferenceInHHmm(getDifference);
-
-    return time.text;
+    // "8h 30m" reads the same in every language.
+    return ShiftService.convertDifferenceInHHmm(getDifference).text;
   }, [formatEnd, formatStart]);
 
   const calculateEarn = useMemo(() => {
@@ -85,8 +82,8 @@ function DialogHourly({ children }: PropsWithChildren) {
   }, [fastHoliday, fastWorked, formatEnd, formatStart, hourValue, taxes, unpaidBreaks]);
 
   const tags = [
-    fastHoliday ? "Public holiday" : null,
-    fastHoliday && fastWorked ? "Worked the holiday" : null,
+    fastHoliday ? t("tags.public_holiday") : null,
+    fastHoliday && fastWorked ? t("tags.worked_holiday") : null,
   ].filter(Boolean) as string[];
 
   return (
@@ -101,11 +98,18 @@ function DialogHourly({ children }: PropsWithChildren) {
       taxes={taxes}
       tags={tags}
       rows={[
-        { label: "Start", value: humanize(formatStart) },
-        { label: "Finish", value: humanize(formatEnd) },
-        { label: "Time worked", value: totalTimeWorked },
-        { label: "Hourly rate", value: money(Number(hourValue) || 0, { currency }) },
-        ...(unpaidBreaks ? [{ label: "Unpaid breaks", value: `${unpaidBreaks} min` }] : []),
+        { label: t("fields.start"), value: humanize(formatStart) },
+        { label: t("fields.finish"), value: humanize(formatEnd) },
+        { label: t("fields.time_worked"), value: totalTimeWorked },
+        { label: t("fields.hourly_rate"), value: money(Number(hourValue) || 0, { currency }) },
+        ...(unpaidBreaks
+          ? [
+              {
+                label: t("fields.unpaid_breaks"),
+                value: t("minutes", { count: Number(unpaidBreaks) }),
+              },
+            ]
+          : []),
       ]}
     >
       {children}

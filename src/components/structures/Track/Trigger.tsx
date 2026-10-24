@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import { buttonVariants } from "@/components/ui/Button";
 import { DialogTrigger } from "@/components/ui/Dialog";
 
@@ -10,24 +12,23 @@ type Props = {
         apply_variant: boolean;
       }
     | undefined;
-  triggerText?: string;
 };
 
-function Trigger({ status, triggerText = "Start Shift" }: Props) {
-  const isStart = /start/i.test(triggerText);
-  const variant = status?.apply_variant ? (isStart ? "accent" : "danger") : "secondary";
+/** Opens the start-shift dialog. */
+function Trigger({ status }: Props) {
+  const t = useTranslations("track.start");
+  const variant = status?.apply_variant ? "accent" : "secondary";
 
   return (
     <DialogTrigger
       className={cn(
         buttonVariants({ variant, size: "lg" }),
-        "remove_button_highlight h-14 w-full rounded-lg text-base font-semibold",
-        isStart && "animate-fade-up"
+        "remove_button_highlight h-14 w-full animate-fade-up rounded-lg text-base font-semibold"
       )}
       disabled={status?.disabled}
       aria-disabled={status?.disabled}
     >
-      {triggerText}
+      {t("trigger")}
     </DialogTrigger>
   );
 }

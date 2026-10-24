@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import Toast from "@/services/Toast";
 
@@ -96,6 +97,7 @@ function Inputs() {
     set when user is typing to show datalist
   */
   const { setIsWriting } = useDatalistStore((state) => state);
+  const t = useTranslations("shift");
 
   const { uniqueTaxes, uniqueContributions } = useGetUniqueSalaryItems({
     localTaxes: taxes,
@@ -152,8 +154,8 @@ function Inputs() {
 
     Toast({
       type: "loading",
-      message: "Your request is being processed",
-      description: "Please wait a moment...",
+      message: t("processing"),
+      description: t("please_wait"),
       duration: Infinity,
     });
 
@@ -258,8 +260,7 @@ function Inputs() {
       if (response?.response) {
         Toast({
           type: "success",
-          message: "Success",
-          description: "Shift created successfully",
+          message: t("created"),
           duration: 3000,
         });
 
@@ -312,8 +313,8 @@ function Inputs() {
 
       Toast({
         type: "error",
-        message: "Error",
-        description: "An error occurred while creating the shift",
+        message: t("save_failed"),
+        description: t("try_again"),
         duration: 3000,
       });
     });
@@ -332,7 +333,7 @@ function Inputs() {
           <Input
             containerClasses="grow"
             variant="outlined"
-            label="Name of your job"
+            label={t("fields.job_name")}
             type="name"
             isError={!!errors["name"]}
             description={errors["name"]?.message}
@@ -363,7 +364,7 @@ function Inputs() {
         <Stack grid cols={2} as="fieldset" classes="w-full">
           <Input
             classes="h-full"
-            label="Start date"
+            label={t("fields.start")}
             type="datetime-local"
             {...register("start-date", {
               onChange(e) {
@@ -381,7 +382,7 @@ function Inputs() {
           />
           <Input
             classes="h-full"
-            label="Finish date"
+            label={t("fields.finish")}
             type="datetime-local"
             isError={!!errors["finish-date"]}
             description={errors["finish-date"]?.message}
@@ -395,13 +396,13 @@ function Inputs() {
         {/* Value and quantity side by side, the same width as the dates. */}
         <Stack grid cols={2} as="fieldset" classes="w-full">
           <Input
-            label="Value per item"
+            label={t("fields.item_value")}
             min={0}
             type="number"
             inputMode="decimal"
             step={"any"}
             measure={currencySymbol(shiftCurrency || defaultCurrency)}
-            description="Per bin, box or piece"
+            description={t("fields.item_value_hint")}
             measurePlace="left"
             {...register("item-value", {
               onChange(e) {
@@ -410,7 +411,7 @@ function Inputs() {
             })}
           />
           <Input
-            label="Quantity"
+            label={t("fields.quantity")}
             min={0}
             type="number"
             inputMode="numeric"

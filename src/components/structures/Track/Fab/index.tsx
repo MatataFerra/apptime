@@ -4,6 +4,7 @@ import { forwardRef } from "react";
 
 import { Receipt, StickyNote } from "lucide-react";
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 
 import { buttonVariants } from "@/components/ui/Button";
 
@@ -45,6 +46,7 @@ const ToolButton = forwardRef<
  */
 function ShiftTools() {
   const { isShiftActive, isClosing } = useTrack();
+  const t = useTranslations("track.tools");
 
   if (!isShiftActive || isClosing) return null;
 
@@ -54,12 +56,12 @@ function ShiftTools() {
         <ToolButton
           icon={<StickyNote className="size-4.5" strokeWidth={1.75} aria-hidden="true" />}
         >
-          Notes
+          {t("notes")}
         </ToolButton>
       </Notes>
       <TaxDialog>
         <ToolButton icon={<Receipt className="size-4.5" strokeWidth={1.75} aria-hidden="true" />}>
-          Taxes
+          {t("taxes")}
         </ToolButton>
       </TaxDialog>
     </div>

@@ -2,6 +2,7 @@
 
 import type { Hourly } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import Toast from "@/services/Toast";
 
@@ -18,7 +19,8 @@ type Props = {
   title?: string;
 };
 
-function ShiftStartButton({ title = "Save config & start" }: Props) {
+function ShiftStartButton({ title }: Props) {
+  const t = useTranslations("track.start");
   const { data, errors } = useShiftData((state) => state);
   const queryClient = useQueryClient();
   const {
@@ -32,7 +34,7 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
 
   function onStartShift() {
     Toast({
-      message: "Shift is being created",
+      message: t("creating"),
       type: "loading",
     });
 
@@ -56,7 +58,7 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
     }).then((response) => {
       if (response?.response) {
         Toast({
-          message: "Shift started",
+          message: t("started"),
           type: "success",
         });
 
@@ -83,7 +85,7 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
       }
 
       Toast({
-        message: "Error creating shift, please try again",
+        message: t("error"),
         type: "error",
       });
 
@@ -101,7 +103,7 @@ function ShiftStartButton({ title = "Save config & start" }: Props) {
         classes="w-full text-sm"
         onClick={onStartShift}
       >
-        {title}
+        {title ?? t("save_and_start")}
       </Button>
     </DialogClose>
   );

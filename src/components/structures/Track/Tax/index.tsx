@@ -3,6 +3,7 @@
 import { type PropsWithChildren } from "react";
 
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 import { create } from "zustand";
 
 import Button from "@/components/ui/Button";
@@ -39,20 +40,21 @@ export const useTaxDialog = create<Observer>((set) => ({
 function TaxDialog({ children }: PropsWithChildren) {
   const { taxesModule } = useTrackTaxesOrContributionsStore();
   const { isOpen, setIsOpen } = useTaxDialog((state) => state);
+  const t = useTranslations("track.taxes");
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="max-h-[85dvh] overflow-y-auto">
         <DialogHeader className="text-left">
-          <DialogTitle>Taxes for this shift</DialogTitle>
-          <DialogDescription>They&apos;re applied when you finish the shift.</DialogDescription>
+          <DialogTitle>{t("title")}</DialogTitle>
+          <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
         <TaxPicker store={taxesModule} theme="track" bare />
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="primary" size="lg" classes="w-full">
-              Done
+              {t("done")}
             </Button>
           </DialogClose>
         </DialogFooter>

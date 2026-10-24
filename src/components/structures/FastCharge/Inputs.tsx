@@ -4,6 +4,7 @@ import { type ChangeEvent, useEffect, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import Toast from "@/services/Toast";
 
@@ -91,6 +92,7 @@ function Inputs() {
   const isPublicHolidayWorkedWatch = useWatch({ control, name: "is-public-holiday-worked" });
 
   const defaultCurrency = useCurrency();
+  const t = useTranslations("shift");
   const queryClient = useQueryClient();
   const { data: user } = useUser();
   const { data: hourly } = useHourlyShifts();
@@ -213,8 +215,8 @@ function Inputs() {
 
     Toast({
       type: "loading",
-      message: "Your request is being processed",
-      description: "Please wait a moment...",
+      message: t("processing"),
+      description: t("please_wait"),
       duration: 2500,
     });
 
@@ -320,7 +322,7 @@ function Inputs() {
         Toast({
           type: "success",
           duration: 1500,
-          message: "Shift created successfully",
+          message: t("created"),
         });
 
         resetStoreValues();
@@ -373,8 +375,8 @@ function Inputs() {
 
       Toast({
         type: "error",
-        message: "Error",
-        description: "An error occurred while creating the shift",
+        message: t("save_failed"),
+        description: t("try_again"),
         duration: 3000,
       });
     });
@@ -394,7 +396,7 @@ function Inputs() {
       >
         <Stack as="fieldset" orientation="vertical" classes="relative w-full">
           <Input
-            label="Name of your job"
+            label={t("fields.job_name")}
             variant="outlined"
             type="name"
             isError={!!errors["name"]}
@@ -432,7 +434,7 @@ function Inputs() {
         <Input
           containerClasses="flex-1"
           classes="h-full"
-          label="Start"
+          label={t("fields.start")}
           name="start-datetime"
           type="datetime-local"
           isError={!!(errors["start-date"] || errors["start-time"])}
@@ -453,7 +455,7 @@ function Inputs() {
         <Input
           containerClasses="flex-1"
           classes="h-full"
-          label="Finish"
+          label={t("fields.finish")}
           name="finish-datetime"
           type="datetime-local"
           isError={!!(errors["finish-date"] || errors["finish-time"])}
@@ -463,7 +465,7 @@ function Inputs() {
           onChange={(e: ChangeEvent<HTMLInputElement>) => setDateTime("finish", e.target.value)}
         />
         <Input
-          label="Hour value"
+          label={t("fields.hourly_rate")}
           type="number"
           step="0.01"
           min={0}
@@ -480,8 +482,8 @@ function Inputs() {
           onChange={(currency) => setStoreValue({ currency })}
         />
         <Input
-          label="Unpaid breaks"
-          measure="min."
+          label={t("fields.unpaid_breaks")}
+          measure={t("minutes_unit")}
           type="number"
           {...register("unpaid-breaks", {
             onChange: (e: ChangeEvent<HTMLInputElement>) => {

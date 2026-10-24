@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import Toast from "@/services/Toast";
 
 import { NOTE_MIN_LENGTH } from "@/components/structures/Notes/TextArea";
@@ -14,6 +16,7 @@ function Buttons() {
     shiftUnclosed: { shift },
   } = useTrack();
   const { notes, error, setlocalNote, setError, setOpen } = useNotes();
+  const t = useTranslations("notes");
 
   function onSaveNotes() {
     if (notes.trim().length < NOTE_MIN_LENGTH) {
@@ -27,9 +30,9 @@ function Buttons() {
     setOpen(false);
 
     Toast({
-      message: "Note saved",
+      message: t("saved"),
       type: "success",
-      description: "It's attached to this shift.",
+      description: t("saved_description"),
       duration: 2000,
     });
   }
@@ -43,11 +46,11 @@ function Buttons() {
           size="lg"
           classes="w-full text-fast-ink hover:bg-fast-ink/10"
         >
-          Cancel
+          {t("cancel")}
         </Button>
       </SheetClose>
       <Button type="button" variant="primary" size="lg" classes="w-full" onClick={onSaveNotes}>
-        Save note
+        {t("save")}
       </Button>
     </div>
   );

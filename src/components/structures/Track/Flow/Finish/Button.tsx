@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import Button from "@/components/ui/Button";
 
 import useFinishShift from "@/hooks/useFinishShift";
@@ -12,6 +14,7 @@ type Props = {
 
 function FinishButton({ buttonStatus }: Props) {
   const { finish, finishing } = useFinishShift();
+  const t = useTranslations("home.live");
   const {
     getShift,
     shiftUnclosed: { shift },
@@ -24,7 +27,7 @@ function FinishButton({ buttonStatus }: Props) {
       disabled={buttonStatus.disabled || finishing}
       onClick={() => finish(getShift(shift?.id) ?? shift)}
     >
-      Finish Shift
+      {t("finish")}
     </Button>
   );
 }

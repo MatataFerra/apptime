@@ -1,7 +1,11 @@
+import { getTranslations } from "next-intl/server";
+
 import Title from "@/components/structures/share/ModuleTitle";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 export default async function TrackPage() {
-  return <Title module={PATH_NAMES.TRACK} title="Track" subtitle="Run the clock while you work." />;
+  const t = await getTranslations("modules.track");
+
+  return <Title module={PATH_NAMES.TRACK} title={t("title")} subtitle={t("subtitle")} />;
 }

@@ -2,7 +2,7 @@
 
 import { type PropsWithChildren, useEffect } from "react";
 
-import { format } from "date-fns";
+import { useTranslations } from "next-intl";
 
 import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
@@ -10,18 +10,15 @@ import ShiftService from "@/services/Shift";
 import ShiftReviewDialog from "@/components/structures/share/ShiftReviewDialog";
 
 import useMoney from "@/hooks/useMoney";
+import useShortDateTime from "@/hooks/useShortDateTime";
 
 import { useProductionForm } from "@/store/useProductionForm";
 import { useProductionTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
 
-function humanize(date?: string | null) {
-  if (!date) return "–";
-  const d = new Date(date);
-  return isNaN(d.valueOf()) ? "–" : format(d, "MMM d, h:mm a");
-}
-
 function DialogProduction({ children }: PropsWithChildren) {
   const format$ = useMoney();
+  const humanize = useShortDateTime();
+  const t = useTranslations("shift");
   const { values, dialog, setDialogState, formError } = useProductionForm((state) => state);
   const currency = values.currency;
   // In the shift's own currency.
@@ -51,8 +48,8 @@ function DialogProduction({ children }: PropsWithChildren) {
   };
 
   const tags = [
-    values.isPublicHoliday ? "Public holiday" : null,
-    values.isPublicHoliday && values.publicHolidayWorked ? "Worked the holiday" : null,
+    values.isPublicHoliday ? t("tags.public_holiday") : null,
+    values.isPublicHoliday && values.publicHolidayWorked ? t("tags.worked_holiday") : null,
   ].filter(Boolean) as string[];
 
   return (
@@ -67,15 +64,15 @@ function DialogProduction({ children }: PropsWithChildren) {
       taxes={taxes}
       tags={tags}
       rows={[
-        ...(values.name ? [{ label: "Job", value: values.name }] : []),
-        { label: "Start", value: humanize(values.startDate) },
-        { label: "Finish", value: humanize(values.finishDate) },
+        ...(values.name ? [{ label: t("fields.job"), value: values.name }] : []),
+        { label: t("fields.start"), value: humanize(values.startDate) },
+        { label: t("fields.finish"), value: humanize(values.finishDate) },
         {
-          label: "Pieces",
+          label: t("fields.pieces"),
           value: `${values.itemQuantity ?? 0} × ${money(Number(values.itemValue ?? 0))}`,
         },
         ...(values.holidayPayRate
-          ? [{ label: "Holiday pay", value: `${values.holidayPayRate}%` }]
+          ? [{ label: t("fields.holiday_pay"), value: `${values.holidayPayRate}%` }]
           : []),
       ]}
     >

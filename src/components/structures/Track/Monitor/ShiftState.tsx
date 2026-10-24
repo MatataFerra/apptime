@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import isEmpty from "lodash/isEmpty";
+import { useTranslations } from "next-intl";
 import { useInterval } from "usehooks-ts";
 
 import ShiftService from "@/services/Shift";
@@ -17,6 +18,8 @@ function elapsedMinutes(start?: string | null) {
 /** Elapsed time of the running shift, as the monitor's headline. */
 function ShiftState() {
   const { shiftUnclosed } = useTrack();
+  const t = useTranslations("track.monitor");
+  const tl = useTranslations("home.live");
   const start = shiftUnclosed.shift?.startDate;
   const [minutes, setMinutes] = useState(() => elapsedMinutes(start));
 
@@ -27,7 +30,7 @@ function ShiftState() {
   }
 
   if (isEmpty(shiftUnclosed.shift)) {
-    return <p className="text-lg text-ink-inverse/70">No shift is being tracked</p>;
+    return <p className="text-lg text-ink-inverse/70">{t("none_tracked")}</p>;
   }
 
   const current = elapsedMinutes(start) || minutes;
@@ -37,11 +40,11 @@ function ShiftState() {
   return (
     <div className="flex flex-col gap-1.5">
       <span className="truncate text-sm text-ink-inverse/70">
-        {shiftUnclosed.shift?.name || "Hourly shift"}
+        {shiftUnclosed.shift?.name || tl("hourly_shift")}
       </span>
       <p
         className="figure text-[5.25rem] leading-[0.9] text-ink-inverse"
-        aria-label={`${hours} hours ${mins} minutes`}
+        aria-label={t("elapsed", { hours, mins })}
       >
         {hours}
         <span className="mr-[0.2em] text-[0.48em] text-ink-inverse/55">h</span>

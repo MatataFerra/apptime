@@ -4,15 +4,40 @@
     "description": "Registra tus horas y mira cuánto ganas, turno a turno."
   },
   "modules": {
-    "track": { "title": "Turno en vivo" },
-    "fast_charge": { "title": "Carga rápida" },
-    "production": { "title": "Producción" },
-    "employers": { "title": "Empleadores", "description": "Dónde trabajas y sus datos" },
-    "dashboard": { "title": "Panel" },
-    "estimate": { "title": "Estimar", "description": "Cuánto paga un período de trabajo" },
-    "compare": { "title": "Comparar", "description": "Por pieza o por hora" },
-    "taxes": { "title": "Impuestos", "description": "Tus tasas y deducciones" },
-    "settings": { "title": "Ajustes" }
+    "track": {
+      "title": "Turno en vivo",
+      "subtitle": "Corre el reloj mientras trabajas."
+    },
+    "fast_charge": {
+      "title": "Carga rápida",
+      "subtitle": "Registra un turno terminado de una vez."
+    },
+    "production": {
+      "title": "Producción",
+      "subtitle": "Cobra por bin, caja o pieza."
+    },
+    "employers": {
+      "title": "Empleadores",
+      "description": "Dónde trabajas y sus datos"
+    },
+    "dashboard": {
+      "title": "Panel"
+    },
+    "estimate": {
+      "title": "Estimar",
+      "description": "Cuánto paga un período de trabajo"
+    },
+    "compare": {
+      "title": "Comparar",
+      "description": "Por pieza o por hora"
+    },
+    "taxes": {
+      "title": "Impuestos",
+      "description": "Tus tasas y deducciones"
+    },
+    "settings": {
+      "title": "Ajustes"
+    }
   },
   "nav": {
     "main": "Principal",
@@ -109,12 +134,65 @@
       "start": "Inicio",
       "finish": "Fin",
       "unpaid_breaks": "Descansos no pagos",
-      "hourly_rate": "Pago por hora"
+      "hourly_rate": "Pago por hora",
+      "job_name": "Nombre del trabajo",
+      "time_worked": "Tiempo trabajado",
+      "pieces": "Piezas",
+      "holiday_pay": "Pago de feriado",
+      "item_value": "Valor por pieza",
+      "item_value_hint": "Por bin, caja o pieza",
+      "quantity": "Cantidad",
+      "paid_in": "Pagado en",
+      "employer": "Empleador",
+      "add_employer": "Agregar uno",
+      "no_employer": "Ninguno",
+      "removed": "(eliminado)"
     },
     "tags": {
       "repeated": "Repetido",
-      "regular_day": "Día normal"
-    }
+      "regular_day": "Día normal",
+      "public_holiday": "Feriado",
+      "worked_holiday": "Trabajó el feriado"
+    },
+    "processing": "Procesando tu solicitud",
+    "please_wait": "Espera un momento...",
+    "created": "Turno creado",
+    "minutes_unit": "min.",
+    "review": {
+      "title": "Revisa tu turno",
+      "description": "No se guarda nada hasta que confirmes.",
+      "earn": "Vas a ganar",
+      "taxes_rate": "Impuestos, {rate}%",
+      "after_taxes": "Después de impuestos",
+      "taxes": "Impuestos",
+      "edit": "Editar",
+      "save": "Guardar turno"
+    },
+    "check_dates": "Revisa las fechas",
+    "check_dates_description": "No se pudo crear el turno con estas fechas.",
+    "errors": {
+      "finish_before_start": "La fecha de fin debe ser posterior a la de inicio",
+      "finish_time_before_start": "La hora de fin debe ser posterior a la de inicio",
+      "finish_invalid": "La fecha de fin no es válida",
+      "time_invalid": "Hora no válida",
+      "name_invalid": "El nombre no es válido"
+    },
+    "holiday": {
+      "question": "¿Qué tipo de día fue?",
+      "none": {
+        "label": "Día normal",
+        "hint": "Tarifa normal"
+      },
+      "worked": {
+        "label": "Feriado, trabajado",
+        "hint": "Se paga ×1,5"
+      },
+      "off": {
+        "label": "Feriado, día libre",
+        "hint": "Pagado, no trabajado"
+      }
+    },
+    "review_button": "Revisar turno"
   },
   "home": {
     "popover": "Cuando el estado es offline, significa que el usuario todavía no inició ningún turno",
@@ -195,6 +273,107 @@
       "since": "Trabajando desde las 8:00",
       "open": "Abrir",
       "this_week": "Esta semana"
+    }
+  },
+  "track": {
+    "errors": {
+      "title": "Error",
+      "tracker": "Ocurrió un error al cargar el contador.",
+      "button": "Error al cargar el botón"
+    },
+    "monitor": {
+      "on": "Trabajando",
+      "off": "Fuera de turno",
+      "status": "Estado",
+      "started": "Empezó a las {time}",
+      "elapsed": "{hours} horas {mins} minutos",
+      "idle_hint": "No hay ningún turno en curso. Toca Empezar turno cuando entres a trabajar.",
+      "none_tracked": "No hay ningún turno en curso",
+      "progress": "Duración del turno comparada con tu turno habitual",
+      "so_far": "Este turno hasta ahora",
+      "usual": "Turno habitual",
+      "last": "Último turno",
+      "none_yet": "Todavía ninguno",
+      "after_three": "Después de 3 turnos"
+    },
+    "start": {
+      "trigger": "Empezar turno",
+      "start": "Empezar turno",
+      "save_and_start": "Guardar y empezar",
+      "creating": "Creando el turno",
+      "started": "Turno iniciado",
+      "error": "Error al crear el turno, por favor intenta de nuevo",
+      "holiday_question": "¿Es feriado?",
+      "holiday_yes": "¡Sí! Quiero dinero 🤑",
+      "holiday_no": "No, un día normal",
+      "last_config_title": "¿Usar la configuración de tu último turno?",
+      "last_config_description": "Encontramos la configuración de un turno anterior. ¿Quieres usarla?",
+      "hour_value_item": "Pago por hora: {value}",
+      "unpaid_breaks_item": "Descansos no pagos: {value}",
+      "employer_item": "Empleador: {name}",
+      "edit": "Editar",
+      "set_title": "Configura el turno antes de empezar",
+      "set_description": "Completa estos datos para empezar tu turno"
+    },
+    "taxes": {
+      "title": "Impuestos de este turno",
+      "description": "Se aplican cuando terminas el turno.",
+      "done": "Listo"
+    },
+    "tools": {
+      "notes": "Notas",
+      "taxes": "Impuestos"
+    },
+    "finish": {
+      "closing": "Cerrando el turno",
+      "saving": "Guardando tus horas…",
+      "saved_description": "Buen trabajo, ya está en tu historial.",
+      "failed": "No se pudo terminar el turno"
+    }
+  },
+  "notes": {
+    "title": "Notas del turno",
+    "started_at": "El turno empezó a las {time}",
+    "empty_description": "Agrega notas a este turno",
+    "saved_badge": "Guardada",
+    "saved": "Nota guardada",
+    "saved_description": "Quedó asociada a este turno.",
+    "cancel": "Cancelar",
+    "save": "Guardar nota",
+    "job_name": "Nombre del trabajo",
+    "job_name_placeholder": "Galpón de empaque, cosecha de manzanas…",
+    "note": "Nota",
+    "placeholder": "Descansos que tomaste, horas extra, con quién trabajaste…",
+    "too_short": "Escribe al menos {min} caracteres",
+    "private": "Solo tú puedes verla."
+  },
+  "tax_picker": {
+    "title": "Impuestos",
+    "subtitle": "Opcional. Se descuentan del pago de este turno.",
+    "total_label": "{rate}% descontado en total",
+    "saved_title": "Tus impuestos",
+    "tap_hint": "Toca para agregar o quitar",
+    "search": "Buscar tus impuestos",
+    "no_match": "Ningún impuesto guardado coincide con “{search}”.",
+    "new_title": "Nuevos para este turno",
+    "remove": "Quitar {name}",
+    "using_saved": "Usando tu \"{name}\" guardado",
+    "using_saved_description": "{rate}% de tus turnos anteriores.",
+    "empty": "Todavía no tienes impuestos. Agrega los de tu recibo de sueldo, como el impuesto a las ganancias; la próxima vez estarán a un toque.",
+    "new": "Nuevo impuesto",
+    "add": "Agregar impuesto",
+    "cancel": "Cancelar",
+    "fields": {
+      "name": "Nombre",
+      "name_placeholder": "Impuesto a las ganancias",
+      "rate": "Tasa",
+      "note": "Nota (opcional)",
+      "note_placeholder": "Como figura en tu recibo"
+    },
+    "errors": {
+      "name_required": "Ponle un nombre",
+      "rate_range": "Entre 0 y 100",
+      "already_added": "Ya está agregado"
     }
   }
 }

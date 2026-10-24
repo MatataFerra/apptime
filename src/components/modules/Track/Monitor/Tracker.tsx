@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 
 import Skeleton from "@/components/ui/Skeleton";
 
@@ -16,6 +17,7 @@ const ShiftInfo = dynamic(() => import("@/components/structures/Track/Monitor/Sh
 });
 
 function Tracker() {
+  const t = useTranslations("track.monitor");
   const {
     isShiftActive,
     isClosing,
@@ -34,17 +36,15 @@ function Tracker() {
         <ShiftState />
       ) : (
         <div className="flex flex-col gap-2">
-          <span className="text-sm text-ink-inverse/70">Off the clock</span>
+          <span className="text-sm text-ink-inverse/70">{t("off")}</span>
           <p
             className="figure text-[5.25rem] leading-[0.9] text-ink-inverse/25"
-            aria-label="0 hours 0 minutes"
+            aria-label={t("elapsed", { hours: 0, mins: 0 })}
           >
             0<span className="mr-[0.2em] text-[0.48em]">h</span>00
             <span className="text-[0.48em]">m</span>
           </p>
-          <p className="max-w-[28ch] text-sm text-ink-inverse/70">
-            No shift running. Press Start shift when you clock in.
-          </p>
+          <p className="max-w-[28ch] text-sm text-ink-inverse/70">{t("idle_hint")}</p>
         </div>
       )}
 
