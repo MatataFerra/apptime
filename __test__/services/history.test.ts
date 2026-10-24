@@ -1,9 +1,9 @@
 import { describe, expect, test } from "vitest";
 
 import {
+  countByEmployer,
   countDays,
   cumulativeEarnings,
-  employersIn,
   entriesForDays,
   filterEntries,
   groupByMonth,
@@ -171,7 +171,10 @@ describe("filterEntries", () => {
     expect(filterEntries(entries, {})).toHaveLength(entries.length);
   });
 
-  test("lists each employer once", () => {
-    expect(employersIn(entries).sort()).toEqual([1, 2]);
+  test("counts the shifts of each employer, and those without one", () => {
+    const counts = countByEmployer(entries);
+    expect(counts.get(1)).toBe(2);
+    expect(counts.get(2)).toBe(1);
+    expect(counts.get("none")).toBe(1);
   });
 });

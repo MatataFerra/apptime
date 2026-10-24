@@ -8,10 +8,10 @@ import { ChevronDown, ChevronRight, ChevronUp } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import {
+  countByEmployer,
   countDays,
   DAYS_PER_PAGE,
   type EmployerFilter as EmployerFilterValue,
-  employersIn,
   entriesForDays,
   filterEntries,
   groupByMonth,
@@ -227,7 +227,7 @@ function ShiftHistory() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="-mx-1 flex [scrollbar-width:none] gap-2 overflow-x-auto px-1">
+      <div className="flex flex-wrap items-center gap-2">
         <div role="radiogroup" aria-label={t("filter_label")} className="flex shrink-0 gap-2">
           {FILTERS.map((f) => (
             <button
@@ -250,8 +250,7 @@ function ShiftHistory() {
         <EmployerFilter
           value={employer}
           onChange={setEmployer}
-          employerIds={employersIn(all)}
-          hasUnassigned={all.some((e) => e.employerId === null)}
+          counts={countByEmployer(filterEntries(all, { kind: filter }))}
         />
       </div>
 

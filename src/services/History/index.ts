@@ -48,11 +48,14 @@ export function filterEntries(
   );
 }
 
-/** The employers that appear in `entries`, in no particular order. */
-export function employersIn(entries: HistoryEntry[]) {
-  return [
-    ...new Set(entries.map((e) => e.employerId).filter((id): id is number => id !== null)),
-  ];
+/** How many entries each employer has; shifts without one count under "none". */
+export function countByEmployer(entries: HistoryEntry[]) {
+  const counts = new Map<number | "none", number>();
+  for (const entry of entries) {
+    const key = entry.employerId ?? "none";
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return counts;
 }
 
 export type MonthGroup = {
