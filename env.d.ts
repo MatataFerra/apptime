@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { type infer as Infer, z } from "zod";
 
 export const envSchema = z.object({
   GOOGLE_CLIENT_ID: z.string(),
@@ -29,6 +29,6 @@ export const envSchema = z.object({
 
 declare global {
   namespace NodeJS {
-    interface ProcessEnv extends z.infer<typeof envSchema> {}
+    interface ProcessEnv extends Infer<typeof envSchema> {}
   }
 }
