@@ -8,8 +8,8 @@ export const HomeHeader = dynamic(() => import("@/components/structures/Home/Hom
   ssr: false,
   loading: () => (
     <div className="flex flex-col gap-2 pt-2">
-      <Skeleton classes="h-4 w-36" />
-      <Skeleton classes="h-16 w-20" />
+      <Skeleton classes="h-5 w-40" />
+      <Skeleton classes="h-[4.5rem] w-24" />
     </div>
   ),
 });

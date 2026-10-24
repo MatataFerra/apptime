@@ -25,14 +25,14 @@ function HomeHeader() {
   return (
     <header className="flex items-end justify-between gap-3 pt-2">
       <div className="flex flex-col gap-1">
-        <span className="text-[0.9375rem] text-ink-muted first-letter:uppercase">
+        <span className="text-[1.0625rem] text-ink-muted first-letter:uppercase">
           {format(now, "EEEE, MMMM", { locale: dateLocale })}
         </span>
-        <h1 className="display-title text-[4.75rem] leading-[0.85] text-ink">{format(now, "d")}</h1>
+        <h1 className="display-title text-[5.25rem] leading-[0.85] text-ink">{format(now, "d")}</h1>
       </div>
       <div className="flex flex-col items-end gap-3 self-stretch">
         <ThemeToggle />
-        <p className="mt-auto mb-1.5 max-w-[11rem] text-right text-[0.9375rem] text-pretty text-ink-muted">
+        <p className="mt-auto mb-1.5 max-w-[12.5rem] text-right text-[1.0625rem] text-pretty text-ink-muted">
           {name
             ? t("greeting_name", { name, week: getISOWeek(now) })
             : t("greeting", { week: getISOWeek(now) })}

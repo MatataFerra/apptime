@@ -18,7 +18,8 @@ import useUser from "@/hooks/useUser";
 /**
  * This week at a glance: earned, hours, shifts and one bar per day.
  * Bars are coloured by shift type (hourly green, per piece plum) and
- * public holidays in amber.
+ * public holidays in amber, in the softer --week-bar-* tones; today's
+ * initial sits on a filled chip.
  */
 function WeekSummary() {
   const { data: user } = useUser();
@@ -95,7 +96,7 @@ function WeekSummary() {
         </div>
       </dl>
 
-      <ol className="grid h-14 grid-cols-7 items-end gap-1.5" aria-label={t("per_day")}>
+      <ol className="grid h-16 grid-cols-7 items-end gap-1.5" aria-label={t("per_day")}>
         {week.days.map((day, i) => {
           const total = day.hourly + day.production;
           // Worked, but only in another currency: a neutral bar, not a money one.
@@ -120,13 +121,16 @@ function WeekSummary() {
                   >
                     {day.production > 0 ? (
                       <div
-                        className="w-full bg-production-bright"
+                        className="w-full bg-week-bar-production"
                         style={{ flexGrow: day.production }}
                       />
                     ) : null}
                     {day.hourly > 0 ? (
                       <div
-                        className={cn("w-full", day.publicHoliday ? "bg-fast-bright" : "bg-live")}
+                        className={cn(
+                          "w-full",
+                          day.publicHoliday ? "bg-week-bar-holiday" : "bg-week-bar-hourly"
+                        )}
                         style={{ flexGrow: day.hourly }}
                       />
                     ) : null}
@@ -145,8 +149,10 @@ function WeekSummary() {
               </div>
               <span
                 className={cn(
-                  "text-[0.625rem]",
-                  isToday ? "font-semibold text-ink-inverse" : "text-ink-inverse/60"
+                  "grid size-5 place-items-center rounded-full text-[0.6875rem] leading-none",
+                  isToday
+                    ? "bg-ink-inverse font-semibold text-surface-inverse"
+                    : "text-ink-inverse/60"
                 )}
                 aria-hidden="true"
               >

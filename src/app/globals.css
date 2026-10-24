@@ -37,6 +37,10 @@
   --accent-soft: #dcf1e8;
   --live: #13efa0; /* running-clock signal, only on inverse surfaces */
   --on-live: #062a1c; /* text on --live, same in light and dark */
+  /* Home week bars: softer than --live and the -bright tones (inverse surface, both themes) */
+  --week-bar-hourly: #8fdcbb;
+  --week-bar-production: #e3b4ca;
+  --week-bar-holiday: #e6c58f;
   --destructive: #c2412d;
   --destructive-foreground: #ffffff;
   --destructive-soft: #f8e3df;
@@ -156,6 +160,9 @@
   --color-accent-soft: var(--accent-soft);
   --color-live: var(--live);
   --color-on-live: var(--on-live);
+  --color-week-bar-hourly: var(--week-bar-hourly);
+  --color-week-bar-production: var(--week-bar-production);
+  --color-week-bar-holiday: var(--week-bar-holiday);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-destructive-soft: var(--destructive-soft);
