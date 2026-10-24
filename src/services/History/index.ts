@@ -28,7 +28,32 @@ export type HistoryEntry = {
   holiday: "worked" | "off" | null;
   /** The shift's own currency; null means the user's default. */
   currency: string | null;
+  /** Who the shift was for; null when not set. */
+  employerId: number | null;
 };
+
+/** "all", only the shifts without an employer ("none"), or one employer's id. */
+export type EmployerFilter = "all" | "none" | number;
+
+/** Entries of one kind and/or one employer. */
+export function filterEntries(
+  entries: HistoryEntry[],
+  { kind = "all", employer = "all" }: { kind?: "all" | ShiftKind; employer?: EmployerFilter }
+) {
+  return entries.filter(
+    (entry) =>
+      (kind === "all" || entry.kind === kind) &&
+      (employer === "all" ||
+        (employer === "none" ? entry.employerId === null : entry.employerId === employer))
+  );
+}
+
+/** The employers that appear in `entries`, in no particular order. */
+export function employersIn(entries: HistoryEntry[]) {
+  return [
+    ...new Set(entries.map((e) => e.employerId).filter((id): id is number => id !== null)),
+  ];
+}
 
 export type MonthGroup = {
   key: string;
@@ -63,6 +88,7 @@ function toEntry(shift: HourlyType | ProductionType, kind: ShiftKind): HistoryEn
     afterTaxes: Pay.afterTax(earned, shift.taxes ?? []),
     holiday: shift.publicHolidayWorked ? "worked" : shift.isPublicHoliday ? "off" : null,
     currency: shift.currency ?? null,
+    employerId: shift.employerId ?? null,
   };
 }
 

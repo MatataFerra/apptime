@@ -570,6 +570,9 @@
         "hourly": "Por hora",
         "production": "Por pieza"
       },
+      "employer_filter_label": "Empleador",
+      "employer_all": "Todos los empleadores",
+      "employer_none": "Sin empleador",
       "hourly_shift": "Turno por hora",
       "piece_shift": "Turno por pieza",
       "hourly_detail": "{hours} · {rate}/h",
@@ -579,6 +582,7 @@
       "net": "{amount} neto",
       "empty": "Todavía no guardaste turnos.",
       "empty_filtered": "No hay turnos en esas fechas.",
+      "empty_employer": "No hay turnos con esos filtros.",
       "shifts": "{count, plural, one {# turno} other {# turnos}}",
       "show_more": "Mostrar más ({count, plural, one {# turno} other {# turnos}})",
       "show_less": "Mostrar menos"

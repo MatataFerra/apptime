@@ -3,7 +3,9 @@ import { describe, expect, test } from "vitest";
 import {
   countDays,
   cumulativeEarnings,
+  employersIn,
   entriesForDays,
+  filterEntries,
   groupByMonth,
   historyEntries,
   weeklyEarnings,
@@ -138,5 +140,38 @@ describe("entriesForDays", () => {
   test("returns everything when there are fewer days", () => {
     expect(entriesForDays(entries, 30)).toHaveLength(entries.length);
     expect(countDays(entries)).toBe(10);
+  });
+});
+
+describe("filterEntries", () => {
+  const day = new Date(2026, 9, 20, 8);
+  const entries = historyEntries(
+    [hourly(day, 8, { employerId: 1 }), hourly(day, 6, { employerId: 2 }), hourly(day, 4)],
+    [production(day, 100, 0.5, { employerId: 1 })]
+  );
+
+  test("by employer, of every kind", () => {
+    const farm = filterEntries(entries, { employer: 1 });
+    expect(farm).toHaveLength(2);
+    expect(farm.every((e) => e.employerId === 1)).toBe(true);
+  });
+
+  test("shifts without an employer", () => {
+    const none = filterEntries(entries, { employer: "none" });
+    expect(none).toHaveLength(1);
+    expect(none[0].employerId).toBeNull();
+  });
+
+  test("kind and employer together", () => {
+    expect(filterEntries(entries, { kind: "production", employer: 1 })).toHaveLength(1);
+    expect(filterEntries(entries, { kind: "production", employer: 2 })).toHaveLength(0);
+  });
+
+  test("everything when nothing is filtered", () => {
+    expect(filterEntries(entries, {})).toHaveLength(entries.length);
+  });
+
+  test("lists each employer once", () => {
+    expect(employersIn(entries).sort()).toEqual([1, 2]);
   });
 });
