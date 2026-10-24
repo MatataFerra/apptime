@@ -10,7 +10,10 @@ import { useTranslations } from "next-intl";
 import {
   countDays,
   DAYS_PER_PAGE,
+  type EmployerFilter as EmployerFilterValue,
+  employersIn,
   entriesForDays,
+  filterEntries,
   groupByMonth,
   historyEntries,
   type HistoryEntry,
@@ -19,6 +22,7 @@ import {
 } from "@/services/History";
 import { formatHours } from "@/services/Summary";
 
+import EmployerFilter from "@/components/structures/Dashboard/History/EmployerFilter";
 import Content from "@/components/structures/Dashboard/Table/Dialog/Content";
 import TableDialog from "@/components/structures/Dashboard/Table/Dialog/Dialog";
 import Skeleton from "@/components/ui/Skeleton";
@@ -26,6 +30,7 @@ import Skeleton from "@/components/ui/Skeleton";
 import { cn } from "@/utils/helpers/styleMerger";
 import useDashboard from "@/hooks/useDashboard";
 import useDateLocale from "@/hooks/useDateLocale";
+import useEmployers from "@/hooks/useEmployers";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
 import useMoney, { useCurrency } from "@/hooks/useMoney";
 import useProductionShifts from "@/hooks/useProductionShifts";
@@ -52,6 +57,8 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
   const format$ = useMoney();
   const t = useTranslations("dashboard.history");
   const locale = useDateLocale();
+  const { byId } = useEmployers();
+  const employer = entry.employerId !== null ? byId.get(entry.employerId) : undefined;
   // Each shift in its own currency.
   function money(value: number) {
     return format$(value, { currency: entry.currency });
@@ -92,7 +99,8 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
             {entry.name || (isHourly ? t("hourly_shift") : t("piece_shift"))}
           </span>
           <span className="truncate text-[0.8125rem] text-ink-muted">
-            {isHourly ? t("filters.hourly") : t("filters.production")} · {detail(entry, money, t)}
+            {employer?.name ?? (isHourly ? t("filters.hourly") : t("filters.production"))} ·{" "}
+            {detail(entry, money, t)}
           </span>
           {entry.holiday ? (
             <span className="mt-0.5 w-fit rounded-full bg-fast-soft px-2 py-0.5 text-[0.6875rem] font-semibold text-fast-ink">
@@ -194,6 +202,7 @@ function ShiftHistory() {
   const t = useTranslations("dashboard.history");
   const locale = useDateLocale();
   const [filter, setFilter] = useState<Filter>("all");
+  const [employer, setEmployer] = useState<EmployerFilterValue>("all");
   const { isDateFiltered } = useDashboard();
   const { data: hourlyData, isLoading: loadingHourly } = useHourlyShifts();
   const { data: productionData, isLoading: loadingProduction } = useProductionShifts();
@@ -212,39 +221,52 @@ function ShiftHistory() {
     return <Skeleton classes="h-64 w-full rounded-xl" />;
   }
 
-  const entries = historyEntries(hourly, productions).filter(
-    (e) => filter === "all" || e.kind === filter
-  );
+  const all = historyEntries(hourly, productions);
+  const entries = filterEntries(all, { kind: filter, employer });
   const months = groupByMonth(entries, currency, locale);
 
   return (
     <div className="flex flex-col gap-4">
-      <div role="radiogroup" aria-label={t("filter_label")} className="flex gap-2">
-        {FILTERS.map((f) => (
-          <button
-            key={f}
-            type="button"
-            role="radio"
-            aria-checked={filter === f}
-            onClick={() => setFilter(f)}
-            className={cn(
-              "h-9 rounded-full border px-3.5 text-sm font-medium transition-colors",
-              filter === f
-                ? "border-transparent bg-primary text-primary-foreground"
-                : "border-border-strong bg-surface text-ink hover:bg-surface-sunken"
-            )}
-          >
-            {t(`filters.${f}`)}
-          </button>
-        ))}
+      <div className="-mx-1 flex [scrollbar-width:none] gap-2 overflow-x-auto px-1">
+        <div role="radiogroup" aria-label={t("filter_label")} className="flex shrink-0 gap-2">
+          {FILTERS.map((f) => (
+            <button
+              key={f}
+              type="button"
+              role="radio"
+              aria-checked={filter === f}
+              onClick={() => setFilter(f)}
+              className={cn(
+                "h-9 rounded-full border px-3.5 text-sm font-medium transition-colors",
+                filter === f
+                  ? "border-transparent bg-primary text-primary-foreground"
+                  : "border-border-strong bg-surface text-ink hover:bg-surface-sunken"
+              )}
+            >
+              {t(`filters.${f}`)}
+            </button>
+          ))}
+        </div>
+        <EmployerFilter
+          value={employer}
+          onChange={setEmployer}
+          employerIds={employersIn(all)}
+          hasUnassigned={all.some((e) => e.employerId === null)}
+        />
       </div>
 
       {months.length === 0 ? (
         <p className="rounded-xl border border-dashed border-border-strong p-6 text-center text-sm text-ink-muted">
-          {isDateFiltered ? t("empty_filtered") : t("empty")}
+          {employer !== "all" && all.length > 0
+            ? t("empty_employer")
+            : isDateFiltered
+              ? t("empty_filtered")
+              : t("empty")}
         </p>
       ) : (
-        months.map((month) => <MonthSection key={`${filter}-${month.key}`} month={month} />)
+        months.map((month) => (
+          <MonthSection key={`${filter}-${employer}-${month.key}`} month={month} />
+        ))
       )}
     </div>
   );
