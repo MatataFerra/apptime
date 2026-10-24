@@ -246,7 +246,8 @@ export class DataProvidedIsNotValid extends Error implements ExceptionsInterface
     if (error instanceof ZodError) {
       this.zod = error.issues.map((issue) => ({
         error: issue.message,
-        input: issue.path,
+        // Zod 4 paths can hold symbols; the API only ever reports strings and indexes.
+        input: issue.path.map((key) => (typeof key === "symbol" ? String(key) : key)),
       }));
     }
     return { ...this.exception, fields: this.zod };

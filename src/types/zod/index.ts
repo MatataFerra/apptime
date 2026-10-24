@@ -44,7 +44,7 @@ const BaseShiftSchema = z.object({
 const ProductionShiftSchema = BaseShiftSchema.merge(
   z.object({
     id: z.number({
-      required_error: "Id must be provided correctly",
+      error: "Id must be provided correctly",
     }),
     itemValue: z.number().nullable(),
     itemQuantity: z.number().nullable(),
@@ -54,7 +54,7 @@ const ProductionShiftSchema = BaseShiftSchema.merge(
 const HourlyShiftSchema = BaseShiftSchema.merge(
   z.object({
     id: z.number({
-      required_error: "Id must be provided correctly",
+      error: "Id must be provided correctly",
     }),
     hourValue: z.number().nullable(),
     /** "track" | "fast" */
@@ -64,7 +64,7 @@ const HourlyShiftSchema = BaseShiftSchema.merge(
 
 const ShiftModelSchema = z.object({
   id: z.number({
-    required_error: "Id must be provided correctly",
+    error: "Id must be provided correctly",
   }),
   hourly: z.array(HourlyShiftSchema).nullable(),
   production: z.array(ProductionShiftSchema).nullable(),
@@ -109,7 +109,7 @@ const HourlyUpdateSchema = HourlyShiftSchema.omit({
 
 const ProfileSchema = z.object({
   id: z.number({
-    required_error: "Id must be provided correctly",
+    error: "Id must be provided correctly",
   }),
   firstName: z.string(),
   lastName: z.string().nullable(),
@@ -138,7 +138,7 @@ const ProfileUpdateSchema = ProfileSchema.partial().refine(
 
 const UserModelSchema = z.object({
   id: z.string({
-    required_error: "Id must be provided correctly",
+    error: "Id must be provided correctly",
   }),
   email: z.string().email(),
   emailVerified: z.boolean().default(false),
@@ -151,7 +151,25 @@ const UserModelSchema = z.object({
   isActive: z.boolean().default(true),
 });
 
-const UserUpdateSchema = UserModelSchema.partial().superRefine((values, ctx) => {
+/**
+ * The fields a user update may carry, all optional and without defaults:
+ * a field left out stays as it is. (`UserModelSchema.partial()` would not do:
+ * since Zod 4, defaults are filled in for missing optional keys too.)
+ */
+const UserUpdateFieldsSchema = z.object({
+  id: z.string().optional(),
+  email: z.string().email().optional(),
+  emailVerified: z.boolean().optional(),
+  image: z.string().nullable().optional(),
+  name: z.string().optional(),
+  online: z.boolean().optional(),
+  formCompleted: z.boolean().optional(),
+  type_account: z.enum(["CREDENTIALS", "OAUTH"]).optional(),
+  role: z.enum(["USER", "ADMIN", "SUPER_USER"]).optional(),
+  isActive: z.boolean().optional(),
+});
+
+const UserUpdateSchema = UserUpdateFieldsSchema.superRefine((values, ctx) => {
   if (Object.keys(values).length < 0) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
