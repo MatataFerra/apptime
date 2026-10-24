@@ -2,66 +2,81 @@
 
 import * as React from "react";
 import { DayPicker } from "react-day-picker";
+import { enUS, es } from "react-day-picker/locale";
 
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
+import { useLocale } from "next-intl";
 
 import { buttonVariants } from "@/components/ui/buttonShadcn";
 
 import { cn } from "@/utils/helpers/styleMerger";
-import useDateLocale from "@/hooks/useDateLocale";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
+/**
+ * DayPicker's locales: date-fns' plus its own labels ("Go to the next
+ * month"…), so month names and the buttons' names follow the app's language.
+ */
+const LOCALES = { en: enUS, es } as const;
+
 function Calendar({ className, classNames, showOutsideDays = true, ...props }: CalendarProps) {
-  // Month and weekday names in the app's language (a `locale` prop still wins).
-  const locale = useDateLocale();
+  const locale = LOCALES[useLocale()] ?? enUS;
 
   return (
     <DayPicker
+      // A `locale` prop still wins.
       locale={locale}
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{
-        months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-        month: "space-y-4",
-        caption: "flex justify-center pt-1 relative items-center",
+        months: "relative flex flex-col gap-4 sm:flex-row",
+        month: "flex flex-col gap-4",
+        month_caption: "flex h-7 items-center justify-center",
         caption_label: "text-sm font-medium",
-        nav: "space-x-1 flex items-center",
-        nav_button: cn(
+        nav: "absolute inset-x-0 top-0 flex items-center justify-between",
+        button_previous: cn(
           buttonVariants({ variant: "outline" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+          "z-10 size-7 bg-transparent p-0 opacity-50 hover:opacity-100 disabled:opacity-25"
         ),
-        nav_button_previous: "absolute left-1",
-        nav_button_next: "absolute right-1",
-        table: "w-full border-collapse space-y-1",
-        head_row: "flex",
-        head_cell: "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem]",
-        row: "flex w-full mt-2",
-        cell: cn(
-          "relative p-0 text-center text-sm focus-within:relative focus-within:z-20 has-aria-[selected]:bg-accent-soft [&:has([aria-selected].day-outside)]:bg-accent-soft/50 [&:has([aria-selected].day-range-end)]:rounded-r-md",
-          props.mode === "range"
-            ? "[&:has(>.day-range-end)]:rounded-r-md [&:has(>.day-range-start)]:rounded-l-md first:has-aria-[selected]:rounded-l-md last:has-aria-[selected]:rounded-r-md"
-            : "has-aria-[selected]:rounded-md"
+        button_next: cn(
+          buttonVariants({ variant: "outline" }),
+          "z-10 size-7 bg-transparent p-0 opacity-50 hover:opacity-100 disabled:opacity-25"
         ),
+        month_grid: "w-full border-collapse",
+        weekdays: "flex",
+        weekday: "w-8 text-[0.8rem] font-normal text-muted-foreground",
+        week: "mt-2 flex w-full",
+        // aria-selected is on the cell itself in v10 (it was on the button before).
         day: cn(
-          buttonVariants({ variant: "ghost" }),
-          "h-8 w-8 p-0 font-normal aria-selected:opacity-100"
+          "relative p-0 text-center text-sm focus-within:relative focus-within:z-20 aria-selected:bg-accent-soft",
+          props.mode === "range"
+            ? "first:aria-selected:rounded-l-md last:aria-selected:rounded-r-md"
+            : "aria-selected:rounded-md"
         ),
-        day_range_start: "day-range-start",
-        day_range_end: "day-range-end",
-        day_selected:
-          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-        day_today: "bg-accent-soft text-ink",
-        day_outside:
-          "day-outside text-muted-foreground opacity-50  aria-selected:bg-accent-soft/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
-        day_disabled: "text-muted-foreground opacity-50",
-        day_range_middle: "aria-selected:bg-accent-soft aria-selected:text-ink",
-        day_hidden: "invisible",
+        day_button: cn(
+          buttonVariants({ variant: "ghost" }),
+          "size-8 p-0 font-normal aria-selected:opacity-100"
+        ),
+        range_start: "rounded-l-md",
+        range_end: "rounded-r-md",
+        selected:
+          "[&>button]:bg-primary [&>button]:text-primary-foreground [&>button]:hover:bg-primary [&>button]:hover:text-primary-foreground [&>button]:focus:bg-primary [&>button]:focus:text-primary-foreground",
+        // Wins over `selected`, which also applies to the days in between.
+        range_middle:
+          "[&>button]:bg-transparent! [&>button]:text-ink! [&>button]:hover:bg-accent-soft!",
+        today: "[&>button]:bg-accent-soft [&>button]:text-ink",
+        outside: "text-muted-foreground opacity-50 aria-selected:opacity-30",
+        disabled: "text-muted-foreground opacity-50",
+        hidden: "invisible",
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ...props }) => <ChevronLeftIcon className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRightIcon className="h-4 w-4" />,
+        Chevron: ({ orientation, className: chevronClassName }) =>
+          orientation === "left" ? (
+            <ChevronLeftIcon className={cn("size-4", chevronClassName)} />
+          ) : (
+            <ChevronRightIcon className={cn("size-4", chevronClassName)} />
+          ),
       }}
       {...props}
     />
