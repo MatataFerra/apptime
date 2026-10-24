@@ -166,7 +166,14 @@
       "employer": "Empleador",
       "add_employer": "Agregar uno",
       "no_employer": "Ninguno",
-      "removed": "(eliminado)"
+      "removed": "(eliminado)",
+      "new_employer": "+ Nuevo empleador…",
+      "new_employer_name": "Nombre del nuevo empleador",
+      "new_employer_hint": "Se guarda con el pago por hora y la moneda de este turno. El resto lo completás en Empleadores.",
+      "new_employer_failed": "No se pudo guardar el empleador",
+      "cancel": "Cancelar",
+      "save_employer": "Guardar",
+      "saving_employer": "Guardando…"
     },
     "tags": {
       "repeated": "Repetido",
@@ -358,9 +365,7 @@
       "creating": "Creando el turno",
       "started": "Turno iniciado",
       "error": "Error al crear el turno, por favor intenta de nuevo",
-      "holiday_question": "¿Es feriado?",
-      "holiday_yes": "¡Sí! Quiero dinero 🤑",
-      "holiday_no": "No, un día normal",
+      "holiday_question": "¿Qué tipo de día es?",
       "last_config_title": "¿Usar la configuración de tu último turno?",
       "last_config_description": "Encontramos la configuración de un turno anterior. ¿Quieres usarla?",
       "hour_value_item": "Pago por hora: {value}",

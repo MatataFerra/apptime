@@ -6,6 +6,40 @@ import { ChevronDown } from "lucide-react";
 
 import { cn } from "@/utils/helpers/styleMerger";
 
+/** The pill-shaped native select used by the shift settings rows. */
+export function PillSelect({
+  id,
+  value,
+  onChange,
+  children,
+  label,
+}: {
+  id?: string;
+  value: string;
+  onChange: (value: string) => void;
+  children: ReactNode;
+  /** Accessible name when there's no visible `<label>`. */
+  label?: string;
+}) {
+  return (
+    <span className="relative min-w-0">
+      <select
+        id={id}
+        aria-label={label}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="h-9 max-w-56 appearance-none truncate rounded-full border border-border-strong bg-surface pr-8 pl-3.5 text-sm font-semibold text-ink"
+      >
+        {children}
+      </select>
+      <ChevronDown
+        className="pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2 text-ink-muted"
+        aria-hidden="true"
+      />
+    </span>
+  );
+}
+
 /**
  * A setting of the shift on one line: label on the left, a pill select on
  * the right ("Employer  [Farm ▾]", "Paid in  [AUD ▾]"). Its own top margin
@@ -32,20 +66,9 @@ function SelectRow({
       <label htmlFor={id} className="text-sm text-ink-muted">
         {label}
       </label>
-      <span className="relative min-w-0">
-        <select
-          id={id}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="h-9 max-w-56 appearance-none truncate rounded-full border border-border-strong bg-surface pr-8 pl-3.5 text-sm font-semibold text-ink"
-        >
-          {children}
-        </select>
-        <ChevronDown
-          className="pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2 text-ink-muted"
-          aria-hidden="true"
-        />
-      </span>
+      <PillSelect id={id} value={value} onChange={onChange}>
+        {children}
+      </PillSelect>
     </div>
   );
 }

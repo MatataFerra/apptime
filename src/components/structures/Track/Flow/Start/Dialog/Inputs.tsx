@@ -9,7 +9,10 @@ import { z } from "zod";
 
 import CurrencySelect from "@/components/structures/ShiftForms/CurrencySelect";
 import EmployerSelect from "@/components/structures/ShiftForms/EmployerSelect";
-import PublicHolidayDropdown from "@/components/structures/Track/Flow/Start/Dialog/Dropdown";
+import HolidayChoice, {
+  fromHolidayValue,
+  toHolidayValue,
+} from "@/components/structures/ShiftForms/HolidayChoice";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 
@@ -30,12 +33,18 @@ function ShiftStartInputs() {
   const { data: user } = useUser();
   const defaultCurrency = useCurrency();
   const t = useTranslations("shift.fields");
+  const tStart = useTranslations("track.start");
   const { register, control, setValue } = useForm({
     resolver: zodResolver(InputsSchema),
     defaultValues: {
-      // The rate from Settings, if one is saved.
-      hourValue: user?.config?.hourValue ? String(user.config.hourValue) : "",
-      unpaidBreaks: "1",
+      // What the dialog already has (the last shift, or edits made on the
+      // previous step), else the rate from Settings.
+      hourValue: data.hourValue
+        ? String(data.hourValue)
+        : user?.config?.hourValue
+          ? String(user.config.hourValue)
+          : "",
+      unpaidBreaks: data.unpaidBreaks != null ? String(data.unpaidBreaks) : "1",
     },
   });
 
@@ -54,13 +63,15 @@ function ShiftStartInputs() {
   }, [hourValue, setData]);
 
   useEffect(() => {
-    if (unpaidBreaks) setData({ unpaidBreaks: unpaidBreaks ? Number(unpaidBreaks) : 1 });
+    if (unpaidBreaks) setData({ unpaidBreaks: Number(unpaidBreaks) });
   }, [unpaidBreaks, setData]);
 
   return (
     <>
       <EmployerSelect
+        allowCreate
         value={data.employerId}
+        newDefaults={{ rate: Number(hourValue) || null, currency: data.currency }}
         onChange={(employer) => {
           setData({ employerId: employer?.id ?? null });
           if (!employer) return;
@@ -91,9 +102,15 @@ function ShiftStartInputs() {
         />
       </Stack>
       <CurrencySelect value={data.currency} onChange={(currency) => setData({ currency })} />
-      <Stack orientation="vertical" classes="h-20">
-        <PublicHolidayDropdown />
-      </Stack>
+      <div className="mt-2 w-full">
+        <HolidayChoice
+          compact
+          legend={tStart("holiday_question")}
+          options={["none", "worked"]}
+          value={toHolidayValue(data.isPublicHoliday, data.publicHolidayWorked)}
+          onChange={(value) => setData(fromHolidayValue(value))}
+        />
+      </div>
     </>
   );
 }
