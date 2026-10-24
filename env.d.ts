@@ -18,7 +18,6 @@ export const envSchema = z.object({
   /** Old name of TURSO_DATABASE_URL, read as a fallback. */
   NEXT_PUBLIC_TURSO_DATABASE_URL: z.string().optional(),
   TURSO_ON: z.string(),
-  STAGING: z.string(),
   RESEND_API_KEY: z.string(),
   RESEND_SENDER: z.string(),
   RESEND_SUBJECT: z.string(),
