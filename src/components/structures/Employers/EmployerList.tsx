@@ -13,9 +13,9 @@ import Toast from "@/services/Toast";
 import type { SavedEmployer } from "@/types";
 
 import EmployerForm from "@/components/structures/Employers/EmployerForm";
+import EmployerListSkeleton from "@/components/structures/Employers/EmployerListSkeleton";
 import { Section } from "@/components/structures/Settings/Preferences/Section";
 import Button from "@/components/ui/Button";
-import Skeleton from "@/components/ui/Skeleton";
 
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import { cn } from "@/utils/helpers/styleMerger";
@@ -260,7 +260,7 @@ function EmployerList() {
     setAdding(false);
   }
 
-  if (isLoading) return <Skeleton classes="h-40 w-full rounded-xl" />;
+  if (isLoading) return <EmployerListSkeleton />;
 
   return (
     <>
