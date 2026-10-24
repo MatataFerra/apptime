@@ -87,7 +87,7 @@ function Calculator() {
   const paidLabel = `${Math.floor(result.paid / 60)}h ${String(Math.round(result.paid % 60)).padStart(2, "0")}m`;
 
   return (
-    <div className="flex flex-col gap-3.5">
+    <div className="flex w-full flex-col gap-3.5">
       <section
         aria-live="polite"
         className="flex flex-col gap-3.5 rounded-3xl bg-surface-inverse p-5 text-ink-inverse"
