@@ -19,7 +19,7 @@ import useUser from "@/hooks/useUser";
  * This week at a glance: earned, hours, shifts and one bar per day.
  * Bars are coloured by shift type (hourly green, per piece plum) and
  * public holidays in amber, in the softer --week-bar-* tones; today's
- * initial sits on a filled chip.
+ * short name sits on a filled chip.
  */
 function WeekSummary() {
   const { data: user } = useUser();
@@ -149,14 +149,15 @@ function WeekSummary() {
               </div>
               <span
                 className={cn(
-                  "grid size-5 place-items-center rounded-full text-[0.6875rem] leading-none",
+                  "grid h-5 min-w-7 place-items-center rounded-full px-1.5 text-base leading-none font-medium",
                   isToday
                     ? "bg-ink-inverse font-semibold text-surface-inverse"
-                    : "text-ink-inverse/60"
+                    : "text-ink-inverse/80"
                 )}
                 aria-hidden="true"
               >
-                {format(day.date, "EEEEE", { locale })}
+                {/* Two letters ("lu", "ma", "mi"): one letter repeats (m, m) in Spanish. */}
+                {format(day.date, "EEEEEE", { locale }).toUpperCase()}
               </span>
             </li>
           );
