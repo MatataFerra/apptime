@@ -2,6 +2,8 @@
 
 import { useId, useState } from "react";
 
+import { useTranslations } from "next-intl";
+
 import { currencyForCountry } from "@/services/Employer/currency";
 import {
   parseEmployerText,
@@ -11,20 +13,6 @@ import {
 } from "@/services/Employer/paste";
 
 import Button from "@/components/ui/Button";
-
-export const FIELD_LABELS: Record<PasteField, string> = {
-  name: "Name",
-  taxId: "Tax or business no.",
-  industry: "Industry",
-  address: "Address",
-  city: "City or town",
-  region: "State or region",
-  postcode: "Postcode",
-  country: "Country",
-  contactName: "Person",
-  contactEmail: "Email",
-  contactPhone: "Phone",
-};
 
 /**
  * A box to paste an email signature, payslip header or job ad into. It shows
@@ -40,6 +28,8 @@ function PasteDetails({
 }) {
   const [text, setText] = useState("");
   const id = useId();
+  const t = useTranslations("employers.paste");
+  const tf = useTranslations("employers.fields");
   const { fields, guessed } = parseEmployerText(text);
   // In the form's order, not the order they were found in.
   const found = PASTE_FIELDS.filter((field) => fields[field]).map(
@@ -49,7 +39,7 @@ function PasteDetails({
   return (
     <div className="flex flex-col gap-3">
       <label htmlFor={id} className="flex flex-col gap-1 text-[0.8125rem] text-ink-muted">
-        Paste anything with their details: an email signature, a payslip, the job ad
+        {t("label")}
         <textarea
           id={id}
           rows={5}
@@ -63,7 +53,7 @@ function PasteDetails({
       </label>
 
       {text.trim() && found.length === 0 ? (
-        <p className="text-[0.8125rem] text-ink-muted">Nothing recognised yet.</p>
+        <p className="text-[0.8125rem] text-ink-muted">{t("nothing")}</p>
       ) : null}
 
       {found.length > 0 ? (
@@ -73,14 +63,17 @@ function PasteDetails({
               const replaces = !!current[field]?.trim() && current[field]?.trim() !== value;
               return (
                 <div key={field} className="contents">
-                  <dt className="text-ink-muted">{FIELD_LABELS[field]}</dt>
+                  <dt className="text-ink-muted">{tf(field)}</dt>
                   <dd className="min-w-0 break-words text-ink">
                     {value}
                     {guessed.includes(field) ? (
-                      <span className="text-ink-muted"> · guessed</span>
+                      <span className="text-ink-muted"> · {t("guessed")}</span>
                     ) : null}
                     {replaces ? (
-                      <span className="text-ink-muted"> · replaces “{current[field]}”</span>
+                      <span className="text-ink-muted">
+                        {" "}
+                        · {t("replaces", { value: current[field] ?? "" })}
+                      </span>
                     ) : null}
                   </dd>
                 </div>
@@ -88,7 +81,7 @@ function PasteDetails({
             })}
             {currencyForCountry(fields.country) ? (
               <div className="contents">
-                <dt className="text-ink-muted">Currency</dt>
+                <dt className="text-ink-muted">{t("currency")}</dt>
                 <dd className="text-ink">{currencyForCountry(fields.country)}</dd>
               </div>
             ) : null}
@@ -102,7 +95,7 @@ function PasteDetails({
               setText("");
             }}
           >
-            Fill {found.length} field{found.length === 1 ? "" : "s"}
+            {t("fill", { count: found.length })}
           </Button>
         </>
       ) : null}

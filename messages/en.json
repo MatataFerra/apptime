@@ -18,7 +18,8 @@
     },
     "employers": {
       "title": "Employers",
-      "description": "Where you work and their details"
+      "description": "Where you work and their details",
+      "subtitle": "Where you work, with the details visa and tax forms ask for."
     },
     "dashboard": {
       "title": "Dashboard",
@@ -36,7 +37,8 @@
     },
     "taxes": {
       "title": "Taxes",
-      "description": "Your rates and deductions"
+      "description": "Your rates and deductions",
+      "subtitle": "Your taxes and contributions, and how many shifts use each one."
     },
     "settings": {
       "title": "Settings"
@@ -71,7 +73,22 @@
     "too_many_attempts": "Too many attempts. Please try again in a while.",
     "email_not_sent": "We couldn't send the email. Please try again.",
     "password_invalid": "Password is not valid",
-    "reset_link_invalid": "The link expired or isn't valid. Ask for a new one."
+    "reset_link_invalid": "The link expired or isn't valid. Ask for a new one.",
+    "not_signed_in": "You're not signed in",
+    "not_found": "It doesn't exist anymore",
+    "check_form": "Check the form",
+    "check_name_rate": "Check the name and rate",
+    "invalid_value": "That value isn't valid",
+    "delete_confirmation": "Type the word to confirm",
+    "lookup_min_chars": "Type at least 3 characters",
+    "lookup_unavailable": "The {register} lookup isn't available right now",
+    "lookup_rate_limited": "Too many lookups, try again in a few minutes",
+    "lookup_failed": "The register didn't answer, try again later",
+    "employer_name_required": "Add a name",
+    "employer_email_invalid": "Check the email",
+    "employer_rate_negative": "The rate can't be negative",
+    "employer_currency_invalid": "Pick a currency",
+    "employer_search_again": "Search again"
   },
   "auth": {
     "go_home": "Go back to home",
@@ -504,5 +521,210 @@
       "save_to_apply": "Save changes to apply it.",
       "remove": "Remove"
     }
+  },
+  "admin": {
+    "title": "Admin Page"
+  },
+  "dropdown": {
+    "select": "Select item",
+    "search": "Searching items...",
+    "empty": "No item found"
+  },
+  "settings": {
+    "preferences": {
+      "saved": "Saved",
+      "save_failed": "Couldn't save that",
+      "check_connection": "Check your connection and try again."
+    },
+    "appearance": {
+      "title": "Appearance",
+      "theme": "Theme",
+      "theme_hint": "System follows your phone.",
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark",
+      "language": "Language"
+    },
+    "money": {
+      "title": "Money and defaults",
+      "description": "New shifts start with these. You can change them on each shift.",
+      "currency": "Currency",
+      "currency_hint": "For totals and new shifts.",
+      "hourly_rate": "Hourly rate",
+      "hourly_rate_hint": "Prefills Track, Fast charge and Estimate.",
+      "unpaid_breaks": "Unpaid breaks",
+      "unpaid_breaks_hint": "Minutes per shift, for Fast charge.",
+      "holiday_pay": "Holiday pay",
+      "holiday_pay_hint": "Used by Estimate.",
+      "week_starts": "Week starts on",
+      "monday": "Monday",
+      "sunday": "Sunday",
+      "none": "None"
+    },
+    "details": {
+      "title": "Your details",
+      "save": "Save details",
+      "updating": "Updating settings...",
+      "updated": "Settings updated successfully",
+      "account": "Account",
+      "name": "Name",
+      "name_hint": "Your full name",
+      "about_you": "About you",
+      "city": "City",
+      "city_hint": "Your city",
+      "select_country": "Select your country",
+      "search_country": "Search your country",
+      "no_country": "No country found"
+    },
+    "data": {
+      "title": "Your data",
+      "export": "Export shifts",
+      "export_hint": "A CSV file for Excel or Sheets. Coming with Premium.",
+      "log_out": "Log out",
+      "log_out_hint": "On this device.",
+      "delete_account": "Delete account",
+      "delete_account_hint": "Your account and all your shifts.",
+      "delete": "Delete",
+      "delete_warning": "This deletes your account and every shift. It can't be undone.",
+      "confirm_word": "delete",
+      "type_to_confirm": "Type <strong>{word}</strong> to confirm",
+      "keep": "Keep my account",
+      "deleting": "Deleting…",
+      "delete_forever": "Delete forever",
+      "delete_failed": "Couldn't delete the account"
+    }
+  },
+  "employers": {
+    "fields": {
+      "name": "Name",
+      "taxId": "Tax or business no.",
+      "industry": "Industry",
+      "address": "Address",
+      "city": "City or town",
+      "region": "State or region",
+      "postcode": "Postcode",
+      "country": "Country",
+      "contactName": "Person",
+      "contactEmail": "Email",
+      "contactPhone": "Phone",
+      "notes": "Notes"
+    },
+    "form": {
+      "lookup": "Look up business",
+      "paste": "Paste details",
+      "guessed": "Guessed from the text: check it",
+      "legal_name_note": "Legal name: {name}",
+      "filled_hint": "The highlighted fields were filled in for you. Check them before saving.",
+      "groups": {
+        "business": "Business",
+        "where": "Where",
+        "contact": "Contact",
+        "pay": "Usual pay"
+      },
+      "per_hour": "Per hour",
+      "currency": "Currency",
+      "settings_currency": "{currency} (Settings)",
+      "pay_hint": "Optional. New shifts for this employer will start with it.",
+      "cancel": "Cancel",
+      "saving": "Saving…",
+      "save": "Save",
+      "add": "Add employer"
+    },
+    "paste": {
+      "label": "Paste anything with their details: an email signature, a payslip, the job ad",
+      "nothing": "Nothing recognised yet.",
+      "guessed": "guessed",
+      "replaces": "replaces “{value}”",
+      "currency": "Currency",
+      "fill": "Fill {count, plural, one {# field} other {# fields}}"
+    },
+    "lookup": {
+      "register": "Register",
+      "search": "Search the register",
+      "searching": "Looking it up…",
+      "no_matches": "No businesses with that name",
+      "searches": "Searches the {register}.",
+      "legal_name": "Legal name",
+      "pays_in": "Pays in",
+      "not_active": "not active",
+      "inactive": "This {id} is {status}. Check with the employer before using it on a visa or tax form.",
+      "which_name": "Which name do you know it by?",
+      "use": "Use these details",
+      "registries": {
+        "abr": {
+          "label": "Australia",
+          "id_label": "ABN",
+          "input_label": "ABN or business name"
+        },
+        "nzbn": {
+          "label": "New Zealand",
+          "id_label": "NZBN",
+          "input_label": "NZBN or business name"
+        },
+        "vies": {
+          "label": "EU (VAT)",
+          "id_label": "VAT number",
+          "input_label": "EU VAT number, with the country code"
+        }
+      },
+      "inactive_since": "This {id} is {status} since {since}. Check with the employer before using it on a visa or tax form."
+    },
+    "list": {
+      "title": "My employers",
+      "description": "Where you work and the details forms ask for: tax number, address, contact.",
+      "empty": "None yet. Add the places you work for to keep their details in one place.",
+      "new": "New employer",
+      "add": "Add employer",
+      "shifts": "{count, plural, one {# shift} other {# shifts}}",
+      "contact": "Contact",
+      "usual_pay": "Usual pay",
+      "per_hour": "{amount} / hour",
+      "no_details": "No details yet. Add them when you have them: forms for visas and taxes usually ask for them.",
+      "save_failed": "Couldn't save",
+      "remove_failed": "Couldn't remove it",
+      "add_failed": "Couldn't add it",
+      "remove_question": "Remove <strong>{name}</strong> and its details?",
+      "remove_keeps": "{count, plural, one {Its shift keeps} other {Its # shifts keep}} its name; it just won't be offered for new ones.",
+      "keep": "Keep it",
+      "removing": "Removing…",
+      "remove": "Remove",
+      "edit_label": "Edit {name}",
+      "remove_label": "Remove {name}"
+    }
+  },
+  "taxes": {
+    "my_taxes": "My taxes",
+    "my_contributions": "My contributions",
+    "taxes_description": "The ones you can pick when you save a shift.",
+    "empty": "None yet. Add one when you save a shift and it shows up here.",
+    "fields": {
+      "name": "Name",
+      "rate": "Rate",
+      "note": "Note (optional)"
+    },
+    "scope_question": "{count, plural, one {# shift uses} other {# shifts use}} it. Which ones get the change?",
+    "scope_label": "Apply the change to",
+    "scope_from": "From a date",
+    "scope_all": "All shifts",
+    "shifts_from": "Shifts from",
+    "scope_from_hint": "Earlier shifts keep the current rate. New shifts use the new one.",
+    "scope_all_hint": "Every shift, past ones included, uses the new values. Use this to fix a mistake.",
+    "cancel": "Cancel",
+    "saving": "Saving…",
+    "save": "Save",
+    "save_failed": "Couldn't save",
+    "rate_updated": "Rate updated",
+    "moved": "{count, plural, one {# shift} other {# shifts}} from that date use the new rate.",
+    "remove_failed": "Couldn't remove it",
+    "remove_question": "Remove <strong>{name}</strong>?",
+    "remove_used": "You won't see it when you save new shifts. {count, plural, one {The shift that already has it keeps it} other {The # shifts that already have it keep it}}, so their pay doesn't change.",
+    "remove_unused": "No shift uses it.",
+    "keep": "Keep it",
+    "removing": "Removing…",
+    "remove": "Remove",
+    "used_in": "Used in {count, plural, one {# shift} other {# shifts}}",
+    "not_used": "Not used yet",
+    "edit_label": "Edit {name}",
+    "remove_label": "Remove {name}"
   }
 }

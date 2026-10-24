@@ -18,7 +18,7 @@ function optional(max: number) {
  */
 export const EmployerInputSchema = z
   .object({
-    name: z.string().trim().min(1, "Add a name").max(80),
+    name: z.string().trim().min(1, "employer_name_required").max(80),
     taxId: optional(40),
     address: optional(160),
     city: optional(80),
@@ -29,13 +29,13 @@ export const EmployerInputSchema = z
     contactName: optional(80),
     contactEmail: optional(120).refine(
       (value) => value === null || z.string().email().safeParse(value).success,
-      "Check the email"
+      "employer_email_invalid"
     ),
     contactPhone: optional(40),
     defaultRate: z
       .number()
       .finite()
-      .min(0, "The rate can't be negative")
+      .min(0, "employer_rate_negative")
       .max(100_000)
       .nullish()
       .transform((value) => value ?? null),
@@ -43,7 +43,7 @@ export const EmployerInputSchema = z
       .string()
       .nullish()
       .transform((value) => value || null)
-      .refine((value) => value === null || isCurrency(value), "Pick a currency"),
+      .refine((value) => value === null || isCurrency(value), "employer_currency_invalid"),
     notes: optional(500),
     /**
      * Set by a register lookup, not typed: which register and when. Left out
@@ -59,7 +59,7 @@ export const EmployerInputSchema = z
           .refine((value) => {
             const age = Date.now() - new Date(value).getTime();
             return age > -5 * 60_000 && age < 24 * 60 * 60_000;
-          }, "Search again"),
+          }, "employer_search_again"),
       })
       .strict()
       .optional(),
@@ -73,7 +73,10 @@ export const EmployerInputSchema = z
 export type EmployerInput = z.input<typeof EmployerInputSchema>;
 export type EmployerData = z.output<typeof EmployerInputSchema>;
 
-/** First error per field, for the form. */
+/**
+ * First error per field, for the form. Messages written above are keys under
+ * "errors" in messages/*.json; the form translates them.
+ */
 export function fieldErrors(error: z.ZodError) {
   const errors: Partial<Record<keyof EmployerInput, string>> = {};
   for (const issue of error.issues) {

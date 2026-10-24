@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { SUPPORTED_LOCALES } from "@/utils/constants";
 import { isLocale } from "@/utils/helpers/locale";
@@ -27,6 +27,7 @@ const LANGUAGES: Record<(typeof SUPPORTED_LOCALES)[number], string> = {
 function AppearanceSection() {
   const { config, save } = usePreferences();
   const locale = useLocale();
+  const t = useTranslations("settings.appearance");
   const pathname = usePathname();
   const router = useRouter();
   const [theme, setTheme] = useState<ThemePreference>(() =>
@@ -47,22 +48,22 @@ function AppearanceSection() {
   }
 
   return (
-    <Section title="Appearance">
-      <Row label="Theme" hint="System follows your phone." stacked>
+    <Section title={t("title")}>
+      <Row label={t("theme")} hint={t("theme_hint")} stacked>
         <Segmented
-          label="Theme"
+          label={t("theme")}
           value={theme}
           onChange={onTheme}
           options={[
-            { value: "system", label: "System" },
-            { value: "light", label: "Light" },
-            { value: "dark", label: "Dark" },
+            { value: "system", label: t("system") },
+            { value: "light", label: t("light") },
+            { value: "dark", label: t("dark") },
           ]}
         />
       </Row>
-      <Row label="Language" stacked>
+      <Row label={t("language")} stacked>
         <Segmented
-          label="Language"
+          label={t("language")}
           value={locale}
           onChange={onLanguage}
           options={SUPPORTED_LOCALES.map((l) => ({ value: l, label: LANGUAGES[l] }))}

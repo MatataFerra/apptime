@@ -3,8 +3,10 @@
 import { useId } from "react";
 
 import { ChevronDown } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { CURRENCIES, currencySymbol } from "@/utils/constants/currencies";
+import useCurrencyName from "@/hooks/useCurrencyName";
 import { useCurrency } from "@/hooks/useMoney";
 import usePreferences from "@/hooks/usePreferences";
 
@@ -16,16 +18,15 @@ import Segmented from "./Segmented";
 function MoneySection() {
   const { config, save } = usePreferences();
   const currency = useCurrency();
+  const t = useTranslations("settings.money");
+  const currencyName = useCurrencyName();
   const currencyId = useId();
   const symbol = currencySymbol(currency);
   const weekStartsOn = config?.weekStartsOn === "sunday" ? "sunday" : "monday";
 
   return (
-    <Section
-      title="Money and defaults"
-      description="New shifts start with these. You can change them on each shift."
-    >
-      <Row label="Currency" hint="For totals and new shifts." htmlFor={currencyId}>
+    <Section title={t("title")} description={t("description")}>
+      <Row label={t("currency")} hint={t("currency_hint")} htmlFor={currencyId}>
         <span className="relative shrink-0">
           <select
             id={currencyId}
@@ -35,7 +36,7 @@ function MoneySection() {
           >
             {CURRENCIES.map((c) => (
               <option key={c.code} value={c.code}>
-                {c.code} · {c.label}
+                {c.code} · {currencyName(c.code)}
               </option>
             ))}
           </select>
@@ -46,8 +47,8 @@ function MoneySection() {
         </span>
       </Row>
       <NumberSetting
-        label="Hourly rate"
-        hint="Prefills Track, Fast charge and Estimate."
+        label={t("hourly_rate")}
+        hint={t("hourly_rate_hint")}
         value={config?.hourValue}
         unit={symbol}
         unitPlace="left"
@@ -55,8 +56,8 @@ function MoneySection() {
         onSave={(hourValue) => save({ hourValue })}
       />
       <NumberSetting
-        label="Unpaid breaks"
-        hint="Minutes per shift, for Fast charge."
+        label={t("unpaid_breaks")}
+        hint={t("unpaid_breaks_hint")}
         value={config?.unpaidBreaks}
         unit="min"
         nullable
@@ -64,21 +65,21 @@ function MoneySection() {
         onSave={(unpaidBreaks) => save({ unpaidBreaks })}
       />
       <NumberSetting
-        label="Holiday pay"
-        hint="Used by Estimate."
+        label={t("holiday_pay")}
+        hint={t("holiday_pay_hint")}
         value={config?.holidayPay ?? 8}
         unit="%"
         max={100}
         onSave={(holidayPay) => holidayPay !== null && save({ holidayPay })}
       />
-      <Row label="Week starts on" stacked>
+      <Row label={t("week_starts")} stacked>
         <Segmented
-          label="Week starts on"
+          label={t("week_starts")}
           value={weekStartsOn}
           onChange={(value) => save({ weekStartsOn: value })}
           options={[
-            { value: "monday", label: "Monday" },
-            { value: "sunday", label: "Sunday" },
+            { value: "monday", label: t("monday") },
+            { value: "sunday", label: t("sunday") },
           ]}
         />
       </Row>

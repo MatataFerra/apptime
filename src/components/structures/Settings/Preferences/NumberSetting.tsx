@@ -2,6 +2,8 @@
 
 import { useId, useState } from "react";
 
+import { useTranslations } from "next-intl";
+
 import { Row } from "./Section";
 
 /**
@@ -28,6 +30,7 @@ function NumberSetting({
   onSave: (value: number | null) => void;
 }) {
   const id = useId();
+  const t = useTranslations("settings.money");
   const saved = value === null || value === undefined ? "" : String(value);
   const [draft, setDraft] = useState<string | null>(null);
   const shown = draft ?? saved;
@@ -58,7 +61,7 @@ function NumberSetting({
           min={0}
           max={max}
           step="any"
-          placeholder={nullable ? "None" : undefined}
+          placeholder={nullable ? t("none") : undefined}
           value={shown}
           onChange={(e) => setDraft(e.target.value)}
           onBlur={commit}

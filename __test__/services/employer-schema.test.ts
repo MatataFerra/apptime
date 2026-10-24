@@ -49,10 +49,10 @@ describe("EmployerInputSchema", () => {
     expect(result.success).toBe(false);
     if (result.success) return;
     expect(fieldErrors(result.error)).toEqual({
-      name: "Add a name",
-      contactEmail: "Check the email",
-      defaultRate: "The rate can't be negative",
-      defaultCurrency: "Pick a currency",
+      name: "employer_name_required",
+      contactEmail: "employer_email_invalid",
+      defaultRate: "employer_rate_negative",
+      defaultCurrency: "employer_currency_invalid",
     });
   });
 

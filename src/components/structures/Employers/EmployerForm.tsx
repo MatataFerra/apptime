@@ -3,6 +3,7 @@
 import { type ReactNode, useId, useState } from "react";
 
 import { ClipboardPaste, Database, Search } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { currencyForCountry } from "@/services/Employer/currency";
 import type { PastedEmployer, PasteField } from "@/services/Employer/paste";
@@ -19,6 +20,7 @@ import Button from "@/components/ui/Button";
 
 import { CURRENCIES, currencySymbol } from "@/utils/constants/currencies";
 import { cn } from "@/utils/helpers/styleMerger";
+import useErrorMessage from "@/hooks/useErrorMessage";
 import { useCurrency } from "@/hooks/useMoney";
 
 type Errors = Partial<Record<keyof EmployerInput, string>>;
@@ -110,6 +112,9 @@ function EmployerForm({
   onSave: (data: EmployerInput) => void;
 }) {
   const settingsCurrency = useCurrency();
+  const t = useTranslations("employers.form");
+  const tf = useTranslations("employers.fields");
+  const errorMessage = useErrorMessage();
   const [text, setText] = useState(() => initialText(employer));
   const [rate, setRate] = useState(
     employer?.defaultRate != null ? String(employer.defaultRate) : ""
@@ -149,13 +154,10 @@ function EmployerForm({
     setGuessed((current) => new Set([...current].filter((f) => f !== name)));
   }
 
-  function field(
-    name: TextField,
-    label: string,
-    props: { type?: string; inputMode?: "email" | "tel" } = {}
-  ) {
+  function field(name: TextField, props: { type?: string; inputMode?: "email" | "tel" } = {}) {
     const id = `${baseId}-${name}`;
-    const error = shown[name];
+    const label = tf(name);
+    const error = shown[name] ? errorMessage(shown[name]) : undefined;
     const guess = guessed.has(name) && !error;
     // Hint and error sit outside the label so they don't become the field's name.
     const describedBy = error ? `${id}-error` : guess ? `${id}-hint` : undefined;
@@ -178,7 +180,7 @@ function EmployerForm({
         />
         {guess ? (
           <span id={`${id}-hint`} className="text-[0.75rem] text-ink-muted">
-            Guessed from the text: check it
+            {t("guessed")}
           </span>
         ) : null}
         {error ? (
@@ -224,14 +226,14 @@ function EmployerForm({
             icon={<Search className="size-4" aria-hidden="true" />}
             onClick={() => setHelper((h) => (h === "lookup" ? null : "lookup"))}
           >
-            Look up business
+            {t("lookup")}
           </HelperTab>
           <HelperTab
             active={helper === "paste"}
             icon={<ClipboardPaste className="size-4" aria-hidden="true" />}
             onClick={() => setHelper((h) => (h === "paste" ? null : "paste"))}
           >
-            Paste details
+            {t("paste")}
           </HelperTab>
         </div>
 
@@ -249,7 +251,7 @@ function EmployerForm({
                     ? current
                     : {
                         ...current,
-                        notes: [current.notes.trim(), `Legal name: ${legalName}`]
+                        notes: [current.notes.trim(), t("legal_name_note", { name: legalName })]
                           .filter(Boolean)
                           .join("\n"),
                       }
@@ -272,43 +274,43 @@ function EmployerForm({
 
         {(filled.size > 0 || currencyFilled) && !helper ? (
           <p className="rounded-xl bg-accent-soft/40 px-3 py-2 text-[0.8125rem] text-ink">
-            The highlighted fields were filled in for you. Check them before saving.
+            {t("filled_hint")}
           </p>
         ) : null}
       </div>
 
-      <Group title="Business">
-        {field("name", "Name")}
+      <Group title={t("groups.business")}>
+        {field("name")}
         <div className="grid grid-cols-2 gap-2">
-          {field("taxId", "Tax or business no.")}
-          {field("industry", "Industry")}
+          {field("taxId")}
+          {field("industry")}
         </div>
       </Group>
 
-      <Group title="Where">
-        {field("address", "Address")}
+      <Group title={t("groups.where")}>
+        {field("address")}
         <div className="grid grid-cols-[1fr_7rem] gap-2">
-          {field("city", "City or town")}
-          {field("postcode", "Postcode")}
+          {field("city")}
+          {field("postcode")}
         </div>
         <div className="grid grid-cols-2 gap-2">
-          {field("region", "State or region")}
-          {field("country", "Country")}
+          {field("region")}
+          {field("country")}
         </div>
       </Group>
 
-      <Group title="Contact">
-        {field("contactName", "Person")}
+      <Group title={t("groups.contact")}>
+        {field("contactName")}
         <div className="grid grid-cols-2 gap-2">
-          {field("contactEmail", "Email", { type: "email", inputMode: "email" })}
-          {field("contactPhone", "Phone", { type: "tel", inputMode: "tel" })}
+          {field("contactEmail", { type: "email", inputMode: "email" })}
+          {field("contactPhone", { type: "tel", inputMode: "tel" })}
         </div>
       </Group>
 
-      <Group title="Usual pay">
+      <Group title={t("groups.pay")}>
         <div className="grid grid-cols-[1fr_8rem] gap-2">
           <label htmlFor={rateId} className="flex flex-col gap-1 text-[0.8125rem] text-ink-muted">
-            Per hour
+            {t("per_hour")}
             <span className="flex h-11 items-center gap-1 rounded-xl border border-border-strong bg-surface px-3 focus-within:border-accent">
               <span className="text-sm text-ink-muted">
                 {currencySymbol(currency || settingsCurrency)}
@@ -326,14 +328,16 @@ function EmployerForm({
               />
             </span>
             {shown.defaultRate ? (
-              <span className="text-[0.8125rem] text-destructive">{shown.defaultRate}</span>
+              <span className="text-[0.8125rem] text-destructive">
+                {errorMessage(shown.defaultRate)}
+              </span>
             ) : null}
           </label>
           <label
             htmlFor={currencyId}
             className="flex flex-col gap-1 text-[0.8125rem] text-ink-muted"
           >
-            Currency
+            {t("currency")}
             <select
               id={currencyId}
               value={currency}
@@ -343,7 +347,7 @@ function EmployerForm({
               }}
               className={cn(FIELD, currencyFilled && "border-accent bg-accent-soft/40")}
             >
-              <option value="">{settingsCurrency} (Settings)</option>
+              <option value="">{t("settings_currency", { currency: settingsCurrency })}</option>
               {CURRENCIES.map((c) => (
                 <option key={c.code} value={c.code}>
                   {c.code}
@@ -352,13 +356,11 @@ function EmployerForm({
             </select>
           </label>
         </div>
-        <p className="text-[0.8125rem] text-ink-subtle">
-          Optional. New shifts for this employer will start with it.
-        </p>
+        <p className="text-[0.8125rem] text-ink-subtle">{t("pay_hint")}</p>
       </Group>
 
       <label htmlFor={notesId} className="flex flex-col gap-1 text-[0.8125rem] text-ink-muted">
-        Notes
+        {tf("notes")}
         <textarea
           id={notesId}
           rows={3}
@@ -371,10 +373,10 @@ function EmployerForm({
 
       <div className="grid grid-cols-2 gap-2">
         <Button type="button" variant="ghost" size="md" classes="w-full" onClick={onCancel}>
-          Cancel
+          {t("cancel")}
         </Button>
         <Button type="submit" size="md" classes="w-full" disabled={busy}>
-          {busy ? "Saving…" : employer ? "Save" : "Add employer"}
+          {busy ? t("saving") : employer ? t("save") : t("add")}
         </Button>
       </div>
     </form>

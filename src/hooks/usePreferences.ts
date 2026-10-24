@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import Toast from "@/services/Toast";
 
@@ -18,6 +19,7 @@ import onUpdatePreferences, { type PreferencesPatch } from "@/server-actions/upd
  * change is rolled back if it fails.
  */
 function usePreferences() {
+  const t = useTranslations("settings.preferences");
   const queryClient = useQueryClient();
   const { data: user } = useUser();
   const key = [USE_QUERY_KEYS.USER, user?.email];
@@ -40,13 +42,13 @@ function usePreferences() {
       queryClient.setQueryData(key, previous);
       Toast({
         type: "error",
-        message: "Couldn't save that",
-        description: "Check your connection and try again.",
+        message: t("save_failed"),
+        description: t("check_connection"),
       });
       return false;
     }
     // Settings save on their own (no Save button), so say it happened.
-    if (!silent) Toast({ type: "success", message: "Saved", duration: 1200 });
+    if (!silent) Toast({ type: "success", message: t("saved"), duration: 1200 });
     return true;
   }
 

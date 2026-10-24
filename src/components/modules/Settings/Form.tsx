@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 
 import { useQueryClient } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 
 import Toast from "@/services/Toast";
 
@@ -33,6 +34,7 @@ const Personal = dynamic(() => import("@/components/modules/Settings/Personal"),
 
 function Form() {
   const queryClient = useQueryClient();
+  const t = useTranslations("settings.details");
   const { user: sessionUser } = useAuthSession();
   const email = sessionUser?.email;
   const { values } = useSettings();
@@ -50,14 +52,14 @@ function Form() {
   useEffect(() => {
     if (isSubmitting) {
       Toast({
-        message: "Updating settings...",
+        message: t("updating"),
         type: "loading",
       });
     }
 
     if (isSubmitted) {
       Toast({
-        message: "Settings updated successfully",
+        message: t("updated"),
         type: "success",
       });
     }
@@ -92,6 +94,7 @@ function Form() {
       });
     }
   }, [
+    t,
     isSubmitted,
     isSubmitting,
     isSubmitSuccessful,

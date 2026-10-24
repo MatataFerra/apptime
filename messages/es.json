@@ -18,7 +18,8 @@
     },
     "employers": {
       "title": "Empleadores",
-      "description": "Dónde trabajas y sus datos"
+      "description": "Dónde trabajas y sus datos",
+      "subtitle": "Dónde trabajas, con los datos que piden los formularios de visa e impuestos."
     },
     "dashboard": {
       "title": "Panel",
@@ -36,7 +37,8 @@
     },
     "taxes": {
       "title": "Impuestos",
-      "description": "Tus tasas y deducciones"
+      "description": "Tus tasas y deducciones",
+      "subtitle": "Tus impuestos y contribuciones, y cuántos turnos usan cada uno."
     },
     "settings": {
       "title": "Ajustes"
@@ -71,7 +73,22 @@
     "too_many_attempts": "Demasiados intentos. Intenta de nuevo en un rato.",
     "email_not_sent": "No pudimos enviar el email. Intenta de nuevo.",
     "password_invalid": "La contraseña no es válida",
-    "reset_link_invalid": "El enlace venció o no es válido. Pide uno nuevo."
+    "reset_link_invalid": "El enlace venció o no es válido. Pide uno nuevo.",
+    "not_signed_in": "No iniciaste sesión",
+    "not_found": "Ya no existe",
+    "check_form": "Revisa el formulario",
+    "check_name_rate": "Revisa el nombre y la tasa",
+    "invalid_value": "Ese valor no es válido",
+    "delete_confirmation": "Escribe la palabra para confirmar",
+    "lookup_min_chars": "Escribe al menos 3 caracteres",
+    "lookup_unavailable": "La búsqueda en {register} no está disponible ahora",
+    "lookup_rate_limited": "Demasiadas búsquedas, intenta en unos minutos",
+    "lookup_failed": "El registro no respondió, intenta más tarde",
+    "employer_name_required": "Agrega un nombre",
+    "employer_email_invalid": "Revisa el email",
+    "employer_rate_negative": "La tarifa no puede ser negativa",
+    "employer_currency_invalid": "Elige una moneda",
+    "employer_search_again": "Busca de nuevo"
   },
   "auth": {
     "go_home": "Volver al inicio",
@@ -504,5 +521,210 @@
       "save_to_apply": "Guarda los cambios para aplicarlo.",
       "remove": "Quitar"
     }
+  },
+  "admin": {
+    "title": "Página de administración"
+  },
+  "dropdown": {
+    "select": "Elegir",
+    "search": "Buscar...",
+    "empty": "Sin resultados"
+  },
+  "settings": {
+    "preferences": {
+      "saved": "Guardado",
+      "save_failed": "No se pudo guardar",
+      "check_connection": "Revisa tu conexión e intenta de nuevo."
+    },
+    "appearance": {
+      "title": "Apariencia",
+      "theme": "Tema",
+      "theme_hint": "Sistema sigue a tu teléfono.",
+      "system": "Sistema",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "language": "Idioma"
+    },
+    "money": {
+      "title": "Dinero y valores por defecto",
+      "description": "Los turnos nuevos empiezan con estos valores. Puedes cambiarlos en cada turno.",
+      "currency": "Moneda",
+      "currency_hint": "Para los totales y los turnos nuevos.",
+      "hourly_rate": "Pago por hora",
+      "hourly_rate_hint": "Se completa en Turno en vivo, Carga rápida y Estimar.",
+      "unpaid_breaks": "Descansos no pagos",
+      "unpaid_breaks_hint": "Minutos por turno, para Carga rápida.",
+      "holiday_pay": "Pago de vacaciones",
+      "holiday_pay_hint": "Lo usa Estimar.",
+      "week_starts": "La semana empieza el",
+      "monday": "Lunes",
+      "sunday": "Domingo",
+      "none": "Ninguno"
+    },
+    "details": {
+      "title": "Tus datos",
+      "save": "Guardar datos",
+      "updating": "Actualizando ajustes...",
+      "updated": "Ajustes actualizados",
+      "account": "Cuenta",
+      "name": "Nombre",
+      "name_hint": "Tu nombre completo",
+      "about_you": "Sobre ti",
+      "city": "Ciudad",
+      "city_hint": "Tu ciudad",
+      "select_country": "Elige tu país",
+      "search_country": "Busca tu país",
+      "no_country": "No se encontró el país"
+    },
+    "data": {
+      "title": "Tus datos guardados",
+      "export": "Exportar turnos",
+      "export_hint": "Un archivo CSV para Excel o Sheets. Llega con Premium.",
+      "log_out": "Cerrar sesión",
+      "log_out_hint": "En este dispositivo.",
+      "delete_account": "Borrar cuenta",
+      "delete_account_hint": "Tu cuenta y todos tus turnos.",
+      "delete": "Borrar",
+      "delete_warning": "Esto borra tu cuenta y todos los turnos. No se puede deshacer.",
+      "confirm_word": "borrar",
+      "type_to_confirm": "Escribe <strong>{word}</strong> para confirmar",
+      "keep": "Conservar mi cuenta",
+      "deleting": "Borrando…",
+      "delete_forever": "Borrar para siempre",
+      "delete_failed": "No se pudo borrar la cuenta"
+    }
+  },
+  "employers": {
+    "fields": {
+      "name": "Nombre",
+      "taxId": "N.º fiscal o de empresa",
+      "industry": "Rubro",
+      "address": "Dirección",
+      "city": "Ciudad o pueblo",
+      "region": "Estado o región",
+      "postcode": "Código postal",
+      "country": "País",
+      "contactName": "Persona",
+      "contactEmail": "Email",
+      "contactPhone": "Teléfono",
+      "notes": "Notas"
+    },
+    "form": {
+      "lookup": "Buscar empresa",
+      "paste": "Pegar datos",
+      "guessed": "Deducido del texto: revísalo",
+      "legal_name_note": "Razón social: {name}",
+      "filled_hint": "Los campos resaltados se completaron solos. Revísalos antes de guardar.",
+      "groups": {
+        "business": "Empresa",
+        "where": "Dónde",
+        "contact": "Contacto",
+        "pay": "Pago habitual"
+      },
+      "per_hour": "Por hora",
+      "currency": "Moneda",
+      "settings_currency": "{currency} (Ajustes)",
+      "pay_hint": "Opcional. Los turnos nuevos con este empleador empiezan con este valor.",
+      "cancel": "Cancelar",
+      "saving": "Guardando…",
+      "save": "Guardar",
+      "add": "Agregar empleador"
+    },
+    "paste": {
+      "label": "Pega cualquier texto con sus datos: una firma de email, un recibo de sueldo, el aviso de trabajo",
+      "nothing": "Todavía no se reconoció nada.",
+      "guessed": "deducido",
+      "replaces": "reemplaza “{value}”",
+      "currency": "Moneda",
+      "fill": "Completar {count, plural, one {# campo} other {# campos}}"
+    },
+    "lookup": {
+      "register": "Registro",
+      "search": "Buscar en el registro",
+      "searching": "Buscando…",
+      "no_matches": "No hay empresas con ese nombre",
+      "searches": "Busca en el {register}.",
+      "legal_name": "Razón social",
+      "pays_in": "Paga en",
+      "not_active": "inactivo",
+      "inactive": "Este {id} figura como {status}. Confírmalo con el empleador antes de usarlo en un formulario de visa o impuestos.",
+      "which_name": "¿Con qué nombre la conoces?",
+      "use": "Usar estos datos",
+      "registries": {
+        "abr": {
+          "label": "Australia",
+          "id_label": "ABN",
+          "input_label": "ABN o nombre de la empresa"
+        },
+        "nzbn": {
+          "label": "Nueva Zelanda",
+          "id_label": "NZBN",
+          "input_label": "NZBN o nombre de la empresa"
+        },
+        "vies": {
+          "label": "UE (IVA)",
+          "id_label": "Número de IVA",
+          "input_label": "Número de IVA de la UE, con el código de país"
+        }
+      },
+      "inactive_since": "Este {id} figura como {status} desde {since}. Confírmalo con el empleador antes de usarlo en un formulario de visa o impuestos."
+    },
+    "list": {
+      "title": "Mis empleadores",
+      "description": "Dónde trabajas y los datos que piden los formularios: número fiscal, dirección, contacto.",
+      "empty": "Todavía ninguno. Agrega los lugares donde trabajas para tener sus datos en un solo lugar.",
+      "new": "Nuevo empleador",
+      "add": "Agregar empleador",
+      "shifts": "{count, plural, one {# turno} other {# turnos}}",
+      "contact": "Contacto",
+      "usual_pay": "Pago habitual",
+      "per_hour": "{amount} / hora",
+      "no_details": "Todavía no hay datos. Agrégalos cuando los tengas: los formularios de visa e impuestos suelen pedirlos.",
+      "save_failed": "No se pudo guardar",
+      "remove_failed": "No se pudo quitar",
+      "add_failed": "No se pudo agregar",
+      "remove_question": "¿Quitar <strong>{name}</strong> y sus datos?",
+      "remove_keeps": "{count, plural, one {Su turno conserva} other {Sus # turnos conservan}} el nombre; solo deja de ofrecerse para turnos nuevos.",
+      "keep": "Conservarlo",
+      "removing": "Quitando…",
+      "remove": "Quitar",
+      "edit_label": "Editar {name}",
+      "remove_label": "Quitar {name}"
+    }
+  },
+  "taxes": {
+    "my_taxes": "Mis impuestos",
+    "my_contributions": "Mis contribuciones",
+    "taxes_description": "Los que puedes elegir al guardar un turno.",
+    "empty": "Todavía ninguno. Agrega uno al guardar un turno y aparecerá aquí.",
+    "fields": {
+      "name": "Nombre",
+      "rate": "Tasa",
+      "note": "Nota (opcional)"
+    },
+    "scope_question": "{count, plural, one {# turno lo usa} other {# turnos lo usan}}. ¿Cuáles reciben el cambio?",
+    "scope_label": "Aplicar el cambio a",
+    "scope_from": "Desde una fecha",
+    "scope_all": "Todos los turnos",
+    "shifts_from": "Turnos desde",
+    "scope_from_hint": "Los turnos anteriores conservan la tasa actual. Los nuevos usan la nueva.",
+    "scope_all_hint": "Todos los turnos, también los pasados, usan los valores nuevos. Úsalo para corregir un error.",
+    "cancel": "Cancelar",
+    "saving": "Guardando…",
+    "save": "Guardar",
+    "save_failed": "No se pudo guardar",
+    "rate_updated": "Tasa actualizada",
+    "moved": "{count, plural, one {# turno} other {# turnos}} desde esa fecha usan la tasa nueva.",
+    "remove_failed": "No se pudo quitar",
+    "remove_question": "¿Quitar <strong>{name}</strong>?",
+    "remove_used": "No lo verás al guardar turnos nuevos. {count, plural, one {El turno que ya lo tiene lo conserva} other {Los # turnos que ya lo tienen lo conservan}}, así que su pago no cambia.",
+    "remove_unused": "Ningún turno lo usa.",
+    "keep": "Conservarlo",
+    "removing": "Quitando…",
+    "remove": "Quitar",
+    "used_in": "Usado en {count, plural, one {# turno} other {# turnos}}",
+    "not_used": "Todavía sin usar",
+    "edit_label": "Editar {name}",
+    "remove_label": "Quitar {name}"
   }
 }

@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import type { EmployerInput } from "@/services/Employer/schema";
 import { attribution, isRegistryId } from "@/services/Registry/registries";
@@ -19,6 +20,7 @@ import Skeleton from "@/components/ui/Skeleton";
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import { cn } from "@/utils/helpers/styleMerger";
 import useEmployers from "@/hooks/useEmployers";
+import useErrorMessage from "@/hooks/useErrorMessage";
 import useMoney from "@/hooks/useMoney";
 
 import { onCreateEmployer, onRemoveEmployer, onUpdateEmployer } from "@/server-actions/employers";
@@ -26,20 +28,21 @@ import { onCreateEmployer, onRemoveEmployer, onUpdateEmployer } from "@/server-a
 type FieldErrors = Partial<Record<keyof EmployerInput, string>>;
 
 /** "Farming · Bundaberg, Australia · 12 shifts" */
-function summary(employer: SavedEmployer) {
+function summary(employer: SavedEmployer, shiftsLabel: (count: number) => string) {
   const place = [employer.city, employer.country].filter(Boolean).join(", ");
-  const shifts =
-    employer.shifts > 0 ? `${employer.shifts} shift${employer.shifts === 1 ? "" : "s"}` : null;
+  const shifts = employer.shifts > 0 ? shiftsLabel(employer.shifts) : null;
   return [employer.industry, place, shifts].filter(Boolean).join(" · ");
 }
 
 /** The saved details, label and value, skipping empty ones. */
 function Details({ employer }: { employer: SavedEmployer }) {
   const money = useMoney(employer.defaultCurrency);
+  const t = useTranslations("employers.list");
+  const tf = useTranslations("employers.fields");
   const rows: [string, string | null][] = [
-    ["Tax or business no.", employer.taxId],
+    [tf("taxId"), employer.taxId],
     [
-      "Address",
+      tf("address"),
       [
         employer.address,
         [employer.city, employer.region, employer.postcode].filter(Boolean).join(" "),
@@ -48,16 +51,16 @@ function Details({ employer }: { employer: SavedEmployer }) {
         .filter(Boolean)
         .join(", ") || null,
     ],
-    ["Contact", employer.contactName],
-    ["Email", employer.contactEmail],
-    ["Phone", employer.contactPhone],
+    [t("contact"), employer.contactName],
+    [tf("contactEmail"), employer.contactEmail],
+    [tf("contactPhone"), employer.contactPhone],
     [
-      "Usual pay",
+      t("usual_pay"),
       employer.defaultRate != null
-        ? `${money(employer.defaultRate, { cents: true })} / hour`
+        ? t("per_hour", { amount: money(employer.defaultRate, { cents: true }) })
         : null,
     ],
-    ["Notes", employer.notes],
+    [tf("notes"), employer.notes],
   ];
   const filled = rows.filter((row): row is [string, string] => !!row[1]);
   const source =
@@ -66,11 +69,7 @@ function Details({ employer }: { employer: SavedEmployer }) {
       : null;
 
   if (filled.length === 0) {
-    return (
-      <p className="px-4 pb-4 text-[0.8125rem] text-ink-muted">
-        No details yet. Add them when you have them: forms for visas and taxes usually ask for them.
-      </p>
-    );
+    return <p className="px-4 pb-4 text-[0.8125rem] text-ink-muted">{t("no_details")}</p>;
   }
 
   return (
@@ -99,7 +98,9 @@ function EmployerRow({
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [fields, setFields] = useState<FieldErrors>();
-  const meta = summary(employer);
+  const t = useTranslations("employers.list");
+  const errorMessage = useErrorMessage();
+  const meta = summary(employer, (count) => t("shifts", { count }));
   const detailsId = `employer-${employer.id}-details`;
 
   async function save(data: EmployerInput) {
@@ -108,7 +109,7 @@ function EmployerRow({
     setBusy(false);
     if (!result?.ok) {
       if (result && "fields" in result) setFields(result.fields);
-      Toast({ type: "error", message: "Couldn't save", description: result?.error });
+      Toast({ type: "error", message: t("save_failed"), description: errorMessage(result?.error) });
       return;
     }
     await onChanged();
@@ -120,7 +121,11 @@ function EmployerRow({
     const result = await onRemoveEmployer(employer.id).catch(() => null);
     setBusy(false);
     if (!result?.ok) {
-      Toast({ type: "error", message: "Couldn't remove it", description: result?.error });
+      Toast({
+        type: "error",
+        message: t("remove_failed"),
+        description: errorMessage(result?.error),
+      });
       return;
     }
     await onChanged();
@@ -142,12 +147,14 @@ function EmployerRow({
     return (
       <div className="flex flex-col gap-3 px-4 py-4">
         <p className="text-[0.9375rem] text-ink">
-          Remove <span className="font-semibold">{employer.name}</span> and its details?
+          {t.rich("remove_question", {
+            name: employer.name,
+            strong: (chunks) => <span className="font-semibold">{chunks}</span>,
+          })}
         </p>
         {employer.shifts > 0 ? (
           <p className="text-[0.8125rem] text-ink-muted">
-            {employer.shifts === 1 ? "Its shift keeps" : `Its ${employer.shifts} shifts keep`} its
-            name; it just won&apos;t be offered for new ones.
+            {t("remove_keeps", { count: employer.shifts })}
           </p>
         ) : null}
         <div className="grid grid-cols-2 gap-2">
@@ -158,7 +165,7 @@ function EmployerRow({
             classes="w-full"
             onClick={() => setMode("view")}
           >
-            Keep it
+            {t("keep")}
           </Button>
           <Button
             type="button"
@@ -168,7 +175,7 @@ function EmployerRow({
             disabled={busy}
             onClick={remove}
           >
-            {busy ? "Removing…" : "Remove"}
+            {busy ? t("removing") : t("remove")}
           </Button>
         </div>
       </div>
@@ -199,7 +206,7 @@ function EmployerRow({
         </button>
         <button
           type="button"
-          aria-label={`Edit ${employer.name}`}
+          aria-label={t("edit_label", { name: employer.name })}
           onClick={() => {
             setFields(undefined);
             setMode("edit");
@@ -210,7 +217,7 @@ function EmployerRow({
         </button>
         <button
           type="button"
-          aria-label={`Remove ${employer.name}`}
+          aria-label={t("remove_label", { name: employer.name })}
           onClick={() => setMode("remove")}
           className="flex size-10 shrink-0 items-center justify-center rounded-xl text-ink-muted transition-colors hover:bg-destructive-soft hover:text-destructive"
         >
@@ -233,6 +240,8 @@ function EmployerList() {
   const [adding, setAdding] = useState(false);
   const [busy, setBusy] = useState(false);
   const [fields, setFields] = useState<FieldErrors>();
+  const t = useTranslations("employers.list");
+  const errorMessage = useErrorMessage();
 
   async function refresh() {
     await queryClient.invalidateQueries({ queryKey: [USE_QUERY_KEYS.EMPLOYERS] });
@@ -244,7 +253,7 @@ function EmployerList() {
     setBusy(false);
     if (!result?.ok) {
       if (result && "fields" in result) setFields(result.fields);
-      Toast({ type: "error", message: "Couldn't add it", description: result?.error });
+      Toast({ type: "error", message: t("add_failed"), description: errorMessage(result?.error) });
       return;
     }
     await refresh();
@@ -256,7 +265,7 @@ function EmployerList() {
   return (
     <>
       {adding ? (
-        <Section title="New employer">
+        <Section title={t("new")}>
           <EmployerForm
             busy={busy}
             serverErrors={fields}
@@ -275,18 +284,13 @@ function EmployerList() {
           }}
         >
           <Plus className="size-4" aria-hidden="true" />
-          Add employer
+          {t("add")}
         </Button>
       )}
 
-      <Section
-        title="My employers"
-        description="Where you work and the details forms ask for: tax number, address, contact."
-      >
+      <Section title={t("title")} description={t("description")}>
         {employers.length === 0 ? (
-          <p className="px-4 py-4 text-[0.9375rem] text-ink-muted">
-            None yet. Add the places you work for to keep their details in one place.
-          </p>
+          <p className="px-4 py-4 text-[0.9375rem] text-ink-muted">{t("empty")}</p>
         ) : (
           employers.map((employer) => (
             <EmployerRow key={employer.id} employer={employer} onChanged={refresh} />

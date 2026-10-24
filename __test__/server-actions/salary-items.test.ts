@@ -51,7 +51,7 @@ describe("onUpdateSalaryItem", () => {
   test("someone else's tax is not found", async () => {
     db.tax.findFirst.mockResolvedValueOnce(null);
     const result = await onUpdateSalaryItem(edit);
-    expect(result).toEqual({ ok: false, error: "Not found" });
+    expect(result).toEqual({ ok: false, error: "not_found" });
     expect(db.tax.findFirst).toHaveBeenCalledWith({ where: { id: 1, userId: "u1" } });
     expect(db.tax.update).not.toHaveBeenCalled();
   });
