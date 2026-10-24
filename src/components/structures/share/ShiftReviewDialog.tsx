@@ -38,6 +38,8 @@ type Props = {
   rows: ReviewRow[];
   /** Short tags like "Public holiday" shown above the rows. */
   tags?: string[];
+  /** Text of the save button; "Save shift" by default. */
+  saveLabel?: string;
 };
 
 /**
@@ -55,6 +57,7 @@ function ShiftReviewDialog({
   taxes,
   rows,
   tags = [],
+  saveLabel,
   children,
 }: PropsWithChildren<Props>) {
   const format$ = useMoney();
@@ -159,7 +162,7 @@ function ShiftReviewDialog({
             form={formId}
             classes={cn("w-full text-on-module hover:opacity-90", colors.strong)}
           >
-            {t("save")}
+            {saveLabel ?? t("save")}
           </Button>
         </DialogFooter>
       </DialogContent>

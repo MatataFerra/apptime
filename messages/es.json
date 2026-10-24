@@ -218,6 +218,30 @@
     "kind": {
       "hourly": "Por hora",
       "production": "Por pieza"
+    },
+    "batch": {
+      "mode_single": "Un turno",
+      "mode_batch": "Varios días",
+      "first_start": "Inicio del primer turno",
+      "first_finish": "Fin del primer turno",
+      "night_hint": "¿Termina al día siguiente? Se repite como turno nocturno.",
+      "until": "Repetir hasta",
+      "weekdays": "Estos días",
+      "preview": "{count} de {total} turnos",
+      "shifts": "Turnos",
+      "overlap": "Ya cargado",
+      "overlap_hint": "{count, plural, one {# día se superpone con un turno ya cargado y no se guardará.} other {# días se superponen con turnos ya cargados y no se guardarán.}}",
+      "review_button": "{count, plural, =0 {Elige algunos días} one {Revisar # turno} other {Revisar # turnos}}",
+      "save": "{count, plural, one {Guardar # turno} other {Guardar # turnos}}",
+      "created": "{count, plural, =0 {No se guardó ningún turno} one {# turno guardado} other {# turnos guardados}}",
+      "skipped": "{count, plural, one {# día omitido: se superpone con un turno guardado.} other {# días omitidos: se superponen con turnos guardados.}}",
+      "errors": {
+        "finish_before_start": "El fin debe ser posterior al inicio",
+        "too_long": "Un turno no puede durar más de 24 horas",
+        "until_before_start": "Elige una fecha igual o posterior al primer turno",
+        "range_too_long": "Hasta {max} días por vez",
+        "no_weekdays": "Elige al menos un día de la semana"
+      }
     }
   },
   "home": {
