@@ -7,6 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { format, isBefore } from "date-fns";
 import isEqual from "lodash/isEqual";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import Toast from "@/services/Toast";
 import ut from "@/services/Utilities/client";
@@ -61,6 +62,8 @@ function TableDialogEditProduction({ shift, user }: Props) {
     defaultValue: shift.publicHolidayWorked,
   });
   const router = useRouter();
+  const t = useTranslations("dashboard.edit");
+  const ts = useTranslations("shift");
   const queryClient = useQueryClient();
   const { setStep } = useTableStore((state) => state);
   const [employerId, setEmployerId] = useState(shift.employerId ?? null);
@@ -95,7 +98,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
     if (isShiftEqual && taxesToDelete.length <= 0 && rateChanges.length <= 0) {
       Toast({
         type: "error",
-        message: "No changes were made.",
+        message: t("no_changes"),
         duration: 1000,
       });
 
@@ -104,12 +107,12 @@ function TableDialogEditProduction({ shift, user }: Props) {
 
     if (isBefore(new Date(endDate), new Date(startDate))) {
       setError("endDate", {
-        message: "Finish date must be after start date",
+        message: ts("errors.finish_before_start"),
       });
 
       Toast({
         type: "error",
-        message: "Please check the dates and try again.",
+        message: t("check_dates"),
         duration: 1000,
       });
 
@@ -119,7 +122,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
     onEditShift(shiftUpdated, taxesToDelete, rateChanges).then(async (res) => {
       Toast({
         type: "loading",
-        message: "Shift is being updated",
+        message: t("updating"),
         duration: Infinity,
       });
 
@@ -128,7 +131,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
       if (res) {
         Toast({
           type: "success",
-          message: "Shift updated successfully!",
+          message: t("updated"),
           duration: 2000,
         });
 
@@ -144,7 +147,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
       } else {
         Toast({
           type: "error",
-          message: "Error updating shift, please reload the page and try again.",
+          message: t("update_failed"),
           duration: 2000,
         });
       }
@@ -153,15 +156,19 @@ function TableDialogEditProduction({ shift, user }: Props) {
 
   return (
     <form className="flex w-full flex-col gap-4" onSubmit={handleSubmit(onHandleEdit)}>
-      <Input type="text" label="Job name" {...register("name", { value: shift?.name ?? "" })} />
+      <Input
+        type="text"
+        label={ts("fields.job")}
+        {...register("name", { value: shift?.name ?? "" })}
+      />
       <Input
         type="datetime-local"
-        label="Start"
+        label={ts("fields.start")}
         {...register("startDate", { value: format(shift.startDate, "yyyy-MM-dd'T'HH:mm") })}
       />
       <Input
         type="datetime-local"
-        label="Finish"
+        label={ts("fields.finish")}
         isError={!!errors["endDate"]}
         description={errors["endDate"]?.message}
         {...register("endDate", {
@@ -170,7 +177,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
       />
       <Input
         type="number"
-        label="Pay per piece"
+        label={ts("fields.item_value")}
         step={"any"}
         placeholder={shift?.itemValue?.toString()}
         {...register("itemValue", {
@@ -179,7 +186,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
       />
       <Input
         type="number"
-        label="Pieces"
+        label={ts("fields.pieces")}
         placeholder={shift?.itemQuantity?.toString()}
         {...register("itemQuantity", {
           value: shift.itemQuantity ?? 0,
@@ -210,7 +217,7 @@ function TableDialogEditProduction({ shift, user }: Props) {
       />
       {shift.taxes?.length ? (
         <div className="flex w-full flex-col gap-2">
-          <h3 className="text-sm font-medium text-ink">Taxes</h3>
+          <h3 className="text-sm font-medium text-ink">{ts("review.taxes")}</h3>
           <Taxes shift={shift} />
         </div>
       ) : null}

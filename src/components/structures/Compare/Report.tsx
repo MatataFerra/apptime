@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 
 import { RotateCcw } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { buttonVariants } from "@/components/ui/Button";
 
@@ -11,12 +12,6 @@ import useMoney from "@/hooks/useMoney";
 
 import { compareWages } from "./compareWages";
 import { useCompareStore } from "@/store/useCompareStore";
-
-const LEADS = {
-  production: "Per piece pays more",
-  hourly: "Per hour pays more",
-  even: "Same money either way",
-} as const;
 
 function Bar({
   label,
@@ -51,6 +46,7 @@ function Bar({
 /** Live result: who pays more, by how much, and pieces needed to match. */
 function Report() {
   const money = useMoney();
+  const t = useTranslations("compare");
   const { hourly, production, reset } = useCompareStore((state) => state);
   const result = useMemo(() => compareWages({ ...production, ...hourly }), [hourly, production]);
   const max = Math.max(result.production, result.hourly);
@@ -63,7 +59,7 @@ function Report() {
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-1">
           <span className="text-sm text-ink-inverse/70">
-            {result.winner ? LEADS[result.winner] : "Fill in both sides to compare"}
+            {result.winner ? t(`lead.${result.winner}`) : t("fill_both")}
           </span>
           <p
             className={cn(
@@ -76,7 +72,7 @@ function Report() {
             )}
           >
             {result.winner === "even"
-              ? "Even"
+              ? t("even")
               : result.winner
                 ? `+${money(result.difference)}`
                 : money(0)}
@@ -85,7 +81,7 @@ function Report() {
         <button
           type="button"
           onClick={reset}
-          aria-label="Clear both sides"
+          aria-label={t("clear")}
           className={cn(
             buttonVariants({ variant: "ghost", size: "icon" }),
             "text-ink-inverse/70 hover:bg-ink-inverse/10 hover:text-ink-inverse"
@@ -97,18 +93,18 @@ function Report() {
 
       <div className="flex flex-col gap-2.5">
         <Bar
-          label="Per piece"
+          label={t("per_piece")}
           value={result.production}
           max={max}
           className="bg-production-bright"
         />
-        <Bar label="Per hour" value={result.hourly} max={max} className="bg-live" />
+        <Bar label={t("per_hour")} value={result.hourly} max={max} className="bg-live" />
       </div>
 
       <p className="text-[0.8125rem] text-ink-inverse/70">
         {result.piecesToMatch !== null
-          ? `You need ${result.piecesToMatch} pieces to match the hourly pay.`
-          : "Add a price per piece and an hourly rate to see how many pieces match the hourly pay."}
+          ? t("pieces_to_match", { count: result.piecesToMatch })
+          : t("pieces_hint")}
       </p>
     </section>
   );

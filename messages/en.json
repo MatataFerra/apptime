@@ -21,15 +21,18 @@
       "description": "Where you work and their details"
     },
     "dashboard": {
-      "title": "Dashboard"
+      "title": "Dashboard",
+      "subtitle": "Your hours and earnings, all in one place."
     },
     "estimate": {
       "title": "Estimate",
-      "description": "What a stretch of work pays"
+      "description": "What a stretch of work pays",
+      "subtitle": "What a stretch of work pays, before you work it."
     },
     "compare": {
       "title": "Compare",
-      "description": "Per piece or per hour"
+      "description": "Per piece or per hour",
+      "subtitle": "Per piece or per hour: which one pays more for the same day?"
     },
     "taxes": {
       "title": "Taxes",
@@ -192,7 +195,13 @@
         "hint": "Paid, not worked"
       }
     },
-    "review_button": "Review shift"
+    "review_button": "Review shift",
+    "earned": "Earned",
+    "notes": "Notes",
+    "kind": {
+      "hourly": "Hourly",
+      "production": "Per piece"
+    }
   },
   "home": {
     "popover": "When state is offline it means that the user doesn't start any shift yet",
@@ -374,6 +383,126 @@
       "name_required": "Give it a name",
       "rate_range": "Between 0 and 100",
       "already_added": "Already added"
+    }
+  },
+  "compare": {
+    "per_piece": "Per piece",
+    "per_hour": "Per hour",
+    "pay_per_piece": "Pay per piece",
+    "pieces_a_day": "Pieces a day",
+    "hourly_rate": "Hourly rate",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "lead": {
+      "production": "Per piece pays more",
+      "hourly": "Per hour pays more",
+      "even": "Same money either way"
+    },
+    "fill_both": "Fill in both sides to compare",
+    "even": "Even",
+    "clear": "Clear both sides",
+    "pieces_to_match": "You need {count} pieces to match the hourly pay.",
+    "pieces_hint": "Add a price per piece and an hourly rate to see how many pieces match the hourly pay."
+  },
+  "estimate": {
+    "earn": "You'd earn, before tax",
+    "paid_time": "Paid time per day",
+    "base_pay": "Base pay",
+    "holiday_pay_rate": "Holiday pay, {rate}%",
+    "per_day": "Per day, for {days, plural, one {# day} other {# days}}",
+    "time": "Time",
+    "hours_a_day": "Hours a day",
+    "minutes": "Minutes",
+    "days": "Days",
+    "pay": "Pay",
+    "hourly_rate": "Hourly rate",
+    "holiday_pay": "Holiday pay",
+    "unpaid_breaks": "Unpaid breaks",
+    "holiday_hint": "Leave holiday pay empty to use {rate}%."
+  },
+  "dashboard": {
+    "stats": {
+      "earned_in": "Earned in {month}",
+      "converted": "Includes shifts in {currencies} converted at each day's rate.",
+      "also": "Also: {others}",
+      "previous": "{month}: {amount}",
+      "past_it": "Already past it",
+      "share_so_far": "{share}% of it so far",
+      "progress": "This month compared with {month}",
+      "change": "{change}% vs {month} 1 to {day}",
+      "no_previous": "No earnings in {month} to compare with.",
+      "hours_worked": "hours worked",
+      "shifts_saved": "shifts saved",
+      "average_per_day": "average per day",
+      "last_shift": "last shift",
+      "none_yet": "None yet"
+    },
+    "charts": {
+      "empty": "Your charts show up after your first saved shift.",
+      "legend": "Legend",
+      "weekly_title": "Earned per week",
+      "last_weeks": "Last {count} weeks",
+      "weekly_label": "Weekly earnings, {total} in total",
+      "week_of": "Week of {date}",
+      "total": "Total",
+      "season_title": "Your season so far",
+      "since": "Since {date}",
+      "share": "{hourly}% per hour, {production}% per piece",
+      "season_label": "Running total of your earnings over the season",
+      "up_to": "Up to {date}"
+    },
+    "history": {
+      "title": "History",
+      "pick_date": "Pick a date",
+      "load_error": "Error during loading",
+      "filter_label": "Shift type",
+      "filters": {
+        "all": "All",
+        "hourly": "Per hour",
+        "production": "Per piece"
+      },
+      "hourly_shift": "Hourly shift",
+      "piece_shift": "Per piece shift",
+      "hourly_detail": "{hours} · {rate}/h",
+      "pieces_detail": "{count, plural, one {# piece} other {# pieces}} × {value}",
+      "holiday_worked": "Holiday, worked 1.5×",
+      "holiday_off": "Holiday, day off",
+      "net": "{amount} net",
+      "empty": "No shifts saved yet.",
+      "empty_filtered": "No shifts in those dates.",
+      "shifts": "{count, plural, one {# shift} other {# shifts}}"
+    },
+    "dialog": {
+      "deleting": "Deleting shift...",
+      "deleted": "Shift deleted successfully!",
+      "keep": "Keep it",
+      "confirm_delete": "Delete shift",
+      "delete": "Delete",
+      "edit": "Edit",
+      "edit_title": "Edit shift",
+      "edit_description": "You can edit the shift details here.",
+      "not_saved": "Changes not saved",
+      "back": "Back",
+      "save_changes": "Save changes"
+    },
+    "edit": {
+      "check_dates": "Please check the dates and try again.",
+      "no_changes": "No changes were made.",
+      "updating": "Shift is being updated",
+      "updated": "Shift updated successfully!",
+      "update_failed": "Error updating shift, please reload the page and try again."
+    },
+    "taxes": {
+      "rate_range": "Enter a rate between 0 and 100",
+      "new_rate": "New rate for {name}",
+      "ok": "OK",
+      "only_this_shift": "Only for this shift",
+      "kept": "Tax kept",
+      "undo": "Undo",
+      "change_rate": "Change %",
+      "will_remove": "Tax will be removed",
+      "save_to_apply": "Save changes to apply it.",
+      "remove": "Remove"
     }
   }
 }

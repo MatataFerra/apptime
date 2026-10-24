@@ -1,6 +1,7 @@
 "use client";
 
 import { format } from "date-fns";
+import { useLocale, useTranslations } from "next-intl";
 import {
   CartesianGrid,
   Line,
@@ -12,11 +13,12 @@ import {
 } from "recharts";
 
 import type { CumulativePoint } from "@/services/History";
-import { formatMoneyCompact } from "@/services/Summary";
+import { formatMoneyCompact, moneyAxisWidth } from "@/services/Summary";
 
+import useDateLocale from "@/hooks/useDateLocale";
 import useMoney from "@/hooks/useMoney";
 
-import ChartCard, { SERIES, SeriesKey } from "./ChartCard";
+import ChartCard, { SeriesKey, useSeries } from "./ChartCard";
 
 function SeasonTooltip({
   active,
@@ -28,12 +30,14 @@ function SeasonTooltip({
   payload?: { payload: CumulativePoint }[];
 }) {
   const money = useMoney(currency);
+  const t = useTranslations("dashboard.charts");
+  const SERIES = useSeries();
   const point = payload?.[0]?.payload;
   if (!active || !point) return null;
 
   return (
     <div className="min-w-40 rounded-xl border border-border bg-surface px-3 py-2.5 text-[0.8125rem] shadow-float">
-      <p className="mb-1.5 font-semibold text-ink">Up to {point.label}</p>
+      <p className="mb-1.5 font-semibold text-ink">{t("up_to", { date: point.label })}</p>
       {(["hourly", "production"] as const).map((kind) => (
         <p key={kind} className="flex items-center justify-between gap-4 text-ink-muted">
           <span className="flex items-center gap-1.5">
@@ -53,6 +57,10 @@ function SeasonTooltip({
  */
 function SeasonChart({ data, currency }: { data: CumulativePoint[]; currency: string }) {
   const money = useMoney(currency);
+  const t = useTranslations("dashboard.charts");
+  const SERIES = useSeries();
+  const locale = useLocale();
+  const dateLocale = useDateLocale();
   const last = data.at(-1) ?? { hourly: 0, production: 0 };
   const total = last.hourly + last.production;
   const share = total > 0 ? Math.round((last.hourly / total) * 100) : 0;
@@ -61,8 +69,8 @@ function SeasonChart({ data, currency }: { data: CumulativePoint[]; currency: st
 
   return (
     <ChartCard
-      title="Your season so far"
-      subtitle={data.length ? `Since ${data[0].label}` : undefined}
+      title={t("season_title")}
+      subtitle={data.length ? t("since", { date: data[0].label }) : undefined}
       figure={
         <span className="figure text-[1.75rem] leading-none text-ink">
           {money(total, { cents: false })}
@@ -74,7 +82,7 @@ function SeasonChart({ data, currency }: { data: CumulativePoint[]; currency: st
             <div
               className="flex h-2.5 w-full gap-0.5 overflow-hidden rounded-full"
               role="img"
-              aria-label={`${share}% per hour, ${100 - share}% per piece`}
+              aria-label={t("share", { hourly: share, production: 100 - share })}
             >
               <span
                 className="rounded-l-full"
@@ -105,11 +113,7 @@ function SeasonChart({ data, currency }: { data: CumulativePoint[]; currency: st
         </div>
       }
     >
-      <div
-        className="h-52 w-full"
-        role="img"
-        aria-label="Running total of your earnings over the season"
-      >
+      <div className="h-52 w-full" role="img" aria-label={t("season_label")}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={points} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
             <CartesianGrid vertical={false} stroke="var(--color-border)" strokeDasharray="3 4" />
@@ -119,7 +123,9 @@ function SeasonChart({ data, currency }: { data: CumulativePoint[]; currency: st
               type="number"
               scale="time"
               domain={["dataMin", "dataMax"]}
-              tickFormatter={(t: number) => format(new Date(t), "d MMM")}
+              tickFormatter={(time: number) =>
+                format(new Date(time), "d MMM", { locale: dateLocale })
+              }
               tickLine={false}
               axisLine={false}
               minTickGap={24}
@@ -128,9 +134,9 @@ function SeasonChart({ data, currency }: { data: CumulativePoint[]; currency: st
             <YAxis
               tickLine={false}
               axisLine={false}
-              width={40}
+              width={moneyAxisWidth(Math.max(last.hourly, last.production), currency, locale)}
               tickCount={4}
-              tickFormatter={(value: number) => formatMoneyCompact(value, currency)}
+              tickFormatter={(value: number) => formatMoneyCompact(value, currency, locale)}
               tick={{ fill: "var(--color-ink-muted)", fontSize: 11 }}
             />
             <Tooltip

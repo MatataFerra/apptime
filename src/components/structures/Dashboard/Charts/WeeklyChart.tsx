@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import {
   Bar,
   BarChart,
@@ -13,11 +14,11 @@ import {
 } from "recharts";
 
 import type { WeekPoint } from "@/services/History";
-import { formatMoneyCompact } from "@/services/Summary";
+import { formatMoneyCompact, moneyAxisWidth } from "@/services/Summary";
 
 import useMoney from "@/hooks/useMoney";
 
-import ChartCard, { SERIES, SeriesKey } from "./ChartCard";
+import ChartCard, { SeriesKey, useSeries } from "./ChartCard";
 
 function WeekTooltip({
   active,
@@ -29,13 +30,15 @@ function WeekTooltip({
   payload?: { payload: WeekPoint }[];
 }) {
   const money = useMoney(currency);
+  const t = useTranslations("dashboard.charts");
+  const SERIES = useSeries();
   const point = payload?.[0]?.payload;
   if (!active || !point) return null;
   const total = point.hourly + point.production;
 
   return (
     <div className="min-w-40 rounded-xl border border-border bg-surface px-3 py-2.5 text-[0.8125rem] shadow-float">
-      <p className="mb-1.5 font-semibold text-ink">Week of {point.label}</p>
+      <p className="mb-1.5 font-semibold text-ink">{t("week_of", { date: point.label })}</p>
       {(["hourly", "production"] as const).map((kind) => (
         <p key={kind} className="flex items-center justify-between gap-4 text-ink-muted">
           <span className="flex items-center gap-1.5">
@@ -46,7 +49,7 @@ function WeekTooltip({
         </p>
       ))}
       <p className="mt-1.5 flex justify-between border-t border-border pt-1.5 font-semibold text-ink">
-        Total <span className="tabular-nums">{money(total)}</span>
+        {t("total")} <span className="tabular-nums">{money(total)}</span>
       </p>
     </div>
   );
@@ -55,6 +58,9 @@ function WeekTooltip({
 /** Earned per week, stacked by kind. Rounded only at the top of each column. */
 function WeeklyChart({ data, currency }: { data: WeekPoint[]; currency: string }) {
   const money = useMoney(currency);
+  const t = useTranslations("dashboard.charts");
+  const SERIES = useSeries();
+  const locale = useLocale();
   const totals = data.reduce(
     (acc, w) => ({ hourly: acc.hourly + w.hourly, production: acc.production + w.production }),
     { hourly: 0, production: 0 }
@@ -64,8 +70,8 @@ function WeeklyChart({ data, currency }: { data: WeekPoint[]; currency: string }
 
   return (
     <ChartCard
-      title="Earned per week"
-      subtitle={`Last ${data.length} weeks`}
+      title={t("weekly_title")}
+      subtitle={t("last_weeks", { count: data.length })}
       figure={
         <span className="figure text-[1.75rem] leading-none text-ink">
           {money(total, { cents: false })}
@@ -85,7 +91,7 @@ function WeeklyChart({ data, currency }: { data: WeekPoint[]; currency: string }
       <div
         className="h-52 w-full"
         role="img"
-        aria-label={`Weekly earnings, ${money(total)} in total`}
+        aria-label={t("weekly_label", { total: money(total) })}
       >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
@@ -105,9 +111,13 @@ function WeeklyChart({ data, currency }: { data: WeekPoint[]; currency: string }
             <YAxis
               tickLine={false}
               axisLine={false}
-              width={40}
+              width={moneyAxisWidth(
+                Math.max(...data.map((w) => w.hourly + w.production), 0),
+                currency,
+                locale
+              )}
               tickCount={4}
-              tickFormatter={(value: number) => formatMoneyCompact(value, currency)}
+              tickFormatter={(value: number) => formatMoneyCompact(value, currency, locale)}
               tick={{ fill: "var(--color-ink-muted)", fontSize: 11 }}
             />
             <Tooltip

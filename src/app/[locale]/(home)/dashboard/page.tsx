@@ -1,21 +1,18 @@
+import { getTranslations } from "next-intl/server";
+
 import Carousel from "@/components/modules/Dashboard/CarouselCards";
 import ModuleTitle from "@/components/structures/share/ModuleTitle";
 import Stack from "@/components/ui/Stack";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
-import { isLocale } from "@/utils/helpers/locale";
 
-export default async function HistoryShift(props: PageProps<"/[locale]/dashboard">) {
-  const { locale: segment } = await props.params;
-  const params = { locale: isLocale(segment) ? segment : "en" } as const;
+export default async function HistoryShift() {
+  const t = await getTranslations("modules.dashboard");
+
   return (
     <Stack orientation="vertical" spacing={5} classes="w-full">
-      <ModuleTitle
-        module={PATH_NAMES.DASHBOARD}
-        title="Dashboard"
-        subtitle="Your hours and earnings, all in one place."
-      />
-      <Carousel params={params} />
+      <ModuleTitle module={PATH_NAMES.DASHBOARD} title={t("title")} subtitle={t("subtitle")} />
+      <Carousel />
     </Stack>
   );
 }

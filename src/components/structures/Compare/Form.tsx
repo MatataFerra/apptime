@@ -2,11 +2,15 @@
 
 import type { ReactNode } from "react";
 
+import { useTranslations } from "next-intl";
+
 import Input from "@/components/ui/Input";
 
+import { currencySymbol } from "@/utils/constants/currencies";
 import { MODULE_THEMES, MODULES } from "@/utils/constants/modules";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 import { cn } from "@/utils/helpers/styleMerger";
+import { useCurrency } from "@/hooks/useMoney";
 
 import { useCompareStore } from "@/store/useCompareStore";
 
@@ -27,17 +31,19 @@ function Side({ path, title, children }: { path: string; title: string; children
 
 function CompareForm() {
   const { setProduction, setHourly, hourly, production } = useCompareStore((state) => state);
+  const t = useTranslations("compare");
+  const symbol = currencySymbol(useCurrency());
 
   return (
     <form className="flex w-full flex-col gap-3.5" onSubmit={(e) => e.preventDefault()}>
-      <Side path={PATH_NAMES.PRODUCTION} title="Per piece">
+      <Side path={PATH_NAMES.PRODUCTION} title={t("per_piece")}>
         <div className="grid grid-cols-2 gap-2.5">
           <Input
             type="number"
             inputMode="decimal"
             name="itemValue"
-            label="Pay per piece"
-            measure="$"
+            label={t("pay_per_piece")}
+            measure={symbol}
             measurePlace="left"
             min={0}
             value={production.itemValue}
@@ -47,7 +53,7 @@ function CompareForm() {
             type="number"
             inputMode="numeric"
             name="itemQuantity"
-            label="Pieces a day"
+            label={t("pieces_a_day")}
             min={0}
             value={production.itemQuantity}
             onChange={(e) => setProduction({ itemQuantity: e.target.value })}
@@ -55,13 +61,13 @@ function CompareForm() {
         </div>
       </Side>
 
-      <Side path={PATH_NAMES.TRACK} title="Per hour">
+      <Side path={PATH_NAMES.TRACK} title={t("per_hour")}>
         <Input
           type="number"
           inputMode="decimal"
           name="hourlyWage"
-          label="Hourly rate"
-          measure="$"
+          label={t("hourly_rate")}
+          measure={symbol}
           measurePlace="left"
           min={0}
           value={hourly.hourlyWage}
@@ -72,7 +78,7 @@ function CompareForm() {
             type="number"
             inputMode="numeric"
             name="hoursWorked"
-            label="Hours"
+            label={t("hours")}
             measure="h"
             min={0}
             value={hourly.hoursWorked}
@@ -82,7 +88,7 @@ function CompareForm() {
             type="number"
             inputMode="numeric"
             name="minutesWorked"
-            label="Minutes"
+            label={t("minutes")}
             measure="min"
             min={0}
             max={59}

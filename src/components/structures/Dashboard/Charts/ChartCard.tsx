@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { useTranslations } from "next-intl";
+
 /** Shared frame for the dashboard charts: title, a headline figure and the plot. */
 function ChartCard({
   title,
@@ -37,8 +39,10 @@ export function SeriesKey({
 }: {
   items: { label: string; color: string; value?: string }[];
 }) {
+  const t = useTranslations("dashboard.charts");
+
   return (
-    <ul className="flex flex-wrap gap-x-4 gap-y-1.5" aria-label="Legend">
+    <ul className="flex flex-wrap gap-x-4 gap-y-1.5" aria-label={t("legend")}>
       {items.map((item) => (
         <li key={item.label} className="flex items-center gap-2 text-[0.8125rem] text-ink-muted">
           <span
@@ -57,8 +61,17 @@ export function SeriesKey({
 }
 
 export const SERIES = {
-  hourly: { label: "Per hour", color: "var(--color-series-hourly)" },
-  production: { label: "Per piece", color: "var(--color-series-production)" },
+  hourly: { color: "var(--color-series-hourly)" },
+  production: { color: "var(--color-series-production)" },
 } as const;
+
+/** The two series with their names in the current language. */
+export function useSeries() {
+  const t = useTranslations("compare");
+  return {
+    hourly: { ...SERIES.hourly, label: t("per_hour") },
+    production: { ...SERIES.production, label: t("per_piece") },
+  };
+}
 
 export default ChartCard;

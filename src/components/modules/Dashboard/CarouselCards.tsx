@@ -4,23 +4,19 @@ import { useMemo } from "react";
 
 import { endOfMonth, format, startOfMonth, subMonths } from "date-fns";
 import { CalendarDays, Clock3, Layers, type LucideIcon, TrendingUp } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 
 import Dashboard from "@/services/Dashboard";
 import DateHumanizer from "@/services/Date";
 import { compareWithPreviousMonth, summarizePeriod } from "@/services/Summary";
 
-import { LocaleParams } from "@/types";
-
 import Skeleton from "@/components/ui/Skeleton";
 
 import { MODULE_THEMES, type ModuleTheme } from "@/utils/constants/modules";
 import { cn } from "@/utils/helpers/styleMerger";
+import useDateLocale from "@/hooks/useDateLocale";
 import useMoney from "@/hooks/useMoney";
 import useShiftsInCurrency from "@/hooks/useShiftsInCurrency";
-
-type Props = {
-  params: LocaleParams;
-};
 
 function Stat({
   icon: Icon,
@@ -59,7 +55,10 @@ function Stat({
 }
 
 /** Month earnings against last month, plus all-time stats. */
-function DashboardStats({ params }: Props) {
+function DashboardStats() {
+  const t = useTranslations("dashboard.stats");
+  const locale = useLocale();
+  const dateLocale = useDateLocale();
   const {
     allHourly,
     allProduction,
@@ -118,9 +117,9 @@ function DashboardStats({ params }: Props) {
 
   const lastDay = new Date(stats.lastDayRegistered);
   const lastDayLabel = lastDay.valueOf()
-    ? new DateHumanizer("short").humanizeDate(lastDay, { locale: params.locale })
-    : "None yet";
-  const previousMonth = format(subMonths(new Date(), 1), "MMMM");
+    ? new DateHumanizer("short").humanizeDate(lastDay, { locale })
+    : t("none_yet");
+  const previousMonth = format(subMonths(new Date(), 1), "LLLL", { locale: dateLocale });
   // Money in other currencies this month, listed apart (never added up).
   const otherThisMonth = earnedThisMonth.filter((c) => c.code !== headline && c.earned > 0);
   const change = month.change;
@@ -129,40 +128,41 @@ function DashboardStats({ params }: Props) {
     <div className="grid w-full grid-cols-2 gap-2.5">
       <section className="col-span-2 flex flex-col gap-3 rounded-xl bg-surface-inverse p-4 text-ink-inverse">
         <span className="text-[0.8125rem] text-ink-inverse/70">
-          Earned in {format(new Date(), "MMMM")}
+          {t("earned_in", { month: format(new Date(), "LLLL", { locale: dateLocale }) })}
         </span>
         <span className="figure text-[3.25rem] leading-[0.9] text-live">
           {money(month.current.earned)}
         </span>
         {convertedFrom.length > 0 ? (
           <span className="text-xs text-ink-inverse/60">
-            Includes shifts in {convertedFrom.join(", ")} converted at each day&apos;s rate.
+            {t("converted", { currencies: convertedFrom.join(", ") })}
           </span>
         ) : null}
         {otherThisMonth.length > 0 ? (
           <span className="text-[0.8125rem] text-ink-inverse/80">
-            Also:{" "}
-            {otherThisMonth
-              .map((other) => `${money(other.earned, { currency: other.code })} (${other.code})`)
-              .join(", ")}
+            {t("also", {
+              others: otherThisMonth
+                .map((other) => `${money(other.earned, { currency: other.code })} (${other.code})`)
+                .join(", "),
+            })}
           </span>
         ) : null}
         {month.previousFull.earned > 0 ? (
           <div className="flex flex-col gap-2.5 border-t border-ink-inverse/15 pt-3">
             <div className="flex items-baseline justify-between gap-3 text-[0.8125rem]">
               <span className="text-ink-inverse/70">
-                {previousMonth}: {money(month.previousFull.earned)}
+                {t("previous", { month: previousMonth, amount: money(month.previousFull.earned) })}
               </span>
               <span className="font-semibold">
                 {(month.shareOfPrevious ?? 0) >= 100
-                  ? "Already past it"
-                  : `${month.shareOfPrevious}% of it so far`}
+                  ? t("past_it")
+                  : t("share_so_far", { share: month.shareOfPrevious ?? 0 })}
               </span>
             </div>
             <div
               className="h-2 overflow-hidden rounded-full bg-ink-inverse/12"
               role="progressbar"
-              aria-label={`This month compared with ${previousMonth}`}
+              aria-label={t("progress", { month: previousMonth })}
               aria-valuenow={Math.min(100, month.shareOfPrevious ?? 0)}
               aria-valuemin={0}
               aria-valuemax={100}
@@ -183,26 +183,29 @@ function DashboardStats({ params }: Props) {
                   className={cn("size-4", change < 0 && "-scale-y-100")}
                   aria-hidden="true"
                 />
-                {change >= 0 ? "+" : ""}
-                {change}% vs {previousMonth} 1 to {new Date().getDate()}
+                {t("change", {
+                  change: `${change >= 0 ? "+" : ""}${change}`,
+                  month: previousMonth,
+                  day: new Date().getDate(),
+                })}
               </span>
             ) : null}
           </div>
         ) : (
           <span className="text-[0.8125rem] text-ink-inverse/70">
-            No earnings in {previousMonth} to compare with.
+            {t("no_previous", { month: previousMonth })}
           </span>
         )}
       </section>
-      <Stat icon={Clock3} theme="track" value={`${stats.hoursWorked}h`} label="hours worked" />
-      <Stat icon={Layers} theme="production" value={stats.shiftsLen} label="shifts saved" />
+      <Stat icon={Clock3} theme="track" value={`${stats.hoursWorked}h`} label={t("hours_worked")} />
+      <Stat icon={Layers} theme="production" value={stats.shiftsLen} label={t("shifts_saved")} />
       <Stat
         icon={TrendingUp}
         theme="insight"
         value={`${stats.averageHoursWorkedPerDay}h`}
-        label="average per day"
+        label={t("average_per_day")}
       />
-      <Stat icon={CalendarDays} theme="fast" value={lastDayLabel} label="last shift" small />
+      <Stat icon={CalendarDays} theme="fast" value={lastDayLabel} label={t("last_shift")} small />
     </div>
   );
 }
