@@ -40,17 +40,23 @@ function StartDialog({ triggerStatus }: Props) {
     unpaidBreaks: number;
     hourValue: number;
     employerId?: number | null;
-  };
+    currency?: string | null;
+  } | null;
   // The last shift's employer, unless it has been removed since.
   const lastEmployerId =
     last?.employerId != null && !byId.get(last.employerId)?.archived ? last.employerId : null;
 
+  /** Every time it opens: the last shift's settings, on a normal day. */
   function resetData() {
-    setStep("HasConfig");
+    setStep(hasConfig ? "HasConfig" : "ShiftInfo");
+    setErrors(false);
     setData({
-      unpaidBreaks: last?.unpaidBreaks,
-      hourValue: last?.hourValue,
+      unpaidBreaks: last?.unpaidBreaks ?? 1,
+      hourValue: last?.hourValue ?? 0,
       employerId: lastEmployerId,
+      currency: last?.currency ?? null,
+      isPublicHoliday: false,
+      publicHolidayWorked: false,
     });
   }
 
@@ -58,21 +64,7 @@ function StartDialog({ triggerStatus }: Props) {
     <>
       <Dialog
         onOpenChange={(open) => {
-          if (open) {
-            if (hasConfig) {
-              setStep("HasConfig");
-              setData({
-                unpaidBreaks: last?.unpaidBreaks,
-                hourValue: last?.hourValue,
-                employerId: lastEmployerId,
-              });
-            } else {
-              setStep("ShiftInfo");
-            }
-          }
-
-          setErrors(false);
-          resetData();
+          if (open) resetData();
         }}
       >
         <Trigger status={triggerStatus} />

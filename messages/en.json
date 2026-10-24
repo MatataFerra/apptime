@@ -166,7 +166,14 @@
       "employer": "Employer",
       "add_employer": "Add one",
       "no_employer": "None",
-      "removed": "(removed)"
+      "removed": "(removed)",
+      "new_employer": "+ New employer…",
+      "new_employer_name": "New employer's name",
+      "new_employer_hint": "Saved with this shift's hourly rate and currency. Fill in the rest from Employers.",
+      "new_employer_failed": "Couldn't save the employer",
+      "cancel": "Cancel",
+      "save_employer": "Save",
+      "saving_employer": "Saving…"
     },
     "tags": {
       "repeated": "Repeated",
@@ -358,9 +365,7 @@
       "creating": "Shift is being created",
       "started": "Shift started",
       "error": "Error creating shift, please try again",
-      "holiday_question": "Is a public holiday?",
-      "holiday_yes": "Yes! I want money 🤑",
-      "holiday_no": "No, just regular day",
+      "holiday_question": "What kind of day is it?",
       "last_config_title": "Use your last shift settings?",
       "last_config_description": "A previous shift configuration was found. Do you want to use it?",
       "hour_value_item": "Hour value: {value}",

@@ -4,6 +4,8 @@ import { useId } from "react";
 
 import { useTranslations } from "next-intl";
 
+import Segmented from "@/components/structures/Settings/Preferences/Segmented";
+
 import { cn } from "@/utils/helpers/styleMerger";
 
 export type HolidayValue = "none" | "worked" | "off";
@@ -29,22 +31,59 @@ const OPTIONS: HolidayValue[] = ["none", "worked", "off"];
 /**
  * One question instead of two checkboxes: was this day a public holiday,
  * and if so did you work it. Maps onto isPublicHoliday / publicHolidayWorked.
+ *
+ * `compact` draws the options as a segmented control with the chosen one's
+ * hint underneath, for tight spots like the Track start dialog.
  */
 function HolidayChoice({
   value,
   onChange,
+  options = OPTIONS,
+  compact = false,
+  legend,
 }: {
   value: HolidayValue;
   onChange: (value: HolidayValue) => void;
+  /** Which choices to offer, e.g. a live shift is always worked. */
+  options?: HolidayValue[];
+  compact?: boolean;
+  /** Replaces the default question ("What kind of day was it?"). */
+  legend?: string;
 }) {
   const id = useId();
   const t = useTranslations("shift.holiday");
+  const question = legend ?? t("question");
+
+  if (compact) {
+    return (
+      <div className="flex w-full flex-col gap-2">
+        <span className="text-sm text-ink-muted" aria-hidden="true">
+          {question}
+        </span>
+        <Segmented
+          label={question}
+          value={value}
+          options={options.map((option) => ({ value: option, label: t(`${option}.label`) }))}
+          onChange={onChange}
+        />
+        <p
+          className={cn(
+            "px-1 text-[0.8125rem]",
+            value === "none" ? "text-ink-muted" : "font-medium text-fast-ink"
+          )}
+          aria-live="polite"
+        >
+          {t(`${value}.hint`)}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <fieldset className="flex w-full flex-col gap-2">
-      <legend className="mb-2 text-sm font-medium text-ink">{t("question")}</legend>
+      <legend className="mb-2 text-sm font-medium text-ink">{question}</legend>
       <div className="grid grid-cols-1 gap-2">
-        {OPTIONS.map((option) => {
+        {options.map((option) => {
           const checked = value === option;
           return (
             <label
