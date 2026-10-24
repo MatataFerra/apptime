@@ -28,6 +28,8 @@ type Props = {
   theme?: ModuleTheme;
   /** Render without the card chrome (e.g. inside a dialog). */
   bare?: boolean;
+  /** Texts that say "this shift", for places that aren't one (e.g. Estimate). */
+  copy?: { subtitle?: string; newTitle?: string; empty?: string };
 };
 
 const SEARCH_FROM = 8;
@@ -43,7 +45,12 @@ export function effectiveRate(taxes: Pick<ContributionOrTax, "value">[]) {
  * remove it, or write a new one inline. New taxes are saved with the
  * shift and show up as saved next time.
  */
-function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", bare }: Props) {
+function TaxPicker({
+  store: { salaryElement, add, remove },
+  theme = "neutral",
+  bare,
+  copy,
+}: Props) {
   const { data, isLoading } = useSalaryItems();
   const saved = useMemo(() => data?.salaryItems?.taxes ?? [], [data?.salaryItems?.taxes]);
   const colors = MODULE_THEMES[theme];
@@ -136,7 +143,7 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
             <h2 id="tax-picker-title" className="text-[0.9375rem] font-semibold text-ink">
               {t("title")}
             </h2>
-            <p className="text-[0.8125rem] text-ink-muted">{t("subtitle")}</p>
+            <p className="text-[0.8125rem] text-ink-muted">{copy?.subtitle ?? t("subtitle")}</p>
           </div>
         </div>
         {salaryElement.length > 0 ? (
@@ -210,7 +217,9 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
 
       {unsavedSelected.length > 0 ? (
         <div className="flex flex-col gap-2.5">
-          <h3 className="text-[0.8125rem] font-medium text-ink-muted">{t("new_title")}</h3>
+          <h3 className="text-[0.8125rem] font-medium text-ink-muted">
+            {copy?.newTitle ?? t("new_title")}
+          </h3>
           <ul className="flex flex-wrap gap-2">
             {unsavedSelected.map((tax) => (
               <li
@@ -300,7 +309,7 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
       ) : (
         <div className="flex flex-col gap-2">
           {saved.length === 0 && salaryElement.length === 0 && !isLoading ? (
-            <p className="text-sm text-ink-muted">{t("empty")}</p>
+            <p className="text-sm text-ink-muted">{copy?.empty ?? t("empty")}</p>
           ) : null}
           <Button
             type="button"
