@@ -4,6 +4,7 @@ import { type PropsWithChildren, useEffect } from "react";
 
 import { useTranslations } from "next-intl";
 
+import { withContributions } from "@/services/Contribution/math";
 import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
 
@@ -27,13 +28,14 @@ function DialogProduction({ children }: PropsWithChildren) {
   }
   const {
     taxesModule: { salaryElement: taxes },
+    contributionsModule: { salaryElement: contributions },
   } = useProductionTaxesOrContributionsStore((state) => state);
 
   useEffect(() => {
     if (formError) return setDialogState(false);
   }, [formError, setDialogState, dialog]);
 
-  const gross = new ShiftService({
+  const base = new ShiftService({
     itemValue: Number(values.itemValue ?? 0),
     itemQuantity: Number(values.itemQuantity),
     isPublicHoliday: !!values.isPublicHoliday,
@@ -41,6 +43,8 @@ function DialogProduction({ children }: PropsWithChildren) {
   })
     .checkPublicHoliday()
     .calculateEarnings();
+  // Holiday pay and the like go on top of the pieces.
+  const gross = withContributions(base, contributions);
   const afterTaxes = Pay.afterTax(gross, taxes);
   const earnings = {
     gross: isNaN(gross) ? 0 : gross,
@@ -71,9 +75,6 @@ function DialogProduction({ children }: PropsWithChildren) {
           label: t("fields.pieces"),
           value: `${values.itemQuantity ?? 0} × ${money(Number(values.itemValue ?? 0))}`,
         },
-        ...(values.holidayPayRate
-          ? [{ label: t("fields.holiday_pay"), value: `${values.holidayPayRate}%` }]
-          : []),
       ]}
     >
       {children}

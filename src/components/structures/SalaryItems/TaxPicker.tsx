@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 
-import { Check, Plus, Receipt, Search, X } from "lucide-react";
+import { Check, HandCoins, Plus, Receipt, Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+import { contributionRate } from "@/services/Contribution/math";
+import { CONTRIBUTION_PRESETS } from "@/services/Contribution/presets";
 import Toast from "@/services/Toast";
 
 import Button from "@/components/ui/Button";
@@ -28,6 +30,11 @@ type Props = {
   theme?: ModuleTheme;
   /** Render without the card chrome (e.g. inside a dialog). */
   bare?: boolean;
+  /**
+   * "taxes" come off the pay, applied one after another; "contributions"
+   * (holiday pay, casual loading…) are added on top and come with presets.
+   */
+  kind?: "taxes" | "contributions";
   /** Texts that say "this shift", for places that aren't one (e.g. Estimate). */
   copy?: { subtitle?: string; newTitle?: string; empty?: string };
 };
@@ -41,20 +48,28 @@ export function effectiveRate(taxes: Pick<ContributionOrTax, "value">[]) {
 }
 
 /**
- * Pick the taxes for a shift in one place: tap a saved tax to add or
- * remove it, or write a new one inline. New taxes are saved with the
- * shift and show up as saved next time.
+ * Pick the taxes (or contributions) for a shift in one place: tap a saved
+ * one to add or remove it, or write a new one inline. New ones are saved
+ * with the shift and show up as saved next time. Contributions also offer
+ * the presets that come with the app (NZ holiday pay 8%…).
  */
 function TaxPicker({
   store: { salaryElement, add, remove },
   theme = "neutral",
   bare,
+  kind = "taxes",
   copy,
 }: Props) {
+  const titleId = useId();
   const { data, isLoading } = useSalaryItems();
-  const saved = useMemo(() => data?.salaryItems?.taxes ?? [], [data?.salaryItems?.taxes]);
+  const savedItems = data?.salaryItems?.[kind];
+  const saved = useMemo(() => savedItems ?? [], [savedItems]);
   const colors = MODULE_THEMES[theme];
-  const t = useTranslations("tax_picker");
+  const tTax = useTranslations("tax_picker");
+  const tContribution = useTranslations("contribution_picker");
+  const tPreset = useTranslations("contribution_presets");
+  const t = kind === "taxes" ? tTax : tContribution;
+  const isTax = kind === "taxes";
 
   const [search, setSearch] = useState("");
   const [creating, setCreating] = useState(false);
@@ -69,7 +84,19 @@ function TaxPicker({
   const visibleSaved = search
     ? saved.filter((t) => t.name.toLowerCase().includes(search.toLowerCase()))
     : saved;
-  const rate = effectiveRate(salaryElement);
+  const rate = isTax ? effectiveRate(salaryElement) : contributionRate(salaryElement);
+  // Presets not already saved or picked, so each shows up once.
+  const presets = isTax
+    ? []
+    : CONTRIBUTION_PRESETS.map((preset) => ({
+        ...preset,
+        name: tPreset(`${preset.id}.name`),
+        description: tPreset(`${preset.id}.hint`),
+      })).filter(
+        (preset) =>
+          !saved.some((s) => sameSalaryItem(s, preset)) &&
+          !salaryElement.some((s) => sameSalaryItem(s, preset))
+      );
 
   function toggleSaved(tax: (typeof saved)[number]) {
     if (isSelected(tax)) {
@@ -122,7 +149,7 @@ function TaxPicker({
 
   return (
     <section
-      aria-labelledby="tax-picker-title"
+      aria-labelledby={titleId}
       className={cn(
         "flex w-full flex-col gap-4",
         !bare && "rounded-xl border border-border bg-surface p-4"
@@ -137,10 +164,14 @@ function TaxPicker({
               colors.ink
             )}
           >
-            <Receipt className="size-4.5" strokeWidth={2} aria-hidden="true" />
+            {isTax ? (
+              <Receipt className="size-4.5" strokeWidth={2} aria-hidden="true" />
+            ) : (
+              <HandCoins className="size-4.5" strokeWidth={2} aria-hidden="true" />
+            )}
           </span>
           <div className="flex flex-col">
-            <h2 id="tax-picker-title" className="text-[0.9375rem] font-semibold text-ink">
+            <h2 id={titleId} className="text-[0.9375rem] font-semibold text-ink">
               {t("title")}
             </h2>
             <p className="text-[0.8125rem] text-ink-muted">{copy?.subtitle ?? t("subtitle")}</p>
@@ -148,10 +179,14 @@ function TaxPicker({
         </div>
         {salaryElement.length > 0 ? (
           <span
-            className="shrink-0 rounded-full bg-destructive-soft px-2.5 py-1 figure text-sm text-destructive"
+            className={cn(
+              "shrink-0 rounded-full px-2.5 py-1 figure text-sm",
+              isTax ? "bg-destructive-soft text-destructive" : "bg-accent-soft text-accent"
+            )}
             aria-label={t("total_label", { rate })}
           >
-            −{rate}%
+            {isTax ? "−" : "+"}
+            {rate}%
           </span>
         ) : null}
       </header>
@@ -246,6 +281,34 @@ function TaxPicker({
         </div>
       ) : null}
 
+      {presets.length > 0 ? (
+        <div className="flex flex-col gap-2.5">
+          <h3 className="text-[0.8125rem] font-medium text-ink-muted">
+            {tContribution("presets_title")}
+          </h3>
+          <ul className="flex flex-wrap gap-2">
+            {presets.map((preset) => (
+              <li key={preset.id}>
+                <button
+                  type="button"
+                  onClick={() =>
+                    add({ name: preset.name, value: preset.value, description: preset.description })
+                  }
+                  title={preset.description}
+                  className="flex h-10 items-center gap-1.5 rounded-full border border-dashed border-border-strong bg-surface px-3.5 text-sm font-medium text-ink transition-colors hover:bg-surface-sunken"
+                >
+                  <span className="rounded bg-surface-sunken px-1 text-[0.6875rem] font-semibold text-ink-muted">
+                    {preset.country}
+                  </span>
+                  {preset.name}
+                  <span className="text-ink-muted tabular-nums">{preset.value}%</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
       {creating ? (
         <div className="flex flex-col gap-3 rounded-2xl bg-surface-sunken p-3">
           <div className="grid grid-cols-[minmax(0,1fr)_7rem] gap-2.5">
@@ -325,6 +388,11 @@ function TaxPicker({
       )}
     </section>
   );
+}
+
+/** The same picker for contributions: added on top of the pay, with presets. */
+export function ContributionPicker(props: Omit<Props, "kind">) {
+  return <TaxPicker {...props} kind="contributions" />;
 }
 
 export default TaxPicker;

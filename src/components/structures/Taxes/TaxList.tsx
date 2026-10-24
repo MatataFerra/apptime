@@ -318,7 +318,7 @@ function TaxList() {
   const groups = [
     { kind: "tax" as const, title: t("my_taxes"), items: taxes },
     { kind: "contribution" as const, title: t("my_contributions"), items: contributions },
-  ].filter((group) => group.kind === "tax" || group.items.length > 0);
+  ];
 
   return (
     <>
@@ -326,7 +326,9 @@ function TaxList() {
         <Section
           key={group.kind}
           title={group.title}
-          description={group.kind === "tax" ? t("taxes_description") : undefined}
+          description={
+            group.kind === "tax" ? t("taxes_description") : t("my_contributions_description")
+          }
         >
           {group.items.length === 0 ? (
             <p className="px-4 py-4 text-[0.9375rem] text-ink-muted">{t("empty")}</p>

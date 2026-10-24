@@ -1,9 +1,10 @@
 import type { Tax } from "@prisma/client";
 
+import { withContributions } from "@/services/Contribution/math";
 import HourlyService from "@/services/Shift/Hourly";
 import ProductionService from "@/services/Shift/Production";
 
-import type { ProductionType, SalaryItemInput,ShiftType } from "@/types";
+import type { ProductionType, SalaryItemInput, ShiftType } from "@/types";
 
 type Shift = ShiftType;
 
@@ -29,23 +30,11 @@ class Pay implements PayInterface {
       earnings = new HourlyService(this.shift).calculateEarnings();
     }
 
-    return earnings;
+    return withContributions(earnings, this.shift.contributions);
   }
 
   netPay() {
     return this.afterTaxes();
-  }
-
-  payContributions() {
-    const netAfterTaxes = this.afterTaxes();
-    return (
-      this.shift.contributions?.reduce((acc, contrib) => {
-        const value = Number(contrib.value);
-        const prepareContribution = (acc * value) / 100;
-
-        return acc + prepareContribution;
-      }, netAfterTaxes) ?? 0
-    );
   }
 
   afterTaxes() {

@@ -43,8 +43,6 @@ const expectedUser = {
     userId: expect.any(String),
     endHour: expect.any(Number),
     extraNightShiftPay: expect.any(Number),
-    holidayPay: expect.any(Boolean),
-    holidayPayRate: expect.any(Number),
     hourlyRate: expect.any(Number),
     nightShift: expect.any(Boolean),
     startHour: expect.any(Number),

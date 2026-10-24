@@ -251,23 +251,20 @@ class ProductionService implements ProductionInterface {
   static earnings({
     itemValue,
     itemQuantity,
-    holidayPayRate,
     publicHolidayWorked,
   }: {
     itemValue: number | null;
     itemQuantity: number | null;
-    holidayPayRate: number | null;
     publicHolidayWorked: boolean | null;
   }) {
     let publicHolidayRate = 1;
-    let holidayPayRateValue = !!holidayPayRate ? holidayPayRate / 100 + 1 : 1;
     if (!itemValue || !itemQuantity) return 0;
 
     if (publicHolidayWorked) {
       publicHolidayRate = 1.5;
     }
 
-    return itemValue * itemQuantity * publicHolidayRate * holidayPayRateValue;
+    return itemValue * itemQuantity * publicHolidayRate;
   }
 
   /*  

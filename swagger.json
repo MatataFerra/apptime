@@ -1132,10 +1132,6 @@
             "type": "number",
             "nullable": true
           },
-          "holidayPay": {
-            "type": "number",
-            "example": 8
-          },
           "theme": {
             "type": "string",
             "enum": [

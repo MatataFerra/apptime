@@ -88,8 +88,6 @@ export const userShiftsMocked: UserType["shifts"] = {
     name: "Permanent work in factory",
     endDate: addMinutes(date, 125 + i).toString(),
     hourValue: 10,
-    holidayPay: true,
-    holidayPayRate: 0,
     taxCode: 0,
     amount: 125 + i,
     isClosed: false,
@@ -123,7 +121,6 @@ export const userMocked: UserType = {
     currency: "USD",
     hourValue: null,
     unpaidBreaks: null,
-    holidayPay: 8,
     theme: "system",
   },
 };
@@ -148,7 +145,6 @@ export const userTestData: UserType = {
     currency: "USD",
     hourValue: null,
     unpaidBreaks: null,
-    holidayPay: 8,
     theme: "system",
   },
   shifts: {

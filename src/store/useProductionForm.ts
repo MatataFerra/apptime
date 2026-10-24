@@ -6,7 +6,6 @@ interface Production {
     finishDate?: string;
     itemValue?: string;
     itemQuantity?: string;
-    holidayPayRate?: string;
     isPublicHoliday?: boolean;
     publicHolidayWorked?: boolean;
     unpaidBreaks?: string;
@@ -22,7 +21,6 @@ interface Production {
     finishDate: boolean;
     itemValue: boolean;
     itemQuantity: boolean;
-    holidayPayRate: boolean;
     startTime: boolean;
     finishTime: boolean;
     unpaidBreaks: boolean;
@@ -33,7 +31,6 @@ interface Production {
     finishDate: boolean;
     itemValue: boolean;
     itemQuantity: boolean;
-    holidayPayRate: boolean;
     startTime: boolean;
     finishTime: boolean;
     unpaidBreaks: boolean;
@@ -60,7 +57,6 @@ export const useProductionForm = create<Production>((set, get) => ({
     name: "",
     itemValue: "",
     itemQuantity: "",
-    holidayPayRate: "",
     startTime: "",
     finishTime: "",
     isPublicHoliday: false,
@@ -75,7 +71,6 @@ export const useProductionForm = create<Production>((set, get) => ({
     finishDate: false,
     itemValue: false,
     itemQuantity: false,
-    holidayPayRate: false,
     startTime: false,
     finishTime: false,
     unpaidBreaks: false,
@@ -86,7 +81,6 @@ export const useProductionForm = create<Production>((set, get) => ({
     finishDate: false,
     itemValue: false,
     itemQuantity: false,
-    holidayPayRate: false,
     startTime: false,
     finishTime: false,
     unpaidBreaks: false,
@@ -105,7 +99,6 @@ export const useProductionForm = create<Production>((set, get) => ({
         startDate: "",
         finishDate: "",
         name: "",
-        holidayPayRate: "",
         isPublicHoliday: false,
         itemQuantity: "",
         itemValue: "",

@@ -155,10 +155,10 @@
       "finish": "Fin",
       "unpaid_breaks": "Descansos no pagos",
       "hourly_rate": "Pago por hora",
+      "contributions": "Contribuciones",
       "job_name": "Nombre del trabajo",
       "time_worked": "Tiempo trabajado",
       "pieces": "Piezas",
-      "holiday_pay": "Pago de vacaciones",
       "item_value": "Valor por pieza",
       "item_value_hint": "Por bin, caja o pieza",
       "quantity": "Cantidad",
@@ -436,6 +436,62 @@
       "already_added": "Ya está agregado"
     }
   },
+  "contribution_picker": {
+    "title": "Contribuciones",
+    "subtitle": "Opcional. Se suman al pago de este turno, como el pago de vacaciones por adelantado.",
+    "total_label": "{rate}% sumado en total",
+    "saved_title": "Tus contribuciones",
+    "tap_hint": "Toca para agregar o quitar",
+    "search": "Buscar tus contribuciones",
+    "no_match": "Ninguna contribución guardada coincide con “{search}”.",
+    "new_title": "Nuevas para este turno",
+    "remove": "Quitar {name}",
+    "using_saved": "Usando tu \"{name}\" guardada",
+    "using_saved_description": "{rate}% de tus turnos anteriores.",
+    "empty": "Algunos países pagan las vacaciones junto con el sueldo. Elige una de las comunes o escribe la tuya.",
+    "new": "Nueva contribución",
+    "add": "Agregar contribución",
+    "cancel": "Cancelar",
+    "presets_title": "Comunes por país",
+    "fields": {
+      "name": "Nombre",
+      "name_placeholder": "Pago de vacaciones",
+      "rate": "Tasa",
+      "note": "Nota (opcional)",
+      "note_placeholder": "Como figura en tu recibo"
+    },
+    "errors": {
+      "name_required": "Ponle un nombre",
+      "rate_range": "Entre 0 y 100",
+      "already_added": "Ya está agregada"
+    }
+  },
+  "contribution_presets": {
+    "nz_holiday_pay": {
+      "name": "Holiday pay (NZ)",
+      "hint": "Nueva Zelanda: 8% del bruto para trabajo casual o de plazo fijo, en lugar de vacaciones pagas."
+    },
+    "au_casual_loading": {
+      "name": "Casual loading (AU)",
+      "hint": "Australia: 25% extra para casuals en la mayoría de los awards. Úsalo si tu tarifa no lo incluye."
+    },
+    "ca_vacation_pay": {
+      "name": "Vacation pay (CA)",
+      "hint": "Canadá: 4% en la mayoría de las provincias (más tras años de antigüedad)."
+    },
+    "uk_rolled_up_holiday": {
+      "name": "Rolled-up holiday pay (UK)",
+      "hint": "Reino Unido: 12,07% para horarios irregulares o trabajo de temporada."
+    },
+    "nl_holiday_allowance": {
+      "name": "Vakantiegeld (NL)",
+      "hint": "Países Bajos: al menos 8% del salario bruto."
+    },
+    "fr_paid_leave": {
+      "name": "Congés payés (FR)",
+      "hint": "Francia: 10% del bruto al terminar un contrato de plazo fijo (CDD)."
+    }
+  },
   "compare": {
     "per_piece": "Por pieza",
     "per_hour": "Por hora",
@@ -592,8 +648,6 @@
       "hourly_rate_hint": "Se completa en Turno en vivo, Carga rápida y Estimar.",
       "unpaid_breaks": "Descansos no pagos",
       "unpaid_breaks_hint": "Minutos por turno, para Carga rápida.",
-      "holiday_pay": "Pago de vacaciones",
-      "holiday_pay_hint": "Lo usa Estimar.",
       "week_starts": "La semana empieza el",
       "monday": "Lunes",
       "sunday": "Domingo",
@@ -763,6 +817,7 @@
     "used_in": "Usado en {count, plural, one {# turno} other {# turnos}}",
     "not_used": "Todavía sin usar",
     "edit_label": "Editar {name}",
-    "remove_label": "Quitar {name}"
+    "remove_label": "Quitar {name}",
+    "my_contributions_description": "Se suman al pago de los turnos que las usan. Se agregan desde el formulario de cada turno."
   }
 }
