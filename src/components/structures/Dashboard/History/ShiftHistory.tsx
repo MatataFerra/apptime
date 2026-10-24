@@ -23,6 +23,13 @@ import {
 import { formatHours } from "@/services/Summary";
 
 import EmployerFilter from "@/components/structures/Dashboard/History/EmployerFilter";
+import {
+  CheckIcon,
+  keyOf,
+  SelectionActions,
+  SelectionHeader,
+  selectionState,
+} from "@/components/structures/Dashboard/History/Selection";
 import Content from "@/components/structures/Dashboard/Table/Dialog/Content";
 import TableDialog from "@/components/structures/Dashboard/Table/Dialog/Dialog";
 import Skeleton from "@/components/ui/Skeleton";
@@ -37,6 +44,7 @@ import useProductionShifts from "@/hooks/useProductionShifts";
 
 import { useDashHourlyStore } from "@/store/useDashHourlyStore";
 import { useDashProductionStore } from "@/store/useDashProductionStore";
+import { useHistorySelection } from "@/store/useHistorySelection";
 
 type Filter = "all" | ShiftKind;
 
@@ -51,6 +59,50 @@ function detail(entry: HistoryEntry, money: (value: number) => string, t: Transl
   }
   const { itemQuantity, itemValue } = entry.shift as Production;
   return t("pieces_detail", { count: itemQuantity ?? 0, value: money(itemValue ?? 0) });
+}
+
+/** A row while selecting: tapping it checks it, the date badge becomes the checkbox. */
+function SelectableRow({ entry }: { entry: HistoryEntry }) {
+  const format$ = useMoney();
+  const t = useTranslations("dashboard.history");
+  const locale = useDateLocale();
+  const { byId } = useEmployers();
+  const checked = useHistorySelection((state) => state.keys.has(keyOf(entry)));
+  const toggle = useHistorySelection((state) => state.toggle);
+  const employer = entry.employerId !== null ? byId.get(entry.employerId) : undefined;
+  const isHourly = entry.kind === "hourly";
+
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={checked}
+      data-testid="history-row"
+      onClick={() => toggle(keyOf(entry))}
+      className={cn(
+        "flex w-full items-center gap-3 px-3.5 py-3 text-left transition-colors",
+        checked ? "bg-accent-soft" : "hover:bg-surface-sunken focus-visible:bg-surface-sunken"
+      )}
+    >
+      <span className="flex w-12 shrink-0 items-center justify-center py-1.5">
+        <CheckIcon state={checked ? "all" : "none"} classes="size-6" />
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="truncate text-[0.9375rem] font-semibold text-ink">
+          {entry.name || (isHourly ? t("hourly_shift") : t("piece_shift"))}
+        </span>
+        <span className="truncate text-[0.8125rem] text-ink-muted">
+          <span className={isHourly ? "text-track-ink" : "text-production-ink"}>
+            {format(entry.date, "EEE d", { locale })}
+          </span>{" "}
+          · {employer?.name ?? (isHourly ? t("filters.hourly") : t("filters.production"))}
+        </span>
+      </span>
+      <span className="shrink-0 text-[0.9375rem] font-semibold text-ink tabular-nums">
+        {format$(entry.earned, { currency: entry.currency })}
+      </span>
+    </button>
+  );
 }
 
 function HistoryRow({ entry }: { entry: HistoryEntry }) {
@@ -132,7 +184,12 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
 function MonthSection({ month }: { month: MonthGroup }) {
   const money = useMoney();
   const t = useTranslations("dashboard.history");
+  const ts = useTranslations("dashboard.selection");
   const [days, setDays] = useState(DAYS_PER_PAGE);
+  const selecting = useHistorySelection((state) => state.active);
+  const keys = useHistorySelection((state) => state.keys);
+  const setMany = useHistorySelection((state) => state.setMany);
+  const monthState = selectionState(month.entries, keys);
   const totalDays = countDays(month.entries);
   const visible = entriesForDays(month.entries, days);
   const hidden = month.entries.length - visible.length;
@@ -140,7 +197,21 @@ function MonthSection({ month }: { month: MonthGroup }) {
   return (
     <section aria-label={month.label} className="flex flex-col gap-2">
       <header className="flex items-baseline justify-between px-1">
-        <h3 className="text-sm font-semibold text-ink">{month.label}</h3>
+        {selecting ? (
+          <button
+            type="button"
+            role="checkbox"
+            aria-checked={monthState === "all" ? true : monthState === "some" ? "mixed" : false}
+            aria-label={ts("select_month", { month: month.label })}
+            onClick={() => setMany(month.entries.map(keyOf), monthState !== "all")}
+            className="-ml-1 flex items-center gap-1.5 rounded-md px-1 text-sm font-semibold text-ink"
+          >
+            <CheckIcon state={monthState} />
+            {month.label}
+          </button>
+        ) : (
+          <h3 className="text-sm font-semibold text-ink">{month.label}</h3>
+        )}
         <span className="text-sm text-ink-muted tabular-nums">
           {t("shifts", { count: month.entries.length })} ·{" "}
           {month.totals.map((total, i) => (
@@ -155,7 +226,7 @@ function MonthSection({ month }: { month: MonthGroup }) {
         <ul className="divide-y divide-border">
           {visible.map((entry) => (
             <li key={`${entry.kind}-${entry.id}`}>
-              <HistoryRow entry={entry} />
+              {selecting ? <SelectableRow entry={entry} /> : <HistoryRow entry={entry} />}
             </li>
           ))}
         </ul>
@@ -208,6 +279,7 @@ function ShiftHistory() {
   const { data: productionData, isLoading: loadingProduction } = useProductionShifts();
   const { hourly, setInitialHourlies } = useDashHourlyStore();
   const { productions, setInitialProductions } = useDashProductionStore();
+  const selecting = useHistorySelection((state) => state.active);
 
   // The date picker filters these stores; keep them in sync with the data otherwise.
   useEffect(() => {
@@ -227,32 +299,36 @@ function ShiftHistory() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <div role="radiogroup" aria-label={t("filter_label")} className="flex shrink-0 gap-2">
-          {FILTERS.map((f) => (
-            <button
-              key={f}
-              type="button"
-              role="radio"
-              aria-checked={filter === f}
-              onClick={() => setFilter(f)}
-              className={cn(
-                "h-9 rounded-full border px-3.5 text-sm font-medium transition-colors",
-                filter === f
-                  ? "border-transparent bg-primary text-primary-foreground"
-                  : "border-border-strong bg-surface text-ink hover:bg-surface-sunken"
-              )}
-            >
-              {t(`filters.${f}`)}
-            </button>
-          ))}
+      {selecting ? (
+        <SelectionHeader entries={entries} />
+      ) : (
+        <div className="flex flex-wrap items-center gap-2">
+          <div role="radiogroup" aria-label={t("filter_label")} className="flex shrink-0 gap-2">
+            {FILTERS.map((f) => (
+              <button
+                key={f}
+                type="button"
+                role="radio"
+                aria-checked={filter === f}
+                onClick={() => setFilter(f)}
+                className={cn(
+                  "h-9 rounded-full border px-3.5 text-sm font-medium transition-colors",
+                  filter === f
+                    ? "border-transparent bg-primary text-primary-foreground"
+                    : "border-border-strong bg-surface text-ink hover:bg-surface-sunken"
+                )}
+              >
+                {t(`filters.${f}`)}
+              </button>
+            ))}
+          </div>
+          <EmployerFilter
+            value={employer}
+            onChange={setEmployer}
+            counts={countByEmployer(filterEntries(all, { kind: filter }))}
+          />
         </div>
-        <EmployerFilter
-          value={employer}
-          onChange={setEmployer}
-          counts={countByEmployer(filterEntries(all, { kind: filter }))}
-        />
-      </div>
+      )}
 
       {months.length === 0 ? (
         <p className="rounded-xl border border-dashed border-border-strong p-6 text-center text-sm text-ink-muted">
@@ -267,6 +343,8 @@ function ShiftHistory() {
           <MonthSection key={`${filter}-${employer}-${month.key}`} month={month} />
         ))
       )}
+
+      {selecting && entries.length > 0 ? <SelectionActions entries={entries} /> : null}
     </div>
   );
 }
