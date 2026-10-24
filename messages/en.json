@@ -570,6 +570,12 @@
         "hourly": "Per hour",
         "production": "Per piece"
       },
+      "employer_filter_label": "Employer",
+      "employer_all": "All employers",
+      "employer_none": "No employer",
+      "employer_search": "Search employers",
+      "employer_no_match": "No employer matches.",
+      "employer_archived": "(removed)",
       "hourly_shift": "Hourly shift",
       "piece_shift": "Per piece shift",
       "hourly_detail": "{hours} · {rate}/h",
@@ -579,6 +585,7 @@
       "net": "{amount} net",
       "empty": "No shifts saved yet.",
       "empty_filtered": "No shifts in those dates.",
+      "empty_employer": "No shifts match those filters.",
       "shifts": "{count, plural, one {# shift} other {# shifts}}",
       "show_more": "Show more ({count, plural, one {# shift} other {# shifts}})",
       "show_less": "Show less"
