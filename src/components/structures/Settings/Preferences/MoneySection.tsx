@@ -64,14 +64,6 @@ function MoneySection() {
         max={600}
         onSave={(unpaidBreaks) => save({ unpaidBreaks })}
       />
-      <NumberSetting
-        label={t("holiday_pay")}
-        hint={t("holiday_pay_hint")}
-        value={config?.holidayPay ?? 8}
-        unit="%"
-        max={100}
-        onSave={(holidayPay) => holidayPay !== null && save({ holidayPay })}
-      />
       <Row label={t("week_starts")} stacked>
         <Segmented
           label={t("week_starts")}

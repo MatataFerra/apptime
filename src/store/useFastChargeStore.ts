@@ -21,7 +21,6 @@ interface FastCharge {
     startDate: boolean;
     finishDate: boolean;
     hourValue: boolean;
-    holidayPayRate: boolean;
     startTime: boolean;
     finishTime: boolean;
     unpaidBreaks: boolean;
@@ -31,7 +30,6 @@ interface FastCharge {
     startDate: boolean;
     finishDate: boolean;
     hourValue: boolean;
-    holidayPayRate: boolean;
     startTime: boolean;
     finishTime: boolean;
     unpaidBreaks: boolean;
@@ -57,7 +55,6 @@ export const useFastChargeStore = create<FastCharge>((set, get) => ({
     finishDate: "",
     hourValue: "",
     name: "",
-    holidayPayRate: "",
     startTime: "",
     finishTime: "",
     fastHoliday: false,
@@ -71,7 +68,6 @@ export const useFastChargeStore = create<FastCharge>((set, get) => ({
     startDate: false,
     finishDate: false,
     hourValue: false,
-    holidayPayRate: false,
     startTime: false,
     finishTime: false,
     unpaidBreaks: false,
@@ -81,7 +77,6 @@ export const useFastChargeStore = create<FastCharge>((set, get) => ({
     startDate: false,
     finishDate: false,
     hourValue: false,
-    holidayPayRate: false,
     startTime: false,
     finishTime: false,
     unpaidBreaks: false,

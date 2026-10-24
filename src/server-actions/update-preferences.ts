@@ -21,7 +21,6 @@ const PreferencesSchema = z
     weekStartsOn: z.enum(WEEK_DAYS).optional(),
     hourValue: optionalAmount,
     unpaidBreaks: z.number().min(0).max(600).nullable().optional(),
-    holidayPay: z.number().min(0).max(100).optional(),
   })
   .strict();
 

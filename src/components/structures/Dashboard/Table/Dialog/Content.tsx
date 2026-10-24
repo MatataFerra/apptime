@@ -57,6 +57,14 @@ function TableDialogContent({ shift }: Props) {
     ...(!production
       ? [{ label: t("fields.hourly_rate"), value: money(Number(shift.hourValue ?? 0)) }]
       : []),
+    ...(shift.contributions?.length
+      ? [
+          {
+            label: t("fields.contributions"),
+            value: shift.contributions.map((c) => `${c.name} +${Number(c.value)}%`).join(", "),
+          },
+        ]
+      : []),
   ];
 
   return (

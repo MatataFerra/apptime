@@ -4,10 +4,11 @@ import cloneDeep from "lodash/cloneDeep";
 import has from "lodash/has";
 import isEmpty from "lodash/isEmpty";
 
+import { withContributions } from "@/services/Contribution/math";
 import HourlyService from "@/services/Shift/Hourly";
 import ProductionService from "@/services/Shift/Production";
 
-import type { HourlyType, ProductionType, SalaryItemInput,Shifts } from "@/types";
+import type { HourlyType, ProductionType, SalaryItemInput, Shifts } from "@/types";
 
 type ShiftHourlyOrProduction = Hourly | Production;
 type ShiftWithTaxesType = HourlyType | ProductionType;
@@ -120,12 +121,14 @@ class ShiftService implements ShiftServiceInterface {
     ============================================================
   */
 
+  /** Pay for the shift, plus its contributions (holiday pay…) when it has any. */
   calculateEarnings() {
-    if (this.isProductionShift) {
-      return new ProductionService(this.shift as Production).calculateEarnings();
-    }
+    const base = this.isProductionShift
+      ? new ProductionService(this.shift as Production).calculateEarnings()
+      : new HourlyService(this.shift as Hourly).calculateEarnings();
+    const contributions = (this.shift as Partial<ShiftWithTaxesType>).contributions;
 
-    return new HourlyService(this.shift as Hourly).calculateEarnings();
+    return withContributions(base, contributions);
   }
 
   /*  
@@ -310,7 +313,6 @@ class ShiftService implements ShiftServiceInterface {
   }
 
   static calculateEarnings({
-    holidayPayRate,
     hourValue,
     hoursWorked,
     startDate,
@@ -318,7 +320,6 @@ class ShiftService implements ShiftServiceInterface {
     unpaidBreaks,
     isPublicHoliday,
   }: {
-    holidayPayRate?: number;
     hourValue: number;
     hoursWorked?: number;
     startDate?: string;
@@ -330,7 +331,6 @@ class ShiftService implements ShiftServiceInterface {
     let amount = 0;
     let totalTime = 0;
     let publicHolidayRate = 1;
-    const holidayPayRateValue = holidayPayRate ? holidayPayRate / 100 + 1 : 1;
     const hourJobValue = hourValue;
     const unpaidBreaksValue = unpaidBreaks ?? 0;
 
@@ -356,7 +356,7 @@ class ShiftService implements ShiftServiceInterface {
       totalTime = amount - unpaidBreaksValue;
     }
 
-    const earnings = totalTime * minuteRate * publicHolidayRate * holidayPayRateValue;
+    const earnings = totalTime * minuteRate * publicHolidayRate;
 
     return Math.round(earnings * 100) / 100;
   }

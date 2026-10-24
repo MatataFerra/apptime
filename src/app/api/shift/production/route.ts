@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
   // over Turso could hit Prisma's 5 s timeout.
   const production = await prisma.production.findMany({
     where: { shift: { userId: checkToken.id } },
-    include: { taxes: true },
+    include: { taxes: true, contributions: true },
   });
 
   if (!production) {

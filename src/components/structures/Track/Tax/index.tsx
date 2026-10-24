@@ -36,9 +36,9 @@ export const useTaxDialog = create<Observer>((set) => ({
   setIsOpen: (isOpen) => set({ isOpen }),
 }));
 
-/** Taxes for the running shift; they're applied when the shift is finished. */
+/** Taxes and contributions for the running shift; applied when it's finished. */
 function TaxDialog({ children }: PropsWithChildren) {
-  const { taxesModule } = useTrackTaxesOrContributionsStore();
+  const { taxesModule, contributionsModule } = useTrackTaxesOrContributionsStore();
   const { isOpen, setIsOpen } = useTaxDialog((state) => state);
   const t = useTranslations("track.taxes");
 
@@ -51,6 +51,8 @@ function TaxDialog({ children }: PropsWithChildren) {
           <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
         <TaxPicker store={taxesModule} theme="track" bare />
+        <hr className="border-border" />
+        <TaxPicker kind="contributions" store={contributionsModule} theme="track" bare />
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="primary" size="lg" classes="w-full">

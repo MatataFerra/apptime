@@ -11,13 +11,14 @@ const TaxPicker = dynamic(() => import("@/components/structures/SalaryItems/TaxP
   loading: () => <Skeleton classes="h-40 w-full rounded-xl" />,
 });
 
-/** Taxes for this shift, inline in the form (no nested drawers). */
+/** Taxes and contributions for this shift, inline in the form (no nested drawers). */
 function Drawer() {
-  const { taxesModule } = useHourlyTaxesOrContributionsStore((state) => state);
+  const { taxesModule, contributionsModule } = useHourlyTaxesOrContributionsStore((state) => state);
 
   return (
-    <div className="my-2 w-full">
+    <div className="my-2 flex w-full flex-col gap-3">
       <TaxPicker store={taxesModule} theme="fast" />
+      <TaxPicker kind="contributions" store={contributionsModule} theme="fast" />
     </div>
   );
 }

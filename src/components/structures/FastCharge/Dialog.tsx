@@ -5,6 +5,7 @@ import { type PropsWithChildren, useEffect, useMemo } from "react";
 import { differenceInMinutes } from "date-fns";
 import { useTranslations } from "next-intl";
 
+import { withContributions } from "@/services/Contribution/math";
 import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
 
@@ -40,6 +41,7 @@ function DialogHourly({ children }: PropsWithChildren) {
 
   const {
     taxesModule: { salaryElement: taxes },
+    contributionsModule: { salaryElement: contributions },
   } = useHourlyTaxesOrContributionsStore((state) => state);
 
   useEffect(() => {
@@ -72,14 +74,27 @@ function DialogHourly({ children }: PropsWithChildren) {
       unpaidBreaks: Number(unpaidBreaks),
     };
 
-    const earnings = new ShiftService(prepareShift).checkPublicHoliday().calculateEarnings();
+    // Holiday pay and the like go on top of the hours.
+    const earnings = withContributions(
+      new ShiftService(prepareShift).checkPublicHoliday().calculateEarnings(),
+      contributions
+    );
     const getTaxesDiscount = Pay.afterTax(earnings, taxes);
 
     return {
       sharp: isNaN(earnings) ? 0 : earnings,
       afterTaxes: isNaN(getTaxesDiscount) ? 0 : getTaxesDiscount,
     };
-  }, [fastHoliday, fastWorked, formatEnd, formatStart, hourValue, taxes, unpaidBreaks]);
+  }, [
+    contributions,
+    fastHoliday,
+    fastWorked,
+    formatEnd,
+    formatStart,
+    hourValue,
+    taxes,
+    unpaidBreaks,
+  ]);
 
   const tags = [
     fastHoliday ? t("tags.public_holiday") : null,

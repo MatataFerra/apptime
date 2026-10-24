@@ -5,6 +5,7 @@ import { type FormEvent, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
+import { withContributions } from "@/services/Contribution/math";
 import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
 import Toast from "@/services/Toast";
@@ -100,9 +101,10 @@ function Batch() {
       gross += new ShiftService(shift).calculateEarnings();
     }
 
-    gross = Math.round(gross * 100) / 100;
+    // Holiday pay and the like go on top.
+    gross = withContributions(Math.round(gross * 100) / 100, contributions);
     return { minutes, gross, afterTaxes: Pay.afterTax(gross, taxes) };
-  }, [chosen, hourValue, unpaidBreaks, taxes]);
+  }, [chosen, hourValue, unpaidBreaks, taxes, contributions]);
 
   function reset() {
     setName("");
