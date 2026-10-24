@@ -155,6 +155,7 @@
       "finish": "Fin",
       "unpaid_breaks": "Descansos no pagos",
       "hourly_rate": "Pago por hora",
+      "contributions": "Contribuciones",
       "job_name": "Nombre del trabajo",
       "time_worked": "Tiempo trabajado",
       "pieces": "Piezas",
@@ -165,8 +166,7 @@
       "employer": "Empleador",
       "add_employer": "Agregar uno",
       "no_employer": "Ninguno",
-      "removed": "(eliminado)",
-      "contributions": "Contribuciones"
+      "removed": "(eliminado)"
     },
     "tags": {
       "repeated": "Repetido",

@@ -155,6 +155,7 @@
       "finish": "Finish",
       "unpaid_breaks": "Unpaid breaks",
       "hourly_rate": "Hourly rate",
+      "contributions": "Contributions",
       "job_name": "Name of your job",
       "time_worked": "Time worked",
       "pieces": "Pieces",
@@ -165,8 +166,7 @@
       "employer": "Employer",
       "add_employer": "Add one",
       "no_employer": "None",
-      "removed": "(removed)",
-      "contributions": "Contributions"
+      "removed": "(removed)"
     },
     "tags": {
       "repeated": "Repeated",
