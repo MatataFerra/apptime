@@ -15,14 +15,14 @@ import { MODULE_THEMES, type ModuleTheme } from "@/utils/constants/modules";
 import { cn } from "@/utils/helpers/styleMerger";
 import useSalaryItems from "@/hooks/useSalaryItems";
 
-import type { ContributionOrTax } from "@/store/useTaxOrContributionStore";
+import { type ContributionOrTax, sameSalaryItem } from "@/store/useTaxOrContributionStore";
 
 type Props = {
   /** taxesModule from one of the useXTaxesOrContributionsStore stores */
   store: {
     salaryElement: ContributionOrTax[];
     add: (element: ContributionOrTax) => void;
-    remove: (name: string) => void;
+    remove: (element: Pick<ContributionOrTax, "name" | "value">) => void;
   };
   /** Colour family of the module the picker lives in. */
   theme?: ModuleTheme;
@@ -36,10 +36,6 @@ const SEARCH_FROM = 8;
 export function effectiveRate(taxes: Pick<ContributionOrTax, "value">[]) {
   const kept = taxes.reduce((acc, t) => acc * (1 - (Number(t.value) || 0) / 100), 1);
   return Math.round((1 - kept) * 1000) / 10;
-}
-
-function sameName(a: string, b: string) {
-  return a.trim().toLowerCase() === b.trim().toLowerCase();
 }
 
 /**
@@ -58,19 +54,19 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
   const [draft, setDraft] = useState({ name: "", value: "", description: "" });
   const [errors, setErrors] = useState<{ name?: string; value?: string }>({});
 
-  function isSelected(name: string) {
-    return salaryElement.some((t) => sameName(t.name, name));
+  function isSelected(tax: Pick<ContributionOrTax, "name" | "value">) {
+    return salaryElement.some((t) => sameSalaryItem(t, tax));
   }
 
-  const unsavedSelected = salaryElement.filter((t) => !saved.some((s) => sameName(s.name, t.name)));
+  const unsavedSelected = salaryElement.filter((t) => !saved.some((s) => sameSalaryItem(s, t)));
   const visibleSaved = search
     ? saved.filter((t) => t.name.toLowerCase().includes(search.toLowerCase()))
     : saved;
   const rate = effectiveRate(salaryElement);
 
   function toggleSaved(tax: (typeof saved)[number]) {
-    if (isSelected(tax.name)) {
-      remove(tax.name);
+    if (isSelected(tax)) {
+      remove(tax);
       return;
     }
     const { id: _id, ...rest } = tax;
@@ -91,15 +87,16 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
     if (!draft.value || isNaN(value) || value <= 0 || value > 100) {
       nextErrors.value = t("errors.rate_range");
     }
-    if (name && isSelected(name)) nextErrors.name = t("errors.already_added");
+    if (name && isSelected({ name, value })) nextErrors.name = t("errors.already_added");
 
     if (nextErrors.name || nextErrors.value) {
       setErrors(nextErrors);
       return;
     }
 
-    // Same name as a saved tax: use the saved one instead of creating a duplicate.
-    const existing = saved.find((s) => sameName(s.name, name));
+    // Same name and rate as a saved tax: use the saved one instead of creating a duplicate.
+    // Same name with another rate is a different tax (e.g. two Social Security rates).
+    const existing = saved.find((s) => sameSalaryItem(s, { name, value }));
     if (existing) {
       toggleSaved(existing);
       Toast({
@@ -178,7 +175,7 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
           ) : null}
           <ul className="flex flex-wrap gap-2">
             {visibleSaved.map((tax) => {
-              const on = isSelected(tax.name);
+              const on = isSelected(tax);
               return (
                 <li key={tax.id}>
                   <button
@@ -217,7 +214,7 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
           <ul className="flex flex-wrap gap-2">
             {unsavedSelected.map((tax) => (
               <li
-                key={tax.name}
+                key={`${tax.name}-${tax.value}`}
                 className={cn(
                   "flex h-10 items-center gap-1.5 rounded-full pr-1 pl-3.5 text-sm font-medium",
                   colors.soft,
@@ -228,7 +225,7 @@ function TaxPicker({ store: { salaryElement, add, remove }, theme = "neutral", b
                 <span className="tabular-nums opacity-80">{tax.value}%</span>
                 <button
                   type="button"
-                  onClick={() => remove(tax.name)}
+                  onClick={() => remove(tax)}
                   aria-label={t("remove", { name: tax.name })}
                   className="flex size-8 items-center justify-center rounded-full hover:bg-black/5"
                 >

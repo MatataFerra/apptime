@@ -4,15 +4,17 @@ import type { SalaryItemInput } from "@/types";
 
 import useSalaryItems from "@/hooks/useSalaryItems";
 
+import { sameSalaryItem } from "@/store/useTaxOrContributionStore";
+
 type HookProps = {
   localTaxes: SalaryItemInput[];
   localContributions: SalaryItemInput[];
 };
 
-type Named = { name: string };
+type Item = { name: string; value: number };
 
-function notSavedYet<T extends Named>(local: T[], saved: Named[] | undefined) {
-  return local.filter((item) => !saved?.some((s) => s.name === item.name));
+function notSavedYet<T extends Item>(local: T[], saved: Item[] | undefined) {
+  return local.filter((item) => !saved?.some((s) => sameSalaryItem(s, item)));
 }
 
 /**
