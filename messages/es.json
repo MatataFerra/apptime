@@ -235,6 +235,11 @@
       "save": "{count, plural, one {Guardar # turno} other {Guardar # turnos}}",
       "created": "{count, plural, =0 {No se guardó ningún turno} one {# turno guardado} other {# turnos guardados}}",
       "skipped": "{count, plural, one {# día omitido: se superpone con un turno guardado.} other {# días omitidos: se superponen con turnos guardados.}}",
+      "quantity_default": "Cantidad por día",
+      "quantity_hint": "Se copia a todos los días; cámbiala en cualquiera abajo",
+      "quantity_for": "Cantidad, {day}",
+      "items": "{count, plural, one {# unidad} other {# unidades}}",
+      "quantity_missing": "{count, plural, one {# día no tiene cantidad: complétala o desmárcalo.} other {# días no tienen cantidad: complétalas o desmárcalos.}}",
       "errors": {
         "finish_before_start": "El fin debe ser posterior al inicio",
         "too_long": "Un turno no puede durar más de 24 horas",

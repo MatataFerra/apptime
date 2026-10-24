@@ -235,6 +235,11 @@
       "save": "{count, plural, one {Save # shift} other {Save # shifts}}",
       "created": "{count, plural, =0 {No shifts saved} one {# shift saved} other {# shifts saved}}",
       "skipped": "{count, plural, one {# day skipped: it overlaps a saved shift.} other {# days skipped: they overlap saved shifts.}}",
+      "quantity_default": "Quantity per day",
+      "quantity_hint": "Fills every day; change any day below",
+      "quantity_for": "Quantity, {day}",
+      "items": "{count, plural, one {# item} other {# items}}",
+      "quantity_missing": "{count, plural, one {# day has no quantity: fill it in or untick it.} other {# days have no quantity: fill them in or untick them.}}",
       "errors": {
         "finish_before_start": "The finish must be after the start",
         "too_long": "A shift can't be longer than 24 hours",

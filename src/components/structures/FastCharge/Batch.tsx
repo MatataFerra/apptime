@@ -3,7 +3,6 @@
 import { type FormEvent, useMemo, useState } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { addDays, format } from "date-fns";
 import { useTranslations } from "next-intl";
 
 import Pay from "@/services/Pay";
@@ -11,6 +10,13 @@ import ShiftService from "@/services/Shift";
 import Toast from "@/services/Toast";
 
 import Drawer from "@/components/modules/FastCharge/Drawer";
+import BatchPreview from "@/components/structures/share/batch/BatchPreview";
+import BatchScheduleFields from "@/components/structures/share/batch/BatchScheduleFields";
+import {
+  toNumber,
+  toShiftDates,
+  useBatchSchedule,
+} from "@/components/structures/share/batch/useBatchSchedule";
 import ShiftReviewDialog from "@/components/structures/share/ShiftReviewDialog";
 import CurrencySelect from "@/components/structures/ShiftForms/CurrencySelect";
 import DatalistShiftNames from "@/components/structures/ShiftForms/Datalist";
@@ -22,17 +28,6 @@ import Stack from "@/components/ui/Stack";
 
 import { currencySymbol } from "@/utils/constants/currencies";
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
-import {
-  type BatchError,
-  buildBatchDays,
-  findOverlaps,
-  MAX_BATCH_DAYS,
-  WEEK_ORDER,
-  type Weekday,
-} from "@/utils/helpers/batchShifts";
-import { defaultFinish, needsDefaultFinish } from "@/utils/helpers/defaultFinish";
-import { cn } from "@/utils/helpers/styleMerger";
-import useDateLocale from "@/hooks/useDateLocale";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
 import useMoney, { useCurrency } from "@/hooks/useMoney";
 import useProductionShifts from "@/hooks/useProductionShifts";
@@ -43,14 +38,6 @@ import onCreateHourlyBatch from "@/server-actions/hourly-batch";
 import { useHourlyTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
 
 const FORM_ID = "fast-charge-batch";
-const WORK_WEEK: Weekday[] = [1, 2, 3, 4, 5];
-/** Any Monday: the chips are labelled from its week. */
-const A_MONDAY = new Date(2026, 9, 5);
-
-function toNumber(value: string) {
-  const n = Number(value);
-  return Number.isFinite(n) && n > 0 ? n : 0;
-}
 
 /**
  * Fast charge for a stretch of days: the first shift's hours, repeated on the
@@ -60,7 +47,6 @@ function toNumber(value: string) {
 function Batch() {
   const t = useTranslations("shift");
   const tb = useTranslations("shift.batch");
-  const dateLocale = useDateLocale();
   const money = useMoney();
   const defaultCurrency = useCurrency();
   const queryClient = useQueryClient();
@@ -75,14 +61,10 @@ function Batch() {
   /** null until typed: the value saved in Settings shows instead. */
   const [typedRate, setHourValue] = useState<string | null>(null);
   const [typedBreaks, setUnpaidBreaks] = useState<string | null>(null);
-  const [start, setStart] = useState("");
-  const [finish, setFinish] = useState("");
-  const [until, setUntil] = useState("");
-  const [weekdays, setWeekdays] = useState<Weekday[]>(WORK_WEEK);
-  /** Days the user unticked in the preview. */
-  const [left, setLeft] = useState<Set<string>>(() => new Set());
   const [review, setReview] = useState(false);
   const [saving, setSaving] = useState(false);
+  const schedule = useBatchSchedule();
+  const { chosen } = schedule;
 
   const { names } = useShiftNames({ hourly, production }, name);
   const { setIsWriting } = useDatalistStore((state) => state);
@@ -97,22 +79,6 @@ function Batch() {
   const savedBreaks = user?.config?.unpaidBreaks;
   const hourValue = typedRate ?? (savedRate ? String(savedRate) : "");
   const unpaidBreaks = typedBreaks ?? (savedBreaks ? String(savedBreaks) : "");
-
-  const result = useMemo(
-    () => buildBatchDays({ start, finish, until, weekdays }),
-    [start, finish, until, weekdays]
-  );
-  const days = useMemo(() => (result.ok ? result.days : []), [result]);
-
-  const clashes = useMemo(
-    () => findOverlaps(days, [...(hourly ?? []), ...(production ?? [])]),
-    [days, hourly, production]
-  );
-
-  const chosen = useMemo(
-    () => days.filter((day) => !clashes.has(day.key) && !left.has(day.key)),
-    [days, clashes, left]
-  );
 
   const totals = useMemo(() => {
     const rate = toNumber(hourValue);
@@ -138,60 +104,11 @@ function Batch() {
     return { minutes, gross, afterTaxes: Pay.afterTax(gross, taxes) };
   }, [chosen, hourValue, unpaidBreaks, taxes]);
 
-  // Only complain about a field once the user has filled the ones it depends on.
-  const error: BatchError | null =
-    !result.ok && start && finish && (until || result.error !== "invalid_until")
-      ? result.error
-      : null;
-
-  const weekdayChips = useMemo(
-    () =>
-      WEEK_ORDER.map((day) => {
-        const date = addDays(A_MONDAY, (day + 6) % 7);
-        return {
-          day,
-          short: format(date, "EEEEEE", { locale: dateLocale }),
-          long: format(date, "EEEE", { locale: dateLocale }),
-        };
-      }),
-    [dateLocale]
-  );
-
-  function toggleWeekday(day: Weekday) {
-    setWeekdays((current) =>
-      current.includes(day) ? current.filter((d) => d !== day) : [...current, day]
-    );
-  }
-
-  function toggleDay(key: string) {
-    setLeft((current) => {
-      const next = new Set(current);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  }
-
-  function onStartChange(value: string) {
-    setStart(value);
-    // A shift rarely spans days: suggest a finish 8h later, same day.
-    if (value && needsDefaultFinish(value, finish)) setFinish(defaultFinish(value));
-    // A week ahead is the usual stretch; never before the first day.
-    const day = value.slice(0, 10);
-    if (day && (!until || until < day)) {
-      setUntil(format(addDays(new Date(`${day}T00:00`), 6), "yyyy-MM-dd"));
-    }
-  }
-
   function reset() {
     setName("");
     setEmployerId(null);
     setCurrency(null);
-    setStart("");
-    setFinish("");
-    setUntil("");
-    setWeekdays(WORK_WEEK);
-    setLeft(new Set());
+    schedule.reset();
     clearTaxes();
     clearContributions();
   }
@@ -212,10 +129,7 @@ function Batch() {
       employerId,
       taxes,
       contributions,
-      shifts: chosen.map((day) => ({
-        startDate: day.start.toString(),
-        endDate: day.end.toString(),
-      })),
+      shifts: toShiftDates(chosen),
     });
 
     setSaving(false);
@@ -241,7 +155,6 @@ function Batch() {
   }
 
   const hoursText = ShiftService.convertDifferenceInHHmm(totals.minutes).text;
-  const thisYear = new Date().getFullYear();
 
   return (
     <Stack orientation="vertical" spacing={4} classes="w-full">
@@ -276,79 +189,7 @@ function Batch() {
           }}
         />
 
-        <Input
-          containerClasses="flex-1"
-          classes="h-full"
-          label={tb("first_start")}
-          name="batch-start"
-          type="datetime-local"
-          max={`${thisYear}-12-31T23:59`}
-          value={start}
-          onChange={(e) => onStartChange(e.target.value)}
-        />
-        <Input
-          containerClasses="flex-1"
-          classes="h-full"
-          label={tb("first_finish")}
-          name="batch-finish"
-          type="datetime-local"
-          max={`${thisYear + 1}-01-01T23:59`}
-          isError={error === "finish_before_start" || error === "too_long"}
-          description={
-            error === "finish_before_start" || error === "too_long"
-              ? tb(`errors.${error}`)
-              : tb("night_hint")
-          }
-          value={finish}
-          onChange={(e) => setFinish(e.target.value)}
-        />
-
-        <Input
-          label={tb("until")}
-          name="batch-until"
-          type="date"
-          min={start.slice(0, 10) || undefined}
-          max={`${thisYear}-12-31`}
-          isError={error === "until_before_start" || error === "range_too_long"}
-          description={
-            error === "until_before_start" || error === "range_too_long"
-              ? tb(`errors.${error}`, { max: MAX_BATCH_DAYS })
-              : undefined
-          }
-          value={until}
-          onChange={(e) => setUntil(e.target.value)}
-        />
-
-        <fieldset className="w-full">
-          <legend className="mb-1.5 block text-sm font-medium text-ink">{tb("weekdays")}</legend>
-          <div className="grid grid-cols-7 gap-1.5">
-            {weekdayChips.map(({ day, short, long }) => {
-              const on = weekdays.includes(day);
-              return (
-                <button
-                  key={day}
-                  type="button"
-                  aria-pressed={on}
-                  aria-label={long}
-                  onClick={() => toggleWeekday(day)}
-                  className={cn(
-                    "h-10 rounded-md border text-sm font-medium capitalize transition-colors",
-                    on
-                      ? "border-fast bg-fast-soft text-fast-ink"
-                      : "border-border text-ink-muted hover:border-border-strong"
-                  )}
-                >
-                  {short}
-                </button>
-              );
-            })}
-          </div>
-          {error === "no_weekdays" ? (
-            <small className="mt-1 block text-xs text-destructive">
-              {tb("errors.no_weekdays")}
-            </small>
-          ) : null}
-        </fieldset>
+        <BatchScheduleFields schedule={schedule} theme="fast" />
 
         <Input
           label={t("fields.hourly_rate")}
@@ -375,60 +216,11 @@ function Batch() {
 
       <Drawer />
 
-      {days.length > 0 ? (
-        <section aria-labelledby="batch-preview" className="w-full">
-          <div className="mb-2 flex items-baseline justify-between gap-2">
-            <h2 id="batch-preview" className="text-sm font-medium text-ink">
-              {tb("preview", { count: chosen.length, total: days.length })}
-            </h2>
-            <span className="text-sm text-ink-muted">
-              {hoursText} · {money(totals.gross, { currency })}
-            </span>
-          </div>
-          <ul className="divide-y divide-border rounded-md border border-border">
-            {days.map((day) => {
-              const clash = clashes.has(day.key);
-              const on = !clash && !left.has(day.key);
-              return (
-                <li key={day.key}>
-                  <label
-                    className={cn(
-                      "flex min-h-11 items-center gap-3 px-3 py-2 text-sm",
-                      clash ? "cursor-not-allowed opacity-60" : "cursor-pointer",
-                      !on && !clash && "text-ink-muted line-through"
-                    )}
-                  >
-                    <input
-                      type="checkbox"
-                      className="size-4 accent-[var(--fast)]"
-                      checked={on}
-                      disabled={clash}
-                      onChange={() => toggleDay(day.key)}
-                    />
-                    <span className="flex-1 capitalize">
-                      {format(day.start, "EEE d MMM", { locale: dateLocale })}
-                    </span>
-                    <span className="text-ink-muted tabular-nums">
-                      {format(day.start, "p", { locale: dateLocale })}–
-                      {format(day.end, "p", { locale: dateLocale })}
-                    </span>
-                    {clash ? (
-                      <span className="rounded-sm bg-surface-sunken px-1.5 py-0.5 text-xs text-ink-muted">
-                        {tb("overlap")}
-                      </span>
-                    ) : null}
-                  </label>
-                </li>
-              );
-            })}
-          </ul>
-          {clashes.size > 0 ? (
-            <p className="mt-1.5 text-xs text-ink-muted">
-              {tb("overlap_hint", { count: clashes.size })}
-            </p>
-          ) : null}
-        </section>
-      ) : null}
+      <BatchPreview
+        schedule={schedule}
+        theme="fast"
+        summary={`${hoursText} · ${money(totals.gross, { currency })}`}
+      />
 
       <ShiftReviewDialog
         open={review}
