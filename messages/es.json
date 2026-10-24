@@ -516,7 +516,9 @@
       "net": "{amount} neto",
       "empty": "Todavía no guardaste turnos.",
       "empty_filtered": "No hay turnos en esas fechas.",
-      "shifts": "{count, plural, one {# turno} other {# turnos}}"
+      "shifts": "{count, plural, one {# turno} other {# turnos}}",
+      "show_more": "Mostrar más ({count, plural, one {# turno} other {# turnos}})",
+      "show_less": "Mostrar menos"
     },
     "dialog": {
       "deleting": "Borrando el turno...",

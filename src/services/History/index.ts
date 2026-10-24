@@ -114,6 +114,32 @@ export function groupByMonth(
   }));
 }
 
+/** Days a month shows before "Show more", and how many each tap adds. */
+export const DAYS_PER_PAGE = 7;
+
+/**
+ * The entries of the `days` most recent days that have shifts (entries come
+ * newest first), so a day with several shifts is never cut in half.
+ */
+export function entriesForDays(entries: HistoryEntry[], days: number) {
+  const seen = new Set<string>();
+  const visible: HistoryEntry[] = [];
+  for (const entry of entries) {
+    const day = format(entry.date, "yyyy-MM-dd");
+    if (!seen.has(day)) {
+      if (seen.size === days) break;
+      seen.add(day);
+    }
+    visible.push(entry);
+  }
+  return visible;
+}
+
+/** How many distinct days have shifts. */
+export function countDays(entries: HistoryEntry[]) {
+  return new Set(entries.map((entry) => format(entry.date, "yyyy-MM-dd"))).size;
+}
+
 export type WeekPoint = { label: string; start: Date; hourly: number; production: number };
 
 /** Earnings per week for the last `weeks` weeks (oldest first), split by kind. */

@@ -4,13 +4,17 @@ import { useEffect, useState } from "react";
 
 import type { Hourly, Production } from "@prisma/client";
 import { format } from "date-fns";
-import { ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronUp } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import {
+  countDays,
+  DAYS_PER_PAGE,
+  entriesForDays,
   groupByMonth,
   historyEntries,
   type HistoryEntry,
+  type MonthGroup,
   type ShiftKind,
 } from "@/services/History";
 import { formatHours } from "@/services/Summary";
@@ -114,11 +118,78 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
 }
 
 /**
+ * One month: the shifts of its last 7 worked days, and a button that adds
+ * 7 more each time. The header totals always cover the whole month.
+ */
+function MonthSection({ month }: { month: MonthGroup }) {
+  const money = useMoney();
+  const t = useTranslations("dashboard.history");
+  const [days, setDays] = useState(DAYS_PER_PAGE);
+  const totalDays = countDays(month.entries);
+  const visible = entriesForDays(month.entries, days);
+  const hidden = month.entries.length - visible.length;
+
+  return (
+    <section aria-label={month.label} className="flex flex-col gap-2">
+      <header className="flex items-baseline justify-between px-1">
+        <h3 className="text-sm font-semibold text-ink">{month.label}</h3>
+        <span className="text-sm text-ink-muted tabular-nums">
+          {t("shifts", { count: month.entries.length })} ·{" "}
+          {month.totals.map((total, i) => (
+            <span key={total.currency} className="font-semibold text-ink">
+              {i > 0 ? " + " : ""}
+              {money(total.amount, { currency: total.currency })}
+            </span>
+          ))}
+        </span>
+      </header>
+      <div className="overflow-hidden rounded-xl border border-border bg-surface">
+        <ul className="divide-y divide-border">
+          {visible.map((entry) => (
+            <li key={`${entry.kind}-${entry.id}`}>
+              <HistoryRow entry={entry} />
+            </li>
+          ))}
+        </ul>
+        {totalDays > DAYS_PER_PAGE ? (
+          <div className="flex border-t border-border">
+            {hidden > 0 ? (
+              <button
+                type="button"
+                data-testid="history-more"
+                onClick={() => setDays((d) => d + DAYS_PER_PAGE)}
+                className="flex h-11 flex-1 items-center justify-center gap-1.5 text-sm font-medium text-accent transition-colors hover:bg-surface-sunken focus-visible:bg-surface-sunken"
+              >
+                {t("show_more", { count: hidden })}
+                <ChevronDown className="size-4" aria-hidden="true" />
+              </button>
+            ) : null}
+            {days > DAYS_PER_PAGE ? (
+              <button
+                type="button"
+                onClick={() => setDays(DAYS_PER_PAGE)}
+                className={cn(
+                  "flex h-11 items-center justify-center gap-1.5 px-4 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-sunken focus-visible:bg-surface-sunken",
+                  hidden > 0 ? "border-l border-border" : "flex-1"
+                )}
+              >
+                {t("show_less")}
+                <ChevronUp className="size-4" aria-hidden="true" />
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+/**
  * Every saved shift, grouped by month: what, when, how much and after tax.
+ * Each month starts with its last 7 worked days.
  * Tap a shift for the details, to edit or to delete it.
  */
 function ShiftHistory() {
-  const money = useMoney();
   const currency = useCurrency();
   const t = useTranslations("dashboard.history");
   const locale = useDateLocale();
@@ -173,29 +244,7 @@ function ShiftHistory() {
           {isDateFiltered ? t("empty_filtered") : t("empty")}
         </p>
       ) : (
-        months.map((month) => (
-          <section key={month.key} aria-label={month.label} className="flex flex-col gap-2">
-            <header className="flex items-baseline justify-between px-1">
-              <h3 className="text-sm font-semibold text-ink">{month.label}</h3>
-              <span className="text-sm text-ink-muted tabular-nums">
-                {t("shifts", { count: month.entries.length })} ·{" "}
-                {month.totals.map((t, i) => (
-                  <span key={t.currency} className="font-semibold text-ink">
-                    {i > 0 ? " + " : ""}
-                    {money(t.amount, { currency: t.currency })}
-                  </span>
-                ))}
-              </span>
-            </header>
-            <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
-              {month.entries.map((entry) => (
-                <li key={`${entry.kind}-${entry.id}`}>
-                  <HistoryRow entry={entry} />
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))
+        months.map((month) => <MonthSection key={`${filter}-${month.key}`} month={month} />)
       )}
     </div>
   );
