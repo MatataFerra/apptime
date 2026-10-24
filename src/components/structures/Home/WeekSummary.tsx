@@ -149,7 +149,7 @@ function WeekSummary() {
               </div>
               <span
                 className={cn(
-                  "grid h-5 min-w-7 place-items-center rounded-full px-1.5 text-xs leading-none font-medium",
+                  "grid h-5 min-w-7 place-items-center rounded-full px-1.5 text-base leading-none font-medium",
                   isToday
                     ? "bg-ink-inverse font-semibold text-surface-inverse"
                     : "text-ink-inverse/80"
@@ -157,7 +157,7 @@ function WeekSummary() {
                 aria-hidden="true"
               >
                 {/* Two letters ("lu", "ma", "mi"): one letter repeats (m, m) in Spanish. */}
-                {format(day.date, "EEEEEE", { locale })}
+                {format(day.date, "EEEEEE", { locale }).toUpperCase()}
               </span>
             </li>
           );
