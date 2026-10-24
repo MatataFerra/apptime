@@ -516,7 +516,9 @@
       "net": "{amount} net",
       "empty": "No shifts saved yet.",
       "empty_filtered": "No shifts in those dates.",
-      "shifts": "{count, plural, one {# shift} other {# shifts}}"
+      "shifts": "{count, plural, one {# shift} other {# shifts}}",
+      "show_more": "Show more ({count, plural, one {# shift} other {# shifts}})",
+      "show_less": "Show less"
     },
     "dialog": {
       "deleting": "Deleting shift...",

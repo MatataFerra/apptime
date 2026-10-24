@@ -1,7 +1,9 @@
 import { describe, expect, test } from "vitest";
 
 import {
+  countDays,
   cumulativeEarnings,
+  entriesForDays,
   groupByMonth,
   historyEntries,
   weeklyEarnings,
@@ -114,5 +116,27 @@ describe("History service", () => {
     expect(points[0].hourly).toBeCloseTo(100, 2);
     expect(points.at(-1)?.hourly).toBeCloseTo(260, 2);
     expect(points.at(-1)?.production).toBe(points[2].production);
+  });
+});
+
+describe("entriesForDays", () => {
+  // Ten days in October, two shifts on the 30th.
+  const shifts = [
+    ...Array.from({ length: 10 }, (_, i) => hourly(new Date(2026, 9, 21 + i, 8), 4)),
+    hourly(new Date(2026, 9, 30, 14), 3),
+  ];
+  const entries = historyEntries(shifts, []);
+
+  test("keeps whole days, newest first", () => {
+    const visible = entriesForDays(entries, 7);
+    expect(countDays(visible)).toBe(7);
+    // Both shifts of the 30th, then the 29th back to the 24th.
+    expect(visible).toHaveLength(8);
+    expect(visible.at(-1)?.date.getDate()).toBe(24);
+  });
+
+  test("returns everything when there are fewer days", () => {
+    expect(entriesForDays(entries, 30)).toHaveLength(entries.length);
+    expect(countDays(entries)).toBe(10);
   });
 });
