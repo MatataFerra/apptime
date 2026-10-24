@@ -1,5 +1,6 @@
 import type { PropsWithChildren, ReactNode } from "react";
 
+import Modes from "@/components/structures/Production/Modes";
 import Stack from "@/components/ui/Stack";
 
 interface Props {
@@ -10,7 +11,7 @@ export default async function ProdctionLayout({ children, form }: PropsWithChild
   return (
     <Stack orientation="vertical" spacing={6}>
       {children}
-      {form}
+      <Modes single={form} />
     </Stack>
   );
 }
