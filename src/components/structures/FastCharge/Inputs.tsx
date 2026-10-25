@@ -108,7 +108,7 @@ function Inputs() {
   /*
     set when user is typing to show datalist
   */
-  const { setIsWriting } = useDatalistStore((state) => state);
+  const setWriting = useDatalistStore((state) => state.setWriting);
 
   const { uniqueTaxes, uniqueContributions } = useGetUniqueSalaryItems({
     localTaxes: taxes,
@@ -435,7 +435,7 @@ function Inputs() {
             type="name"
             isError={!!errors["name"]}
             description={errors["name"]?.message}
-            onKeyDown={() => setIsWriting(true)}
+            onKeyDown={() => setWriting("fast-name")}
             {...register("name", {
               onChange: (e: ChangeEvent<HTMLInputElement>) => {
                 setStoreValue({ name: e.target.value });
@@ -443,6 +443,7 @@ function Inputs() {
             })}
           />
           <DatalistShiftNames
+            field="fast-name"
             data={names}
             value={nameWatch}
             onSelect={(name) => {
