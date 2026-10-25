@@ -2,7 +2,7 @@
 
 import { type ReactNode, useId, useState } from "react";
 
-import { Check, ChevronDown, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import type { HistoryEntry } from "@/services/History";
@@ -10,6 +10,7 @@ import type { HistoryEntry } from "@/services/History";
 import type { HourlyType, ProductionType } from "@/types";
 
 import Button from "@/components/ui/Button";
+import { ChoiceOptions, ChoiceTrigger, useInlineChoice } from "@/components/ui/Choice";
 import {
   Drawer,
   DrawerContent,
@@ -124,83 +125,54 @@ function Choice<T extends string>({
   const id = useId();
   const current = value ?? common;
   const changed = value !== undefined && value !== common;
+  const { rootRef, triggerRef } = useInlineChoice({
+    open,
+    onOpenChange: (next) => {
+      if (next !== open) onToggle();
+    },
+  });
 
   return (
-    <FieldRow
-      label={label}
-      hint={hint}
-      changed={changed}
-      onReset={onReset}
-      below={
-        open ? (
-          <div
-            id={id}
-            role="listbox"
-            aria-label={label}
-            className="mt-2 flex max-h-56 w-full flex-col overflow-y-auto rounded-xl border border-border bg-surface-sunken/60 p-1"
-          >
-            {options.map((option) => {
-              const selected = current === option;
-              return (
-                <button
-                  key={option}
-                  type="button"
-                  role="option"
-                  aria-selected={selected}
-                  onClick={() => onChange(option)}
-                  className={cn(
-                    "flex min-h-11 items-center gap-2.5 rounded-lg px-2.5 text-left text-sm transition-colors hover:bg-surface",
-                    selected ? "bg-surface font-semibold text-ink" : "text-ink"
-                  )}
-                >
-                  <Check
-                    className={cn(
-                      "size-4 shrink-0 text-accent",
-                      selected ? "opacity-100" : "opacity-0"
-                    )}
-                    aria-hidden="true"
-                  />
-                  <span className="min-w-0 flex-1 truncate">{render(option)}</span>
-                  {option === common ? (
-                    <span className="shrink-0 text-xs font-normal text-ink-muted">
-                      {t("current")}
-                    </span>
-                  ) : null}
-                </button>
-              );
-            })}
-          </div>
-        ) : null
-      }
-    >
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-controls={id}
-        aria-label={`${label}: ${current === MIXED ? t("mixed") : render(current)}`}
-        onClick={onToggle}
-        className={cn(
-          "flex h-9 max-w-[60%] min-w-0 items-center gap-1.5 rounded-full border pr-2.5 pl-3.5 text-sm transition-colors",
-          open
-            ? "border-ink bg-surface"
-            : "border-border-strong bg-surface hover:bg-surface-sunken",
-          changed
-            ? "font-semibold text-accent"
-            : current === MIXED
-              ? "text-ink-muted"
-              : "font-semibold text-ink"
-        )}
+    <div ref={rootRef}>
+      <FieldRow
+        label={label}
+        hint={hint}
+        changed={changed}
+        onReset={onReset}
+        below={
+          open ? (
+            <ChoiceOptions
+              inline
+              id={id}
+              label={label}
+              className="mt-2"
+              value={current === MIXED ? undefined : current}
+              options={options.map((option) => ({
+                value: option,
+                label: render(option),
+                tag: option === common ? t("current") : undefined,
+              }))}
+              onSelect={(next) => {
+                triggerRef.current?.focus({ preventScroll: true });
+                onChange(next as T);
+              }}
+            />
+          ) : null
+        }
       >
-        <span className="truncate">{current === MIXED ? t("mixed") : render(current)}</span>
-        <ChevronDown
-          className={cn(
-            "size-4 shrink-0 text-ink-muted transition-transform",
-            open && "rotate-180"
-          )}
-          aria-hidden="true"
-        />
-      </button>
-    </FieldRow>
+        <ChoiceTrigger
+          ref={triggerRef}
+          open={open}
+          aria-controls={open ? id : undefined}
+          aria-label={`${label}: ${current === MIXED ? t("mixed") : render(current)}`}
+          onClick={onToggle}
+          tone={changed ? "changed" : current === MIXED ? "muted" : "default"}
+          className="max-w-[60%]"
+        >
+          {current === MIXED ? t("mixed") : render(current)}
+        </ChoiceTrigger>
+      </FieldRow>
+    </div>
   );
 }
 

@@ -1,75 +1,56 @@
 "use client";
 
-import { type ReactNode, useId } from "react";
+import { type ChoiceOption, ChoicePopover, ChoiceRow } from "@/components/ui/Choice";
 
-import { ChevronDown } from "lucide-react";
-
-import { cn } from "@/utils/helpers/styleMerger";
-
-/** The pill-shaped native select used by the shift settings rows. */
-export function PillSelect({
-  id,
+/** The pill used by the shift settings rows when it sits next to something else. */
+export function PillSelect<T extends string>({
   value,
   onChange,
-  children,
+  options,
   label,
 }: {
-  id?: string;
-  value: string;
-  onChange: (value: string) => void;
-  children: ReactNode;
-  /** Accessible name when there's no visible `<label>`. */
-  label?: string;
+  value: T;
+  onChange: (value: T) => void;
+  options: ChoiceOption<T>[];
+  label: string;
 }) {
-  return (
-    <span className="relative min-w-0">
-      <select
-        id={id}
-        aria-label={label}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="h-9 max-w-56 appearance-none truncate rounded-full border border-border-strong bg-surface pr-8 pl-3.5 text-sm font-semibold text-ink"
-      >
-        {children}
-      </select>
-      <ChevronDown
-        className="pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2 text-ink-muted"
-        aria-hidden="true"
-      />
-    </span>
-  );
+  return <ChoicePopover label={label} value={value} options={options} onChange={onChange} />;
 }
 
 /**
- * A setting of the shift on one line: label on the left, a pill select on
- * the right ("Employer  [Farm ▾]", "Paid in  [AUD ▾]"). Its own top margin
- * keeps it clear of the field above, whatever form it sits in.
+ * A setting of the shift on one line: label on the left, a pill on the
+ * right ("Employer  [Farm ▾]", "Paid in  [AUD ▾]"), and its options opening
+ * under the row. Its own top margin keeps it clear of the field above,
+ * whatever form it sits in.
  */
-function SelectRow({
+function SelectRow<T extends string>({
   label,
   value,
   onChange,
-  children,
+  options,
+  display,
+  searchPlaceholder,
   classes,
 }: {
   label: string;
-  value: string;
-  onChange: (value: string) => void;
-  /** The `<option>`s. */
-  children: ReactNode;
+  value: T;
+  onChange: (value: T) => void;
+  options: ChoiceOption<T>[];
+  /** What the pill says when it differs from the option's label. */
+  display?: (value: T) => string;
+  searchPlaceholder?: string;
   classes?: string;
 }) {
-  const id = useId();
-
   return (
-    <div className={cn("mt-3 mb-1 flex w-full items-center justify-between gap-3", classes)}>
-      <label htmlFor={id} className="text-sm text-ink-muted">
-        {label}
-      </label>
-      <PillSelect id={id} value={value} onChange={onChange}>
-        {children}
-      </PillSelect>
-    </div>
+    <ChoiceRow
+      label={label}
+      value={value}
+      options={options}
+      onChange={onChange}
+      display={display}
+      searchPlaceholder={searchPlaceholder}
+      classes={classes}
+    />
   );
 }
 

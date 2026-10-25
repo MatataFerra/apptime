@@ -15,7 +15,7 @@ import useEmployers from "@/hooks/useEmployers";
 
 import { Link } from "@/i18n/navigation";
 
-const NONE = "";
+const NONE = "none";
 const NEW = "__new__";
 
 /**
@@ -99,20 +99,22 @@ function EmployerSelect({
       label={t("employer")}
       classes={classes}
       value={value != null ? String(value) : NONE}
+      searchPlaceholder={t("search_employer")}
+      options={[
+        ...options.map((employer) => ({
+          value: String(employer.id),
+          label: employer.archived ? `${employer.name} ${t("removed")}` : employer.name,
+        })),
+        { value: NONE, label: t("no_employer"), muted: true, separated: options.length > 0 },
+        ...(allowCreate
+          ? [{ value: NEW, label: t("new_employer"), action: true, separated: true }]
+          : []),
+      ]}
       onChange={(id) => {
         if (id === NEW) return setCreating(true);
         onChange(id === NONE ? null : (byId.get(Number(id)) ?? null));
       }}
-    >
-      <option value={NONE}>{t("no_employer")}</option>
-      {options.map((employer) => (
-        <option key={employer.id} value={employer.id}>
-          {employer.name}
-          {employer.archived ? ` ${t("removed")}` : ""}
-        </option>
-      ))}
-      {allowCreate ? <option value={NEW}>{t("new_employer")}</option> : null}
-    </SelectRow>
+    />
   );
 }
 

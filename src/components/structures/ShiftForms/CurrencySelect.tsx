@@ -27,35 +27,26 @@ function CurrencySelect({
   const currencyName = useCurrencyName();
   const current = value || fallback;
 
+  const options = CURRENCIES.map((c) => ({
+    value: c.code as string,
+    label: `${c.code} · ${currencyName(c.code)}`,
+  }));
+  function pick(code: string) {
+    onChange(code === fallback ? null : code);
+  }
+
   if (pill) {
     return (
       <PillSelect
         label={t("paid_in")}
         value={current}
-        onChange={(code) => onChange(code === fallback ? null : code)}
-      >
-        {CURRENCIES.map((c) => (
-          <option key={c.code} value={c.code}>
-            {c.code}
-          </option>
-        ))}
-      </PillSelect>
+        options={options.map((o) => ({ ...o, label: o.value }))}
+        onChange={pick}
+      />
     );
   }
 
-  return (
-    <SelectRow
-      label={t("paid_in")}
-      value={current}
-      onChange={(code) => onChange(code === fallback ? null : code)}
-    >
-      {CURRENCIES.map((c) => (
-        <option key={c.code} value={c.code}>
-          {c.code} · {currencyName(c.code)}
-        </option>
-      ))}
-    </SelectRow>
-  );
+  return <SelectRow label={t("paid_in")} value={current} options={options} onChange={pick} />;
 }
 
 export default CurrencySelect;
