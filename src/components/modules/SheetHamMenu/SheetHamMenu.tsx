@@ -3,12 +3,12 @@
 import type { PropsWithChildren } from "react";
 
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 import Login from "@/components/structures/Auth/Login";
 import Logout from "@/components/structures/Auth/Logout";
+import Ham from "@/components/structures/share/Ham";
 import Options from "@/components/structures/SheetHamMenu/Options";
 import { LogoMark } from "@/components/ui/Logo";
 import {
@@ -20,7 +20,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/Sheet";
-import Skeleton from "@/components/ui/Skeleton";
 
 import { useAuthSession } from "@/providers/Session";
 
@@ -30,11 +29,6 @@ import { PATH_NAMES } from "@/utils/constants/pathnames";
 import { useRouter } from "@/i18n/navigation";
 
 type Props = {};
-
-const Ham = dynamic(() => import("@/components/structures/share/Ham"), {
-  ssr: false,
-  loading: () => <Skeleton classes="h-8 w-12" />,
-});
 
 function SheetHamMenu({ children }: PropsWithChildren<Props>) {
   const router = useRouter();

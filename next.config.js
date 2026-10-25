@@ -50,16 +50,21 @@ const nextConfig = {
   // VS Code dev tunnels (e.g. d33vz13z-3000.aue.devtunnels.ms). Hosts only:
   // no scheme, no trailing slash. The app's own origin is always allowed.
   allowedDevOrigins: ["*.aue.devtunnels.ms"],
-  // Only in development: in production any *.aue.devtunnels.ms page (anyone
-  // can open one) could call the server actions.
-  ...(isDev && {
-    experimental: {
-      // Server Actions are stable; their options still live under `experimental`.
+  experimental: {
+    // Keep visited pages in the client router cache for 30 s (default 0), so
+    // going back to one doesn't wait for the server. Safe here: the pages
+    // under (home) are shells and their data lives in React Query; logging
+    // out is a full page load, which empties this cache.
+    staleTimes: { dynamic: 30 },
+    // Only in development: in production any *.aue.devtunnels.ms page (anyone
+    // can open one) could call the server actions.
+    // Server Actions are stable; their options still live under `experimental`.
+    ...(isDev && {
       serverActions: {
         allowedOrigins: ["*.aue.devtunnels.ms"],
       },
-    },
-  }),
+    }),
+  },
 };
 
 module.exports = 
