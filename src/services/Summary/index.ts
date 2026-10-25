@@ -16,11 +16,25 @@ import type { HourlyType, ProductionType } from "@/types";
 
 type AnyShift = HourlyType | ProductionType;
 
+/** One shift of a day, enough to name it: "Box Maker, 07:00–12:00, $125". */
+export type DayShift = {
+  kind: "hourly" | "production";
+  /** Where it was logged: the Track clock, Fast charge, or Production. */
+  source: "track" | "fast" | "production";
+  name: string | null;
+  start: Date;
+  end: Date | null;
+  earned: number;
+  publicHoliday: boolean;
+};
+
 export type DaySummary = {
   date: Date;
   hourly: number;
   production: number;
   publicHoliday: boolean;
+  /** Every shift that day, earliest first (two jobs the same day show up apart). */
+  shifts: DayShift[];
 };
 
 export type PeriodSummary = {
@@ -102,11 +116,32 @@ export function summarizeWeek(
     const h = closedIn(hourly, dayStart, dayLast);
     const p = closedIn(production, dayStart, dayLast);
 
+    const shifts: DayShift[] = [
+      ...h.map((s) => ({ kind: "hourly" as const, shift: s })),
+      ...p.map((s) => ({ kind: "production" as const, shift: s })),
+    ]
+      .map(({ kind, shift }) => ({
+        kind,
+        source:
+          kind === "production"
+            ? ("production" as const)
+            : (shift as HourlyType).source === "fast"
+              ? ("fast" as const)
+              : ("track" as const),
+        name: shift.name?.trim() || null,
+        start: new Date(shift.startDate),
+        end: shift.endDate ? new Date(shift.endDate) : null,
+        earned: shiftEarnings(shift),
+        publicHoliday: !!shift.isPublicHoliday,
+      }))
+      .sort((a, b) => a.start.valueOf() - b.start.valueOf());
+
     return {
       date,
       hourly: h.reduce((acc, s) => acc + shiftEarnings(s), 0),
       production: p.reduce((acc, s) => acc + shiftEarnings(s), 0),
       publicHoliday: [...h, ...p].some((s) => s.isPublicHoliday),
+      shifts,
     };
   });
 

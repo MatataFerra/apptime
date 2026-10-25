@@ -1,12 +1,20 @@
 "use client";
 
-import { useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 
 import { format, isSameDay, isSameMonth } from "date-fns";
 import { useLocale, useTranslations } from "next-intl";
 
-import { formatHours, summarizePeriod, summarizeWeek, weekStartsOnIndex } from "@/services/Summary";
+import {
+  type DayShift,
+  type DaySummary,
+  formatHours,
+  summarizePeriod,
+  summarizeWeek,
+  weekStartsOnIndex,
+} from "@/services/Summary";
 
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
 import Skeleton from "@/components/ui/Skeleton";
 
 import { cn } from "@/utils/helpers/styleMerger";
@@ -14,6 +22,128 @@ import useDateLocale from "@/hooks/useDateLocale";
 import useMoney from "@/hooks/useMoney";
 import useShiftsInCurrency from "@/hooks/useShiftsInCurrency";
 import useUser from "@/hooks/useUser";
+
+const SOURCE_COLOR: Record<DayShift["source"], string> = {
+  track: "bg-week-bar-track",
+  fast: "bg-week-bar-fast",
+  production: "bg-week-bar-production",
+};
+
+/** The module's hue (Track green, Fast charge yellow, Production plum); holidays hatched. */
+function segmentColor(shift: DayShift) {
+  return cn(SOURCE_COLOR[shift.source], shift.publicHoliday && "holiday-hatch");
+}
+
+/**
+ * Tapping a day's bar: which shifts made it ("Box Maker 07:00–12:00
+ * $125 · Web Developer 18:00–23:00 $140"), so two jobs the same day can
+ * be told apart.
+ */
+function DayDetail({
+  day,
+  money,
+  label,
+  children,
+}: {
+  day: DaySummary;
+  money: (value: number) => string;
+  label: string;
+  children: ReactNode;
+}) {
+  const t = useTranslations("home.week");
+  const tk = useTranslations("shift.kind");
+  const locale = useDateLocale();
+  function time(date: Date) {
+    return format(date, "p", { locale });
+  }
+  const total = day.shifts.reduce((sum, shift) => sum + shift.earned, 0);
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          aria-label={label}
+          className="flex flex-col items-center gap-2 rounded-lg outline-hidden transition-opacity focus-visible:ring-2 focus-visible:ring-ink-inverse/60 data-[state=open]:opacity-80"
+        >
+          {children}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent side="top" collisionPadding={16} className="w-64 p-3">
+        <p className="mb-2 text-[0.8125rem] font-semibold text-ink capitalize">
+          {format(day.date, "EEEE d MMMM", { locale })}
+        </p>
+        <ul className="flex flex-col gap-2">
+          {day.shifts.map((shift) => (
+            <li key={shift.start.toISOString()} className="flex items-start gap-2.5">
+              <span
+                className={cn("mt-1 size-2.5 shrink-0 rounded-full", segmentColor(shift))}
+                aria-hidden="true"
+              />
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="truncate text-sm font-medium text-ink">
+                  {shift.name ?? tk(shift.kind)}
+                </span>
+                <span className="text-xs text-ink-muted tabular-nums">
+                  {shift.end ? `${time(shift.start)}–${time(shift.end)}` : time(shift.start)}
+                  {shift.publicHoliday ? ` · ${t("holiday")}` : ""}
+                </span>
+              </span>
+              <span className="shrink-0 text-sm font-semibold text-ink tabular-nums">
+                {money(shift.earned)}
+              </span>
+            </li>
+          ))}
+        </ul>
+        {day.shifts.length > 1 ? (
+          <p className="mt-2 flex justify-between border-t border-border pt-2 text-sm font-semibold text-ink tabular-nums">
+            <span>{t("day_total")}</span>
+            <span>{money(total)}</span>
+          </p>
+        ) : null}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+const LEGEND: { source: DayShift["source"]; title: "track" | "fast_charge" | "production" }[] = [
+  { source: "track", title: "track" },
+  { source: "fast", title: "fast_charge" },
+  { source: "production", title: "production" },
+];
+
+/** What the colours mean, only for what this week has (and the hatching, if any holiday). */
+function WeekLegend({ days }: { days: DaySummary[] }) {
+  const t = useTranslations("home.week");
+  const tm = useTranslations("modules");
+  const shifts = days.flatMap((day) => day.shifts);
+  const shown = LEGEND.filter((item) => shifts.some((shift) => shift.source === item.source));
+  const holiday = shifts.some((shift) => shift.publicHoliday);
+  if (shown.length < 2 && !holiday) return null;
+
+  return (
+    <ul className="-mt-1 flex flex-wrap gap-x-3.5 gap-y-1 text-[0.6875rem] text-ink-inverse/65">
+      {shown.map((item) => (
+        <li key={item.source} className="flex items-center gap-1.5">
+          <span
+            className={cn("size-2 rounded-[2px]", SOURCE_COLOR[item.source])}
+            aria-hidden="true"
+          />
+          {tm(`${item.title}.title`)}
+        </li>
+      ))}
+      {holiday ? (
+        <li className="flex items-center gap-1.5">
+          <span
+            className="size-2 rounded-[2px] bg-ink-inverse/70 holiday-hatch"
+            aria-hidden="true"
+          />
+          {t("holiday")}
+        </li>
+      ) : null}
+    </ul>
+  );
+}
 
 /**
  * This week at a glance: earned, hours, shifts and one bar per day.
@@ -100,65 +230,89 @@ function WeekSummary() {
             total > 0 ? money(total) : otherOnly ? t("other_currency") : t("no_shifts")
           }`;
 
+          const bar = (
+            <div className="flex h-[5.75rem] w-full flex-col justify-end">
+              {/* More than one shift that day: a dot each, in its colour, over the bar. */}
+              {day.shifts.length > 1 ? (
+                <span
+                  className="mb-1.5 flex h-1.5 justify-center gap-[3px]"
+                  data-testid="day-dots"
+                  aria-hidden="true"
+                >
+                  {day.shifts.map((shift) => (
+                    <span
+                      key={shift.start.toISOString()}
+                      className={cn("size-1.5 rounded-full", SOURCE_COLOR[shift.source])}
+                    />
+                  ))}
+                </span>
+              ) : null}
+              {total > 0 ? (
+                <div
+                  className="flex max-h-20 w-full flex-col-reverse overflow-hidden rounded-md"
+                  style={{ height: `${(height / 100) * 5}rem` }}
+                >
+                  {day.shifts.map((shift) => (
+                    <div
+                      key={shift.start.toISOString()}
+                      className={cn("w-full", segmentColor(shift))}
+                      style={{ flexGrow: Math.max(shift.earned, total * 0.04) }}
+                    />
+                  ))}
+                </div>
+              ) : otherOnly ? (
+                <div className="h-[30%] w-full rounded-md bg-ink-inverse/35" />
+              ) : (
+                <div className="h-1 w-full rounded-full bg-ink-inverse/15" />
+              )}
+            </div>
+          );
+          const date = (
+            <span className="flex flex-col items-center gap-1" aria-hidden="true">
+              <span
+                className={cn(
+                  "text-[0.6875rem] leading-none font-medium",
+                  isToday ? "text-ink-inverse" : "text-ink-inverse/50"
+                )}
+              >
+                {weekday.format(day.date)}
+              </span>
+              <span
+                className={cn(
+                  "grid size-7 place-items-center rounded-full text-sm leading-none tabular-nums",
+                  isToday
+                    ? "bg-ink-inverse font-semibold text-surface-inverse"
+                    : "text-ink-inverse/80"
+                )}
+              >
+                {format(day.date, "d")}
+              </span>
+            </span>
+          );
+
           return (
             <li
               key={day.date.toISOString()}
-              className="flex flex-col items-center gap-2"
-              aria-label={label}
+              className="flex flex-col"
               aria-current={isToday ? "date" : undefined}
             >
-              <div className="flex h-20 w-full flex-col justify-end">
-                {total > 0 ? (
-                  <div
-                    className="flex w-full flex-col overflow-hidden rounded-md"
-                    style={{ height: `${height}%` }}
-                  >
-                    {day.production > 0 ? (
-                      <div
-                        className="w-full bg-week-bar-production"
-                        style={{ flexGrow: day.production }}
-                      />
-                    ) : null}
-                    {day.hourly > 0 ? (
-                      <div
-                        className={cn(
-                          "w-full",
-                          day.publicHoliday ? "bg-week-bar-holiday" : "bg-week-bar-hourly"
-                        )}
-                        style={{ flexGrow: day.hourly }}
-                      />
-                    ) : null}
-                  </div>
-                ) : otherOnly ? (
-                  <div className="h-[30%] w-full rounded-md bg-ink-inverse/35" />
-                ) : (
-                  <div className="h-1 w-full rounded-full bg-ink-inverse/15" />
-                )}
-              </div>
-              <span className="flex flex-col items-center gap-1" aria-hidden="true">
-                <span
-                  className={cn(
-                    "text-[0.6875rem] leading-none font-medium",
-                    isToday ? "text-ink-inverse" : "text-ink-inverse/50"
-                  )}
-                >
-                  {weekday.format(day.date)}
-                </span>
-                <span
-                  className={cn(
-                    "grid size-7 place-items-center rounded-full text-sm leading-none tabular-nums",
-                    isToday
-                      ? "bg-ink-inverse font-semibold text-surface-inverse"
-                      : "text-ink-inverse/80"
-                  )}
-                >
-                  {format(day.date, "d")}
-                </span>
-              </span>
+              {day.shifts.length > 0 ? (
+                <DayDetail day={day} money={money} label={label}>
+                  {bar}
+                  {date}
+                </DayDetail>
+              ) : (
+                <div className="flex flex-col items-center gap-2" aria-label={label}>
+                  {bar}
+                  {date}
+                </div>
+              )}
             </li>
           );
         })}
       </ol>
+
+      <WeekLegend days={week.days} />
 
       <div className="flex flex-col gap-2 border-t border-ink-inverse/10 pt-3.5">
         <dl className="flex flex-wrap items-baseline gap-x-5 gap-y-1 text-[0.8125rem] text-ink-inverse/60">

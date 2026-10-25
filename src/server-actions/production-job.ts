@@ -4,6 +4,7 @@ import type { Production } from "@prisma/client";
 
 import { ownEmployerId } from "@/services/Employer/owned";
 import ShiftService from "@/services/Shift";
+import { clashesWithSaved } from "@/services/Shift/clash";
 import ProductionService from "@/services/Shift/Production";
 import UserService from "@/services/User";
 
@@ -20,6 +21,17 @@ export default async function onCreateProductionShift(data: ProductionInputsPars
 
   if (currentUser.shifts?.id === null) {
     return null;
+  }
+
+  // Another job the same day is fine; the same hours twice are not.
+  if (
+    currentUser.shifts?.id &&
+    (await clashesWithSaved(currentUser.shifts.id, {
+      startDate: data.startDate,
+      endDate: data.endDate,
+    }))
+  ) {
+    return { response: false, overlap: true } as const;
   }
 
   // Someone else's employer is refused, not silently dropped.
