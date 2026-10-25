@@ -238,6 +238,8 @@
       "shifts": "Shifts",
       "overlap": "Already logged",
       "overlap_hint": "{count, plural, one {# day runs into a shift you already logged and won't be saved.} other {# days run into shifts you already logged and won't be saved.}}",
+      "saving": "{count, plural, one {Saving # shift…} other {Saving # shifts…}}",
+      "saving_hint": "You can keep using the app; we'll let you know when it's done.",
       "review_button": "{count, plural, =0 {Choose some days} one {Review # shift} other {Review # shifts}}",
       "save": "{count, plural, one {Save # shift} other {Save # shifts}}",
       "created": "{count, plural, =0 {No shifts saved} one {# shift saved} other {# shifts saved}}",

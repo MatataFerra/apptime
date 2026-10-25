@@ -6,8 +6,6 @@ import { z } from "zod";
 import ShiftService from "@/services/Shift";
 import { type BatchResult, batchSchema, BatchShiftDates, saveBatch } from "@/services/Shift/batch";
 
-import prisma from "#/prisma/client";
-
 const ProductionBatchSchema = batchSchema(
   { itemValue: z.number().min(0) },
   // Bins, boxes or pieces change from day to day: each shift brings its own.
@@ -28,8 +26,9 @@ export default async function onCreateProductionBatch(
     input,
     schema: ProductionBatchSchema,
     tag: "production-batch",
-    create: (shift, data, { shiftId, employerId, connect }) => {
-      const row = new ShiftService({
+    model: "production",
+    row: (shift, data, { shiftId, employerId }) =>
+      new ShiftService({
         startDate: shift.startDate,
         endDate: shift.endDate,
         name: data.name?.trim() || null,
@@ -46,9 +45,6 @@ export default async function onCreateProductionBatch(
       })
         .closeShift()
         .differenceInMinsBetweenStartAndEnd()
-        .build<Production>();
-
-      return prisma.production.create({ data: { ...row, ...connect }, select: { id: true } });
-    },
+        .build<Production>(),
   });
 }

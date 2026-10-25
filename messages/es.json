@@ -238,6 +238,8 @@
       "shifts": "Turnos",
       "overlap": "Ya cargado",
       "overlap_hint": "{count, plural, one {# día se superpone con un turno ya cargado y no se guardará.} other {# días se superponen con turnos ya cargados y no se guardarán.}}",
+      "saving": "{count, plural, one {Guardando # turno…} other {Guardando # turnos…}}",
+      "saving_hint": "Puedes seguir usando la app; te avisamos cuando termine.",
       "review_button": "{count, plural, =0 {Elige algunos días} one {Revisar # turno} other {Revisar # turnos}}",
       "save": "{count, plural, one {Guardar # turno} other {Guardar # turnos}}",
       "created": "{count, plural, =0 {No se guardó ningún turno} one {# turno guardado} other {# turnos guardados}}",
