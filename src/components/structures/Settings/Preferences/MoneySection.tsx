@@ -2,8 +2,9 @@
 
 import { useId } from "react";
 
-import { ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
+
+import { ChoicePopover } from "@/components/ui/Choice";
 
 import { CURRENCIES, currencySymbol } from "@/utils/constants/currencies";
 import useCurrencyName from "@/hooks/useCurrencyName";
@@ -27,24 +28,17 @@ function MoneySection() {
   return (
     <Section title={t("title")} description={t("description")}>
       <Row label={t("currency")} hint={t("currency_hint")} htmlFor={currencyId}>
-        <span className="relative shrink-0">
-          <select
-            id={currencyId}
-            value={currency}
-            onChange={(e) => save({ currency: e.target.value })}
-            className="h-10 appearance-none rounded-xl border border-border-strong bg-surface pr-9 pl-3 text-[0.9375rem] font-semibold text-ink"
-          >
-            {CURRENCIES.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.code} · {currencyName(c.code)}
-              </option>
-            ))}
-          </select>
-          <ChevronDown
-            className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-ink-muted"
-            aria-hidden="true"
-          />
-        </span>
+        <ChoicePopover
+          id={currencyId}
+          label={t("currency")}
+          value={currency}
+          className="h-10 shrink-0 rounded-xl text-[0.9375rem]"
+          options={CURRENCIES.map((c) => ({
+            value: c.code as string,
+            label: `${c.code} · ${currencyName(c.code)}`,
+          }))}
+          onChange={(code) => save({ currency: code })}
+        />
       </Row>
       <NumberSetting
         label={t("hourly_rate")}

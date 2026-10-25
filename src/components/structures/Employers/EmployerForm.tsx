@@ -17,9 +17,11 @@ import BusinessLookup, {
 } from "@/components/structures/Employers/BusinessLookup";
 import PasteDetails from "@/components/structures/Employers/PasteDetails";
 import Button from "@/components/ui/Button";
+import { ChoicePopover } from "@/components/ui/Choice";
 
 import { CURRENCIES, currencySymbol } from "@/utils/constants/currencies";
 import { cn } from "@/utils/helpers/styleMerger";
+import useCurrencyName from "@/hooks/useCurrencyName";
 import useErrorMessage from "@/hooks/useErrorMessage";
 import { useCurrency } from "@/hooks/useMoney";
 
@@ -112,6 +114,7 @@ function EmployerForm({
   onSave: (data: EmployerInput) => void;
 }) {
   const settingsCurrency = useCurrency();
+  const currencyName = useCurrencyName();
   const t = useTranslations("employers.form");
   const tf = useTranslations("employers.fields");
   const errorMessage = useErrorMessage();
@@ -333,28 +336,33 @@ function EmployerForm({
               </span>
             ) : null}
           </label>
-          <label
-            htmlFor={currencyId}
-            className="flex flex-col gap-1 text-[0.8125rem] text-ink-muted"
-          >
-            {t("currency")}
-            <select
+          <div className="flex flex-col gap-1 text-[0.8125rem] text-ink-muted">
+            <label htmlFor={currencyId}>{t("currency")}</label>
+            <ChoicePopover
               id={currencyId}
+              variant="field"
+              label={t("currency")}
               value={currency}
-              onChange={(e) => {
-                setCurrency(e.target.value);
+              tone={currencyFilled ? "filled" : undefined}
+              display={(code) => code || t("settings_currency", { currency: settingsCurrency })}
+              options={[
+                ...CURRENCIES.map((c) => ({
+                  value: c.code as string,
+                  label: `${c.code} · ${currencyName(c.code)}`,
+                })),
+                {
+                  value: "",
+                  label: t("settings_currency", { currency: settingsCurrency }),
+                  muted: true,
+                  separated: true,
+                },
+              ]}
+              onChange={(code) => {
+                setCurrency(code);
                 setCurrencyFilled(false);
               }}
-              className={cn(FIELD, currencyFilled && "border-accent bg-accent-soft/40")}
-            >
-              <option value="">{t("settings_currency", { currency: settingsCurrency })}</option>
-              {CURRENCIES.map((c) => (
-                <option key={c.code} value={c.code}>
-                  {c.code}
-                </option>
-              ))}
-            </select>
-          </label>
+            />
+          </div>
         </div>
         <p className="text-[0.8125rem] text-ink-subtle">{t("pay_hint")}</p>
       </Group>

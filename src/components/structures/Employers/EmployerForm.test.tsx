@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
@@ -107,13 +107,32 @@ describe("EmployerForm helpers", () => {
     expect(screen.getByText("Currency", { selector: "dt" }).nextSibling).toHaveTextContent("NZD");
     await user.click(screen.getByRole("button", { name: /^fill \d+ fields?/i }));
 
-    const currency = screen.getByLabelText("Currency") as HTMLSelectElement;
-    expect(currency.value).toBe("NZD");
+    const currency = screen.getByLabelText("Currency");
+    expect(currency).toHaveTextContent("NZD");
     expect(currency.className).toMatch(/bg-accent-soft/);
 
     await user.click(screen.getByRole("button", { name: /add employer/i }));
     expect(onSave).toHaveBeenCalledWith(
       expect.objectContaining({ country: "New Zealand", defaultCurrency: "NZD" })
     );
+  });
+
+  test("the currency opens a list instead of a native select", async () => {
+    const { user, onSave } = setup();
+
+    expect(document.querySelector("select")).toBeNull();
+    const currency = screen.getByLabelText("Currency");
+    expect(currency).toHaveTextContent("AUD (Settings)");
+
+    await user.click(currency);
+    const list = await screen.findByRole("listbox", { name: "Currency" });
+    await user.click(within(list).getByRole("option", { name: /^GBP/ }));
+
+    expect(screen.queryByRole("listbox")).toBeNull();
+    expect(currency).toHaveTextContent("GBP");
+
+    await user.type(screen.getByLabelText("Name"), "Sunny Farms");
+    await user.click(screen.getByRole("button", { name: /add employer/i }));
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ defaultCurrency: "GBP" }));
   });
 });
