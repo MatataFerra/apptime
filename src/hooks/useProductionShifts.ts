@@ -23,7 +23,6 @@ function useProductionShifts() {
     queryFn: fetchProductions,
     enabled: isSignedIn,
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
     refetchInterval: 60 * 60 * 1000,
     staleTime: 2 * 60 * 1000,
   });

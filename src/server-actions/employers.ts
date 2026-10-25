@@ -1,12 +1,10 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { type EmployerInput, EmployerInputSchema, fieldErrors } from "@/services/Employer/schema";
 
 import { getSession } from "@/utils/auth/session";
-import { EMPLOYERS_PAGE } from "@/utils/helpers/revalidateShiftPages";
 
 import prisma from "#/prisma/client";
 
@@ -14,10 +12,6 @@ const IdSchema = z.number().int().positive();
 
 async function sessionUserId() {
   return (await getSession())?.user.id ?? null;
-}
-
-function revalidate() {
-  revalidatePath(EMPLOYERS_PAGE, "page");
 }
 
 /** Adds an employer for the signed-in user. */
@@ -31,7 +25,6 @@ export async function onCreateEmployer(input: EmployerInput) {
   }
 
   const employer = await prisma.employer.create({ data: { ...parsed.data, userId } });
-  revalidate();
   return { ok: true as const, id: employer.id };
 }
 
@@ -53,7 +46,6 @@ export async function onUpdateEmployer(id: number, input: EmployerInput) {
   });
   if (count === 0) return { ok: false as const, error: "not_found" };
 
-  revalidate();
   return { ok: true as const };
 }
 
@@ -79,6 +71,5 @@ export async function onRemoveEmployer(id: number) {
     await prisma.employer.deleteMany({ where: { id, userId } });
   }
 
-  revalidate();
   return { ok: true as const, archived: used };
 }

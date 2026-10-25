@@ -10,10 +10,8 @@ import UserService from "@/services/User";
 
 import type { ProductionInputsParsed } from "@/types/forms";
 
-import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
-
 export default async function onCreateProductionShift(data: ProductionInputsParsed) {
-  const currentUser = await UserService.getSessionUser();
+  const currentUser = await UserService.getSessionOwner();
 
   if (!currentUser) {
     return null;
@@ -85,8 +83,6 @@ export default async function onCreateProductionShift(data: ProductionInputsPars
     await productionService.addtaxes(taxesFromLocal, currentUser.id);
 
     const response = await productionService.create();
-
-    revalidateShiftPages();
 
     return {
       response: typeof response !== "string",

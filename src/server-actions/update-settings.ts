@@ -8,7 +8,6 @@ import UserService from "@/services/User";
 
 import { auth } from "@/utils/auth";
 import { SETTINGS_FIELDS } from "@/utils/constants/settings";
-import { revalidateSettingsPage } from "@/utils/helpers/revalidateShiftPages";
 
 import prisma from "#/prisma/client";
 
@@ -20,7 +19,7 @@ const SettingsSchema = z.object({
 });
 
 export default async function onUpdateSettings(values: typeof SETTINGS_FIELDS) {
-  const user = await UserService.getSessionUser();
+  const user = await UserService.getSessionOwner();
 
   if (!user) {
     return null;
@@ -91,8 +90,6 @@ export default async function onUpdateSettings(values: typeof SETTINGS_FIELDS) {
       .getSession({ headers: await headers(), query: { disableCookieCache: true } })
       .catch(() => null);
   }
-
-  revalidateSettingsPage();
 
   return updateSettings;
 }

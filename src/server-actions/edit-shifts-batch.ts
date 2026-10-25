@@ -7,7 +7,6 @@ import { BatchShiftIds } from "@/services/Shift/selection";
 import UserService from "@/services/User";
 
 import { CURRENCIES } from "@/utils/constants/currencies";
-import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
 
 import prisma from "#/prisma/client";
 
@@ -47,7 +46,7 @@ export type BatchEditResult = { hourly: number; production: number };
 export default async function onEditShiftsBatch(
   input: BatchEditInput
 ): Promise<BatchEditResult | null> {
-  const user = await UserService.getSessionUser();
+  const user = await UserService.getSessionOwner();
   if (!user?.id) return null;
 
   const parsed = BatchEditInput.safeParse(input);
@@ -91,8 +90,6 @@ export default async function onEditShiftsBatch(
         data: productionData,
       }),
     ]);
-
-    revalidateShiftPages();
 
     return { hourly: hourly.count, production: production.count };
   } catch (error) {

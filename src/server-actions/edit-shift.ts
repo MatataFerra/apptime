@@ -11,8 +11,6 @@ import UserService from "@/services/User";
 
 import type { HourlyType, ProductionType } from "@/types";
 
-import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
-
 import prisma from "#/prisma/client";
 
 /** A new rate for one of the shift's taxes, for this shift only. */
@@ -27,7 +25,7 @@ export default async function onEditShift(
   taxes?: Tax[] | null,
   rateChanges?: TaxRateChange[] | null
 ) {
-  const currentUser = await UserService.getSessionUser();
+  const currentUser = await UserService.getSessionOwner();
 
   if (!currentUser?.shifts?.id) {
     return null;
@@ -85,8 +83,6 @@ export default async function onEditShift(
       }
     }
     if (relinks.length > 0) await prisma.$transaction(relinks);
-
-    revalidateShiftPages();
 
     return updateShift;
   } catch (error) {

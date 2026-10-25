@@ -129,6 +129,22 @@ class UserService {
     return user;
   }
 
+  /**
+   * The signed-in user's id and email plus their shift container id: all a
+   * server action needs to check ownership. One small query; unlike
+   * getSessionUser it doesn't read the user's shifts.
+   */
+  static async getSessionOwner() {
+    const session = await getSession();
+    if (!session) return null;
+
+    // By id: the email in the session cookie cache can be stale.
+    return prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { id: true, email: true, shifts: { select: { id: true } } },
+    });
+  }
+
   static async updateUser({ id, user }: { id: string; user: Partial<User> }) {
     return await prisma.user.update({
       where: {

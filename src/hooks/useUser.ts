@@ -19,7 +19,8 @@ function useUser() {
     return api.getUserByEmail({
       email: email,
       profile: true,
-      shifts: true,
+      // The lists come from useHourlyShifts / useProductionShifts.
+      shifts: false,
       config: true,
     }) as unknown as SuccessApiResponse<UserType>;
   }, [email]);
@@ -29,7 +30,6 @@ function useUser() {
     queryFn: fetchUser,
     enabled: !!email,
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
     refetchInterval: 60 * 60 * 1000,
     staleTime: 2 * 60 * 1000,
   });

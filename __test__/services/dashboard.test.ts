@@ -5,11 +5,11 @@ import { describe, expect, test } from "vitest";
 import DashboardService from "@/services/Dashboard";
 import ShiftService from "@/services/Shift";
 
-import { UserModelSchema, UserType } from "@/types";
+import { type Shifts, UserModelSchema, type UserType } from "@/types";
 
 import { userMocked } from "../../mocks";
 
-const user: UserType = {
+const user: UserType & { shifts: Shifts } = {
   id: "clwil47o10000t7mdgtf1gtsv",
   email: "matias.agf@gmail.com",
   emailVerified: false,

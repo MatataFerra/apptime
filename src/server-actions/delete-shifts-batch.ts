@@ -5,8 +5,6 @@ import { z } from "zod";
 import { BatchShiftIds } from "@/services/Shift/selection";
 import UserService from "@/services/User";
 
-import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
-
 import prisma from "#/prisma/client";
 
 const BatchDeleteInput = z.object({ ids: BatchShiftIds }).strict();
@@ -21,7 +19,7 @@ export type BatchDeleteResult = { hourly: number; production: number };
 export default async function onDeleteShiftsBatch(
   input: BatchDeleteInput
 ): Promise<BatchDeleteResult | null> {
-  const user = await UserService.getSessionUser();
+  const user = await UserService.getSessionOwner();
   if (!user?.id) return null;
 
   const parsed = BatchDeleteInput.safeParse(input);
@@ -35,8 +33,6 @@ export default async function onDeleteShiftsBatch(
       prisma.hourly.deleteMany({ where: { id: { in: ids.hourly }, shift: { userId } } }),
       prisma.production.deleteMany({ where: { id: { in: ids.production }, shift: { userId } } }),
     ]);
-
-    revalidateShiftPages();
 
     return { hourly: hourly.count, production: production.count };
   } catch (error) {
