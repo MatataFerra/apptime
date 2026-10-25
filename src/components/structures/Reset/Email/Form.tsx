@@ -13,6 +13,7 @@ import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
+import useZodI18n from "@/hooks/useZodI18n";
 
 import { useRouter } from "@/i18n/navigation";
 import onSendEmailToResetPassword from "@/server-actions/send-email-reset-password";
@@ -26,6 +27,7 @@ type ResetInputs = {
 };
 
 function ResetForm() {
+  useZodI18n();
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations("auth.forgot");

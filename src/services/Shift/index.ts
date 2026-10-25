@@ -1,7 +1,5 @@
 import type { Hourly, Production, Tax } from "@prisma/client";
 import { differenceInMinutes, isAfter } from "date-fns";
-import cloneDeep from "lodash/cloneDeep";
-import has from "lodash/has";
 import isEmpty from "lodash/isEmpty";
 
 import { withContributions } from "@/services/Contribution/math";
@@ -9,6 +7,8 @@ import HourlyService from "@/services/Shift/Hourly";
 import ProductionService from "@/services/Shift/Production";
 
 import type { HourlyType, ProductionType, Shifts } from "@/types";
+
+import { clonePlain } from "@/utils/helpers/clonePlain";
 
 type ShiftHourlyOrProduction = Hourly | Production;
 type ShiftWithTaxesType = HourlyType | ProductionType;
@@ -52,7 +52,7 @@ interface ShiftServiceInterface {
 class ShiftService implements ShiftServiceInterface {
   shift: Shift;
   constructor(shift: Shift) {
-    this.shift = cloneDeep(shift);
+    this.shift = clonePlain(shift);
   }
 
   /*  
@@ -333,7 +333,7 @@ class ShiftService implements ShiftServiceInterface {
     if (isEmpty(taxes) || !taxes) return this;
 
     if (this.shiftHasTaxes()) {
-      let cache = cloneDeep(this.shift) as ShiftWithTaxesType;
+      let cache = clonePlain(this.shift) as ShiftWithTaxesType;
       const taxIdsToDelete = new Set(taxes.map((t) => t.id));
 
       cache.taxes = cache?.taxes?.filter((t) => !taxIdsToDelete.has(t.id));
@@ -409,7 +409,7 @@ class ShiftService implements ShiftServiceInterface {
   }
 
   private shiftHasTaxes(): this is ShiftWithTaxesType {
-    return has(this.shift, "taxes");
+    return Object.prototype.hasOwnProperty.call(this.shift, "taxes");
   }
 }
 

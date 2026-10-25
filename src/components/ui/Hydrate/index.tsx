@@ -2,10 +2,6 @@
 
 import { type PropsWithChildren, useEffect, useRef } from "react";
 
-import every from "lodash/every";
-import isObject from "lodash/isObject";
-import isString from "lodash/isString";
-import map from "lodash/map";
 import type { StoreApi, UseBoundStore } from "zustand";
 
 import { hydrateStore } from "@/utils/store";
@@ -15,10 +11,9 @@ function isEmptyDeep(obj: unknown): boolean {
     return true;
   }
 
-  if (isObject(obj)) {
-    if (Object.keys(obj).length === 0) return true;
-    return every(map(obj, (v) => isEmptyDeep(v)));
-  } else if (isString(obj)) {
+  if ((typeof obj === "object" && obj !== null) || typeof obj === "function") {
+    return Object.values(obj).every((v) => isEmptyDeep(v));
+  } else if (typeof obj === "string") {
     return !obj.length;
   }
   return false;

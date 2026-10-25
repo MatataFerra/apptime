@@ -19,16 +19,18 @@ import Stack from "@/components/ui/Stack";
 import { currencySymbol } from "@/utils/constants/currencies";
 import { useCurrency } from "@/hooks/useMoney";
 import useUser from "@/hooks/useUser";
+import useZodI18n from "@/hooks/useZodI18n";
 
 import { useShiftData } from "@/store/useShiftData";
 
-// Required-field messages come from the active language (providers/ZodI18n).
+// Required-field messages come from the active language (hooks/useZodI18n).
 const InputsSchema = z.object({
   hourValue: z.string().min(1),
   unpaidBreaks: z.string().min(1),
 });
 
 function ShiftStartInputs() {
+  useZodI18n();
   const { data, setData, setErrors } = useShiftData((state) => state);
   const { data: user } = useUser();
   const defaultCurrency = useCurrency();

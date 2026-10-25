@@ -4,7 +4,8 @@ import ut from "@/services/Utilities";
 import utClient from "@/services/Utilities/client";
 
 import LayoutMobile from "@/components/Layout/LayoutMobile";
-import Compatibility from "@/components/modules/Desktop/Compatibility";
+
+import { Compatibility } from "./lazy";
 
 export default async function AuthLayout({ children }: LayoutProps<"/[locale]">) {
   const userAgent = (await headers()).get("user-agent") ?? "";

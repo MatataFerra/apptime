@@ -1,4 +1,4 @@
-import { random } from "lodash";
+import random from "lodash/random";
 
 export default function generateRandomEmail() {
   const letters = ["a", "b", "c", "x", "t", "i", "o", "l", "m", "j"];

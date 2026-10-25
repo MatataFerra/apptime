@@ -7,11 +7,14 @@ import { z } from "zod";
 
 /**
  * Zod's default messages ("Required", "Invalid email"…) in the current
- * language, for every schema used on the client. A message written in a
- * schema (`.min(1, "…")` or `{ error: "…" }`) still wins over these;
- * anything not handled here falls back to Zod's own message.
+ * language. Forms that validate with Zod call it; it used to be a provider
+ * around the whole app, which put Zod in every page's bundle. The config is
+ * global, so calling it from several forms is harmless.
+ *
+ * A message written in a schema (`.min(1, "…")` or `{ error: "…" }`) still
+ * wins over these; anything not handled here falls back to Zod's own message.
  */
-function ZodI18n() {
+function useZodI18n() {
   const t = useTranslations("validation");
 
   useEffect(() => {
@@ -46,8 +49,6 @@ function ZodI18n() {
       },
     });
   }, [t]);
-
-  return null;
 }
 
-export default ZodI18n;
+export default useZodI18n;

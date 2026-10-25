@@ -1,4 +1,3 @@
-import _ from "lodash";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
