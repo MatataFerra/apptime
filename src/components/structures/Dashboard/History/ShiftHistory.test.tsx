@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { act, screen, within } from "@testing-library/react";
+import { act, fireEvent, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -242,5 +242,37 @@ describe("Dashboard history", () => {
 
     await user.click(screen.getByRole("button", { name: "Delete 1" }));
     expect(mocks.remove).toHaveBeenCalledWith({ ids: { hourly: [1], production: [] } });
+  });
+
+  describe("long press", () => {
+    function press(row: HTMLElement, ms: number, move = 0) {
+      vi.useFakeTimers();
+      fireEvent.pointerDown(row, { button: 0, clientX: 10, clientY: 10 });
+      if (move) fireEvent.pointerMove(row, { clientX: 10, clientY: 10 + move });
+      act(() => vi.advanceTimersByTime(ms));
+      fireEvent.pointerUp(row);
+      vi.useRealTimers();
+    }
+
+    test("holding a row starts selecting with it checked", () => {
+      renderHistory();
+      const [first] = screen.getAllByTestId("history-row");
+      press(first, 600);
+
+      expect(useHistorySelection.getState().active).toBe(true);
+      expect(screen.getByText("1 selected")).toBeInTheDocument();
+      // The click the browser sends after lifting the finger doesn't uncheck it.
+      fireEvent.click(screen.getAllByTestId("history-row")[0]);
+      expect(screen.getAllByTestId("history-row")[0]).toHaveAttribute("aria-checked", "true");
+    });
+
+    test("a short tap or a scroll doesn't", () => {
+      renderHistory();
+      press(screen.getAllByTestId("history-row")[0], 200);
+      expect(useHistorySelection.getState().active).toBe(false);
+
+      press(screen.getAllByTestId("history-row")[0], 600, 30);
+      expect(useHistorySelection.getState().active).toBe(false);
+    });
   });
 });

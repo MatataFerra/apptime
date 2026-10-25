@@ -168,6 +168,7 @@
       "no_employer": "Ninguno",
       "removed": "(eliminado)",
       "new_employer": "Nuevo empleador…",
+      "create_employer_for_shift": "Crear empleador para este turno",
       "search_employer": "Buscar empleador",
       "new_employer_name": "Nombre del nuevo empleador",
       "new_employer_hint": "Se guarda con el pago por hora y la moneda de este turno. El resto lo completás en Empleadores.",

@@ -39,6 +39,7 @@ import useDashboard from "@/hooks/useDashboard";
 import useDateLocale from "@/hooks/useDateLocale";
 import useEmployers from "@/hooks/useEmployers";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
+import useLongPress from "@/hooks/useLongPress";
 import useMoney, { useCurrency } from "@/hooks/useMoney";
 import useProductionShifts from "@/hooks/useProductionShifts";
 
@@ -119,6 +120,9 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
   const productionStore = useDashProductionStore();
   const store = entry.kind === "hourly" ? hourlyStore : productionStore;
   const isHourly = entry.kind === "hourly";
+  // Holding a row starts selecting with it checked, instead of opening it.
+  const startWith = useHistorySelection((state) => state.startWith);
+  const longPress = useLongPress(() => startWith(keyOf(entry)));
 
   return (
     <TableDialog
@@ -132,7 +136,8 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
       <button
         type="button"
         data-testid="history-row"
-        className="flex w-full items-center gap-3 px-3.5 py-3 text-left transition-colors hover:bg-surface-sunken focus-visible:bg-surface-sunken"
+        {...longPress}
+        className="flex w-full touch-manipulation items-center gap-3 px-3.5 py-3 text-left transition-colors select-none [-webkit-touch-callout:none] hover:bg-surface-sunken focus-visible:bg-surface-sunken"
       >
         <span
           className={cn(

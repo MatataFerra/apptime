@@ -168,6 +168,7 @@
       "no_employer": "None",
       "removed": "(removed)",
       "new_employer": "New employer…",
+      "create_employer_for_shift": "Add an employer for this shift",
       "search_employer": "Search employers",
       "new_employer_name": "New employer's name",
       "new_employer_hint": "Saved with this shift's hourly rate and currency. Fill in the rest from Employers.",

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import type { SavedEmployer } from "@/types";
@@ -31,6 +32,7 @@ function EmployerSelect({
   onChange,
   classes,
   allowCreate = false,
+  createLink = false,
   newDefaults,
 }: {
   value: number | null | undefined;
@@ -38,6 +40,8 @@ function EmployerSelect({
   /** Overrides the row's own spacing, e.g. inside a gap-based column. */
   classes?: string;
   allowCreate?: boolean;
+  /** With `allowCreate`: when nothing is picked, also a link under the row to add one. */
+  createLink?: boolean;
   newDefaults?: { rate?: number | null; currency?: string | null };
 }) {
   const { employers, byId, isLoading } = useEmployers();
@@ -94,7 +98,7 @@ function EmployerSelect({
     );
   }
 
-  return (
+  const row = (
     <SelectRow
       label={t("employer")}
       classes={classes}
@@ -116,6 +120,25 @@ function EmployerSelect({
       }}
     />
   );
+
+  // No employer yet: say so, with the way to add one in plain sight.
+  if (createLink && value == null) {
+    return (
+      <div className={cn("flex w-full flex-col", classes)}>
+        {row}
+        <button
+          type="button"
+          onClick={() => setCreating(true)}
+          className="mt-1 flex w-fit items-center gap-1 self-end text-[0.8125rem] font-semibold text-accent underline-offset-4 hover:underline"
+        >
+          <Plus className="size-3.5" aria-hidden="true" />
+          {t("create_employer_for_shift")}
+        </button>
+      </div>
+    );
+  }
+
+  return row;
 }
 
 export default EmployerSelect;

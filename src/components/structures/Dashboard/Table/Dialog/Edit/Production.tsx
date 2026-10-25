@@ -202,7 +202,11 @@ function TableDialogEditProduction({ shift, user }: Props) {
         hidden
         {...register("publicHolidayWorked", { value: shift.publicHolidayWorked })}
       />
+      {/* "New employer…" right here: a shift without one is one tap from having it. */}
       <EmployerSelect
+        allowCreate
+        createLink
+        newDefaults={{ currency: shift.currency }}
         value={employerId}
         onChange={(employer) => setEmployerId(employer?.id ?? null)}
         classes="mt-0 mb-0"
