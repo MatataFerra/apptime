@@ -7,6 +7,7 @@ import { z } from "zod";
 import { ownEmployerId } from "@/services/Employer/owned";
 import SalaryItems from "@/services/SalaryItems";
 import ShiftService from "@/services/Shift";
+import { ShiftRecord } from "@/services/Shift/server";
 import UserService from "@/services/User";
 
 import type { HourlyType, ProductionType } from "@/types";
@@ -64,7 +65,7 @@ export default async function onEditShift(
       .closeShift()
       .build();
 
-    const updateShift = await new ShiftService(buildShift).update(data.id, {
+    const updateShift = await new ShiftRecord(buildShift).update(data.id, {
       deleteTaxes: taxes ?? [],
     });
 

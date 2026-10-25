@@ -1,14 +1,9 @@
 import type { Contribution, Hourly, Tax } from "@prisma/client";
 import { differenceInMinutes, endOfDay, isSameDay, startOfDay } from "date-fns";
 
-import ContributionService from "@/services/Contribution";
-import TaxService from "@/services/Tax";
-
 import type { HourlyType, SalaryItemInput } from "@/types";
 
-import prisma from "../../../prisma/client";
-
-type HourlyOptions = {
+export type HourlyOptions = {
   deleteTaxes?: Tax[];
   createTaxes?: SalaryItemInput[];
   /** Owner of the shift; new taxes are created for this user. */
@@ -16,10 +11,6 @@ type HourlyOptions = {
 };
 
 interface HourlyInterface {
-  update(id: number): Promise<Hourly>;
-  create(): Promise<Hourly>;
-  delete(id: number): Promise<Hourly>;
-  addtaxes(taxes: SalaryItemInput[], userId: string): Promise<HourlyService>;
   build(): Omit<Hourly, "shiftId" | "id">;
   calculateEarnings(): number;
   getConfig(): Pick<Hourly, "hourValue" | "unpaidBreaks" | "employerId" | "currency">;
@@ -30,9 +21,6 @@ interface HourlyInterface {
  * @description This class is responsible for all the logic related to the Hourly model
  * this class is based on Builder pattern
  * @param {Hourly} shift - The shift
- * @method update - Updates a shift with or without `taxes`
- * @method create - Creates a new shift with or without `taxes`
- * @method delete - Deletes a shift
  * @method build - Returns the shift
  * @method calculateEarnings - Calculates the earnings of a shift
  * @method getConfig - Returns the configuration of the shift
@@ -44,143 +32,16 @@ interface HourlyInterface {
  */
 
 class HourlyService implements HourlyInterface {
-  private taxes: Pick<Tax, "id">[];
-  private contributions: Pick<Contribution, "id">[];
-  private options?: HourlyOptions;
+  // Set by the server-side subclass (services/Shift/server.ts), which saves the shift.
+  protected taxes: Pick<Tax, "id">[];
+  protected contributions: Pick<Contribution, "id">[];
+  protected options?: HourlyOptions;
   shift: Omit<HourlyType, "shiftId" | "id">;
   constructor(shift: Omit<HourlyType, "shiftId" | "id">, options?: HourlyOptions) {
     this.shift = shift;
     this.options = options;
     this.taxes = [];
     this.contributions = [];
-  }
-
-  /*  
-    ============================================================
-    CRUD methods
-    ============================================================
-  */
-
-  /*
-    ===========================
-    -----------Create----------
-    ===========================
-  */
-
-  async create() {
-    const createHourlyShift = await prisma.hourly.create({
-      data: {
-        ...this.shift,
-        taxes: {
-          connect: this.taxes,
-        },
-        contributions: {
-          connect: this.contributions,
-        },
-      },
-    });
-
-    return createHourlyShift;
-  }
-
-  /*
-    ===========================
-    -----------Update----------
-    ===========================
-  */
-  async update(id: number) {
-    const { deleteTaxes, createTaxes, userId } = this.options || {};
-
-    // Delete case
-    if (this.getTaxesIds(deleteTaxes ?? []).length > 0) {
-      const updatedShiftData = await prisma.hourly.update({
-        where: { id },
-        data: {
-          ...this.shift,
-          taxes: {
-            disconnect: deleteTaxes?.map((tax) => ({
-              id: tax.id,
-            })),
-          },
-          contributions: {},
-        },
-      });
-
-      return updatedShiftData;
-    }
-
-    // Create case
-    if (userId && createTaxes && createTaxes.length > 0) {
-      await this.addtaxes(createTaxes, userId);
-      const updatedShiftData = await prisma.hourly.update({
-        where: { id },
-        data: {
-          ...this.shift,
-          taxes: {
-            connect: this.taxes,
-          },
-          contributions: {
-            connect: this.contributions,
-          },
-        },
-      });
-
-      return updatedShiftData;
-    }
-
-    // Default case
-    const updatedShiftData = await prisma.hourly.update({
-      where: { id },
-      data: {
-        ...this.shift,
-        taxes: {
-          connect: this.taxes,
-        },
-        contributions: {
-          connect: this.contributions,
-        },
-      },
-    });
-
-    return updatedShiftData;
-  }
-
-  /*
-    ===========================
-    -----------Delete----------
-    ===========================
-  */
-
-  async delete(id: number) {
-    const deleteShift = await prisma.hourly.delete({
-      where: {
-        id,
-      },
-    });
-
-    return deleteShift;
-  }
-
-  /*  
-    ============================================================
-    Helper methods
-    ============================================================
-  */
-
-  async addContributions(contributions: SalaryItemInput[], userId: string) {
-    const created = await new ContributionService(contributions, userId).create();
-
-    this.contributions = created;
-
-    return this;
-  }
-
-  async addtaxes(taxes: SalaryItemInput[], userId: string) {
-    const created = await new TaxService(taxes, userId).create();
-
-    this.taxes = created;
-
-    return this;
   }
 
   build() {
@@ -305,7 +166,7 @@ class HourlyService implements HourlyInterface {
     ============================================================
   */
 
-  private getTaxesIds(taxes: Tax[]): number[] {
+  protected getTaxesIds(taxes: Tax[]): number[] {
     const idTaxes = taxes.reduce((acc: number[], curr) => {
       const { id } = curr;
 

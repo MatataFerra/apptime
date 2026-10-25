@@ -48,7 +48,7 @@ vi.mock("resend", () => ({
 }));
 
 import { getRateTable } from "@/services/ExchangeRates";
-import HourlyService from "@/services/Shift/Hourly";
+import { HourlyRecord } from "@/services/Shift/server";
 
 import { auth } from "@/utils/auth";
 
@@ -112,7 +112,7 @@ async function addShift(shiftId: number, day: string, userId: string) {
       isClosed: true,
     },
   });
-  const service = new HourlyService(shift as never);
+  const service = new HourlyRecord(shift as never);
   await service.addtaxes([{ name: "Income tax", value: 10.5, description: null }], userId);
   await service.update(shift.id);
   return shift.id;

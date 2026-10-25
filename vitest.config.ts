@@ -15,6 +15,11 @@ export default defineConfig({
     alias: [
       { find: "@", replacement: resolve(__dirname, "./src") },
       { find: "#", replacement: resolve(__dirname, "./") },
+      // Tests aren't a React Server bundle; Next resolves this to empty.js there.
+      {
+        find: /^server-only$/,
+        replacement: resolve(__dirname, "./node_modules/server-only/empty.js"),
+      },
     ],
   },
 });

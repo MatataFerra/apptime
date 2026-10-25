@@ -2,6 +2,8 @@ import type { Tax } from "@prisma/client";
 
 import type { SalaryItemInput } from "@/types";
 
+import "server-only";
+
 import prisma from "#/prisma/client";
 
 /**

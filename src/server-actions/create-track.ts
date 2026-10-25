@@ -4,6 +4,7 @@ import type { Hourly } from "@prisma/client";
 
 import { ownEmployerId } from "@/services/Employer/owned";
 import ShiftService from "@/services/Shift";
+import { ShiftRecord } from "@/services/Shift/server";
 import UserService from "@/services/User";
 
 import { HourlyCreateSchema } from "@/types";
@@ -37,7 +38,7 @@ export default async function onCreateTrackJob(data: Omit<Hourly, "id">) {
     .build<Hourly>();
 
   try {
-    const shift = await new ShiftService(shiftTransform).create<Hourly>();
+    const shift = await new ShiftRecord(shiftTransform).create<Hourly>();
 
     revalidateShiftPages();
 

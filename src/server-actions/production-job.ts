@@ -5,7 +5,7 @@ import type { Production } from "@prisma/client";
 import { ownEmployerId } from "@/services/Employer/owned";
 import ShiftService from "@/services/Shift";
 import { clashesWithSaved } from "@/services/Shift/clash";
-import ProductionService from "@/services/Shift/Production";
+import { ProductionRecord } from "@/services/Shift/server";
 import UserService from "@/services/User";
 
 import type { ProductionInputsParsed } from "@/types/forms";
@@ -79,7 +79,7 @@ export default async function onCreateProductionShift(data: ProductionInputsPars
         };
       });
 
-    const productionService = new ProductionService(shift);
+    const productionService = new ProductionRecord(shift);
 
     await productionService.addContributions(contributionsFromLocal, currentUser.id);
     await productionService.addtaxes(taxesFromLocal, currentUser.id);
