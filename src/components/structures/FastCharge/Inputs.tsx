@@ -4,6 +4,7 @@ import { type ChangeEvent, useEffect, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 
 import Toast from "@/services/Toast";
@@ -37,6 +38,7 @@ import type { SalaryItems } from "@/hooks/useSalaryItems";
 import useShiftNames from "@/hooks/useShiftNames";
 import useUser from "@/hooks/useUser";
 
+import useRepeatPrefill from "./useRepeatPrefill";
 import onCreateHourlyShift from "@/server-actions/hourly-job";
 import { useFastChargeStore } from "@/store/useFastChargeStore";
 import { useHourlyTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
@@ -69,8 +71,12 @@ function Inputs() {
     Custom hook to get the taxes from the store
   */
   const {
-    taxesModule: { clear: clearTaxes, salaryElement: taxes },
-    contributionsModule: { clear: clearContributions, salaryElement: contributions },
+    taxesModule: { clear: clearTaxes, salaryElement: taxes, setSalaryItems: setTaxes },
+    contributionsModule: {
+      clear: clearContributions,
+      salaryElement: contributions,
+      setSalaryItems: setContributions,
+    },
   } = useHourlyTaxesOrContributionsStore((state) => state);
 
   /*
@@ -195,6 +201,34 @@ function Inputs() {
         : { finishDate: date, finishTime: time }
     );
   }
+
+  // "Edit" on the home's repeat card: that shift, moved to today.
+  useRepeatPrefill(hourly, (shift, start, end) => {
+    const opts = { shouldValidate: true, shouldDirty: true };
+    const hourValue = String(shift.hourValue);
+    const breaks = String(shift.unpaidBreaks ?? 0);
+    setValue("name", shift.name ?? "", opts);
+    setValue("hour-value", hourValue, opts);
+    setValue("unpaid-breaks", breaks, opts);
+    setValue("is-public-holiday", false);
+    setValue("is-public-holiday-worked", false);
+    setDateTime("start", format(start, "yyyy-MM-dd'T'HH:mm"));
+    setDateTime("finish", format(end, "yyyy-MM-dd'T'HH:mm"));
+    setStoreValue({
+      name: shift.name ?? "",
+      hourValue,
+      unpaidBreaks: breaks,
+      fastHoliday: false,
+      fastWorked: false,
+      currency: shift.currency ?? null,
+      employerId: shift.employerId ?? null,
+    });
+    function item(i: { name: string; value: number; description?: string | null }) {
+      return { name: i.name, value: i.value, description: i.description ?? null, fromDb: true };
+    }
+    setTaxes?.((shift.taxes ?? []).map(item));
+    setContributions?.((shift.contributions ?? []).map(item));
+  });
 
   function onSubmit(formData: FastChargeInputs) {
     const parseData = {
