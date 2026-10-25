@@ -15,7 +15,7 @@ export const HomeHeader = dynamic(() => import("@/components/structures/Home/Hom
 });
 export const WeekSummary = dynamic(() => import("@/components/structures/Home/WeekSummary"), {
   ssr: false,
-  loading: () => <Skeleton classes="h-52 w-full rounded-2xl" />,
+  loading: () => <Skeleton classes="h-80 w-full rounded-xl" />,
 });
 export const LiveShift = dynamic(() => import("@/components/structures/Home/LiveShift"), {
   ssr: false,
