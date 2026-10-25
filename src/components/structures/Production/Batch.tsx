@@ -69,7 +69,7 @@ function Batch() {
   const { chosen } = schedule;
 
   const { names } = useShiftNames({ hourly, production }, name);
-  const { setIsWriting } = useDatalistStore((state) => state);
+  const setWriting = useDatalistStore((state) => state.setWriting);
 
   const {
     taxesModule: { clear: clearTaxes, salaryElement: taxes },
@@ -150,10 +150,15 @@ function Batch() {
             name="batch-name"
             variant="outlined"
             value={name}
-            onKeyDown={() => setIsWriting(true)}
+            onKeyDown={() => setWriting("production-batch-name")}
             onChange={(e) => setName(e.target.value)}
           />
-          <DatalistShiftNames data={names} value={name} onSelect={setName} />
+          <DatalistShiftNames
+            field="production-batch-name"
+            data={names}
+            value={name}
+            onSelect={setName}
+          />
         </Stack>
 
         <EmployerSelect

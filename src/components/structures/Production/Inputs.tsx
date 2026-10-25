@@ -96,7 +96,7 @@ function Inputs() {
   /*
     set when user is typing to show datalist
   */
-  const { setIsWriting } = useDatalistStore((state) => state);
+  const setWriting = useDatalistStore((state) => state.setWriting);
   const t = useTranslations("shift");
 
   const { uniqueTaxes, uniqueContributions } = useGetUniqueSalaryItems({
@@ -337,7 +337,7 @@ function Inputs() {
             type="name"
             isError={!!errors["name"]}
             description={errors["name"]?.message}
-            onKeyDown={() => setIsWriting(true)}
+            onKeyDown={() => setWriting("production-name")}
             {...register("name", {
               onChange: (e) => {
                 setStoreValues({ name: e.target.value });
@@ -345,6 +345,7 @@ function Inputs() {
             })}
           />
           <DatalistShiftNames
+            field="production-name"
             data={names}
             value={nameWatch}
             onSelect={(name) => {
