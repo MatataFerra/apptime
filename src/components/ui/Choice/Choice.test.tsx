@@ -64,16 +64,22 @@ describe("ChoiceRow", () => {
     expect(trigger).toHaveTextContent("NZD · New Zealand dollar");
   });
 
-  test("only one is open at a time", async () => {
+  test("floats as a menu and keeps the page behind it inert", async () => {
     const user = userEvent.setup();
     renderWithIntl(<TwoRows />);
 
-    await user.click(screen.getByRole("button", { name: /^Paid in/ }));
-    await user.click(screen.getByRole("button", { name: /^Employer/ }));
+    const paidIn = screen.getByRole("button", { name: /^Paid in/ });
+    await user.click(paidIn);
+    const list = screen.getByRole("listbox", { name: "Paid in" });
+    // Not inside the row: rendered in a popover layer.
+    expect(paidIn.parentElement?.contains(list)).toBe(false);
+    // While it's open the rest is hidden from assistive tech, like a native select.
+    expect(screen.queryByRole("button", { name: /^Employer/ })).toBeNull();
 
-    const lists = screen.getAllByRole("listbox");
-    expect(lists).toHaveLength(1);
-    expect(lists[0]).toHaveAccessibleName("Employer");
+    await user.keyboard("{Escape}");
+    await user.click(screen.getByRole("button", { name: /^Employer/ }));
+    expect(screen.getAllByRole("listbox")).toHaveLength(1);
+    expect(screen.getByRole("listbox")).toHaveAccessibleName("Employer");
   });
 
   test("arrow keys move through the options and Escape closes", async () => {

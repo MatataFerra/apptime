@@ -10,7 +10,7 @@ import type { HistoryEntry } from "@/services/History";
 import type { HourlyType, ProductionType } from "@/types";
 
 import Button from "@/components/ui/Button";
-import { ChoiceOptions, ChoiceTrigger, useInlineChoice } from "@/components/ui/Choice";
+import { ChoicePopover } from "@/components/ui/Choice";
 import {
   Drawer,
   DrawerContent,
@@ -56,15 +56,12 @@ function FieldRow({
   changed,
   onReset,
   children,
-  below,
 }: {
   label: string;
   hint?: string;
   changed: boolean;
   onReset: () => void;
   children: ReactNode;
-  /** Shown under the row, e.g. a Choice's options. */
-  below?: ReactNode;
 }) {
   const t = useTranslations("dashboard.selection");
   return (
@@ -88,14 +85,13 @@ function FieldRow({
         </span>
         {children}
       </div>
-      {below}
     </div>
   );
 }
 
 /**
- * A pick-one field that opens its options right under the row (no native
- * select, no portal inside the drawer). Only one is open at a time.
+ * A pick-one field that opens its options in a floating menu. Only one is
+ * open at a time.
  */
 function Choice<T extends string>({
   label,
@@ -122,57 +118,30 @@ function Choice<T extends string>({
   render: (value: T) => string;
 }) {
   const t = useTranslations("dashboard.selection");
-  const id = useId();
   const current = value ?? common;
   const changed = value !== undefined && value !== common;
-  const { rootRef, triggerRef } = useInlineChoice({
-    open,
-    onOpenChange: (next) => {
-      if (next !== open) onToggle();
-    },
-  });
+  const shown = current === MIXED ? t("mixed") : render(current);
 
   return (
-    <div ref={rootRef}>
-      <FieldRow
+    <FieldRow label={label} hint={hint} changed={changed} onReset={onReset}>
+      <ChoicePopover
         label={label}
-        hint={hint}
-        changed={changed}
-        onReset={onReset}
-        below={
-          open ? (
-            <ChoiceOptions
-              inline
-              id={id}
-              label={label}
-              className="mt-2"
-              value={current === MIXED ? undefined : current}
-              options={options.map((option) => ({
-                value: option,
-                label: render(option),
-                tag: option === common ? t("current") : undefined,
-              }))}
-              onSelect={(next) => {
-                triggerRef.current?.focus({ preventScroll: true });
-                onChange(next as T);
-              }}
-            />
-          ) : null
-        }
-      >
-        <ChoiceTrigger
-          ref={triggerRef}
-          open={open}
-          aria-controls={open ? id : undefined}
-          aria-label={`${label}: ${current === MIXED ? t("mixed") : render(current)}`}
-          onClick={onToggle}
-          tone={changed ? "changed" : current === MIXED ? "muted" : "default"}
-          className="max-w-[60%]"
-        >
-          {current === MIXED ? t("mixed") : render(current)}
-        </ChoiceTrigger>
-      </FieldRow>
-    </div>
+        open={open}
+        onOpenChange={(next) => {
+          if (next !== open) onToggle();
+        }}
+        value={current === MIXED ? undefined : current}
+        triggerLabel={shown}
+        tone={changed ? "changed" : current === MIXED ? "muted" : "default"}
+        className="max-w-[60%]"
+        options={options.map((option) => ({
+          value: option,
+          label: render(option),
+          tag: option === common ? t("current") : undefined,
+        }))}
+        onChange={(next) => onChange(next as T)}
+      />
+    </FieldRow>
   );
 }
 

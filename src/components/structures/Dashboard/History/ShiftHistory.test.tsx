@@ -160,8 +160,9 @@ describe("Dashboard history", () => {
     // Filtered by employer: the drawer shows it, not "Mixed".
     const employer = within(drawer).getByRole("button", { name: "Employer: Berry Farm" });
     await user.click(employer);
-    await user.click(within(drawer).getByRole("option", { name: /Kiwi Packhouse/ }));
-    expect(within(drawer).queryByRole("listbox")).not.toBeInTheDocument();
+    // The options float in a menu outside the drawer.
+    await user.click(screen.getByRole("option", { name: /Kiwi Packhouse/ }));
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
 
     // Both hourly shifts in the selection share a rate: it's there to edit.
     const rate = within(drawer).getByLabelText("Hourly rate") as HTMLInputElement;
@@ -188,10 +189,15 @@ describe("Dashboard history", () => {
     expect(within(drawer).getByRole("button", { name: "Employer: Mixed" })).toBeInTheDocument();
 
     await user.click(within(drawer).getByRole("button", { name: /^Paid in:/ }));
-    expect(within(drawer).getByRole("listbox", { name: "Paid in" })).toBeInTheDocument();
+    expect(screen.getByRole("listbox", { name: "Paid in" })).toBeInTheDocument();
+    // Escape closes the menu, not the drawer.
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+
     await user.click(within(drawer).getByRole("button", { name: "Employer: Mixed" }));
-    expect(within(drawer).getAllByRole("listbox")).toHaveLength(1);
-    expect(within(drawer).getByRole("listbox", { name: "Employer" })).toBeInTheDocument();
+    expect(screen.getAllByRole("listbox")).toHaveLength(1);
+    expect(screen.getByRole("listbox", { name: "Employer" })).toBeInTheDocument();
   });
 
   test("keeps the filters while selecting, and the selection across filter changes", async () => {

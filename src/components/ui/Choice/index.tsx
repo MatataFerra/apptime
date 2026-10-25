@@ -5,7 +5,6 @@ import {
   forwardRef,
   type KeyboardEvent,
   type ReactNode,
-  useEffect,
   useId,
   useLayoutEffect,
   useRef,
@@ -85,7 +84,7 @@ export const ChoiceTrigger = forwardRef<
 
 /**
  * The options themselves: a check on the picked one, a tag on the right,
- * arrow keys to move. Used inline (under a row) and inside a popover.
+ * arrow keys to move.
  */
 export function ChoiceOptions<T extends string>({
   id,
@@ -95,7 +94,6 @@ export function ChoiceOptions<T extends string>({
   onSelect,
   searchPlaceholder,
   className,
-  inline = false,
 }: {
   id?: string;
   /** The listbox's accessible name. */
@@ -106,8 +104,6 @@ export function ChoiceOptions<T extends string>({
   /** Shows a search box once there are SEARCH_FROM options or more. */
   searchPlaceholder?: string;
   className?: string;
-  /** Sits under its row in a tinted well instead of floating. */
-  inline?: boolean;
 }) {
   const t = useTranslations("dropdown");
   const listRef = useRef<HTMLDivElement>(null);
@@ -146,12 +142,7 @@ export function ChoiceOptions<T extends string>({
   }
 
   return (
-    <div
-      className={cn(
-        inline ? "rounded-xl border border-border bg-surface-sunken/60 p-1" : "",
-        className
-      )}
-    >
+    <div className={className}>
       {searchable ? (
         <label className="mb-1 flex h-10 items-center gap-2 rounded-lg bg-surface-sunken px-2.5">
           <Search className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
@@ -194,10 +185,7 @@ export function ChoiceOptions<T extends string>({
                 onClick={() => onSelect(option.value)}
                 className={cn(
                   "flex min-h-11 w-full items-center gap-2.5 rounded-lg px-2.5 text-left text-sm outline-hidden transition-colors",
-                  inline
-                    ? "hover:bg-surface focus-visible:bg-surface"
-                    : "hover:bg-surface-sunken focus-visible:bg-surface-sunken",
-                  selected && inline && "bg-surface",
+                  "hover:bg-surface-sunken focus-visible:bg-surface-sunken",
                   selected
                     ? "font-semibold text-ink"
                     : option.action
@@ -237,116 +225,10 @@ export function ChoiceOptions<T extends string>({
 }
 
 /**
- * Open/closed state for an inline choice: closes when tapping outside it
- * (so opening another one closes this one) and on Escape, before a dialog
- * around it gets the key.
- */
-export function useInlineChoice(external?: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}) {
-  const [own, setOwn] = useState(false);
-  const open = external ? external.open : own;
-  const setOpen = external ? external.onOpenChange : setOwn;
-  const rootRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const setOpenRef = useRef(setOpen);
-  useEffect(() => {
-    setOpenRef.current = setOpen;
-  });
-
-  useEffect(() => {
-    if (!open) return;
-    function onPointerDown(e: PointerEvent) {
-      if (!rootRef.current?.contains(e.target as Node)) setOpenRef.current(false);
-    }
-    // Capture on window runs before Radix's dialog listener on the document.
-    function onKeyDown(e: globalThis.KeyboardEvent) {
-      if (e.key !== "Escape") return;
-      e.stopPropagation();
-      setOpenRef.current(false);
-      triggerRef.current?.focus();
-    }
-    document.addEventListener("pointerdown", onPointerDown);
-    window.addEventListener("keydown", onKeyDown, { capture: true });
-    return () => {
-      document.removeEventListener("pointerdown", onPointerDown);
-      window.removeEventListener("keydown", onKeyDown, { capture: true });
-    };
-  }, [open]);
-
-  return { open, setOpen, rootRef, triggerRef };
-}
-
-/**
- * "Employer  [Farm ▾]": label on the left, a pill on the right, and the
- * options opening right under the row. No portal, so it behaves the same
- * inside dialogs and drawers.
- */
-export function ChoiceRow<T extends string>({
-  label,
-  value,
-  options,
-  onChange,
-  display,
-  placeholder,
-  searchPlaceholder,
-  classes,
-}: {
-  label: string;
-  value: T | undefined;
-  options: ChoiceOption<T>[];
-  onChange: (value: T) => void;
-  /** What the pill says; defaults to the option's label. */
-  display?: (value: T) => string;
-  placeholder?: string;
-  searchPlaceholder?: string;
-  classes?: string;
-}) {
-  const id = useId();
-  const { open, setOpen, rootRef, triggerRef } = useInlineChoice();
-  const current = options.find((o) => o.value === value);
-  const text = value !== undefined && display ? display(value) : current?.label;
-
-  return (
-    <div ref={rootRef} className={cn("mt-3 mb-1 flex w-full flex-col", classes)}>
-      <div className="flex w-full items-center justify-between gap-3">
-        <span className="text-sm text-ink-muted">{label}</span>
-        <ChoiceTrigger
-          ref={triggerRef}
-          open={open}
-          aria-controls={open ? id : undefined}
-          aria-label={`${label}: ${text ?? placeholder ?? ""}`}
-          tone={text ? "default" : "muted"}
-          onClick={() => setOpen(!open)}
-        >
-          {text ?? placeholder}
-        </ChoiceTrigger>
-      </div>
-      {open ? (
-        <ChoiceOptions
-          inline
-          id={id}
-          label={label}
-          options={options}
-          value={value}
-          searchPlaceholder={searchPlaceholder}
-          className="mt-2"
-          onSelect={(next) => {
-            setOpen(false);
-            triggerRef.current?.focus({ preventScroll: true });
-            onChange(next);
-          }}
-        />
-      ) : null}
-    </div>
-  );
-}
-
-/**
- * A choice that floats its options in a popover, for a trigger that isn't
- * on a row of its own (next to a rate, at the end of a settings row, in a
- * form column).
+ * A choice whose options float in a menu under its trigger. Modal, so the
+ * list scrolls and takes focus even inside a dialog or drawer (their scroll
+ * lock would swallow it otherwise), and only one menu is open at a time.
+ * Open/closed can be controlled, e.g. by a form that tracks which is open.
  */
 export function ChoicePopover<T extends string>({
   id,
@@ -361,6 +243,9 @@ export function ChoicePopover<T extends string>({
   tone,
   className,
   testId,
+  open: openProp,
+  onOpenChange,
+  triggerLabel,
 }: {
   /** For an outside `<label htmlFor>`. */
   id?: string;
@@ -375,13 +260,22 @@ export function ChoicePopover<T extends string>({
   tone?: Tone;
   className?: string;
   testId?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** What the trigger says, when it isn't the picked option ("Mixed"). */
+  triggerLabel?: string;
 }) {
-  const [open, setOpen] = useState(false);
+  const [ownOpen, setOwnOpen] = useState(false);
+  const open = openProp ?? ownOpen;
+  function setOpen(next: boolean) {
+    if (openProp === undefined) setOwnOpen(next);
+    onOpenChange?.(next);
+  }
   const current = options.find((o) => o.value === value);
-  const text = value !== undefined && display ? display(value) : current?.label;
+  const text = triggerLabel ?? (value !== undefined && display ? display(value) : current?.label);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal>
       <PopoverTrigger asChild>
         <ChoiceTrigger
           id={id}
@@ -413,5 +307,51 @@ export function ChoicePopover<T extends string>({
         />
       </PopoverContent>
     </Popover>
+  );
+}
+
+/**
+ * "Employer  [Farm ▾]": label on the left, a pill on the right that opens
+ * its options in a floating menu.
+ */
+export function ChoiceRow<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+  display,
+  placeholder,
+  searchPlaceholder,
+  classes,
+}: {
+  label: string;
+  value: T | undefined;
+  options: ChoiceOption<T>[];
+  onChange: (value: T) => void;
+  /** What the pill says; defaults to the option's label. */
+  display?: (value: T) => string;
+  placeholder?: string;
+  searchPlaceholder?: string;
+  classes?: string;
+}) {
+  const id = useId();
+
+  return (
+    <div className={cn("mt-3 mb-1 flex w-full items-center justify-between gap-3", classes)}>
+      <label htmlFor={id} className="text-sm text-ink-muted">
+        {label}
+      </label>
+      <ChoicePopover
+        id={id}
+        label={label}
+        value={value}
+        options={options}
+        onChange={onChange}
+        display={display}
+        placeholder={placeholder}
+        searchPlaceholder={searchPlaceholder}
+        className="max-w-[60%]"
+      />
+    </div>
   );
 }
