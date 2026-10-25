@@ -2,17 +2,17 @@
 
 import { type FormEvent, useMemo, useState } from "react";
 
-import { useQueryClient } from "@tanstack/react-query";
+import { LoaderCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { withContributions } from "@/services/Contribution/math";
 import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
-import Toast from "@/services/Toast";
 
 import Drawer from "@/components/modules/FastCharge/Drawer";
 import BatchPreview from "@/components/structures/share/batch/BatchPreview";
 import BatchScheduleFields from "@/components/structures/share/batch/BatchScheduleFields";
+import useBatchSave from "@/components/structures/share/batch/useBatchSave";
 import {
   toNumber,
   toShiftDates,
@@ -28,7 +28,6 @@ import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 
 import { currencySymbol } from "@/utils/constants/currencies";
-import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
 import useMoney, { useCurrency } from "@/hooks/useMoney";
 import useProductionShifts from "@/hooks/useProductionShifts";
@@ -50,7 +49,6 @@ function Batch() {
   const tb = useTranslations("shift.batch");
   const money = useMoney();
   const defaultCurrency = useCurrency();
-  const queryClient = useQueryClient();
 
   const { data: user } = useUser();
   const { data: hourly } = useHourlyShifts();
@@ -63,7 +61,7 @@ function Batch() {
   const [typedRate, setHourValue] = useState<string | null>(null);
   const [typedBreaks, setUnpaidBreaks] = useState<string | null>(null);
   const [review, setReview] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const batch = useBatchSave("hourly");
   const schedule = useBatchSchedule();
   const { chosen } = schedule;
 
@@ -117,43 +115,24 @@ function Batch() {
 
   async function onSave(event: FormEvent) {
     event.preventDefault();
-    if (saving || chosen.length === 0) return;
-    setSaving(true);
+    if (batch.saving || chosen.length === 0) return;
     setReview(false);
 
-    Toast({ type: "loading", message: t("processing"), description: t("please_wait") });
-
-    const response = await onCreateHourlyBatch({
-      name: name.trim() || null,
-      hourValue: toNumber(hourValue),
-      unpaidBreaks: toNumber(unpaidBreaks),
-      currency,
-      employerId,
-      taxes,
-      contributions,
-      shifts: toShiftDates(chosen),
-    });
-
-    setSaving(false);
-
-    if (!response) {
-      Toast({ type: "error", message: t("save_failed"), description: t("try_again") });
-      return;
-    }
-
-    [USE_QUERY_KEYS.HOURLY, USE_QUERY_KEYS.SALARY, USE_QUERY_KEYS.USER].forEach((key) =>
-      queryClient.invalidateQueries({ queryKey: [key] })
+    await batch.run(
+      chosen.length,
+      () =>
+        onCreateHourlyBatch({
+          name: name.trim() || null,
+          hourValue: toNumber(hourValue),
+          unpaidBreaks: toNumber(unpaidBreaks),
+          currency,
+          employerId,
+          taxes,
+          contributions,
+          shifts: toShiftDates(chosen),
+        }),
+      reset
     );
-
-    Toast({
-      type: response.created > 0 ? "success" : "error",
-      message: tb("created", { count: response.created }),
-      description: response.skipped.length
-        ? tb("skipped", { count: response.skipped.length })
-        : undefined,
-    });
-
-    if (response.created > 0) reset();
   }
 
   const hoursText = ShiftService.convertDifferenceInHHmm(totals.minutes).text;
@@ -252,10 +231,17 @@ function Batch() {
           type="button"
           variant="primary"
           classes="h-14 w-full rounded-2xl text-base font-semibold"
-          disabled={chosen.length === 0 || saving}
+          disabled={chosen.length === 0 || batch.saving}
           onClick={() => setReview(true)}
         >
-          {tb("review_button", { count: chosen.length })}
+          {batch.saving ? (
+            <>
+              <LoaderCircle className="size-5 animate-spin" aria-hidden="true" />
+              {tb("saving", { count: chosen.length })}
+            </>
+          ) : (
+            tb("review_button", { count: chosen.length })
+          )}
         </Button>
       </ShiftReviewDialog>
     </Stack>

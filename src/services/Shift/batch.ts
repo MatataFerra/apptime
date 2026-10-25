@@ -63,11 +63,9 @@ type Common = {
 type Context = {
   shiftId: number;
   employerId: number | null;
-  connect: {
-    taxes: { connect: { id: number }[] };
-    contributions: { connect: { id: number }[] };
-  };
 };
+
+type Model = "hourly" | "production";
 
 /** Only items with a name and a rate are saved, as in a single shift. */
 function salaryItems(items: Common["taxes"]) {
@@ -80,18 +78,25 @@ function salaryItems(items: Common["taxes"]) {
  * Saves several shifts at once for the signed-in user, all or nothing.
  * Shifts that overlap a saved one (hourly or production), or an earlier one in
  * the batch, are skipped. Taxes and contributions are resolved once and shared.
- * `create` returns the Prisma create for one shift.
+ * `row` builds the columns of one shift for `model`.
+ *
+ * Every statement is a round trip to Turso, so the shifts go in with one
+ * multi-row insert and each tax or contribution is linked to all of them in
+ * one update, instead of one insert (plus its links) per shift: a few
+ * statements whatever the number of days.
  */
 export async function saveBatch<D extends Common & { shifts: S[] }, S extends ShiftDates>({
   input,
   schema,
   tag,
-  create,
+  model,
+  row,
 }: {
   input: unknown;
   schema: z.ZodType<D>;
   tag: string;
-  create: (shift: S, data: D, ctx: Context) => Prisma.PrismaPromise<unknown>;
+  model: Model;
+  row: (shift: S, data: D, ctx: Context) => Record<string, unknown>;
 }): Promise<BatchResult<S> | null> {
   const parsed = schema.safeParse(input);
   if (!parsed.success) return null;
@@ -136,14 +141,30 @@ export async function saveBatch<D extends Common & { shifts: S[] }, S extends Sh
       new ContributionService(salaryItems(data.contributions), currentUser.id).create(),
     ]);
 
-    const ctx: Context = {
-      shiftId,
-      employerId: employerId ?? null,
-      connect: { taxes: { connect: taxes }, contributions: { connect: contributions } },
-    };
+    const ctx: Context = { shiftId, employerId: employerId ?? null };
+    const rows = accepted.map((shift) => row(shift, data, ctx));
 
     // All or nothing: a half-saved batch would be hard to spot and fix.
-    await prisma.$transaction(accepted.map((shift) => create(shift, data, ctx)));
+    await prisma.$transaction(async (tx) => {
+      const created =
+        model === "hourly"
+          ? await tx.hourly.createManyAndReturn({
+              data: rows as Prisma.HourlyCreateManyInput[],
+              select: { id: true },
+            })
+          : await tx.production.createManyAndReturn({
+              data: rows as Prisma.ProductionCreateManyInput[],
+              select: { id: true },
+            });
+      const link = { [model]: { connect: created.map(({ id }) => ({ id })) } };
+
+      for (const { id } of taxes) {
+        await tx.tax.update({ where: { id }, data: link, select: { id: true } });
+      }
+      for (const { id } of contributions) {
+        await tx.contribution.update({ where: { id }, data: link, select: { id: true } });
+      }
+    });
 
     revalidateShiftPages();
 

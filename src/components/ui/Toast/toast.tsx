@@ -8,6 +8,10 @@ import { cn } from "@/utils/helpers/styleMerger";
 
 const ToastProvider = ToastPrimitives.Provider;
 
+/**
+ * Toasts sit at the bottom, clear of the header: a long one ("Saving 9
+ * shifts…") must not cover the menu and the way home.
+ */
 const ToastViewport = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Viewport>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport>
@@ -15,7 +19,7 @@ const ToastViewport = React.forwardRef<
   <ToastPrimitives.Viewport
     ref={ref}
     className={cn(
-      "fixed inset-x-0 top-0 z-100 mx-auto flex max-h-screen w-full max-w-md flex-col gap-2 px-3 pt-[max(env(safe-area-inset-top),0.75rem)] outline-hidden",
+      "fixed inset-x-0 bottom-0 z-100 mx-auto flex max-h-screen w-full max-w-md flex-col gap-2 px-3 pb-[max(env(safe-area-inset-bottom),0.75rem)] outline-hidden",
       className
     )}
     {...props}
@@ -28,7 +32,7 @@ ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
  * so messages read the same on any module's background.
  */
 const toastVariants = cva(
-  "group pointer-events-auto relative flex w-full items-center gap-3 overflow-hidden rounded-2xl bg-surface-inverse py-3 pr-10 pl-3 text-ink-inverse shadow-float transition-all data-[swipe=cancel]:translate-y-0 data-[swipe=end]:translate-y-(--radix-toast-swipe-end-y) data-[swipe=move]:translate-y-(--radix-toast-swipe-move-y) data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-top-full data-[state=open]:slide-in-from-top-full",
+  "group pointer-events-auto relative flex w-full items-center gap-3 overflow-hidden rounded-2xl bg-surface-inverse py-3 pr-10 pl-3 text-ink-inverse shadow-float transition-all data-[swipe=cancel]:translate-y-0 data-[swipe=end]:translate-y-(--radix-toast-swipe-end-y) data-[swipe=move]:translate-y-(--radix-toast-swipe-move-y) data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-bottom-full data-[state=open]:slide-in-from-bottom-full",
   {
     variants: {
       variant: {

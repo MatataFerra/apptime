@@ -35,7 +35,7 @@ export default function Toaster() {
   const { toasts } = useToast();
 
   return (
-    <ToastProvider swipeDirection="up">
+    <ToastProvider swipeDirection="down">
       {toasts.map(function ({ id, title, description, action, variant, ...props }) {
         const tone = ICONS[variant ?? "default"];
         const Icon = tone?.icon;

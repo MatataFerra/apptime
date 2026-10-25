@@ -6,17 +6,24 @@ const db = vi.hoisted(() => {
       findMany: vi.fn(),
       findFirst: vi.fn(),
       create: vi.fn(),
+      update: vi.fn(),
       updateMany: vi.fn(),
+      // One id per row, like a multi-row INSERT … RETURNING.
+      createManyAndReturn: vi.fn(async ({ data }: { data: unknown[] }) =>
+        data.map((_, i) => ({ id: 100 + i }))
+      ),
     };
   }
-  return {
+  const db = {
     tax: model(),
     contribution: model(),
     employer: model(),
     hourly: model(),
     production: model(),
-    $transaction: vi.fn((ops: unknown[]) => Promise.all(ops)),
+    // Interactive transaction: the callback gets the client.
+    $transaction: vi.fn(async (fn: (tx: unknown) => unknown) => fn(db)),
   };
+  return db;
 });
 
 vi.mock("#/prisma/client", () => ({ default: db }));
@@ -57,7 +64,6 @@ beforeEach(() => {
   db.tax.findMany.mockResolvedValue([]);
   db.contribution.findMany.mockResolvedValue([]);
   db.contribution.create.mockResolvedValue({ id: 9 });
-  db.production.create.mockImplementation(async () => ({ id: 1 }));
 });
 
 describe("onCreateProductionBatch", () => {
@@ -66,9 +72,13 @@ describe("onCreateProductionBatch", () => {
 
     expect(db.$transaction).toHaveBeenCalledTimes(1);
     expect(db.contribution.create).toHaveBeenCalledTimes(1);
-    expect(db.hourly.create).not.toHaveBeenCalled();
+    expect(db.hourly.createManyAndReturn).not.toHaveBeenCalled();
+    expect(db.production.createManyAndReturn).toHaveBeenCalledTimes(1);
 
-    const rows = db.production.create.mock.calls.map(([arg]) => arg.data);
+    const rows = db.production.createManyAndReturn.mock.calls[0][0].data as Record<
+      string,
+      unknown
+    >[];
     expect(rows.map((r) => r.itemQuantity)).toEqual([4, 6.5]);
     expect(rows[0]).toMatchObject({
       name: "Picking",
@@ -76,7 +86,13 @@ describe("onCreateProductionBatch", () => {
       shiftId: 7,
       isClosed: true,
       amount: 480,
-      contributions: { connect: [{ id: 9 }] },
+    });
+    expect(rows[0]).not.toHaveProperty("contributions");
+    // Linked to both new shifts at once.
+    expect(db.contribution.update).toHaveBeenCalledWith({
+      where: { id: 9 },
+      data: { production: { connect: [{ id: 100 }, { id: 101 }] } },
+      select: { id: true },
     });
   });
 
@@ -104,6 +120,6 @@ describe("onCreateProductionBatch", () => {
     expect(
       await onCreateProductionBatch(input(overrides as Partial<ProductionBatchInput>))
     ).toBeNull();
-    expect(db.production.create).not.toHaveBeenCalled();
+    expect(db.production.createManyAndReturn).not.toHaveBeenCalled();
   });
 });

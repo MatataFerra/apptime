@@ -2,18 +2,18 @@
 
 import { type FormEvent, useMemo, useState } from "react";
 
-import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { LoaderCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { withContributions } from "@/services/Contribution/math";
 import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
-import Toast from "@/services/Toast";
 
 import Drawer from "@/components/modules/Production/Drawer";
 import BatchPreview from "@/components/structures/share/batch/BatchPreview";
 import BatchScheduleFields from "@/components/structures/share/batch/BatchScheduleFields";
+import useBatchSave from "@/components/structures/share/batch/useBatchSave";
 import {
   toNumber,
   toShiftDates,
@@ -29,7 +29,6 @@ import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 
 import { currencySymbol } from "@/utils/constants/currencies";
-import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import { cn } from "@/utils/helpers/styleMerger";
 import useDateLocale from "@/hooks/useDateLocale";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
@@ -53,7 +52,6 @@ function Batch() {
   const dateLocale = useDateLocale();
   const money = useMoney();
   const defaultCurrency = useCurrency();
-  const queryClient = useQueryClient();
 
   const { data: hourly } = useHourlyShifts();
   const { data: production } = useProductionShifts();
@@ -66,7 +64,7 @@ function Batch() {
   /** Quantities edited day by day; the others use `defaultQuantity`. */
   const [quantities, setQuantities] = useState<Record<string, string>>({});
   const [review, setReview] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const batch = useBatchSave("production");
   const schedule = useBatchSchedule();
   const { chosen } = schedule;
 
@@ -113,46 +111,27 @@ function Batch() {
 
   async function onSave(event: FormEvent) {
     event.preventDefault();
-    if (saving || chosen.length === 0 || missing > 0) return;
-    setSaving(true);
+    if (batch.saving || chosen.length === 0 || missing > 0) return;
     setReview(false);
 
-    Toast({ type: "loading", message: t("processing"), description: t("please_wait") });
-
     const dates = toShiftDates(chosen);
-    const response = await onCreateProductionBatch({
-      name: name.trim() || null,
-      itemValue: toNumber(itemValue),
-      currency,
-      employerId,
-      taxes,
-      contributions,
-      shifts: chosen.map((day, i) => ({
-        ...dates[i],
-        itemQuantity: toNumber(quantityOf(day.key)),
-      })),
-    });
-
-    setSaving(false);
-
-    if (!response) {
-      Toast({ type: "error", message: t("save_failed"), description: t("try_again") });
-      return;
-    }
-
-    [USE_QUERY_KEYS.PRODUCTION, USE_QUERY_KEYS.SALARY, USE_QUERY_KEYS.USER].forEach((key) =>
-      queryClient.invalidateQueries({ queryKey: [key] })
+    await batch.run(
+      chosen.length,
+      () =>
+        onCreateProductionBatch({
+          name: name.trim() || null,
+          itemValue: toNumber(itemValue),
+          currency,
+          employerId,
+          taxes,
+          contributions,
+          shifts: chosen.map((day, i) => ({
+            ...dates[i],
+            itemQuantity: toNumber(quantityOf(day.key)),
+          })),
+        }),
+      reset
     );
-
-    Toast({
-      type: response.created > 0 ? "success" : "error",
-      message: tb("created", { count: response.created }),
-      description: response.skipped.length
-        ? tb("skipped", { count: response.skipped.length })
-        : undefined,
-    });
-
-    if (response.created > 0) reset();
   }
 
   return (
@@ -275,10 +254,17 @@ function Batch() {
           type="button"
           variant="primary"
           classes="h-14 w-full rounded-2xl text-base font-semibold"
-          disabled={chosen.length === 0 || missing > 0 || saving}
+          disabled={chosen.length === 0 || missing > 0 || batch.saving}
           onClick={() => setReview(true)}
         >
-          {tb("review_button", { count: chosen.length })}
+          {batch.saving ? (
+            <>
+              <LoaderCircle className="size-5 animate-spin" aria-hidden="true" />
+              {tb("saving", { count: chosen.length })}
+            </>
+          ) : (
+            tb("review_button", { count: chosen.length })
+          )}
         </Button>
       </ShiftReviewDialog>
     </Stack>

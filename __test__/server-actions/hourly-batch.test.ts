@@ -6,17 +6,24 @@ const db = vi.hoisted(() => {
       findMany: vi.fn(),
       findFirst: vi.fn(),
       create: vi.fn(),
+      update: vi.fn(),
       updateMany: vi.fn(),
+      // One id per row, like a multi-row INSERT … RETURNING.
+      createManyAndReturn: vi.fn(async ({ data }: { data: unknown[] }) =>
+        data.map((_, i) => ({ id: 100 + i }))
+      ),
     };
   }
-  return {
+  const db = {
     tax: model(),
     contribution: model(),
     employer: model(),
     hourly: model(),
     production: model(),
-    $transaction: vi.fn((ops: unknown[]) => Promise.all(ops)),
+    // Interactive transaction: the callback gets the client.
+    $transaction: vi.fn(async (fn: (tx: unknown) => unknown) => fn(db)),
   };
+  return db;
 });
 
 const session = vi.hoisted(() => ({
@@ -59,7 +66,6 @@ beforeEach(() => {
   db.tax.findMany.mockResolvedValue([]);
   db.contribution.findMany.mockResolvedValue([]);
   db.tax.create.mockResolvedValue({ id: 3 });
-  db.hourly.create.mockImplementation(async () => ({ id: 1 }));
 });
 
 describe("onCreateHourlyBatch", () => {
@@ -70,10 +76,13 @@ describe("onCreateHourlyBatch", () => {
     expect(db.$transaction).toHaveBeenCalledTimes(1);
     // The tax is created once, not once per shift.
     expect(db.tax.create).toHaveBeenCalledTimes(1);
-    expect(db.hourly.create).toHaveBeenCalledTimes(3);
+    // One multi-row insert, not one per shift.
+    expect(db.hourly.createManyAndReturn).toHaveBeenCalledTimes(1);
+    expect(db.hourly.create).not.toHaveBeenCalled();
 
-    const { data } = db.hourly.create.mock.calls[0][0];
-    expect(data).toMatchObject({
+    const { data } = db.hourly.createManyAndReturn.mock.calls[0][0];
+    expect(data).toHaveLength(3);
+    expect(data[0]).toMatchObject({
       name: "Packhouse",
       shiftId: 7,
       hourValue: 26.5,
@@ -82,7 +91,13 @@ describe("onCreateHourlyBatch", () => {
       isClosed: true,
       amount: 480,
       source: "fast",
-      taxes: { connect: [{ id: 3 }] },
+    });
+    // The tax is linked to the three new shifts in one update.
+    expect(db.tax.update).toHaveBeenCalledTimes(1);
+    expect(db.tax.update).toHaveBeenCalledWith({
+      where: { id: 3 },
+      data: { hourly: { connect: [{ id: 100 }, { id: 101 }, { id: 102 }] } },
+      select: { id: true },
     });
   });
 
@@ -93,7 +108,7 @@ describe("onCreateHourlyBatch", () => {
 
     expect(result?.created).toBe(2);
     expect(result?.skipped).toEqual([{ startDate: at(6, 8), endDate: at(6, 16) }]);
-    expect(db.hourly.create).toHaveBeenCalledTimes(2);
+    expect(db.hourly.createManyAndReturn.mock.calls[0][0].data).toHaveLength(2);
   });
 
   test("nothing is created when every day clashes", async () => {
@@ -110,7 +125,7 @@ describe("onCreateHourlyBatch", () => {
   test("someone else's employer refuses the whole batch", async () => {
     db.employer.findFirst.mockResolvedValue(null);
     expect(await onCreateHourlyBatch(input({ employerId: 99 }))).toBeNull();
-    expect(db.hourly.create).not.toHaveBeenCalled();
+    expect(db.hourly.createManyAndReturn).not.toHaveBeenCalled();
   });
 
   test.each([
@@ -122,7 +137,7 @@ describe("onCreateHourlyBatch", () => {
     ["a negative rate", { hourValue: -1 }],
   ])("refuses %s", async (_, overrides) => {
     expect(await onCreateHourlyBatch(input(overrides as Partial<HourlyBatchInput>))).toBeNull();
-    expect(db.hourly.create).not.toHaveBeenCalled();
+    expect(db.hourly.createManyAndReturn).not.toHaveBeenCalled();
   });
 
   test("needs a signed-in user with a shift container", async () => {
