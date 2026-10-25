@@ -10,10 +10,8 @@ import UserService from "@/services/User";
 
 import type { FastChargeInputsParsed } from "@/types/forms";
 
-import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
-
 export default async function onCreateHourlyShift(data: FastChargeInputsParsed) {
-  const currentUser = await UserService.getSessionUser();
+  const currentUser = await UserService.getSessionOwner();
 
   if (!currentUser) {
     return null;
@@ -86,8 +84,6 @@ export default async function onCreateHourlyShift(data: FastChargeInputsParsed) 
     await hourlyService.addtaxes(taxesFromLocal, currentUser.id);
 
     const response = await hourlyService.create();
-
-    revalidateShiftPages();
 
     return {
       response: typeof response !== "string",

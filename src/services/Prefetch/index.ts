@@ -7,31 +7,43 @@ import "server-only";
 
 import prisma from "#/prisma/client";
 
-/** The signed-in user with shifts (and their taxes), profile and config. Never the password. */
+/**
+ * The signed-in user (never the password) with only their shift container,
+ * plus both shift lists with the same includes as /api/shift/hourly and
+ * /api/shift/production. Three queries in parallel; the lists aren't
+ * nested in the user, so the page carries each shift once.
+ */
 async function findUserForClient(id: string) {
-  return prisma.user.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      email: true,
-      emailVerified: true,
-      image: true,
-      name: true,
-      type_account: true,
-      role: true,
-      online: true,
-      formCompleted: true,
-      isActive: true,
-      shifts: {
-        include: {
-          hourly: { include: { taxes: true } },
-          production: { include: { taxes: true } },
-        },
+  const [user, hourly, production] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        emailVerified: true,
+        image: true,
+        name: true,
+        type_account: true,
+        role: true,
+        online: true,
+        formCompleted: true,
+        isActive: true,
+        shifts: true,
+        profile: true,
+        config: true,
       },
-      profile: true,
-      config: true,
-    },
-  });
+    }),
+    prisma.hourly.findMany({
+      where: { shift: { userId: id } },
+      include: { taxes: true, contributions: true },
+    }),
+    prisma.production.findMany({
+      where: { shift: { userId: id } },
+      include: { taxes: true, contributions: true },
+    }),
+  ]);
+
+  return user ? { user, hourly, production } : null;
 }
 
 /**
@@ -44,8 +56,8 @@ function asJson<T>(value: T): T {
 
 /**
  * Seeds React Query on the server so the first render already has the
- * user and their shifts: one database query instead of the session,
- * user, hourly and production requests the client used to make.
+ * user and their shifts, instead of the user, hourly and production
+ * requests the client used to make.
  */
 export async function prefetchUserData() {
   const queryClient = new QueryClient();
@@ -56,22 +68,16 @@ export async function prefetchUserData() {
 
   if (email && userId) {
     // By id: the email in the session cookie cache can be stale.
-    const user = await findUserForClient(userId).catch(() => null);
+    const found = await findUserForClient(userId).catch(() => null);
 
-    if (user) {
-      const data = asJson(user);
-      profile = { name: data.name, email: data.email, image: data.image };
+    if (found) {
+      const { user, hourly, production } = asJson(found);
+      profile = { name: user.name, email: user.email, image: user.image };
       const ok = { message: "success", response: true } as const;
 
-      queryClient.setQueryData([USE_QUERY_KEYS.USER, email], { ...ok, user: data });
-      queryClient.setQueryData([USE_QUERY_KEYS.HOURLY], {
-        ...ok,
-        hourly: data.shifts?.hourly ?? [],
-      });
-      queryClient.setQueryData([USE_QUERY_KEYS.PRODUCTION], {
-        ...ok,
-        production: data.shifts?.production ?? [],
-      });
+      queryClient.setQueryData([USE_QUERY_KEYS.USER, email], { ...ok, user });
+      queryClient.setQueryData([USE_QUERY_KEYS.HOURLY], { ...ok, hourly });
+      queryClient.setQueryData([USE_QUERY_KEYS.PRODUCTION], { ...ok, production });
     }
   }
 

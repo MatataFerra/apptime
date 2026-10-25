@@ -20,7 +20,7 @@ vi.mock("#/prisma/client", () => ({ default: db }));
 vi.mock("../../prisma/client", () => ({ default: db }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/services/User", () => ({
-  default: { getSessionUser: vi.fn(async () => ({ id: "u1", shifts: { id: 7 } })) },
+  default: { getSessionOwner: vi.fn(async () => ({ id: "u1", shifts: { id: 7 } })) },
 }));
 
 import type { HourlyType } from "@/types";

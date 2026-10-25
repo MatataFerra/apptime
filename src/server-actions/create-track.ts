@@ -8,10 +8,8 @@ import UserService from "@/services/User";
 
 import { HourlyCreateSchema } from "@/types";
 
-import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
-
 export default async function onCreateTrackJob(data: Omit<Hourly, "id">) {
-  const currentUser = await UserService.getSessionUser();
+  const currentUser = await UserService.getSessionOwner();
 
   if (!currentUser) {
     return null;
@@ -38,8 +36,6 @@ export default async function onCreateTrackJob(data: Omit<Hourly, "id">) {
 
   try {
     const shift = await new ShiftService(shiftTransform).create<Hourly>();
-
-    revalidateShiftPages();
 
     return {
       response: true,

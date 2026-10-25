@@ -1,7 +1,10 @@
 import { Profile, User } from "@prisma/client";
 import { addDays, addHours, addMinutes, differenceInMinutes } from "date-fns";
 
-import { UserType } from "@/types";
+import type { Shifts, UserType } from "@/types";
+
+/** A user fixture with both shift lists loaded (getSessionUser with shifts). */
+type UserWithShifts = UserType & { shifts: Shifts };
 
 import { generateRandomID } from "@/utils/helpers/generateRandomID";
 
@@ -63,7 +66,7 @@ export const userMockedParsed: User = {
   id: generateRandomID("uuid"),
 };
 
-export const userShiftsMocked: UserType["shifts"] = {
+export const userShiftsMocked: Shifts = {
   id: 1,
   userId: userMockedParsed.id,
   production: datesMock.map((date, i) => ({
@@ -108,7 +111,7 @@ export const profileParsed: Profile = {
   userId: userMockedParsed.id,
 };
 
-export const userMocked: UserType = {
+export const userMocked: UserWithShifts = {
   ...userMockedParsed,
   shifts: {
     ...userShiftsMocked,
@@ -125,7 +128,7 @@ export const userMocked: UserType = {
   },
 };
 
-export const userTestData: UserType = {
+export const userTestData: UserWithShifts = {
   id: "user-123",
   email: "testuser@example.com",
   emailVerified: true,

@@ -11,7 +11,7 @@ export default async function TokenLayout({
   children,
   password,
 }: PropsWithChildren<{ password: ReactNode }>) {
-  const user = await UserService.getSessionUser();
+  const user = await UserService.getSessionOwner();
 
   if (!isEmpty(user)) {
     return redirect(PATH_NAMES.HOME);

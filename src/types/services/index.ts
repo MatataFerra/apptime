@@ -15,7 +15,8 @@ import { HandleErrorTypeSchema } from "@/types/zod";
 // Types
 export interface UserType extends User {
   config: Config | null;
-  shifts: Shifts | null;
+  /** The container; its lists only when asked for (they have their own queries). */
+  shifts: (Shift & Partial<Pick<Shifts, "hourly" | "production">>) | null;
   profile: Profile | null;
 }
 

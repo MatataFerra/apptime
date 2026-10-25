@@ -33,7 +33,7 @@ const session = vi.hoisted(() => ({
 vi.mock("#/prisma/client", () => ({ default: db }));
 vi.mock("../../prisma/client", () => ({ default: db }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
-vi.mock("@/services/User", () => ({ default: { getSessionUser: session.user } }));
+vi.mock("@/services/User", () => ({ default: { getSessionOwner: session.user } }));
 
 import onCreateHourlyBatch, { type HourlyBatchInput } from "@/server-actions/hourly-batch";
 

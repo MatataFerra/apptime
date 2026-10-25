@@ -5,7 +5,6 @@ import { z } from "zod";
 import { getSessionUserId } from "@/utils/auth/session";
 import { WEEK_DAYS } from "@/utils/constants";
 import { CURRENCIES } from "@/utils/constants/currencies";
-import { revalidateSettingsPage, revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
 import { THEMES } from "@/utils/theme";
 
 import prisma from "#/prisma/client";
@@ -41,9 +40,6 @@ export default async function onUpdatePreferences(patch: PreferencesPatch) {
     create: { userId: user.id, ...parsed.data },
     update: parsed.data,
   });
-
-  revalidateSettingsPage();
-  revalidateShiftPages();
 
   return { ok: true as const, config };
 }

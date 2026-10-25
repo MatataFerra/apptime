@@ -5,7 +5,6 @@ import { z } from "zod";
 import SalaryItems, { startsOnOrAfter } from "@/services/SalaryItems";
 
 import { getSessionUserId } from "@/utils/auth/session";
-import { revalidateSettingsPage, revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
 
 import prisma from "#/prisma/client";
 
@@ -42,11 +41,6 @@ function model(kind: SalaryItemKind) {
   return (kind === "tax" ? prisma.tax : prisma.contribution) as typeof prisma.tax;
 }
 
-function revalidate() {
-  revalidateSettingsPage();
-  revalidateShiftPages();
-}
-
 /**
  * Rename a tax or change its rate, for every shift that uses it or only
  * for shifts from a date on.
@@ -68,7 +62,6 @@ export async function onUpdateSalaryItem(input: z.input<typeof UpdateSchema>) {
 
   if (!from || sameRate) {
     await model(kind).update({ where: { id }, data: { name, value, description } });
-    revalidate();
     return { ok: true as const, moved: null };
   }
 
@@ -95,7 +88,6 @@ export async function onUpdateSalaryItem(input: z.input<typeof UpdateSchema>) {
     }
   }
 
-  revalidate();
   return { ok: true as const, moved: moving.length };
 }
 
@@ -121,6 +113,5 @@ export async function onRemoveSalaryItem(input: z.input<typeof RemoveSchema>) {
     await model(kind).deleteMany({ where: { id, userId } });
   }
 
-  revalidate();
   return { ok: true as const, archived: used };
 }

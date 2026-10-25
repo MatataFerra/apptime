@@ -12,7 +12,7 @@ vi.mock("#/prisma/client", () => ({ default: db }));
 vi.mock("../../prisma/client", () => ({ default: db }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/services/User", () => ({
-  default: { getSessionUser: vi.fn(async () => session.user) },
+  default: { getSessionOwner: vi.fn(async () => session.user) },
 }));
 
 import { idsByKind, selectionKey } from "@/services/Shift/selection";

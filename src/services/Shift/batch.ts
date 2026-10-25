@@ -8,7 +8,6 @@ import TaxService from "@/services/Tax";
 import UserService from "@/services/User";
 
 import { MAX_BATCH_DAYS, MAX_SHIFT_MINUTES, overlaps } from "@/utils/helpers/batchShifts";
-import { revalidateShiftPages } from "@/utils/helpers/revalidateShiftPages";
 
 import prisma from "#/prisma/client";
 
@@ -102,11 +101,7 @@ export async function saveBatch<D extends Common & { shifts: S[] }, S extends Sh
   if (!parsed.success) return null;
   const data = parsed.data;
 
-  const currentUser = await UserService.getSessionUser({
-    shifts: true,
-    profile: false,
-    config: false,
-  });
+  const currentUser = await UserService.getSessionOwner();
   const shiftId = currentUser?.shifts?.id;
   if (!currentUser || !shiftId) return null;
 
@@ -165,8 +160,6 @@ export async function saveBatch<D extends Common & { shifts: S[] }, S extends Sh
         await tx.contribution.update({ where: { id }, data: link, select: { id: true } });
       }
     });
-
-    revalidateShiftPages();
 
     return { created: accepted.length, skipped };
   } catch (error) {

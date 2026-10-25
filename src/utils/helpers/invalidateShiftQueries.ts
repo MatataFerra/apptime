@@ -6,8 +6,8 @@ import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
  * Mark every query that holds shift data as stale, so screens like the
  * dashboard refetch after a shift is started, finished, created or edited.
  *
- * The shift hooks use `refetchOnMount: false` and a 2 min `staleTime`, so
- * without this the dashboard keeps showing the cached lists until a reload.
+ * Active queries refetch now; inactive ones are marked stale and refetch
+ * when a screen that uses them mounts (the hooks have a 2 min `staleTime`).
  */
 export function invalidateShiftQueries(queryClient: QueryClient) {
   return Promise.all([

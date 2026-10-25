@@ -64,11 +64,12 @@ export async function GET(req: NextRequest) {
     const user = await prisma.user.findUnique({
       where,
       include: {
-        // The client expects user.shifts.hourly / user.shifts.production (UserType),
-        // so include the shift lists, not just the Shifts row.
+        // shifts=true: the container with both shift lists. Otherwise only the
+        // container row (its id is all the client needs; the lists have their
+        // own queries).
         shifts: JSON.parse(parsedSearchParams.data.shifts ?? "false")
           ? { include: { hourly: true, production: true } }
-          : false,
+          : true,
         profile: JSON.parse(parsedSearchParams.data.profile ?? "false"),
         config: JSON.parse(parsedSearchParams.data.config ?? "false"),
       },
