@@ -12,8 +12,8 @@ import type { SavedSalaryItem } from "@/types";
 
 import { Section } from "@/components/structures/Settings/Preferences/Section";
 import Segmented from "@/components/structures/Settings/Preferences/Segmented";
+import TaxListSkeleton from "@/components/structures/Taxes/TaxListSkeleton";
 import Button from "@/components/ui/Button";
-import Skeleton from "@/components/ui/Skeleton";
 
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import useErrorMessage from "@/hooks/useErrorMessage";
@@ -313,7 +313,7 @@ function TaxList() {
     );
   }
 
-  if (isLoading) return <Skeleton classes="h-40 w-full rounded-xl" />;
+  if (isLoading) return <TaxListSkeleton />;
 
   const groups = [
     { kind: "tax" as const, title: t("my_taxes"), items: taxes },

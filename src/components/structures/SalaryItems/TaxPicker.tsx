@@ -9,9 +9,9 @@ import { contributionRate } from "@/services/Contribution/math";
 import { CONTRIBUTION_PRESETS } from "@/services/Contribution/presets";
 import Toast from "@/services/Toast";
 
+import { SavedChipsSkeleton } from "@/components/structures/SalaryItems/TaxPickerSkeleton";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import Skeleton from "@/components/ui/Skeleton";
 
 import { MODULE_THEMES, type ModuleTheme } from "@/utils/constants/modules";
 import { cn } from "@/utils/helpers/styleMerger";
@@ -192,10 +192,7 @@ function TaxPicker({
       </header>
 
       {isLoading ? (
-        <div className="flex gap-2">
-          <Skeleton classes="h-10 w-28 rounded-full" />
-          <Skeleton classes="h-10 w-24 rounded-full" />
-        </div>
+        <SavedChipsSkeleton />
       ) : saved.length > 0 ? (
         <div className="flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
