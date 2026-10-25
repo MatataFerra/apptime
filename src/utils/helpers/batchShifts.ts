@@ -117,6 +117,11 @@ export function overlaps(a: Span, b: Span, now = new Date()) {
   return x.start < y.end && y.start < x.end;
 }
 
+/** The first saved shift that `span` runs into, if any. */
+export function findClash<T extends Span>(span: Span, existing: T[], now = new Date()) {
+  return existing.find((shift) => overlaps(span, shift, now));
+}
+
 /** Keys of the batch days that run into a shift already saved. */
 export function findOverlaps(days: BatchDay[], existing: Span[], now = new Date()) {
   const clash = new Set<string>();

@@ -1,15 +1,35 @@
-import { act, screen } from "@testing-library/react";
+import { act, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-const days = [
-  { hourly: 186, production: 0, publicHoliday: false },
-  { hourly: 210, production: 0, publicHoliday: false },
-  { hourly: 0, production: 0, publicHoliday: false },
-  { hourly: 120, production: 95, publicHoliday: false },
-  { hourly: 240, production: 0, publicHoliday: true },
-  { hourly: 0, production: 0, publicHoliday: false },
-  { hourly: 0, production: 0, publicHoliday: false },
-].map((d, i) => ({ ...d, date: new Date(2026, 9, 19 + i) }));
+function job(day: number, name: string, from: number, to: number, earned: number) {
+  return {
+    kind: "hourly" as const,
+    name,
+    start: new Date(2026, 9, day, from),
+    end: new Date(2026, 9, day, to),
+    earned,
+    publicHoliday: false,
+  };
+}
+
+// Thursday 22: Box Maker in the morning, Web Developer at night.
+const shifts = [
+  [job(19, "Box Maker", 7, 15, 186)],
+  [job(20, "Box Maker", 7, 16, 210)],
+  [],
+  [job(22, "Box Maker", 7, 12, 120), job(22, "Web Developer", 18, 22, 95)],
+  [{ ...job(23, "Box Maker", 7, 16, 240), publicHoliday: true }],
+  [],
+  [],
+];
+const days = shifts.map((list, i) => ({
+  date: new Date(2026, 9, 19 + i),
+  hourly: list.reduce((sum, s) => sum + s.earned, 0),
+  production: 0,
+  publicHoliday: list.some((s) => s.publicHoliday),
+  shifts: list,
+}));
 const week = { from: days[0].date, to: days[6].date, earned: 851, minutes: 1935, shifts: 5, days };
 
 vi.mock("@/services/Summary", async (orig) => ({
@@ -65,8 +85,9 @@ describe("WeekSummary", () => {
       "D25",
     ]);
     expect(days[3]).toHaveAttribute("aria-current", "date");
-    expect(days[3]).toHaveAccessibleName(/^jueves 22: \$215/);
-    expect(days[2]).toHaveAccessibleName("miércoles 21: sin turnos");
+    expect(within(days[3]).getByRole("button")).toHaveAccessibleName(/^jueves 22: \$215/);
+    expect(within(days[2]).queryByRole("button")).toBeNull();
+    expect(days[2].firstElementChild).toHaveAccessibleName("miércoles 21: sin turnos");
     vi.useRealTimers();
   });
 
@@ -78,5 +99,26 @@ describe("WeekSummary", () => {
     expect(screen.getByText("32.3h")).toBeInTheDocument();
     expect(screen.getByText("shifts")).toBeInTheDocument();
     vi.useRealTimers();
+  });
+
+  test("tapping a day names its shifts, two jobs apart", async () => {
+    await renderOn(new Date(2026, 9, 22, 10), "en");
+    vi.useRealTimers();
+    const user = userEvent.setup();
+
+    // One bar segment per shift.
+    const thursday = screen.getAllByRole("listitem")[3];
+    expect(thursday.querySelectorAll(".bg-week-bar-hourly")).toHaveLength(2);
+
+    await user.click(within(thursday).getByRole("button"));
+    const detail = await screen.findByRole("dialog");
+    expect(within(detail).getByText("Thursday 22 October")).toBeInTheDocument();
+    const rows = within(detail).getAllByRole("listitem");
+    expect(rows.map((row) => row.textContent)).toEqual([
+      "Box Maker7:00 AM–12:00 PM$120",
+      "Web Developer6:00 PM–10:00 PM$95",
+    ]);
+    expect(within(detail).getByText("Day total")).toBeInTheDocument();
+    expect(within(detail).getByText("$215")).toBeInTheDocument();
   });
 });

@@ -22,6 +22,7 @@ import HolidayChoice, {
   toHolidayValue,
 } from "@/components/structures/ShiftForms/HolidayChoice";
 import { useDatalistStore } from "@/components/structures/ShiftForms/store/useDatalistStore";
+import useOverlapGuard from "@/components/structures/ShiftForms/useOverlapGuard";
 import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 import Text from "@/components/ui/Text";
@@ -103,6 +104,7 @@ function Inputs() {
   const { data: user } = useUser();
   const { data: hourly } = useHourlyShifts();
   const { data: production } = useProductionShifts();
+  const isFree = useOverlapGuard(hourly, production);
   const { names } = useShiftNames({ hourly, production }, nameWatch);
 
   /*
@@ -246,6 +248,8 @@ function Inputs() {
       currency: shiftCurrency ?? null,
       employerId: shiftEmployerId ?? null,
     };
+
+    if (!isFree(parseData)) return;
 
     Toast({
       type: "loading",

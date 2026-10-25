@@ -40,6 +40,7 @@ vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 import { auth } from "@/utils/auth";
 
 import onCreateHourlyBatch from "@/server-actions/hourly-batch";
+import onCreateHourlyShift from "@/server-actions/hourly-job";
 import onCreateProductionBatch from "@/server-actions/production-batch";
 import prisma from "#/prisma/client";
 
@@ -189,5 +190,61 @@ describe("batch saves on a real database", () => {
       include: { hourly: true },
     });
     expect(linked?.hourly).toHaveLength(23);
+  });
+
+  test("two jobs the same day, as long as the hours don't overlap", async () => {
+    // December, clear of the other tests' shifts.
+    function at(h: number, m = 0) {
+      return new Date(2026, 11, 3, h, m).toString();
+    }
+    function job(name: string, start: string, end: string) {
+      return {
+        startDate: start,
+        endDate: end,
+        hourValue: 25,
+        name,
+        isPublicHoliday: false,
+        isWorked: false,
+        unpaidBreaks: 0,
+        taxes: [],
+        contributions: [],
+        currency: null,
+        employerId: null,
+      };
+    }
+
+    // Box Maker in the morning, Web Developer at night: both saved.
+    expect(await onCreateHourlyShift(job("Box Maker", at(7), at(12)))).toBeTruthy();
+    expect(await onCreateHourlyShift(job("Web Developer", at(18), at(23)))).toBeTruthy();
+
+    // The same hours twice are refused, even from the one-shift form.
+    expect(await onCreateHourlyShift(job("Box Maker", at(9), at(11)))).toEqual({
+      response: false,
+      overlap: true,
+    });
+
+    // Batch days: one that fits between them is saved, one that runs into the morning is skipped.
+    const between = { startDate: at(13), endDate: at(17) };
+    const clash = { startDate: at(11), endDate: at(13) };
+    async function batch(shifts: { startDate: string; endDate: string }[]) {
+      return onCreateHourlyBatch({
+        name: "Picking",
+        hourValue: 25,
+        unpaidBreaks: 0,
+        currency: null,
+        employerId: null,
+        taxes: [],
+        contributions: [],
+        shifts,
+      });
+    }
+    expect(await batch([between])).toEqual({ created: 1, skipped: [] });
+    expect(await batch([clash])).toEqual({ created: 0, skipped: [clash] });
+
+    const day = await prisma.hourly.findMany({
+      where: { name: { in: ["Box Maker", "Web Developer", "Picking"] } },
+      orderBy: { id: "asc" },
+    });
+    expect(day.map((s) => s.name)).toEqual(["Box Maker", "Web Developer", "Picking"]);
   });
 });

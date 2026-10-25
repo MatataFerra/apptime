@@ -182,6 +182,8 @@
       "public_holiday": "Feriado",
       "worked_holiday": "Trabajó el feriado"
     },
+    "overlap": "Se superpone con un turno ya cargado",
+    "overlap_description": "{name}, de {start} a {end}. Cambia el horario: dos trabajos el mismo día están bien si no se pisan.",
     "processing": "Procesando tu solicitud",
     "please_wait": "Espera un momento...",
     "created": "Turno creado",
@@ -283,6 +285,8 @@
       "worked": "trabajado",
       "shifts": "{count, plural, one {turno} other {turnos}}",
       "per_day": "Ganancias por día",
+      "holiday": "Feriado",
+      "day_total": "Total del día",
       "other_currency": "turnos en otra moneda",
       "no_shifts": "sin turnos",
       "converted": "Incluye turnos en {currencies} convertidos al tipo de cambio de cada día.",

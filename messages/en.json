@@ -182,6 +182,8 @@
       "public_holiday": "Public holiday",
       "worked_holiday": "Worked the holiday"
     },
+    "overlap": "It overlaps a shift you already logged",
+    "overlap_description": "{name}, {start} to {end}. Change the hours: two jobs the same day are fine if they don't overlap.",
     "processing": "Your request is being processed",
     "please_wait": "Please wait a moment...",
     "created": "Shift created successfully",
@@ -283,6 +285,8 @@
       "worked": "worked",
       "shifts": "{count, plural, one {shift} other {shifts}}",
       "per_day": "Earnings per day",
+      "holiday": "Public holiday",
+      "day_total": "Day total",
       "other_currency": "shifts in another currency",
       "no_shifts": "no shifts",
       "converted": "Includes shifts in {currencies} converted at each day's rate.",
