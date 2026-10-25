@@ -2,13 +2,14 @@
 
 import { type ReactNode, useId, useState } from "react";
 
-import { RotateCcw } from "lucide-react";
+import { Plus, RotateCcw } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import type { HistoryEntry } from "@/services/History";
 
 import type { HourlyType, ProductionType } from "@/types";
 
+import NewEmployer from "@/components/structures/ShiftForms/NewEmployer";
 import Button from "@/components/ui/Button";
 import { ChoicePopover } from "@/components/ui/Choice";
 import {
@@ -56,12 +57,15 @@ function FieldRow({
   changed,
   onReset,
   children,
+  below,
 }: {
   label: string;
   hint?: string;
   changed: boolean;
   onReset: () => void;
   children: ReactNode;
+  /** Under the row, e.g. a link to add an employer. */
+  below?: ReactNode;
 }) {
   const t = useTranslations("dashboard.selection");
   return (
@@ -85,6 +89,7 @@ function FieldRow({
         </span>
         {children}
       </div>
+      {below}
     </div>
   );
 }
@@ -104,6 +109,8 @@ function Choice<T extends string>({
   onChange,
   onReset,
   render,
+  actions = [],
+  below,
 }: {
   label: string;
   hint?: string;
@@ -116,6 +123,9 @@ function Choice<T extends string>({
   onChange: (value: T) => void;
   onReset: () => void;
   render: (value: T) => string;
+  /** Options that do something instead of being a value ("New employer…"). */
+  actions?: { value: T; label: string }[];
+  below?: ReactNode;
 }) {
   const t = useTranslations("dashboard.selection");
   const current = value ?? common;
@@ -123,7 +133,7 @@ function Choice<T extends string>({
   const shown = current === MIXED ? t("mixed") : render(current);
 
   return (
-    <FieldRow label={label} hint={hint} changed={changed} onReset={onReset}>
+    <FieldRow label={label} hint={hint} changed={changed} onReset={onReset} below={below}>
       <ChoicePopover
         label={label}
         open={open}
@@ -134,11 +144,14 @@ function Choice<T extends string>({
         triggerLabel={shown}
         tone={changed ? "changed" : current === MIXED ? "muted" : "default"}
         className="max-w-[60%]"
-        options={options.map((option) => ({
-          value: option,
-          label: render(option),
-          tag: option === common ? t("current") : undefined,
-        }))}
+        options={[
+          ...options.map((option) => ({
+            value: option,
+            label: render(option),
+            tag: option === common ? t("current") : undefined,
+          })),
+          ...actions.map((action) => ({ ...action, action: true, separated: true })),
+        ]}
         onChange={(next) => onChange(next as T)}
       />
     </FieldRow>
@@ -223,11 +236,13 @@ function BatchEditDrawer({
   const [hourValue, setHourValue] = useState<string>();
   const [itemValue, setItemValue] = useState<string>();
   const [error, setError] = useState<string | null>(null);
+  const [creatingEmployer, setCreatingEmployer] = useState(false);
 
   const hourly = entries.filter((e) => e.kind === "hourly");
   const production = entries.filter((e) => e.kind === "production");
 
   const NONE = "none";
+  const NEW_EMPLOYER = "__new__";
   const common = {
     employer: commonValue(entries, (e) => (e.employerId === null ? NONE : String(e.employerId))),
     currency: commonValue(entries, (e) => e.currency ?? fallback),
@@ -261,6 +276,7 @@ function BatchEditDrawer({
 
   function reset() {
     setOpenField(null);
+    setCreatingEmployer(false);
     setEmployer(undefined);
     setCurrency(undefined);
     setHoliday(undefined);
@@ -326,8 +342,48 @@ function BatchEditDrawer({
             value={employer}
             common={common.employer}
             options={[...employerIds, NONE]}
-            onChange={choose(setEmployer)}
+            actions={[{ value: NEW_EMPLOYER, label: tf("new_employer") }]}
+            onChange={(id) => {
+              if (id === NEW_EMPLOYER) {
+                setOpenField(null);
+                setCreatingEmployer(true);
+                return;
+              }
+              choose(setEmployer)(id);
+            }}
             onReset={() => setEmployer(undefined)}
+            below={
+              creatingEmployer ? (
+                <NewEmployer
+                  defaultRate={
+                    production.length === 0 && common.hourValue !== MIXED
+                      ? Number(common.hourValue)
+                      : null
+                  }
+                  defaultCurrency={
+                    common.currency !== MIXED && common.currency !== fallback
+                      ? common.currency
+                      : null
+                  }
+                  onCancel={() => setCreatingEmployer(false)}
+                  onCreated={(created) => {
+                    setCreatingEmployer(false);
+                    setEmployer(String(created.id));
+                    setError(null);
+                  }}
+                />
+              ) : (employer ?? common.employer) === NONE ? (
+                // None of them has an employer: the way to add one, in plain sight.
+                <button
+                  type="button"
+                  onClick={() => setCreatingEmployer(true)}
+                  className="mt-1.5 ml-auto flex w-fit items-center gap-1 text-[0.8125rem] font-semibold text-accent underline-offset-4 hover:underline"
+                >
+                  <Plus className="size-3.5" aria-hidden="true" />
+                  {t("create_employer", { count: entries.length })}
+                </button>
+              ) : null
+            }
             render={(id) => {
               if (id === NONE) return tf("no_employer");
               const found = byId.get(Number(id));

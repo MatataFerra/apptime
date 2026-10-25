@@ -7,6 +7,8 @@ interface HistorySelectionState {
   active: boolean;
   keys: Set<SelectionKey>;
   start: () => void;
+  /** Enters selection mode with `key` already checked (a long press on a row). */
+  startWith: (key: SelectionKey) => void;
   /** Leaves selection mode and forgets the selection. */
   stop: () => void;
   toggle: (key: SelectionKey) => void;
@@ -19,6 +21,7 @@ export const useHistorySelection = create<HistorySelectionState>((set) => ({
   active: false,
   keys: new Set(),
   start: () => set({ active: true, keys: new Set() }),
+  startWith: (key) => set({ active: true, keys: new Set([key]) }),
   stop: () => set({ active: false, keys: new Set() }),
   toggle: (key) =>
     set((state) => {
