@@ -5,7 +5,7 @@ import type { Hourly } from "@prisma/client";
 import { ownEmployerId } from "@/services/Employer/owned";
 import ShiftService from "@/services/Shift";
 import { clashesWithSaved } from "@/services/Shift/clash";
-import HourlyService from "@/services/Shift/Hourly";
+import { HourlyRecord } from "@/services/Shift/server";
 import UserService from "@/services/User";
 
 import type { FastChargeInputsParsed } from "@/types/forms";
@@ -78,7 +78,7 @@ export default async function onCreateHourlyShift(data: FastChargeInputsParsed) 
         };
       });
 
-    const hourlyService = new HourlyService(shift);
+    const hourlyService = new HourlyRecord(shift);
 
     await hourlyService.addContributions(contributionsFromLocal, currentUser.id);
     await hourlyService.addtaxes(taxesFromLocal, currentUser.id);

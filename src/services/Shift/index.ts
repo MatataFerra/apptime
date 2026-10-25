@@ -8,7 +8,7 @@ import { withContributions } from "@/services/Contribution/math";
 import HourlyService from "@/services/Shift/Hourly";
 import ProductionService from "@/services/Shift/Production";
 
-import type { HourlyType, ProductionType, SalaryItemInput, Shifts } from "@/types";
+import type { HourlyType, ProductionType, Shifts } from "@/types";
 
 type ShiftHourlyOrProduction = Hourly | Production;
 type ShiftWithTaxesType = HourlyType | ProductionType;
@@ -19,14 +19,13 @@ type Shift =
   | Partial<ShiftHourlyOrProduction>
   | Partial<ShiftWithTaxesType>;
 
-type UpdateOptions = {
+export type UpdateOptions = {
   createTaxes?: Tax[];
   deleteTaxes?: Tax[];
 };
 
 interface ShiftServiceInterface {
   shift: Shift;
-  create: (taxes?: SalaryItemInput[]) => Promise<ShiftHourlyOrProduction | undefined>;
   differenceInMinsBetweenStartAndEnd: () => this;
   closeShift: () => this;
   checkPublicHoliday: () => this;
@@ -48,71 +47,12 @@ interface ShiftServiceInterface {
  * @param {string} endDate - The end date of the shift
  * @method shiftStatus - Checks if the shift is closed
  * @method checkPublicHoliday - Checks if the shift is a public holiday
- * @method create - Creates a new shift and executes all the methods above
  * @method build - Returns the shift
  */
 class ShiftService implements ShiftServiceInterface {
   shift: Shift;
   constructor(shift: Shift) {
     this.shift = cloneDeep(shift);
-  }
-
-  /*  
-    ============================================================
-    CRUD methods
-    ============================================================
-  */
-
-  /*
-    ===========================
-    -----------Delete----------
-    ===========================
-  */
-
-  async delete(id: number): Promise<ShiftHourlyOrProduction | undefined> {
-    if (this.isProductionShift) {
-      return await this.deleteProductionShift(id);
-    }
-
-    return await this.deleteHourlyShift(id);
-  }
-
-  private async deleteHourlyShift(id: number) {
-    return await new HourlyService(this.shift as Hourly).delete(id);
-  }
-
-  private async deleteProductionShift(id: number) {
-    return await new ProductionService(this.shift as Production).delete(id);
-  }
-
-  /*
-    ===========================
-    -----------Create----------
-    ===========================
-  */
-  async create<T extends ShiftHourlyOrProduction>(): Promise<T | undefined> {
-    if (this.isProductionShift) {
-      return (await new ProductionService(this.shift as Production).create()) as T;
-    }
-    return (await new HourlyService(this.shift as Hourly).create()) as T;
-  }
-
-  /*
-    ===========================
-    -----------Update----------
-    ===========================
-  */
-
-  async update<T extends ShiftWithTaxesType>(
-    id?: number,
-    options?: UpdateOptions
-  ): Promise<T | null> {
-    if (!id) return null;
-    if (this.isProductionShift) {
-      return (await new ProductionService(this.shift as ProductionType, options).update(id)) as T;
-    }
-
-    return (await new HourlyService(this.shift as HourlyType, options).update(id)) as T;
   }
 
   /*  
@@ -462,7 +402,7 @@ class ShiftService implements ShiftServiceInterface {
     return getDecimals;
   }
 
-  private get isProductionShift(): boolean {
+  protected get isProductionShift(): boolean {
     const shift = this.shift as Production;
 
     return !!shift.itemValue;

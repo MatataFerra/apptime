@@ -6,7 +6,7 @@ import omit from "lodash/omit";
 
 import { ownEmployerId } from "@/services/Employer/owned";
 import ShiftService from "@/services/Shift";
-import HourlyService from "@/services/Shift/Hourly";
+import { HourlyRecord } from "@/services/Shift/server";
 import UserService from "@/services/User";
 
 import type { TrackInputs } from "@/types/forms";
@@ -74,7 +74,7 @@ export default async function onUpdateTrackJob(data: UpdateTrackData, shiftId: n
     });
 
   try {
-    const hourlyService = new HourlyService(shift);
+    const hourlyService = new HourlyRecord(shift);
 
     await hourlyService.addContributions(contributionsFromLocal, currentUser.id);
     await hourlyService.addtaxes(taxesFromLocal, currentUser.id);
