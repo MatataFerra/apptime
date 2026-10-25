@@ -40,6 +40,11 @@ type Props = {
   tags?: string[];
   /** Text of the save button; "Save shift" by default. */
   saveLabel?: string;
+  /**
+   * Where "Edit" goes when there's no form behind the dialog (e.g. the
+   * home's repeat card). Without it, "Edit" just closes the dialog.
+   */
+  onEdit?: () => void;
 };
 
 /**
@@ -58,6 +63,7 @@ function ShiftReviewDialog({
   rows,
   tags = [],
   saveLabel,
+  onEdit,
   children,
 }: PropsWithChildren<Props>) {
   const format$ = useMoney();
@@ -151,11 +157,26 @@ function ShiftReviewDialog({
         ) : null}
 
         <DialogFooter className="grid grid-cols-2 gap-2.5 sm:space-x-0">
-          <DialogClose asChild>
-            <Button type="button" variant="outline" size="lg" classes="w-full">
+          {onEdit ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              classes="w-full"
+              onClick={() => {
+                onOpenChange(false);
+                onEdit();
+              }}
+            >
               {t("edit")}
             </Button>
-          </DialogClose>
+          ) : (
+            <DialogClose asChild>
+              <Button type="button" variant="outline" size="lg" classes="w-full">
+                {t("edit")}
+              </Button>
+            </DialogClose>
+          )}
           <Button
             type="submit"
             size="lg"

@@ -15,11 +15,13 @@ import Toast from "@/services/Toast";
 import { effectiveRate } from "@/components/structures/SalaryItems/TaxPicker";
 import ShiftReviewDialog from "@/components/structures/share/ShiftReviewDialog";
 
+import { PATH_NAMES } from "@/utils/constants/pathnames";
 import { invalidateShiftQueries } from "@/utils/helpers/invalidateShiftQueries";
 import useDateLocale from "@/hooks/useDateLocale";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
 import useMoney from "@/hooks/useMoney";
 
+import { useRouter } from "@/i18n/navigation";
 import onCreateHourlyShift from "@/server-actions/hourly-job";
 
 const FORM_ID = "repeat-fast-charge";
@@ -45,6 +47,7 @@ function RepeatFastCharge() {
   }
   const { data: hourly } = useHourlyShifts();
   const queryClient = useQueryClient();
+  const router = useRouter();
   const [now] = useState(() => new Date());
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -57,6 +60,11 @@ function RepeatFastCharge() {
     name: t.name,
     value: t.value,
     description: t.description ?? null,
+  }));
+  const contributions = (last.contributions ?? []).map((c) => ({
+    name: c.name,
+    value: c.value,
+    description: c.description ?? null,
   }));
   const draft = {
     ...last,
@@ -84,8 +92,9 @@ function RepeatFastCharge() {
       isPublicHoliday: false,
       isWorked: false,
       taxes,
-      contributions: [],
+      contributions,
       currency: last.currency,
+      employerId: last.employerId ?? null,
     });
 
     setSaving(false);
@@ -146,6 +155,7 @@ function RepeatFastCharge() {
           afterTaxes={afterTaxes}
           taxes={taxes}
           tags={[ts("tags.repeated"), ts("tags.regular_day")]}
+          onEdit={() => router.push(`${PATH_NAMES.FAST_CHARGE}?repeat=${last.id}`)}
           rows={[
             { label: ts("fields.job"), value: last.name || "–" },
             { label: ts("fields.start"), value: dateTime(start) },
