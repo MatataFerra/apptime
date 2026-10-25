@@ -614,6 +614,7 @@
       "edit_title": "Editar {count, plural, one {# turno} other {# turnos}}",
       "edit_description": "Cada campo muestra lo que tienen en común; si difieren dice \"Varios\". Solo se guarda lo que cambies.",
       "mixed": "Varios",
+      "create_employer": "{count, plural, one {Crear empleador para este turno} other {Crear empleador para estos # turnos}}",
       "current": "Actual",
       "undo_field": "Deshacer el cambio en {field}",
       "piece_value": "Valor por pieza",

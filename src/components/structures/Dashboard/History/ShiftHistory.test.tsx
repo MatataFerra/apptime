@@ -41,6 +41,14 @@ vi.mock("@/components/structures/Dashboard/Table/Dialog/Dialog", () => ({
 }));
 vi.mock("@/components/structures/Dashboard/Table/Dialog/Content", () => ({ default: () => null }));
 // vaul needs layout APIs jsdom lacks: a plain container is enough here.
+// The quick "new employer" form: creating one hands back Kiwi Packhouse.
+vi.mock("@/components/structures/ShiftForms/NewEmployer", () => ({
+  default: ({ onCreated }: { onCreated: (employer: { id: number }) => void }) => (
+    <button type="button" onClick={() => onCreated({ id: 2 })}>
+      create it
+    </button>
+  ),
+}));
 vi.mock("@/components/ui/Drawer", () => {
   function Pass({ children }: { children?: React.ReactNode }) {
     return <div>{children}</div>;
@@ -242,6 +250,47 @@ describe("Dashboard history", () => {
 
     await user.click(screen.getByRole("button", { name: "Delete 1" }));
     expect(mocks.remove).toHaveBeenCalledWith({ ids: { hourly: [1], production: [] } });
+  });
+
+  test("shifts without an employer get a link to add one from the drawer", async () => {
+    const user = userEvent.setup();
+    renderHistory();
+    await pickEmployer(user, "No employer");
+    act(() => useHistorySelection.getState().start());
+    await user.click(screen.getByRole("button", { name: "Select all" }));
+    await user.click(screen.getByRole("button", { name: "Edit 1" }));
+    const drawer = screen.getByRole("dialog");
+
+    await user.click(
+      within(drawer).getByRole("button", { name: "Add an employer for this shift" })
+    );
+    await user.click(within(drawer).getByRole("button", { name: "create it" }));
+
+    // The new one is picked, and saving sends it.
+    expect(
+      within(drawer).getByRole("button", { name: "Employer: Kiwi Packhouse" })
+    ).toBeInTheDocument();
+    expect(within(drawer).queryByRole("button", { name: /Add an employer/ })).toBeNull();
+    await user.click(within(drawer).getByRole("button", { name: "Save 1 shift" }));
+    expect(mocks.edit).toHaveBeenCalledWith({
+      ids: { hourly: [3], production: [] },
+      changes: { employerId: 2 },
+    });
+  });
+
+  test("the employer menu offers a new one too", async () => {
+    const user = userEvent.setup();
+    renderHistory();
+    act(() => useHistorySelection.getState().start());
+    await user.click(screen.getByRole("button", { name: "Select all" }));
+    await user.click(screen.getByRole("button", { name: "Edit 4" }));
+    const drawer = screen.getByRole("dialog");
+
+    // Some have one: no link, but the menu has "New employer…".
+    expect(within(drawer).queryByRole("button", { name: /Add an employer/ })).toBeNull();
+    await user.click(within(drawer).getByRole("button", { name: "Employer: Mixed" }));
+    await user.click(screen.getByRole("option", { name: "New employer…" }));
+    expect(within(drawer).getByRole("button", { name: "create it" })).toBeInTheDocument();
   });
 
   describe("long press", () => {

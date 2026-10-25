@@ -614,6 +614,7 @@
       "edit_title": "Edit {count, plural, one {# shift} other {# shifts}}",
       "edit_description": "Each field shows what they have in common, or \"Mixed\" when they differ. Only what you change is saved.",
       "mixed": "Mixed",
+      "create_employer": "{count, plural, one {Add an employer for this shift} other {Add an employer for these # shifts}}",
       "current": "Current",
       "undo_field": "Undo the change to {field}",
       "piece_value": "Value per piece",
