@@ -37,10 +37,11 @@
   --accent-soft: #dcf1e8;
   --live: #13efa0; /* running-clock signal, only on inverse surfaces */
   --on-live: #062a1c; /* text on --live, same in light and dark */
-  /* Home week bars: softer than --live and the -bright tones (inverse surface, both themes) */
-  --week-bar-hourly: #8fdcbb;
+  /* Home week bars, one hue per module, softer than --live and the -bright tones
+     (inverse surface, both themes). Public holidays are hatched, not a colour. */
+  --week-bar-track: #8fdcbb;
+  --week-bar-fast: #efc77a;
   --week-bar-production: #e3b4ca;
-  --week-bar-holiday: #e6c58f;
   --destructive: #c2412d;
   --destructive-foreground: #ffffff;
   --destructive-soft: #f8e3df;
@@ -160,9 +161,9 @@
   --color-accent-soft: var(--accent-soft);
   --color-live: var(--live);
   --color-on-live: var(--on-live);
-  --color-week-bar-hourly: var(--week-bar-hourly);
+  --color-week-bar-track: var(--week-bar-track);
+  --color-week-bar-fast: var(--week-bar-fast);
   --color-week-bar-production: var(--week-bar-production);
-  --color-week-bar-holiday: var(--week-bar-holiday);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-destructive-soft: var(--destructive-soft);
@@ -708,4 +709,13 @@ div[data-radio-state="false"] .animate_fade_out {
 
 .h-monitor {
   @apply h-[45dvh];
+}
+
+/* Public holiday on a home week bar: diagonal hatching over the module's colour. */
+@utility holiday-hatch {
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgb(20 33 28 / 0.28) 0 2px,
+    transparent 2px 6px
+  );
 }

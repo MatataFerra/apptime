@@ -2,9 +2,17 @@ import { act, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-function job(day: number, name: string, from: number, to: number, earned: number) {
+function job(
+  day: number,
+  name: string,
+  from: number,
+  to: number,
+  earned: number,
+  source: "track" | "fast" = "fast"
+) {
   return {
     kind: "hourly" as const,
+    source,
     name,
     start: new Date(2026, 9, day, from),
     end: new Date(2026, 9, day, to),
@@ -18,7 +26,7 @@ const shifts = [
   [job(19, "Box Maker", 7, 15, 186)],
   [job(20, "Box Maker", 7, 16, 210)],
   [],
-  [job(22, "Box Maker", 7, 12, 120), job(22, "Web Developer", 18, 22, 95)],
+  [job(22, "Box Maker", 7, 12, 120), job(22, "Web Developer", 18, 22, 95, "track")],
   [{ ...job(23, "Box Maker", 7, 16, 240), publicHoliday: true }],
   [],
   [],
@@ -74,7 +82,9 @@ describe("WeekSummary", () => {
   test("each day shows its initial and date, today marked", async () => {
     await renderOn(new Date(2026, 9, 22, 10), "es");
 
-    const days = screen.getAllByRole("listitem");
+    const days = within(screen.getByRole("list", { name: "Ganancias por día" })).getAllByRole(
+      "listitem"
+    );
     expect(days.map((d) => d.textContent)).toEqual([
       "L19",
       "M20",
@@ -106,9 +116,20 @@ describe("WeekSummary", () => {
     vi.useRealTimers();
     const user = userEvent.setup();
 
-    // One bar segment per shift.
-    const thursday = screen.getAllByRole("listitem")[3];
-    expect(thursday.querySelectorAll(".bg-week-bar-hourly")).toHaveLength(2);
+    // Two shifts: a dot each over the bar, in their module's colour. One-shift days have none.
+    const [monday, , , thursday] = within(
+      screen.getByRole("list", { name: "Earnings per day" })
+    ).getAllByRole("listitem");
+    const dots = within(thursday).getByTestId("day-dots");
+    expect([...dots.children].map((dot) => dot.className)).toEqual([
+      expect.stringContaining("bg-week-bar-fast"),
+      expect.stringContaining("bg-week-bar-track"),
+    ]);
+    expect(within(monday).queryByTestId("day-dots")).toBeNull();
+    // The legend names the modules present, and the hatching for Friday's holiday.
+    expect(screen.getByText("Fast charge")).toBeInTheDocument();
+    expect(screen.getByText("Track")).toBeInTheDocument();
+    expect(screen.getByText("Public holiday")).toBeInTheDocument();
 
     await user.click(within(thursday).getByRole("button"));
     const detail = await screen.findByRole("dialog");

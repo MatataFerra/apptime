@@ -23,9 +23,15 @@ import useMoney from "@/hooks/useMoney";
 import useShiftsInCurrency from "@/hooks/useShiftsInCurrency";
 import useUser from "@/hooks/useUser";
 
+const SOURCE_COLOR: Record<DayShift["source"], string> = {
+  track: "bg-week-bar-track",
+  fast: "bg-week-bar-fast",
+  production: "bg-week-bar-production",
+};
+
+/** The module's hue (Track green, Fast charge yellow, Production plum); holidays hatched. */
 function segmentColor(shift: DayShift) {
-  if (shift.kind === "production") return "bg-week-bar-production";
-  return shift.publicHoliday ? "bg-week-bar-holiday" : "bg-week-bar-hourly";
+  return cn(SOURCE_COLOR[shift.source], shift.publicHoliday && "holiday-hatch");
 }
 
 /**
@@ -97,6 +103,45 @@ function DayDetail({
         ) : null}
       </PopoverContent>
     </Popover>
+  );
+}
+
+const LEGEND: { source: DayShift["source"]; title: "track" | "fast_charge" | "production" }[] = [
+  { source: "track", title: "track" },
+  { source: "fast", title: "fast_charge" },
+  { source: "production", title: "production" },
+];
+
+/** What the colours mean, only for what this week has (and the hatching, if any holiday). */
+function WeekLegend({ days }: { days: DaySummary[] }) {
+  const t = useTranslations("home.week");
+  const tm = useTranslations("modules");
+  const shifts = days.flatMap((day) => day.shifts);
+  const shown = LEGEND.filter((item) => shifts.some((shift) => shift.source === item.source));
+  const holiday = shifts.some((shift) => shift.publicHoliday);
+  if (shown.length < 2 && !holiday) return null;
+
+  return (
+    <ul className="-mt-1 flex flex-wrap gap-x-3.5 gap-y-1 text-[0.6875rem] text-ink-inverse/65">
+      {shown.map((item) => (
+        <li key={item.source} className="flex items-center gap-1.5">
+          <span
+            className={cn("size-2 rounded-[2px]", SOURCE_COLOR[item.source])}
+            aria-hidden="true"
+          />
+          {tm(`${item.title}.title`)}
+        </li>
+      ))}
+      {holiday ? (
+        <li className="flex items-center gap-1.5">
+          <span
+            className="size-2 rounded-[2px] bg-ink-inverse/70 holiday-hatch"
+            aria-hidden="true"
+          />
+          {t("holiday")}
+        </li>
+      ) : null}
+    </ul>
   );
 }
 
@@ -186,12 +231,26 @@ function WeekSummary() {
           }`;
 
           const bar = (
-            <div className="flex h-20 w-full flex-col justify-end">
+            <div className="flex h-[5.75rem] w-full flex-col justify-end">
+              {/* More than one shift that day: a dot each, in its colour, over the bar. */}
+              {day.shifts.length > 1 ? (
+                <span
+                  className="mb-1.5 flex h-1.5 justify-center gap-[3px]"
+                  data-testid="day-dots"
+                  aria-hidden="true"
+                >
+                  {day.shifts.map((shift) => (
+                    <span
+                      key={shift.start.toISOString()}
+                      className={cn("size-1.5 rounded-full", SOURCE_COLOR[shift.source])}
+                    />
+                  ))}
+                </span>
+              ) : null}
               {total > 0 ? (
-                // One segment per shift, so two jobs the same day read as two.
                 <div
-                  className="flex w-full flex-col-reverse gap-px overflow-hidden rounded-md"
-                  style={{ height: `${height}%` }}
+                  className="flex max-h-20 w-full flex-col-reverse overflow-hidden rounded-md"
+                  style={{ height: `${(height / 100) * 5}rem` }}
                 >
                   {day.shifts.map((shift) => (
                     <div
@@ -252,6 +311,8 @@ function WeekSummary() {
           );
         })}
       </ol>
+
+      <WeekLegend days={week.days} />
 
       <div className="flex flex-col gap-2 border-t border-ink-inverse/10 pt-3.5">
         <dl className="flex flex-wrap items-baseline gap-x-5 gap-y-1 text-[0.8125rem] text-ink-inverse/60">

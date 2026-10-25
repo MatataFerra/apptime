@@ -19,6 +19,8 @@ type AnyShift = HourlyType | ProductionType;
 /** One shift of a day, enough to name it: "Box Maker, 07:00–12:00, $125". */
 export type DayShift = {
   kind: "hourly" | "production";
+  /** Where it was logged: the Track clock, Fast charge, or Production. */
+  source: "track" | "fast" | "production";
   name: string | null;
   start: Date;
   end: Date | null;
@@ -120,6 +122,12 @@ export function summarizeWeek(
     ]
       .map(({ kind, shift }) => ({
         kind,
+        source:
+          kind === "production"
+            ? ("production" as const)
+            : (shift as HourlyType).source === "fast"
+              ? ("fast" as const)
+              : ("track" as const),
         name: shift.name?.trim() || null,
         start: new Date(shift.startDate),
         end: shift.endDate ? new Date(shift.endDate) : null,
