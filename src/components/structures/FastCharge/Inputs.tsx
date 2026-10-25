@@ -38,6 +38,7 @@ import useProductionShifts from "@/hooks/useProductionShifts";
 import type { SalaryItems } from "@/hooks/useSalaryItems";
 import useShiftNames from "@/hooks/useShiftNames";
 import useUser from "@/hooks/useUser";
+import useZodI18n from "@/hooks/useZodI18n";
 
 import useRepeatPrefill from "./useRepeatPrefill";
 import onCreateHourlyShift from "@/server-actions/hourly-job";
@@ -50,6 +51,7 @@ function joinDateTime(date?: string | null, time?: string | null) {
 }
 
 function Inputs() {
+  useZodI18n();
   /*
     Custom hook to get the values from the form
   */

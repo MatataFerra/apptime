@@ -21,6 +21,7 @@ import { authClient } from "@/utils/auth/client";
 import { MAX_ATTEMPTS_TO_REGISTER } from "@/utils/constants";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 import usePasswordErrors from "@/hooks/usePasswordErrors";
+import useZodI18n from "@/hooks/useZodI18n";
 
 import { getPathname, useRouter } from "@/i18n/navigation";
 
@@ -35,6 +36,7 @@ type RegisterInputs = {
 };
 
 function RegisterForm() {
+  useZodI18n();
   const router = useRouter();
   const t = useTranslations("auth.register");
   const tf = useTranslations("auth.fields");

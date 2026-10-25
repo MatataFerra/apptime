@@ -1,4 +1,4 @@
-import { isEmpty, isEqual } from "lodash";
+import isEmpty from "lodash/isEmpty";
 
 import { PASSWORD } from "@/utils/constants";
 
@@ -124,7 +124,7 @@ class Password {
   }
 
   isSamePassword(password: string, confirmPassword: string): boolean {
-    return isEqual(password, confirmPassword);
+    return password === confirmPassword;
   }
 }
 

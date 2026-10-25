@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import _ from "lodash";
+import cloneDeep from "lodash/cloneDeep";
 import { ZodError } from "zod";
 
 import { Exception, ExceptionsInterface } from "./factory";
@@ -186,7 +186,7 @@ export class PasswordIsNotValid extends Error implements ExceptionsInterface {
     }
 
     if (typeof error === "object") {
-      const errorClone = _.cloneDeep(error as Exception);
+      const errorClone = cloneDeep(error as Exception);
       this.exception.cause = errorClone.cause;
       return {
         ...this.exception,

@@ -17,6 +17,7 @@ import Stack from "@/components/ui/Stack";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 import usePasswordErrors from "@/hooks/usePasswordErrors";
+import useZodI18n from "@/hooks/useZodI18n";
 
 import { useRouter } from "@/i18n/navigation";
 import onResetPassword from "@/server-actions/reset-password";
@@ -36,6 +37,7 @@ type Params = {
 };
 
 function ResetForm() {
+  useZodI18n();
   const router = useRouter();
   const t = useTranslations("auth.reset");
   const tf = useTranslations("auth.fields");

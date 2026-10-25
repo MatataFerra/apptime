@@ -12,7 +12,10 @@ import { Inputs, SuscribeSchema } from "@/types";
 
 import Loader from "@/components/ui/Loader";
 
+import useZodI18n from "@/hooks/useZodI18n";
+
 function Suscribe() {
+  useZodI18n();
   const t = useTranslations("no_mobile");
 
   const mutation = useMutation({

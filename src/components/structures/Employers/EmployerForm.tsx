@@ -24,6 +24,7 @@ import { cn } from "@/utils/helpers/styleMerger";
 import useCurrencyName from "@/hooks/useCurrencyName";
 import useErrorMessage from "@/hooks/useErrorMessage";
 import { useCurrency } from "@/hooks/useMoney";
+import useZodI18n from "@/hooks/useZodI18n";
 
 type Errors = Partial<Record<keyof EmployerInput, string>>;
 
@@ -113,6 +114,7 @@ function EmployerForm({
   onCancel: () => void;
   onSave: (data: EmployerInput) => void;
 }) {
+  useZodI18n();
   const settingsCurrency = useCurrency();
   const currencyName = useCurrencyName();
   const t = useTranslations("employers.form");

@@ -25,6 +25,12 @@ const config = [
           message: "Use useWatch({ control, name }) instead of watch(): the React Compiler freezes watch() values.",
         },
       ],
+      // lodash is CommonJS: `from "lodash"` pulls the whole library into the
+      // bundle, even for one function. Import each one: lodash/isEmpty.
+      "no-restricted-imports": [
+        "error",
+        { paths: [{ name: "lodash", message: 'Import the function itself: "lodash/<name>".' }] },
+      ],
       "func-style": ["error", "declaration", { allowArrowFunctions: false }],
       "@tanstack/query/exhaustive-deps": "error",
       "simple-import-sort/exports": "error",

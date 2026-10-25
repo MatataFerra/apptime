@@ -279,7 +279,7 @@ const SearchParamsSchema = z.object({
 */
 
 const SuscribeSchema = z.object({
-  // Message from the active language (providers/ZodI18n).
+  // Message from the active language (hooks/useZodI18n).
   email: z.string().email(),
 });
 
@@ -310,7 +310,7 @@ const PasswordSchema = z.object({
   Fast Charge Schema
 */
 
-// Required-field messages come from the active language (providers/ZodI18n).
+// Required-field messages come from the active language (hooks/useZodI18n).
 const FastChargeFormSchema = z.object({
   "start-date": z.string().min(1),
 
