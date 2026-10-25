@@ -189,6 +189,9 @@ model Production {
   shift               Shift?         @relation(fields: [shiftId], references: [id])
   employer            Employer?      @relation(fields: [employerId], references: [id], onDelete: SetNull)
 
+  /// Every shift list filters by the user's Shift container; without this
+  /// SQLite scans the whole table (every user's rows).
+  @@index([shiftId])
   @@index([employerId])
 }
 
@@ -216,6 +219,9 @@ model Hourly {
   shift               Shift?         @relation(fields: [shiftId], references: [id])
   employer            Employer?      @relation(fields: [employerId], references: [id], onDelete: SetNull)
 
+  /// Every shift list filters by the user's Shift container; without this
+  /// SQLite scans the whole table (every user's rows).
+  @@index([shiftId])
   @@index([employerId])
 }
 
