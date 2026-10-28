@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 
 import type { BatchDay } from "@/utils/helpers/batchShifts";
+import { datePattern } from "@/utils/helpers/dateFormats";
 import { cn } from "@/utils/helpers/styleMerger";
 import useDateLocale from "@/hooks/useDateLocale";
 
@@ -63,7 +64,9 @@ function BatchPreview({ schedule, theme, summary, renderExtra }: Props) {
                   onChange={() => schedule.toggleDay(day.key)}
                 />
                 <span className="flex-1 capitalize">
-                  {format(day.start, "EEE d MMM", { locale: dateLocale })}
+                  {format(day.start, datePattern(dateLocale, "weekdayDayMonth"), {
+                    locale: dateLocale,
+                  })}
                 </span>
                 <span className="text-ink-muted tabular-nums">
                   {format(day.start, "p", { locale: dateLocale })}–

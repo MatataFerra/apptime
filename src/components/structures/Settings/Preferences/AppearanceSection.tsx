@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 
+import { format } from "date-fns";
 import { useLocale, useTranslations } from "next-intl";
 
 import { SUPPORTED_LOCALES } from "@/utils/constants";
+import { type DateOrder, datePattern, type TimeFormat } from "@/utils/helpers/dateFormats";
 import { isLocale } from "@/utils/helpers/locale";
 import {
   applyTheme,
@@ -12,6 +14,7 @@ import {
   readThemeCookie,
   type ThemePreference,
 } from "@/utils/theme";
+import useDateLocale from "@/hooks/useDateLocale";
 import usePreferences from "@/hooks/usePreferences";
 
 import { Row, Section } from "./Section";
@@ -23,13 +26,21 @@ const LANGUAGES: Record<(typeof SUPPORTED_LOCALES)[number], string> = {
   es: "Español",
 };
 
-/** Theme (applies at once and follows you to other devices) and language. */
+/**
+ * Theme (applies at once and follows you to other devices), language, and
+ * how times and dates read (12/24 h, day or month first), which can differ
+ * from the language's own (Spanish in Australia, say).
+ */
 function AppearanceSection() {
   const { config, save } = usePreferences();
   const locale = useLocale();
   const t = useTranslations("settings.appearance");
   const pathname = usePathname();
   const router = useRouter();
+  const dateLocale = useDateLocale();
+  const [now] = useState(() => new Date());
+  const timeFormat = (config?.timeFormat ?? "auto") as TimeFormat;
+  const dateFormat = (config?.dateFormat ?? "auto") as DateOrder;
   const [theme, setTheme] = useState<ThemePreference>(() =>
     isThemePreference(config?.theme) ? config.theme : readThemeCookie()
   );
@@ -67,6 +78,40 @@ function AppearanceSection() {
           value={locale}
           onChange={onLanguage}
           options={SUPPORTED_LOCALES.map((l) => ({ value: l, label: LANGUAGES[l] }))}
+        />
+      </Row>
+      <Row
+        label={t("time_format")}
+        hint={t("example", { example: format(now, "p", { locale: dateLocale }) })}
+        stacked
+      >
+        <Segmented
+          label={t("time_format")}
+          value={timeFormat}
+          onChange={(value) => save({ timeFormat: value })}
+          options={[
+            { value: "auto", label: t("auto") },
+            { value: "12", label: t("hours_12") },
+            { value: "24", label: t("hours_24") },
+          ]}
+        />
+      </Row>
+      <Row
+        label={t("date_format")}
+        hint={t("example", {
+          example: format(now, datePattern(dateLocale, "weekdayDayMonth"), { locale: dateLocale }),
+        })}
+        stacked
+      >
+        <Segmented
+          label={t("date_format")}
+          value={dateFormat}
+          onChange={(value) => save({ dateFormat: value })}
+          options={[
+            { value: "auto", label: t("auto") },
+            { value: "dmy", label: format(now, "d MMM", { locale: dateLocale }) },
+            { value: "mdy", label: format(now, "MMM d", { locale: dateLocale }) },
+          ]}
         />
       </Row>
     </Section>

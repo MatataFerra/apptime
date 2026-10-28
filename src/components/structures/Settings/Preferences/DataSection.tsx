@@ -2,7 +2,7 @@
 
 import { useId, useState } from "react";
 
-import { Lock, LogOut, Trash2 } from "lucide-react";
+import { BriefcaseBusiness, ChevronRight, Lock, LogOut, Percent, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import Toast from "@/services/Toast";
@@ -10,8 +10,10 @@ import Toast from "@/services/Toast";
 import Button from "@/components/ui/Button";
 
 import { signOutAndLeave } from "@/utils/auth/client";
+import { PATH_NAMES } from "@/utils/constants/pathnames";
 
 import { Row, Section } from "./Section";
+import { Link } from "@/i18n/navigation";
 import onDeleteAccount from "@/server-actions/delete-account";
 
 /** Export (Premium), log out, or delete the account for good. */
@@ -41,6 +43,13 @@ function DataSection() {
 
   return (
     <Section title={t("title")}>
+      <Shortcut href={PATH_NAMES.TAXES} icon={Percent} label={t("taxes")} hint={t("taxes_hint")} />
+      <Shortcut
+        href={PATH_NAMES.EMPLOYERS}
+        icon={BriefcaseBusiness}
+        label={t("employers")}
+        hint={t("employers_hint")}
+      />
       {/* Export is a Premium feature; shiftsToCsv (services/Export) is ready for it. */}
       <Row label={t("export")} hint={t("export_hint")}>
         <span className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-surface-sunken px-3 text-[0.8125rem] font-semibold text-ink-muted">
@@ -112,6 +121,35 @@ function DataSection() {
         </Row>
       )}
     </Section>
+  );
+}
+
+/** A row that opens another screen (My taxes, Employers). */
+function Shortcut({
+  href,
+  icon: Icon,
+  label,
+  hint,
+}: {
+  href: string;
+  icon: typeof Percent;
+  label: string;
+  hint: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="flex min-h-14 items-center gap-3 px-4 py-3 transition-colors hover:bg-surface-sunken focus-visible:bg-surface-sunken"
+    >
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-surface-sunken text-ink-muted">
+        <Icon className="size-4.5" aria-hidden="true" />
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="text-[0.9375rem] text-ink">{label}</span>
+        <span className="text-[0.8125rem] text-ink-muted">{hint}</span>
+      </span>
+      <ChevronRight className="size-4 shrink-0 text-ink-subtle" aria-hidden="true" />
+    </Link>
   );
 }
 

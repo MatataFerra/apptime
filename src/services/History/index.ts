@@ -13,6 +13,8 @@ import { shiftEarnings, shiftMinutes } from "@/services/Summary";
 
 import type { HourlyType, ProductionType } from "@/types";
 
+import { datePattern } from "@/utils/helpers/dateFormats";
+
 export type ShiftKind = "hourly" | "production";
 
 export type HistoryEntry = {
@@ -192,7 +194,7 @@ export function weeklyEarnings(
     }
 
     return {
-      label: format(start, "d MMM", { locale }),
+      label: format(start, datePattern(locale, "dayMonth"), { locale }),
       start,
       hourly: sum("hourly"),
       production: sum("production"),
@@ -224,7 +226,7 @@ export function cumulativeEarnings(
       production += totals.production;
       const date = new Date(day);
       return {
-        label: format(date, "d MMM", { locale }),
+        label: format(date, datePattern(locale, "dayMonth"), { locale }),
         date,
         hourly: round(hourly),
         production: round(production),

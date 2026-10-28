@@ -17,6 +17,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
 import Skeleton from "@/components/ui/Skeleton";
 
+import { datePattern } from "@/utils/helpers/dateFormats";
 import { cn } from "@/utils/helpers/styleMerger";
 import useDateLocale from "@/hooks/useDateLocale";
 import useMoney from "@/hooks/useMoney";
@@ -71,7 +72,7 @@ function DayDetail({
       </PopoverTrigger>
       <PopoverContent side="top" collisionPadding={16} className="w-64 p-3">
         <p className="mb-2 text-[0.8125rem] font-semibold text-ink capitalize">
-          {format(day.date, "EEEE d MMMM", { locale })}
+          {format(day.date, datePattern(locale, "longWeekdayDayMonth"), { locale })}
         </p>
         <ul className="flex flex-col gap-2">
           {day.shifts.map((shift) => (
@@ -197,9 +198,19 @@ function WeekSummary() {
   const max = Math.max(...week.days.map((d) => d.hourly + d.production), 1);
   const today = new Date();
   const weekday = new Intl.DateTimeFormat(intlLocale, { weekday: "narrow" });
+  const monthFirst = datePattern(locale, "dayMonth") !== "d MMM";
   const range = t("range", {
-    from: format(week.from, isSameMonth(week.from, week.to) ? "d" : "d MMM", { locale }),
-    to: format(week.to, "d MMM", { locale }),
+    // "26 to 31 Oct" / "Oct 26 to 31": the month once when both days share it.
+    from: format(
+      week.from,
+      isSameMonth(week.from, week.to) && !monthFirst ? "d" : datePattern(locale, "dayMonth"),
+      { locale }
+    ),
+    to: format(
+      week.to,
+      isSameMonth(week.from, week.to) && monthFirst ? "d" : datePattern(locale, "dayMonth"),
+      { locale }
+    ),
   });
 
   return (
