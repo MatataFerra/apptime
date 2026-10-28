@@ -715,8 +715,7 @@
       "city_hint": "Tu ciudad",
       "country": "País",
       "select_country": "Elige tu país",
-      "search_country": "Busca tu país",
-      "no_country": "No se encontró el país"
+      "search_country": "Busca tu país"
     },
     "data": {
       "title": "Tus datos guardados",

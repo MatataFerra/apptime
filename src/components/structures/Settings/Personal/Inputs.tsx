@@ -1,21 +1,20 @@
 "use client";
 
+import { useId } from "react";
+
 import { useTranslations } from "next-intl";
 
-import Dropdown from "@/components/structures/Settings/Personal/Dropdown";
+import CountrySelect from "@/components/structures/Settings/Personal/CountrySelect";
 import { FIELD, Row } from "@/components/structures/Settings/Preferences/Section";
 import Skeleton from "@/components/ui/Skeleton";
 
-import getCountryData from "@/utils/helpers/getCountryData";
-import useRegionName from "@/hooks/useRegionName";
 import useSettings from "@/hooks/useSettings";
 
 /** City and country, saved with "Save details". */
 function Inputs() {
   const { setValue, values, isLoading } = useSettings();
   const t = useTranslations("settings.details");
-  const regionName = useRegionName();
-  const country = values.personal.country;
+  const countryId = useId();
 
   return (
     <>
@@ -33,23 +32,17 @@ function Inputs() {
           />
         )}
       </Row>
-      <Row label={t("country")} stacked>
+      <Row label={t("country")} htmlFor={countryId} stacked>
         {isLoading ? (
           <Skeleton classes="h-11 w-full rounded-xl" />
         ) : (
-          <Dropdown
-            triggerClassName={FIELD}
-            staleTitle={
-              country
-                ? `${getCountryData(country).flag} ${regionName(
-                    getCountryData(country).countryId,
-                    country
-                  )}`
-                : t("select_country")
-            }
-            searchingTitle={t("search_country")}
-            emptyTitle={t("no_country")}
-            setSelected={(value) => setValue({ personal: { ...values.personal, country: value } })}
+          <CountrySelect
+            id={countryId}
+            label={t("country")}
+            value={values.personal.country}
+            placeholder={t("select_country")}
+            searchPlaceholder={t("search_country")}
+            onChange={(country) => setValue({ personal: { ...values.personal, country } })}
           />
         )}
       </Row>

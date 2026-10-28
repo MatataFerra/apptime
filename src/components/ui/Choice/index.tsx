@@ -32,6 +32,8 @@ export type ChoiceOption<T extends string = string> = {
   separated?: boolean;
   /** Does something instead of picking a value ("New employer…"): no check, accent color. */
   action?: boolean;
+  /** Other words the search box matches, e.g. a country's English name. */
+  keywords?: string;
 };
 
 type Tone = "default" | "muted" | "changed" | "filled";
@@ -112,7 +114,9 @@ export function ChoiceOptions<T extends string>({
   const searchable = !!searchPlaceholder && options.length >= SEARCH_FROM;
   const needle = query.trim().toLocaleLowerCase();
   const shown = needle
-    ? options.filter((o) => !o.action && o.label.toLocaleLowerCase().includes(needle))
+    ? options.filter(
+        (o) => !o.action && `${o.label} ${o.keywords ?? ""}`.toLocaleLowerCase().includes(needle)
+      )
     : options;
 
   // Opens on the picked option, like a native select, without scrolling the page.
