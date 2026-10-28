@@ -10,6 +10,7 @@ import {
   buildBatchDays,
   findOverlaps,
   type Weekday,
+  withDayTimes,
 } from "@/utils/helpers/batchShifts";
 import { defaultFinish, needsDefaultFinish } from "@/utils/helpers/defaultFinish";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
@@ -30,6 +31,8 @@ export function useBatchSchedule() {
   const [finish, setFinish] = useState("");
   const [until, setUntil] = useState("");
   const [weekdays, setWeekdays] = useState<Weekday[]>(WORK_WEEK);
+  /** Hours changed for one day (`HH:mm`), e.g. a shorter Saturday, by day key. */
+  const [times, setTimes] = useState<Record<string, { start: string; finish: string }>>({});
   /** Days the user unticked in the preview. */
   const [left, setLeft] = useState<Set<string>>(() => new Set());
 
@@ -37,7 +40,29 @@ export function useBatchSchedule() {
     () => buildBatchDays({ start, finish, until, weekdays }),
     [start, finish, until, weekdays]
   );
-  const days = useMemo(() => (result.ok ? result.days : []), [result]);
+  const days = useMemo(
+    () =>
+      (result.ok ? result.days : []).map((day) => {
+        const own = times[day.key];
+        return (own && withDayTimes(day, own.start, own.finish)) || day;
+      }),
+    [result, times]
+  );
+  /** Days whose hours differ from the first shift's. */
+  const edited = useMemo(
+    () =>
+      new Set(
+        result.ok
+          ? result.days
+              .filter((day) => {
+                const own = times[day.key];
+                return own && withDayTimes(day, own.start, own.finish);
+              })
+              .map((day) => day.key)
+          : []
+      ),
+    [result, times]
+  );
 
   const clashes = useMemo(
     () => findOverlaps(days, [...(hourly ?? []), ...(production ?? [])]),
@@ -81,7 +106,22 @@ export function useBatchSchedule() {
     });
   }
 
+  /** Other hours for one day; finishing at or before the start means the next day. */
+  function setDayTimes(key: string, start: string, finish: string) {
+    setTimes((current) => ({ ...current, [key]: { start, finish } }));
+  }
+
+  /** Back to the first shift's hours. */
+  function resetDayTimes(key: string) {
+    setTimes((current) => {
+      const next = { ...current };
+      delete next[key];
+      return next;
+    });
+  }
+
   function reset() {
+    setTimes({});
     setStart("");
     setFinish("");
     setUntil("");
@@ -99,11 +139,14 @@ export function useBatchSchedule() {
     chosen,
     error,
     left,
+    edited,
     onStartChange,
     setFinish,
     setUntil,
     toggleWeekday,
     toggleDay,
+    setDayTimes,
+    resetDayTimes,
     reset,
   };
 }

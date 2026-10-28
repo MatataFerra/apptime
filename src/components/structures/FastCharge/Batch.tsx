@@ -41,7 +41,8 @@ const FORM_ID = "fast-charge-batch";
 
 /**
  * Fast charge for a stretch of days: the first shift's hours, repeated on the
- * chosen weekdays until a date. Every day can be left out before saving, and
+ * chosen weekdays until a date. Any day can get its own hours (a shorter
+ * Saturday) or be left out before saving, and
  * days that run into a saved shift are never saved twice.
  */
 function Batch() {
@@ -135,6 +136,8 @@ function Batch() {
     );
   }
 
+  // Days with their own hours that are still going to be saved.
+  const ownHours = chosen.filter((day) => schedule.edited.has(day.key)).length;
   const hoursText = ShiftService.convertDifferenceInHHmm(totals.minutes).text;
 
   return (
@@ -205,6 +208,7 @@ function Batch() {
       <BatchPreview
         schedule={schedule}
         theme="fast"
+        editTimes
         summary={`${hoursText} · ${money(totals.gross, { currency })}`}
       />
 
@@ -221,6 +225,9 @@ function Batch() {
         rows={[
           { label: tb("shifts"), value: chosen.length },
           { label: t("fields.time_worked"), value: hoursText },
+          ...(ownHours > 0
+            ? [{ label: tb("hours"), value: tb("edited_days", { count: ownHours }) }]
+            : []),
           { label: t("fields.hourly_rate"), value: money(toNumber(hourValue), { currency }) },
           ...(toNumber(unpaidBreaks)
             ? [
