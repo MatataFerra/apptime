@@ -713,7 +713,13 @@
       "system": "Sistema",
       "light": "Claro",
       "dark": "Oscuro",
-      "language": "Idioma"
+      "language": "Idioma",
+      "time_format": "Hora",
+      "date_format": "Fecha",
+      "auto": "Idioma",
+      "hours_12": "12 h",
+      "hours_24": "24 h",
+      "example": "Ahora: {example}"
     },
     "money": {
       "title": "Dinero y valores por defecto",
@@ -834,7 +840,11 @@
       "keep": "Conservar mi cuenta",
       "deleting": "Borrando…",
       "delete_forever": "Borrar para siempre",
-      "delete_failed": "No se pudo borrar la cuenta"
+      "delete_failed": "No se pudo borrar la cuenta",
+      "taxes": "Mis impuestos",
+      "taxes_hint": "Los impuestos y descuentos que usas en tus turnos.",
+      "employers": "Empleadores",
+      "employers_hint": "Para quién trabajas y sus datos."
     }
   },
   "employers": {

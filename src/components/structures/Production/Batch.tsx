@@ -31,6 +31,7 @@ import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 
 import { currencySymbol } from "@/utils/constants/currencies";
+import { datePattern } from "@/utils/helpers/dateFormats";
 import { cn } from "@/utils/helpers/styleMerger";
 import useDateLocale from "@/hooks/useDateLocale";
 import useDefaultEmployer from "@/hooks/useDefaultEmployer";
@@ -226,7 +227,9 @@ function Batch() {
               step="any"
               min={0}
               aria-label={tb("quantity_for", {
-                day: format(day.start, "EEEE d MMMM", { locale: dateLocale }),
+                day: format(day.start, datePattern(dateLocale, "longWeekdayDayMonth"), {
+                  locale: dateLocale,
+                }),
               })}
               disabled={!on}
               value={value}

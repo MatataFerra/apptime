@@ -713,7 +713,13 @@
       "system": "System",
       "light": "Light",
       "dark": "Dark",
-      "language": "Language"
+      "language": "Language",
+      "time_format": "Time",
+      "date_format": "Date",
+      "auto": "Language",
+      "hours_12": "12 h",
+      "hours_24": "24 h",
+      "example": "Now: {example}"
     },
     "money": {
       "title": "Money and defaults",
@@ -834,7 +840,11 @@
       "keep": "Keep my account",
       "deleting": "Deleting…",
       "delete_forever": "Delete forever",
-      "delete_failed": "Couldn't delete the account"
+      "delete_failed": "Couldn't delete the account",
+      "taxes": "My taxes",
+      "taxes_hint": "Taxes and deductions you use on your shifts.",
+      "employers": "Employers",
+      "employers_hint": "Who you work for and their details."
     }
   },
   "employers": {

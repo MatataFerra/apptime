@@ -7,6 +7,7 @@ import { ownEmployerId } from "@/services/Employer/owned";
 import { getSessionUserId } from "@/utils/auth/session";
 import { WEEK_DAYS } from "@/utils/constants";
 import { CURRENCIES } from "@/utils/constants/currencies";
+import { DATE_ORDERS, TIME_FORMATS } from "@/utils/helpers/dateFormats";
 import { ROUND_STEPS } from "@/utils/helpers/roundShift";
 import { THEMES } from "@/utils/theme";
 
@@ -34,6 +35,8 @@ const PreferencesSchema = z
     defaultEmployerId: z.number().int().positive().nullable().optional(),
     earningsGoal: z.number().min(0).max(10_000_000).nullable().optional(),
     goalPeriod: z.enum(["week", "month"]).optional(),
+    timeFormat: z.enum(TIME_FORMATS).optional(),
+    dateFormat: z.enum(DATE_ORDERS).optional(),
   })
   .strict();
 

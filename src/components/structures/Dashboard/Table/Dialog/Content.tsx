@@ -8,6 +8,7 @@ import ShiftService from "@/services/Shift";
 import type { ShiftType } from "@/types";
 
 import { MODULE_THEMES } from "@/utils/constants/modules";
+import { datePattern } from "@/utils/helpers/dateFormats";
 import { isProductionShift } from "@/utils/helpers/isProductionShift";
 import { cn } from "@/utils/helpers/styleMerger";
 import useDateLocale from "@/hooks/useDateLocale";
@@ -26,7 +27,9 @@ function TableDialogContent({ shift }: Props) {
   function when(date?: string | null) {
     if (!date) return "–";
     const d = new Date(date);
-    return isNaN(d.valueOf()) ? "–" : format(d, "EEE d MMM, p", { locale });
+    return isNaN(d.valueOf())
+      ? "–"
+      : format(d, datePattern(locale, "weekdayDayMonthTime"), { locale });
   }
   const { byId } = useEmployers();
   const employer = shift.employerId != null ? byId.get(shift.employerId) : undefined;

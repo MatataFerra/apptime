@@ -2,13 +2,15 @@
 
 import { useCallback } from "react";
 
-import { useLocale, useTranslations } from "next-intl";
+import { format } from "date-fns";
+import { useTranslations } from "next-intl";
 
 import ut from "@/services/Utilities/client";
 
 import PopoverHome from "@/components/structures/Home/Popover";
 import Text from "@/components/ui/Text";
 
+import useDateLocale from "@/hooks/useDateLocale";
 import useTrack from "@/hooks/useTrack";
 
 function ShiftTextState() {
@@ -16,7 +18,7 @@ function ShiftTextState() {
     shiftUnclosed: { shift },
   } = useTrack();
   const t = useTranslations("track.monitor");
-  const locale = useLocale();
+  const locale = useDateLocale();
 
   const checkCloseShift = useCallback(() => {
     if (typeof shift?.isClosed === "undefined") {
@@ -52,7 +54,7 @@ function ShiftTextState() {
       {online && startedAt && !isNaN(startedAt.valueOf()) ? (
         <span className="text-sm text-ink-muted">
           {t("started", {
-            time: startedAt.toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit" }),
+            time: format(startedAt, "p", { locale }),
           })}
         </span>
       ) : null}

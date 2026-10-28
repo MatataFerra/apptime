@@ -2,8 +2,9 @@
 
 import type { PropsWithChildren } from "react";
 
+import { format, type Locale as DateLocale } from "date-fns";
 import { StickyNote } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 
 import Buttons from "@/components/structures/Notes/Buttons";
 import Header from "@/components/structures/Notes/Header";
@@ -17,15 +18,16 @@ import {
   SheetTrigger,
 } from "@/components/ui/Sheet";
 
+import useDateLocale from "@/hooks/useDateLocale";
 import useTrack from "@/hooks/useTrack";
 
 import { useNotes } from "@/store/useNotesStore";
 
-function startedLabel(start: string | Date | null | undefined, locale: string) {
+function startedLabel(start: string | Date | null | undefined, locale: DateLocale) {
   if (!start) return null;
   const date = new Date(start);
   if (isNaN(date.valueOf())) return null;
-  return date.toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit" });
+  return format(date, "p", { locale });
 }
 
 /**
@@ -38,7 +40,7 @@ function Notes({ children }: PropsWithChildren) {
     shiftUnclosed: { shift },
   } = useTrack();
   const t = useTranslations("notes");
-  const started = startedLabel(shift?.startDate, useLocale());
+  const started = startedLabel(shift?.startDate, useDateLocale());
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>

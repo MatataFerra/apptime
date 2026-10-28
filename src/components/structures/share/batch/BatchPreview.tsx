@@ -9,6 +9,7 @@ import { useTranslations } from "next-intl";
 import Input from "@/components/ui/Input";
 
 import type { BatchDay } from "@/utils/helpers/batchShifts";
+import { datePattern } from "@/utils/helpers/dateFormats";
 import { cn } from "@/utils/helpers/styleMerger";
 import useDateLocale from "@/hooks/useDateLocale";
 
@@ -61,7 +62,9 @@ function BatchPreview({ schedule, theme, summary, renderExtra, editTimes = false
           const on = !clash && !left.has(day.key);
           const own = edited.has(day.key);
           const open = editTimes && on && editing === day.key;
-          const dayName = format(day.start, "EEEE d MMM", { locale: dateLocale });
+          const dayName = format(day.start, datePattern(dateLocale, "longWeekdayDayMonth"), {
+            locale: dateLocale,
+          });
           const hours = (
             <>
               {format(day.start, "p", { locale: dateLocale })}–
@@ -86,7 +89,9 @@ function BatchPreview({ schedule, theme, summary, renderExtra, editTimes = false
                     onChange={() => schedule.toggleDay(day.key)}
                   />
                   <span className="flex-1 capitalize">
-                    {format(day.start, "EEE d MMM", { locale: dateLocale })}
+                    {format(day.start, datePattern(dateLocale, "weekdayDayMonth"), {
+                      locale: dateLocale,
+                    })}
                   </span>
                   {editTimes && on ? null : (
                     <span

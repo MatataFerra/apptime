@@ -9,6 +9,7 @@ import ut from "@/services/Utilities/client";
 
 import type { Locale } from "@/types";
 
+import DateFormatSync from "@/providers/DateFormatSync";
 import { SessionProvider } from "@/providers/Session";
 import ThemeSync from "@/providers/ThemeSync";
 
@@ -42,6 +43,7 @@ function Providers({ children, i18n, session }: Props) {
       <SessionProvider session={session}>
         <NextIntlClientProvider {...i18n} timeZone="UTC">
           <ThemeSync />
+          <DateFormatSync />
           {children}
         </NextIntlClientProvider>
       </SessionProvider>

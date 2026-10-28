@@ -15,6 +15,7 @@ import {
 import type { CumulativePoint } from "@/services/History";
 import { formatMoneyCompact, moneyAxisWidth } from "@/services/Summary";
 
+import { datePattern } from "@/utils/helpers/dateFormats";
 import useDateLocale from "@/hooks/useDateLocale";
 import useMoney from "@/hooks/useMoney";
 
@@ -124,7 +125,7 @@ function SeasonChart({ data, currency }: { data: CumulativePoint[]; currency: st
               scale="time"
               domain={["dataMin", "dataMax"]}
               tickFormatter={(time: number) =>
-                format(new Date(time), "d MMM", { locale: dateLocale })
+                format(new Date(time), datePattern(dateLocale, "dayMonth"), { locale: dateLocale })
               }
               tickLine={false}
               axisLine={false}

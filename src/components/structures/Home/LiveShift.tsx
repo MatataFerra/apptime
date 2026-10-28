@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 
+import { format } from "date-fns";
 import { ChevronRight, LoaderCircle, Square } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useInterval } from "usehooks-ts";
 
 import { runningShiftEarnings } from "@/services/Summary";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
+import useDateLocale from "@/hooks/useDateLocale";
 import useFinishShift from "@/hooks/useFinishShift";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
 import useMoney from "@/hooks/useMoney";
@@ -27,7 +29,7 @@ function elapsed(start: Date, now: Date) {
 function LiveShift() {
   const money = useMoney();
   const t = useTranslations("home.live");
-  const locale = useLocale();
+  const locale = useDateLocale();
   const { data: hourly } = useHourlyShifts();
   const { finish, finishing } = useFinishShift();
   const [now, setNow] = useState(() => new Date());
@@ -48,7 +50,7 @@ function LiveShift() {
   const { hours, mins } = elapsed(start, now);
   const earned = runningShiftEarnings(running, now);
   function clock(date: Date) {
-    return date.toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit" });
+    return format(date, "p", { locale });
   }
   const startedAt = clock(start);
 

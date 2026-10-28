@@ -285,6 +285,10 @@ model Config {
   earningsGoal      Float?
   /// "week" | "month"
   goalPeriod        String  @default("week")
+  /// Clock for times: "auto" (the app's language), "12" or "24".
+  timeFormat        String  @default("auto")
+  /// Day/month order: "auto" (the app's language), "dmy" or "mdy".
+  dateFormat        String  @default("auto")
   userId            String? @unique
   user              User?   @relation(fields: [userId], references: [id])
 }

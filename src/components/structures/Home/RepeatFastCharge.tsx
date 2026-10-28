@@ -16,6 +16,7 @@ import { effectiveRate } from "@/components/structures/SalaryItems/TaxPicker";
 import ShiftReviewDialog from "@/components/structures/share/ShiftReviewDialog";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
+import { datePattern } from "@/utils/helpers/dateFormats";
 import { invalidateShiftQueries } from "@/utils/helpers/invalidateShiftQueries";
 import useDateLocale from "@/hooks/useDateLocale";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
@@ -39,7 +40,7 @@ function RepeatFastCharge() {
     return format(date, "p", { locale });
   }
   function dateTime(date: Date) {
-    return format(date, "EEE d MMM, p", { locale });
+    return format(date, datePattern(locale, "weekdayDayMonthTime"), { locale });
   }
   // In the shift's own currency.
   function money(value: number) {

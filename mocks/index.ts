@@ -133,6 +133,8 @@ export const userMocked: UserWithShifts = {
     itemValue: null,
     earningsGoal: null,
     goalPeriod: "week",
+    timeFormat: "auto",
+    dateFormat: "auto",
   },
 };
 
@@ -163,6 +165,8 @@ export const userTestData: UserWithShifts = {
     itemValue: null,
     earningsGoal: null,
     goalPeriod: "week",
+    timeFormat: "auto",
+    dateFormat: "auto",
   },
   shifts: {
     id: 1,
