@@ -216,7 +216,7 @@
       },
       "worked": {
         "label": "Feriado, trabajado",
-        "hint": "Se paga ×1,5"
+        "hint": "Se paga ×{rate, number}"
       },
       "off": {
         "label": "Feriado, día libre",
@@ -595,7 +595,7 @@
       "piece_shift": "Turno por pieza",
       "hourly_detail": "{hours} · {rate}/h",
       "pieces_detail": "{count, plural, one {# pieza} other {# piezas}} × {value}",
-      "holiday_worked": "Feriado, trabajado ×1,5",
+      "holiday_worked": "Feriado, trabajado ×{rate, number}",
       "holiday_off": "Feriado, día libre",
       "net": "{amount} neto",
       "empty": "Todavía no guardaste turnos.",

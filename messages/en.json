@@ -216,7 +216,7 @@
       },
       "worked": {
         "label": "Public holiday, worked",
-        "hint": "Paid at 1.5×"
+        "hint": "Paid at {rate, number}×"
       },
       "off": {
         "label": "Public holiday, day off",
@@ -595,7 +595,7 @@
       "piece_shift": "Per piece shift",
       "hourly_detail": "{hours} · {rate}/h",
       "pieces_detail": "{count, plural, one {# piece} other {# pieces}} × {value}",
-      "holiday_worked": "Holiday, worked 1.5×",
+      "holiday_worked": "Holiday, worked {rate, number}×",
       "holiday_off": "Holiday, day off",
       "net": "{amount} net",
       "empty": "No shifts saved yet.",
