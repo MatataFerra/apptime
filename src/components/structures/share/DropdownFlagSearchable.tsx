@@ -31,6 +31,8 @@ type Props = {
   searchingTitle?: string;
   selected?: string;
   setSelected?: (value: string) => void;
+  /** Extra classes for the button that opens the list. */
+  triggerClassName?: string;
 };
 
 function DropdownFlagSearchable({
@@ -39,6 +41,7 @@ function DropdownFlagSearchable({
   emptyTitle,
   searchingTitle,
   setSelected,
+  triggerClassName,
 }: Props) {
   const t = useTranslations("dropdown");
   const [search, setSearch] = useState("");
@@ -51,7 +54,7 @@ function DropdownFlagSearchable({
           variant="ghost"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between text-ink-muted"
+          className={cn("w-full justify-between text-ink-muted", triggerClassName)}
         >
           {search
             ? data.find((item) => item?.value === search)?.label

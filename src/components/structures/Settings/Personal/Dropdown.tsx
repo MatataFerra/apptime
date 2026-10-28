@@ -11,6 +11,7 @@ type Props = {
   emptyTitle?: string;
   searchingTitle?: string;
   setSelected?: (value: string) => void;
+  triggerClassName?: string;
 };
 
 function Dropdown({ ...props }: Props) {

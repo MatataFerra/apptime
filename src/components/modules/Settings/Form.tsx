@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import { useQueryClient } from "@tanstack/react-query";
-import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 
 import Toast from "@/services/Toast";
@@ -12,25 +11,16 @@ import Toast from "@/services/Toast";
 import { UserType } from "@/types";
 import { SuccessApiResponse } from "@/types/api_response";
 
-import AccordionSettings from "@/components/structures/Settings/Accordion";
+import AccountInputs from "@/components/structures/Settings/Account/Inputs";
+import PersonalInputs from "@/components/structures/Settings/Personal/Inputs";
+import { Section } from "@/components/structures/Settings/Preferences/Section";
 import FormBase from "@/components/ui/Form";
-import Skeleton from "@/components/ui/Skeleton";
 
 import { useAuthSession } from "@/providers/Session";
 
 import useSettings from "@/hooks/useSettings";
 
 import onUpdateSettings from "@/server-actions/update-settings";
-
-const Account = dynamic(() => import("@/components/modules/Settings/Account"), {
-  ssr: false,
-  loading: () => <Skeleton classes="h-20 w-full" />,
-});
-
-const Personal = dynamic(() => import("@/components/modules/Settings/Personal"), {
-  ssr: false,
-  loading: () => <Skeleton classes="h-20 w-full" />,
-});
 
 function Form() {
   const queryClient = useQueryClient();
@@ -116,10 +106,10 @@ function Form() {
       onSubmit={handleSubmit(onSubmitForm)}
       id="settings"
     >
-      <AccordionSettings>
-        <Account />
-        <Personal />
-      </AccordionSettings>
+      <Section title={t("title")}>
+        <AccountInputs />
+        <PersonalInputs />
+      </Section>
     </FormBase>
   );
 }
