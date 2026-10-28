@@ -105,4 +105,32 @@ describe("Fast charge, several days", () => {
     expect(screen.getByText("The finish must be after the start")).toBeInTheDocument();
     expect(screen.queryByRole("list")).not.toBeInTheDocument();
   });
+
+  test("a day can have its own hours, e.g. a shorter Saturday", async () => {
+    const user = userEvent.setup();
+    renderWithIntl(<Batch />);
+
+    fireEvent.change(screen.getByLabelText("First shift starts"), {
+      target: { value: "2026-10-05T08:00" },
+    });
+    await user.click(screen.getByRole("button", { name: "Saturday" }));
+    // Wednesday 7 is already logged: Mon, Tue, Thu, Fri and Sat 10 are left.
+    expect(screen.getByText("5 of 6 shifts")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /Change hours, Saturday 10/ }));
+    fireEvent.change(screen.getByLabelText("Finishes"), { target: { value: "12:00" } });
+    await user.click(screen.getByRole("button", { name: "Done" }));
+
+    await user.click(screen.getByRole("button", { name: "Review 5 shifts" }));
+    expect(await screen.findByText("1 day with its own hours")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Save 5 shifts" }));
+
+    const sent = mocks.save.mock.calls[0][0].shifts as { startDate: string; endDate: string }[];
+    expect(sent.at(-1)).toEqual({
+      startDate: new Date(2026, 9, 10, 8, 0).toString(),
+      endDate: new Date(2026, 9, 10, 12, 0).toString(),
+    });
+    // The rest keep the first shift's hours.
+    expect(sent[0].endDate).toBe(new Date(2026, 9, 5, 16, 0).toString());
+  });
 });
