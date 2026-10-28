@@ -140,19 +140,23 @@
     }
   },
   "email": {
+    "fallback": "Button not working? Copy this link into your browser:",
+    "footer": "CasualApp · Your hours and pay, season after season. You're getting this email because of an action on your account.",
     "reset_password": {
       "subject": "Reset your CasualApp password",
-      "greeting": "Hello, {name}!",
-      "intro": "You asked to reset your CasualApp password. If it wasn't you,",
-      "ignore": "please ignore this email and change your password.",
-      "cta": "Click the link below to choose a new password. It works for one hour."
+      "preview": "Choose a new password. The link works for one hour.",
+      "greeting": "Hi, {name}",
+      "body": "We got a request to reset the password of your CasualApp account. Choose a new one with the button below; the link works for one hour.",
+      "button": "Choose a new password",
+      "not_you": "Didn't ask for this? You can ignore this email: your password stays the same."
     },
     "verify_email": {
       "subject": "Confirm your new CasualApp email",
-      "greeting": "Hi, {name}!",
-      "intro": "You asked to use this address for your CasualApp account.",
-      "cta": "Click the link to confirm it. It works for one hour.",
-      "ignore": "If it wasn't you, ignore this email: nothing changes."
+      "preview": "Confirm this address to use it for your account.",
+      "greeting": "Hi, {name}",
+      "body": "You asked to use this address for your CasualApp account. Confirm it with the button below; the link works for one hour.",
+      "button": "Confirm my email",
+      "not_you": "Wasn't you? Ignore this email: nothing changes in the account."
     }
   },
   "shift": {

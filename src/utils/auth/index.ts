@@ -2,9 +2,9 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
-import { Resend } from "resend";
 
 import PasswordService from "@/services/Auth/password";
+import { sendEmail } from "@/services/Email";
 
 import type { Locale } from "@/types";
 
@@ -59,14 +59,13 @@ export const auth = betterAuth({
     revokeSessionsOnPasswordReset: true,
     async sendResetPassword({ user, url, token }) {
       const locale = localeFromCallback(url);
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      const { error } = await resend.emails.send({
-        from: `CasualApp Team <resetpassword@${process.env.RESEND_SENDER}>`,
+      await sendEmail({
+        local: "resetpassword",
         to: user.email,
         subject:
           process.env.RESEND_SUBJECT ?? translatorFor(locale)("email.reset_password.subject"),
         // Links to our own page (/{locale}/reset/{token}), which calls resetPassword.
-        react: EmailTemplate({
+        email: EmailTemplate({
           firstName: user.name,
           url: `${(baseURL ?? "").replace(/\/$/, "")}/`,
           locale,
@@ -74,7 +73,6 @@ export const auth = betterAuth({
           token,
         }),
       });
-      if (error) throw new Error(`Reset email failed: ${error.message}`);
     },
   },
 
@@ -85,14 +83,12 @@ export const auth = betterAuth({
     expiresIn: 60 * 60,
     async sendVerificationEmail({ user, url }) {
       const locale = localeFromCallback(url);
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      const { error } = await resend.emails.send({
-        from: `CasualApp Team <account@${process.env.RESEND_SENDER}>`,
+      await sendEmail({
+        local: "account",
         to: user.email,
         subject: translatorFor(locale)("email.verify_email.subject"),
-        react: VerifyEmailTemplate({ firstName: user.name, url, locale }),
+        email: VerifyEmailTemplate({ firstName: user.name, url, locale }),
       });
-      if (error) throw new Error(`Verification email failed: ${error.message}`);
     },
   },
 

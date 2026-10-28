@@ -24,7 +24,7 @@ const env = vi.hoisted(() => {
   return {
     url,
     headers: new Headers(),
-    sent: [] as { to: string; subject: string; url: string }[],
+    sent: [] as { to: string; subject: string; url: string; text: string }[],
   };
 });
 
@@ -34,21 +34,13 @@ vi.mock("next/headers", () => ({
 }));
 vi.mock("server-only", () => ({}));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
-// Captures the email instead of sending it; the link is in the template's props.
+// Captures the email instead of sending it; the link is the button's href.
 vi.mock("resend", () => ({
   Resend: class {
     emails = {
-      send: async ({
-        to,
-        subject,
-        react,
-      }: {
-        to: string;
-        subject: string;
-        react: { props: { children: { props: { href?: string } }[] } };
-      }) => {
-        const href = react.props.children.find((child) => child?.props?.href)?.props.href ?? "";
-        env.sent.push({ to, subject, url: href });
+      send: async ({ to, subject, html, text }: Record<string, string>) => {
+        const url = /<a href="(http[^"]+)"[^>]*target="_blank"/.exec(html)?.[1] ?? "";
+        env.sent.push({ to, subject, url: url.replaceAll("&amp;", "&"), text });
         return { error: null };
       },
     };
@@ -188,6 +180,8 @@ describe("account and security on a real database", () => {
     const mail = env.sent.at(-1)!;
     expect(mail.to).toBe("eve.new@x.com");
     expect(mail.subject).toBe("Confirma tu nuevo email de CasualApp");
+    // Sent with a plain-text part too, which carries the same link.
+    expect(mail.text).toContain(mail.url.split("?")[0]);
 
     const verify = await auth.handler(
       new Request(mail.url, { headers: { cookie: cookie.get("cookie") ?? "" } })

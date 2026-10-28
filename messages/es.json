@@ -140,19 +140,23 @@
     }
   },
   "email": {
+    "fallback": "¿El botón no funciona? Copia este enlace en tu navegador:",
+    "footer": "CasualApp · Tus horas y tu pago, temporada tras temporada. Recibes este email por una acción en tu cuenta.",
     "reset_password": {
       "subject": "Restablece tu contraseña de CasualApp",
-      "greeting": "¡Hola, {name}!",
-      "intro": "Pediste restablecer tu contraseña de CasualApp. Si no fuiste tú,",
-      "ignore": "ignora este email y cambia tu contraseña.",
-      "cta": "Haz clic en el enlace para elegir una contraseña nueva. Funciona durante una hora."
+      "preview": "Elige una contraseña nueva. El enlace funciona durante una hora.",
+      "greeting": "Hola, {name}",
+      "body": "Recibimos un pedido para restablecer la contraseña de tu cuenta de CasualApp. Elige una nueva con el botón; el enlace funciona durante una hora.",
+      "button": "Elegir contraseña nueva",
+      "not_you": "¿No lo pediste tú? Puedes ignorar este email: tu contraseña no cambia."
     },
     "verify_email": {
       "subject": "Confirma tu nuevo email de CasualApp",
-      "greeting": "¡Hola, {name}!",
-      "intro": "Pediste usar esta dirección para tu cuenta de CasualApp.",
-      "cta": "Haz clic en el enlace para confirmarla. Funciona durante una hora.",
-      "ignore": "Si no fuiste tú, ignora este email: no cambia nada."
+      "preview": "Confirma esta dirección para usarla en tu cuenta.",
+      "greeting": "Hola, {name}",
+      "body": "Pediste usar esta dirección para tu cuenta de CasualApp. Confírmala con el botón; el enlace funciona durante una hora.",
+      "button": "Confirmar mi email",
+      "not_you": "¿No fuiste tú? Ignora este email: no cambia nada en la cuenta."
     }
   },
   "shift": {
