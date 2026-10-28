@@ -705,6 +705,15 @@
     "empty": "Sin resultados"
   },
   "settings": {
+    "changes": {
+      "unsaved": "Cambios sin guardar",
+      "save": "Guardar cambios",
+      "saving": "Guardando…",
+      "discard": "Descartar",
+      "saved": "Cambios guardados",
+      "failed": "No se pudieron guardar los cambios",
+      "failed_hint": "Revisa tu conexión e intenta de nuevo; tus cambios siguen acá."
+    },
     "preferences": {
       "saved": "Guardado",
       "save_failed": "No se pudo guardar",
@@ -765,9 +774,6 @@
     },
     "details": {
       "title": "Tus datos",
-      "save": "Guardar datos",
-      "updating": "Actualizando ajustes...",
-      "updated": "Ajustes actualizados",
       "account": "Cuenta",
       "name": "Nombre",
       "name_hint": "Tu nombre completo",

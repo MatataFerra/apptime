@@ -6,15 +6,7 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 
 function useSettings() {
   const { data: user, isLoading } = useUser();
-  const { setValue, values, setDefaultValues, defaultValues, setIsDirty } = useSettingsStore(
-    (state) => state
-  );
-
-  useEffect(() => {
-    setIsDirty((prev) => {
-      return JSON.stringify(prev) !== JSON.stringify(defaultValues);
-    });
-  }, [setIsDirty, defaultValues, values]);
+  const { setValue, values, setDefaultValues } = useSettingsStore((state) => state);
 
   useEffect(() => {
     if (isLoading) return;

@@ -1,15 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { type FormEvent, useEffect } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-
-import Toast from "@/services/Toast";
-
-import { UserType } from "@/types";
-import { SuccessApiResponse } from "@/types/api_response";
 
 import AccountInputs from "@/components/structures/Settings/Account/Inputs";
 import PersonalInputs from "@/components/structures/Settings/Personal/Inputs";
@@ -18,94 +12,30 @@ import FormBase from "@/components/ui/Form";
 
 import { useAuthSession } from "@/providers/Session";
 
-import useSettings from "@/hooks/useSettings";
+import useSettingsChanges from "@/hooks/useSettingsChanges";
 
-import onUpdateSettings from "@/server-actions/update-settings";
-
+/**
+ * "Your details": name, city and country. Saved with the rest of Settings by
+ * "Save changes" (SaveBar); Enter in a field does the same.
+ */
 function Form() {
   const queryClient = useQueryClient();
   const t = useTranslations("settings.details");
   const { user: sessionUser } = useAuthSession();
   const email = sessionUser?.email;
-  const { values } = useSettings();
-  const {
-    handleSubmit,
-    formState: { isSubmitting, isSubmitted, isSubmitSuccessful },
-  } = useForm();
+  const { dirty, save } = useSettingsChanges();
 
   useEffect(() => {
-    queryClient.refetchQueries({
-      queryKey: ["user", email],
-    });
+    queryClient.refetchQueries({ queryKey: ["user", email] });
   }, [queryClient, email]);
 
-  useEffect(() => {
-    if (isSubmitting) {
-      Toast({
-        message: t("updating"),
-        type: "loading",
-      });
-    }
-
-    if (isSubmitted) {
-      Toast({
-        message: t("updated"),
-        type: "success",
-      });
-    }
-
-    if (isSubmitSuccessful) {
-      //* Optimistic update
-      queryClient.cancelQueries({ queryKey: ["user", email] }).then(() => {
-        const previousUserData = queryClient.getQueryData<SuccessApiResponse<UserType>>([
-          "user",
-          email,
-        ]);
-        queryClient.setQueryData(["user", email], {
-          ...previousUserData,
-          user: {
-            ...previousUserData?.user,
-            name: values.account.name,
-            email: values.account.email,
-
-            profile: {
-              ...previousUserData?.user?.profile,
-              city: values.personal.city,
-              country: values.personal.country,
-            },
-          },
-        });
-
-        return { previousUserData };
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ["user", email],
-      });
-    }
-  }, [
-    t,
-    isSubmitted,
-    isSubmitting,
-    isSubmitSuccessful,
-    queryClient,
-    email,
-    values.account.name,
-    values.account.email,
-    values.personal.city,
-    values.personal.country,
-  ]);
-
-  function onSubmitForm() {
-    onUpdateSettings(values);
+  function onSubmit(event: FormEvent) {
+    event.preventDefault();
+    if (dirty) save();
   }
 
   return (
-    <FormBase
-      classes="flex w-full flex-col gap-4"
-      onSubmit={handleSubmit(onSubmitForm)}
-      id="settings"
-    >
+    <FormBase classes="flex w-full flex-col gap-4" onSubmit={onSubmit} id="settings">
       <Section title={t("title")}>
         <AccountInputs />
         <PersonalInputs />

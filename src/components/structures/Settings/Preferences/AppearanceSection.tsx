@@ -20,6 +20,7 @@ import usePreferences from "@/hooks/usePreferences";
 import { Row, Section } from "./Section";
 import Segmented from "./Segmented";
 import { usePathname, useRouter } from "@/i18n/navigation";
+import { usePreferencesDraft } from "@/store/usePreferencesDraft";
 
 const LANGUAGES: Record<(typeof SUPPORTED_LOCALES)[number], string> = {
   en: "English",
@@ -41,18 +42,21 @@ function AppearanceSection() {
   const [now] = useState(() => new Date());
   const timeFormat = (config?.timeFormat ?? "auto") as TimeFormat;
   const dateFormat = (config?.dateFormat ?? "auto") as DateOrder;
-  const [theme, setTheme] = useState<ThemePreference>(() =>
-    isThemePreference(config?.theme) ? config.theme : readThemeCookie()
-  );
+  // Includes an unsaved choice, which is already previewed.
+  const theme: ThemePreference = isThemePreference(config?.theme)
+    ? config.theme
+    : readThemeCookie();
+  const setCarryOver = usePreferencesDraft((state) => state.setCarryOver);
 
   function onTheme(next: ThemePreference) {
-    setTheme(next);
     applyTheme(next);
     save({ theme: next });
   }
 
   function onLanguage(next: string) {
     if (next === locale || !isLocale(next)) return;
+    // The page remounts in the other language; keep what isn't saved yet.
+    setCarryOver(true);
     // Same page in the other language; also saves the choice (NEXT_LOCALE
     // cookie) so links and visits without a locale keep it.
     router.replace(pathname, { locale: next });
