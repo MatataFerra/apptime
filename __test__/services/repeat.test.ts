@@ -24,7 +24,7 @@ function shift(start: Date, hours: number, extra: Partial<HourlyType> = {}): Hou
   } as HourlyType;
 }
 
-const now = new Date(2026, 9, 20, 17, 30); // Tue 20 Oct, 17:30
+const now = new Date(2026, 9, 20, 9, 30); // Tue 20 Oct, 09:30
 
 describe("repeatableFastCharge", () => {
   test("offers yesterday's Fast charge for today, same time and length", () => {
@@ -34,25 +34,38 @@ describe("repeatableFastCharge", () => {
     expect(plan?.last.name).toBe("Picking");
   });
 
-  test("works before 24h have passed, as long as it's another day", () => {
-    const plan = repeatableFastCharge(
-      [shift(new Date(2026, 9, 19, 16, 0), 8)],
-      new Date(2026, 9, 20, 9, 0)
-    );
-    expect(plan).not.toBeNull();
+  test("not offered until 8h after the shift ended", () => {
+    const last = [shift(new Date(2026, 9, 19, 16, 0), 8)]; // ends 20 Oct 00:00
+    expect(repeatableFastCharge(last, new Date(2026, 9, 20, 7, 59))).toBeNull();
+    expect(repeatableFastCharge(last, new Date(2026, 9, 20, 8, 0))).not.toBeNull();
   });
 
-  test("not offered again the same day", () => {
-    expect(repeatableFastCharge([shift(new Date(2026, 9, 20, 8, 0), 8)], now)).toBeNull();
+  test("gone 24h after the shift ended", () => {
+    const last = [shift(new Date(2026, 9, 19, 8, 0), 8)]; // ends 19 Oct 16:00
+    expect(repeatableFastCharge(last, new Date(2026, 9, 20, 15, 59))).not.toBeNull();
+    expect(repeatableFastCharge(last, new Date(2026, 9, 20, 16, 0))).toBeNull();
+    expect(repeatableFastCharge(last, new Date(2026, 9, 22, 9, 0))).toBeNull();
+  });
+
+  test("night shift: offered the same calendar day once 8h have passed", () => {
+    const last = [shift(new Date(2026, 9, 19, 18, 0), 8)]; // ends 20 Oct 02:00
+    const plan = repeatableFastCharge(last, new Date(2026, 9, 20, 11, 0));
+    expect(plan?.start).toEqual(new Date(2026, 9, 20, 18, 0));
+  });
+
+  test("not offered right after logging it (a second one is a duplicate)", () => {
+    expect(
+      repeatableFastCharge([shift(new Date(2026, 9, 20, 0, 0), 8)], new Date(2026, 9, 20, 9, 0))
+    ).toBeNull();
   });
 
   test("uses the latest Fast charge and ignores Track and open shifts", () => {
     const plan = repeatableFastCharge(
       [
         shift(new Date(2026, 9, 15, 7, 0), 9, { name: "Older" }),
-        shift(new Date(2026, 9, 18, 9, 0), 6, { name: "Latest" }),
-        shift(new Date(2026, 9, 19, 8, 0), 8, { source: "track", name: "Tracked" }),
-        shift(new Date(2026, 9, 19, 8, 0), 8, { isClosed: false, name: "Open" }),
+        shift(new Date(2026, 9, 19, 9, 0), 6, { name: "Latest" }),
+        shift(new Date(2026, 9, 19, 10, 0), 8, { source: "track", name: "Tracked" }),
+        shift(new Date(2026, 9, 19, 10, 0), 8, { isClosed: false, name: "Open" }),
       ],
       now
     );
