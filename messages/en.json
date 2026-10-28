@@ -721,9 +721,9 @@
       "about_you": "About you",
       "city": "City",
       "city_hint": "Your city",
+      "country": "Country",
       "select_country": "Select your country",
-      "search_country": "Search your country",
-      "no_country": "No country found"
+      "search_country": "Search your country"
     },
     "data": {
       "title": "Your data",
