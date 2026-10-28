@@ -701,6 +701,15 @@
     "empty": "No item found"
   },
   "settings": {
+    "changes": {
+      "unsaved": "Unsaved changes",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "discard": "Discard",
+      "saved": "Changes saved",
+      "failed": "Couldn't save the changes",
+      "failed_hint": "Check your connection and try again; your changes are still here."
+    },
     "preferences": {
       "saved": "Saved",
       "save_failed": "Couldn't save that",
@@ -761,9 +770,6 @@
     },
     "details": {
       "title": "Your details",
-      "save": "Save details",
-      "updating": "Updating settings...",
-      "updated": "Settings updated successfully",
       "account": "Account",
       "name": "Name",
       "name_hint": "Your full name",
