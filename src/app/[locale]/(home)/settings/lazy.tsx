@@ -6,3 +6,8 @@ export const DataSection = dynamic(
   () => import("@/components/structures/Settings/Preferences/DataSection"),
   { ssr: false }
 );
+
+export const SecuritySection = dynamic(
+  () => import("@/components/structures/Settings/Security/SecuritySection"),
+  { ssr: false }
+);

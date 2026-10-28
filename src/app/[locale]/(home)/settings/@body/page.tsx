@@ -17,9 +17,6 @@ export default async function BodyPage() {
       <MoneySection />
       <WorkSection />
       <GoalSection />
-      <h2 className="-mb-2 px-1 text-sm font-semibold text-ink-muted">
-        {t("settings.details.title")}
-      </h2>
     </>
   );
 }

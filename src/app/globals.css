@@ -719,3 +719,17 @@ div[data-radio-state="false"] .animate_fade_out {
     transparent 2px 6px
   );
 }
+
+/*
+ * iOS Safari zooms in on any field whose text is under 16px when it gets
+ * focus, and leaves the page zoomed (with sideways scroll) after typing.
+ * Touch screens get 16px fields. Kept outside @layer on purpose: unlayered
+ * CSS wins over Tailwind's utilities, so a text-sm on a field can't undo it.
+ */
+@media (pointer: coarse) {
+  input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}

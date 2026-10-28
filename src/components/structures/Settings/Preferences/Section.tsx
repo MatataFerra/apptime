@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
 
+/** A full-width text field inside a stacked Row, matching the number fields. */
+export const FIELD =
+  "h-11 w-full rounded-xl border border-border-strong bg-surface px-3 text-[0.9375rem] text-ink outline-hidden transition-colors placeholder:text-ink-subtle focus:border-accent";
+
 /** A titled group of settings rows. */
 export function Section({
   title,

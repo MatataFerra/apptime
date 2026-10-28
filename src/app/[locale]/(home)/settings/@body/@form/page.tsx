@@ -1,5 +1,5 @@
-import Form from "@/components/modules/Settings/Form";
+import { SettingsForm } from "./lazy";
 
 export default async function FormPage() {
-  return <Form />;
+  return <SettingsForm />;
 }

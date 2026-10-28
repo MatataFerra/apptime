@@ -5,6 +5,7 @@ import {
   findOverlaps,
   MAX_BATCH_DAYS,
   overlaps,
+  withDayTimes,
 } from "@/utils/helpers/batchShifts";
 
 const WEEKDAYS = [1, 2, 3, 4, 5] as const;
@@ -161,5 +162,31 @@ describe("overlaps", () => {
       })
     );
     expect([...findOverlaps(result, [shift])]).toEqual(["2026-10-05"]);
+  });
+});
+
+describe("withDayTimes", () => {
+  const saturday = {
+    key: "2026-10-10",
+    start: new Date(2026, 9, 10, 8, 0),
+    end: new Date(2026, 9, 10, 16, 0),
+  };
+
+  test("a shorter day keeps its date", () => {
+    expect(withDayTimes(saturday, "08:00", "12:30")).toEqual({
+      key: "2026-10-10",
+      start: new Date(2026, 9, 10, 8, 0),
+      end: new Date(2026, 9, 10, 12, 30),
+    });
+  });
+
+  test("a finish before the start ends the next day", () => {
+    expect(withDayTimes(saturday, "22:00", "06:00")?.end).toEqual(new Date(2026, 9, 11, 6, 0));
+  });
+
+  test("invalid or equal times are refused", () => {
+    expect(withDayTimes(saturday, "08:00", "08:00")).toBeNull();
+    expect(withDayTimes(saturday, "25:00", "12:00")).toBeNull();
+    expect(withDayTimes(saturday, "", "12:00")).toBeNull();
   });
 });

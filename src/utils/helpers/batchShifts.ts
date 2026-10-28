@@ -100,6 +100,32 @@ export function buildBatchDays({ start, finish, until, weekdays }: BatchPattern)
   return { ok: true, days };
 }
 
+/** `HH:mm` → [hours, minutes], or null when it isn't a time. */
+function parseTime(value: string): [number, number] | null {
+  const match = /^(\d{1,2}):(\d{2})$/.exec(value);
+  if (!match) return null;
+  const [h, m] = [Number(match[1]), Number(match[2])];
+  return h < 24 && m < 60 ? [h, m] : null;
+}
+
+/**
+ * The same batch day with other hours (`HH:mm`), e.g. a shorter Saturday.
+ * A finish at or before the start ends the next day (night shift). Null when
+ * a time is invalid or both are the same.
+ */
+export function withDayTimes(day: BatchDay, start: string, finish: string): BatchDay | null {
+  const s = parseTime(start);
+  const f = parseTime(finish);
+  if (!s || !f || (s[0] === f[0] && s[1] === f[1])) return null;
+
+  const date = localDay(day.key);
+  if (!isValid(date)) return null;
+  const startAt = atTime(date, s[0], s[1]);
+  const sameDay = f[0] * 60 + f[1] > s[0] * 60 + s[1];
+  const endAt = atTime(sameDay ? date : addDays(date, 1), f[0], f[1]);
+  return { key: day.key, start: startAt, end: endAt };
+}
+
 type Span = { startDate: string | Date; endDate?: string | Date | null };
 
 function toRange(span: Span, now: Date) {
