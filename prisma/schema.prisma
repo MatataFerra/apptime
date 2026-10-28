@@ -179,6 +179,8 @@ model Production {
   notes               String?
   itemValue           Float?
   itemQuantity        Float?
+  /// Multiplier for a worked public holiday when the shift was saved (Config.holidayRate). Null: 1.5.
+  holidayRate         Float?
   /// ISO 4217 code. Null: the user's default currency (Config.currency).
   currency            String?
   shiftId             Int?
@@ -207,6 +209,8 @@ model Hourly {
   notes               String?
   hourValue           Float
   unpaidBreaks        Float?
+  /// Multiplier for a worked public holiday when the shift was saved (Config.holidayRate). Null: 1.5.
+  holidayRate         Float?
   /// ISO 4217 code. Null: the user's default currency (Config.currency).
   currency            String?
   /// Where the shift was logged: "track" (live clock) or "fast" (Fast charge). Null: before this existed.
@@ -258,17 +262,31 @@ model Contribution {
 }
 
 model Config {
-  id           Int     @id @default(autoincrement())
-  weekStartsOn String  @default("monday")
+  id                Int     @id @default(autoincrement())
+  weekStartsOn      String  @default("monday")
   /// Default currency for new shifts and for shifts saved before currencies existed.
-  currency     String  @default("USD")
+  currency          String  @default("USD")
   /// Defaults that prefill Track, Fast charge and Estimate.
-  hourValue    Float?
-  unpaidBreaks Float?
+  hourValue         Float?
+  unpaidBreaks      Float?
   /// "system" | "light" | "dark"
-  theme        String  @default("system")
-  userId       String? @unique
-  user         User?   @relation(fields: [userId], references: [id])
+  theme             String  @default("system")
+  /// Pay multiplier for a worked public holiday (1.5 = time and a half).
+  /// Copied onto each new shift, so changing it doesn't touch past ones.
+  holidayRate       Float   @default(1.5)
+  /// Track (live clock) rounds start and finish to this many minutes; 0 = exact.
+  roundMinutes      Int     @default(0)
+  /// Employer prefilled in Fast charge, Track and Production. Not a foreign
+  /// key: a deleted or archived employer is just not prefilled.
+  defaultEmployerId Int?
+  /// Value per item that prefills Production, like hourValue for hourly shifts.
+  itemValue         Float?
+  /// Earnings goal shown on Home, in the user's currency. Null: no goal.
+  earningsGoal      Float?
+  /// "week" | "month"
+  goalPeriod        String  @default("week")
+  userId            String? @unique
+  user              User?   @relation(fields: [userId], references: [id])
 }
 
 model WaitingListDesktop {

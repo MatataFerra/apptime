@@ -358,6 +358,7 @@ describe("auth and taxes on a real database", () => {
         isClosed: false,
         isPublicHoliday: false,
         publicHolidayWorked: false,
+        holidayRate: null,
         hourValue: 20,
         unpaidBreaks: 0,
         shiftId: bob.shiftId,

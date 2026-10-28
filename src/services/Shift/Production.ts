@@ -2,6 +2,8 @@ import type { Contribution, Production, Tax } from "@prisma/client";
 
 import type { ProductionType, SalaryItemInput } from "@/types";
 
+import { DEFAULT_HOLIDAY_RATE } from "@/utils/constants";
+
 export type HourlyOptions = {
   deleteTaxes?: Tax[];
   createTaxes?: SalaryItemInput[];
@@ -50,7 +52,8 @@ class ProductionService implements ProductionInterface {
     if (!this.shift.itemValue || !this.shift.itemQuantity) return 0;
 
     if (this.shift.publicHolidayWorked) {
-      publicHolidayRate = 1.5;
+      // The rate the shift was saved with; older shifts were always 1.5.
+      publicHolidayRate = this.shift.holidayRate ?? DEFAULT_HOLIDAY_RATE;
     }
 
     return this.shift.itemValue * this.shift.itemQuantity * publicHolidayRate;

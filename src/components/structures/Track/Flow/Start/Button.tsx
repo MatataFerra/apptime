@@ -49,6 +49,7 @@ function ShiftStartButton({ title }: Props) {
       isClosed: false,
       isPublicHoliday: data.isPublicHoliday,
       publicHolidayWorked: data.publicHolidayWorked,
+      holidayRate: null,
       hourValue: Number(data.hourValue),
       unpaidBreaks: Number(data.unpaidBreaks),
       shiftId: user?.shifts?.id as number | null,

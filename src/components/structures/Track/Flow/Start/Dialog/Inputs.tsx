@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
+import type { SavedEmployer } from "@/types";
+
 import CurrencySelect from "@/components/structures/ShiftForms/CurrencySelect";
 import EmployerSelect from "@/components/structures/ShiftForms/EmployerSelect";
 import HolidayChoice, {
@@ -17,6 +19,7 @@ import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 
 import { currencySymbol } from "@/utils/constants/currencies";
+import useDefaultEmployer from "@/hooks/useDefaultEmployer";
 import { useCurrency } from "@/hooks/useMoney";
 import useUser from "@/hooks/useUser";
 import useZodI18n from "@/hooks/useZodI18n";
@@ -50,6 +53,17 @@ function ShiftStartInputs() {
     },
   });
 
+  /** Picking an employer (by hand or the default from Settings) brings its rate and currency. */
+  function pickEmployer(employer: SavedEmployer | null) {
+    setData({ employerId: employer?.id ?? null });
+    if (!employer) return;
+    if (employer.defaultRate != null) {
+      setValue("hourValue", String(employer.defaultRate), { shouldDirty: true });
+    }
+    if (employer.defaultCurrency) setData({ currency: employer.defaultCurrency });
+  }
+  useDefaultEmployer(data.employerId, pickEmployer);
+
   const hourValue = useWatch({ control, name: "hourValue" });
   const unpaidBreaks = useWatch({ control, name: "unpaidBreaks" });
 
@@ -74,15 +88,7 @@ function ShiftStartInputs() {
         allowCreate
         value={data.employerId}
         newDefaults={{ rate: Number(hourValue) || null, currency: data.currency }}
-        onChange={(employer) => {
-          setData({ employerId: employer?.id ?? null });
-          if (!employer) return;
-          // Their usual rate and currency, as a starting point.
-          if (employer.defaultRate != null) {
-            setValue("hourValue", String(employer.defaultRate), { shouldDirty: true });
-          }
-          if (employer.defaultCurrency) setData({ currency: employer.defaultCurrency });
-        }}
+        onChange={pickEmployer}
       />
       <Stack orientation="horizontal" alignItems="center" wrap>
         <Input

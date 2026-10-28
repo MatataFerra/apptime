@@ -228,7 +228,7 @@
       },
       "worked": {
         "label": "Public holiday, worked",
-        "hint": "Paid at 1.5×"
+        "hint": "Paid at {rate, number}×"
       },
       "off": {
         "label": "Public holiday, day off",
@@ -332,6 +332,13 @@
       "summary": "{start} – {end} · {hours} at {rate}/h",
       "log_today": "Log it for today",
       "saved_description": "{name} for today."
+    },
+    "goal": {
+      "title_week": "Weekly goal",
+      "title_month": "Goal for {month}",
+      "of": "{earned} of {goal}",
+      "remaining": "{amount} to go · {days, plural, =0 {last day} one {# day left} other {# days left}}",
+      "reached": "Goal reached. Nice work!"
     }
   },
   "no_mobile": {
@@ -608,7 +615,7 @@
       "piece_shift": "Per piece shift",
       "hourly_detail": "{hours} · {rate}/h",
       "pieces_detail": "{count, plural, one {# piece} other {# pieces}} × {value}",
-      "holiday_worked": "Holiday, worked 1.5×",
+      "holiday_worked": "Holiday, worked {rate, number}×",
       "holiday_off": "Holiday, day off",
       "net": "{amount} net",
       "empty": "No shifts saved yet.",
@@ -720,7 +727,31 @@
       "week_starts": "Week starts on",
       "monday": "Monday",
       "sunday": "Sunday",
-      "none": "None"
+      "none": "None",
+      "item_value": "Value per item",
+      "item_value_hint": "Fills Production."
+    },
+    "work": {
+      "title": "Work and calculations",
+      "description": "How new shifts are prefilled and paid.",
+      "default_employer": "Default employer",
+      "default_employer_hint": "Fills Fast charge, Live shift and Production.",
+      "no_employer": "None",
+      "holiday_rate": "Public holiday pay",
+      "holiday_rate_hint": "Multiplier for a worked holiday. Applies to new shifts.",
+      "rounding": "Round live shifts",
+      "rounding_hint": "Start and finish of Live shift, when you finish it.",
+      "exact": "Exact",
+      "minutes": "{count} min"
+    },
+    "goal": {
+      "title": "Earnings goal",
+      "description": "Shown on Home, before taxes, in {currency}.",
+      "amount": "Goal",
+      "amount_hint": "Leave it empty for no goal.",
+      "period": "Each",
+      "week": "Week",
+      "month": "Month"
     },
     "details": {
       "title": "Your details",

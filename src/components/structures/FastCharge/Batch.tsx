@@ -9,6 +9,8 @@ import { withContributions } from "@/services/Contribution/math";
 import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
 
+import type { SavedEmployer } from "@/types";
+
 import Drawer from "@/components/modules/FastCharge/Drawer";
 import BatchPreview from "@/components/structures/share/batch/BatchPreview";
 import BatchScheduleFields from "@/components/structures/share/batch/BatchScheduleFields";
@@ -28,6 +30,7 @@ import Input from "@/components/ui/Input";
 import Stack from "@/components/ui/Stack";
 
 import { currencySymbol } from "@/utils/constants/currencies";
+import useDefaultEmployer from "@/hooks/useDefaultEmployer";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
 import useMoney, { useCurrency } from "@/hooks/useMoney";
 import useProductionShifts from "@/hooks/useProductionShifts";
@@ -105,6 +108,15 @@ function Batch() {
     return { minutes, gross, afterTaxes: Pay.afterTax(gross, taxes) };
   }, [chosen, hourValue, unpaidBreaks, taxes, contributions]);
 
+  /** Picking an employer (by hand or the default from Settings) brings its rate and currency. */
+  function pickEmployer(employer: SavedEmployer | null) {
+    setEmployerId(employer?.id ?? null);
+    if (!employer) return;
+    if (employer.defaultRate != null) setHourValue(String(employer.defaultRate));
+    if (employer.defaultCurrency) setCurrency(employer.defaultCurrency);
+  }
+  useDefaultEmployer(employerId, pickEmployer);
+
   function reset() {
     setName("");
     setEmployerId(null);
@@ -167,16 +179,7 @@ function Batch() {
           />
         </Stack>
 
-        <EmployerSelect
-          value={employerId}
-          onChange={(employer) => {
-            setEmployerId(employer?.id ?? null);
-            if (!employer) return;
-            // Their usual rate and currency, as a starting point.
-            if (employer.defaultRate != null) setHourValue(String(employer.defaultRate));
-            if (employer.defaultCurrency) setCurrency(employer.defaultCurrency);
-          }}
-        />
+        <EmployerSelect value={employerId} onChange={pickEmployer} />
 
         <BatchScheduleFields schedule={schedule} theme="fast" />
 

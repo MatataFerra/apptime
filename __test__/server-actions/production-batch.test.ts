@@ -20,6 +20,8 @@ const db = vi.hoisted(() => {
     employer: model(),
     hourly: model(),
     production: model(),
+    // The holiday multiplier from Settings, copied onto every shift.
+    config: { findUnique: vi.fn(async () => ({ holidayRate: 1.5 })) },
     // Interactive transaction: the callback gets the client.
     $transaction: vi.fn(async (fn: (tx: unknown) => unknown) => fn(db)),
   };

@@ -161,7 +161,9 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
           </span>
           {entry.holiday ? (
             <span className="mt-0.5 w-fit rounded-full bg-fast-soft px-2 py-0.5 text-[0.6875rem] font-semibold text-fast-ink">
-              {entry.holiday === "worked" ? t("holiday_worked") : t("holiday_off")}
+              {entry.holiday === "worked"
+                ? t("holiday_worked", { rate: entry.holidayRate })
+                : t("holiday_off")}
             </span>
           ) : null}
         </span>

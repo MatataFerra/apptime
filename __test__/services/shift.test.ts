@@ -27,6 +27,7 @@ describe("ShiftService", () => {
       isPublicHoliday: false,
       notes: "",
       publicHolidayWorked: false,
+      holidayRate: null,
       shiftId: 1,
       currency: null,
       employerId: null,
@@ -43,6 +44,7 @@ describe("ShiftService", () => {
       isPublicHoliday: false,
       notes: "",
       publicHolidayWorked: false,
+      holidayRate: null,
       unpaidBreaks: 0,
       shiftId: 1,
       currency: null,
@@ -92,6 +94,7 @@ describe("ShiftService", () => {
         isPublicHoliday: false,
         notes: HOURLY_SHIFT_MOCK.notes,
         publicHolidayWorked: false,
+        holidayRate: null,
         isClosed: true,
         endDate: now.toString(),
         amount: DIFFERENCE_SHIFT,
@@ -229,6 +232,7 @@ describe("ShiftService", () => {
         endDate: addMinutes(startDate, DIFFERENCE_SHIFT).toString(),
         isPublicHoliday: true,
         publicHolidayWorked: true,
+        holidayRate: null,
         unpaidBreaks: 30,
         shiftId: 1,
         currency: null,
@@ -254,6 +258,7 @@ describe("ShiftService", () => {
         startDate: startDate.toString(),
         endDate: endDate.toString(),
         publicHolidayWorked: true,
+        holidayRate: null,
         hourValue: 20, // $20 per hour
         unpaidBreaks: 30, // 30 minutes
       };

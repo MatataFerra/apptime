@@ -14,6 +14,7 @@ import ShiftReviewDialog from "@/components/structures/share/ShiftReviewDialog";
 import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
 import useMoney from "@/hooks/useMoney";
 import useShortDateTime from "@/hooks/useShortDateTime";
+import useUser from "@/hooks/useUser";
 
 import { useFastChargeStore } from "@/store/useFastChargeStore";
 import { useHourlyTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
@@ -22,6 +23,7 @@ function DialogHourly({ children }: PropsWithChildren) {
   const money = useMoney();
   const humanize = useShortDateTime();
   const t = useTranslations("shift");
+  const holidayRate = useUser().data?.config?.holidayRate;
   const {
     values: {
       startDate,
@@ -72,6 +74,8 @@ function DialogHourly({ children }: PropsWithChildren) {
       publicHolidayWorked: fastWorked,
       hourValue: Number(hourValue),
       unpaidBreaks: Number(unpaidBreaks),
+      // Saved with the multiplier from Settings.
+      holidayRate: holidayRate ?? null,
     };
 
     // Holiday pay and the like go on top of the hours.
@@ -91,6 +95,7 @@ function DialogHourly({ children }: PropsWithChildren) {
     fastWorked,
     formatEnd,
     formatStart,
+    holidayRate,
     hourValue,
     taxes,
     unpaidBreaks,

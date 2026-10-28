@@ -11,6 +11,10 @@ vi.mock("@/services/Toast", () => ({ default: vi.fn() }));
 vi.mock("@/server-actions/production-batch", () => ({ default: mocks.save }));
 vi.mock("@/hooks/useHourlyShifts", () => ({ default: () => ({ data: [] }) }));
 vi.mock("@/hooks/useProductionShifts", () => ({ default: () => ({ data: [] }) }));
+vi.mock("@/hooks/useUser", () => ({ default: () => ({ data: { config: {} } }) }));
+vi.mock("@/hooks/useEmployers", () => ({
+  default: () => ({ employers: [], byId: new Map(), isLoading: false }),
+}));
 vi.mock("@/hooks/useShiftNames", () => ({ default: () => ({ names: [] }) }));
 vi.mock("@/hooks/useMoney", () => ({
   default: () => (value: number) => `$${value.toFixed(2)}`,

@@ -10,6 +10,8 @@ import { withContributions } from "@/services/Contribution/math";
 import Pay from "@/services/Pay";
 import ShiftService from "@/services/Shift";
 
+import type { SavedEmployer } from "@/types";
+
 import Drawer from "@/components/modules/Production/Drawer";
 import BatchPreview from "@/components/structures/share/batch/BatchPreview";
 import BatchScheduleFields from "@/components/structures/share/batch/BatchScheduleFields";
@@ -31,10 +33,12 @@ import Stack from "@/components/ui/Stack";
 import { currencySymbol } from "@/utils/constants/currencies";
 import { cn } from "@/utils/helpers/styleMerger";
 import useDateLocale from "@/hooks/useDateLocale";
+import useDefaultEmployer from "@/hooks/useDefaultEmployer";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
 import useMoney, { useCurrency } from "@/hooks/useMoney";
 import useProductionShifts from "@/hooks/useProductionShifts";
 import useShiftNames from "@/hooks/useShiftNames";
+import useUser from "@/hooks/useUser";
 
 import onCreateProductionBatch from "@/server-actions/production-batch";
 import { useProductionTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
@@ -53,13 +57,15 @@ function Batch() {
   const money = useMoney();
   const defaultCurrency = useCurrency();
 
+  const { data: user } = useUser();
   const { data: hourly } = useHourlyShifts();
   const { data: production } = useProductionShifts();
 
   const [name, setName] = useState("");
   const [employerId, setEmployerId] = useState<number | null>(null);
   const [currency, setCurrency] = useState<string | null>(null);
-  const [itemValue, setItemValue] = useState("");
+  /** null until typed: the value per item saved in Settings shows instead. */
+  const [typedItemValue, setItemValue] = useState<string | null>(null);
   const [defaultQuantity, setDefaultQuantity] = useState("");
   /** Quantities edited day by day; the others use `defaultQuantity`. */
   const [quantities, setQuantities] = useState<Record<string, string>>({});
@@ -69,6 +75,16 @@ function Batch() {
   const { chosen } = schedule;
 
   const { names } = useShiftNames({ hourly, production }, name);
+
+  const savedItemValue = user?.config?.itemValue;
+  const itemValue = typedItemValue ?? (savedItemValue ? String(savedItemValue) : "");
+
+  /** Picking an employer (by hand or the default from Settings) brings its currency. */
+  function pickEmployer(employer: SavedEmployer | null) {
+    setEmployerId(employer?.id ?? null);
+    if (employer?.defaultCurrency) setCurrency(employer.defaultCurrency);
+  }
+  useDefaultEmployer(employerId, pickEmployer);
   const setWriting = useDatalistStore((state) => state.setWriting);
 
   const {
@@ -161,13 +177,7 @@ function Batch() {
           />
         </Stack>
 
-        <EmployerSelect
-          value={employerId}
-          onChange={(employer) => {
-            setEmployerId(employer?.id ?? null);
-            if (employer?.defaultCurrency) setCurrency(employer.defaultCurrency);
-          }}
-        />
+        <EmployerSelect value={employerId} onChange={pickEmployer} />
 
         <BatchScheduleFields schedule={schedule} theme="production" />
 

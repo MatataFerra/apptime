@@ -32,6 +32,7 @@ export const useShiftData = create(
         isPublicHoliday: false,
         notes: "",
         publicHolidayWorked: false,
+        holidayRate: null,
         unpaidBreaks: 0,
         shiftId: null,
         currency: null,

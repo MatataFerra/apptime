@@ -4,7 +4,7 @@ import ModuleTitle from "@/components/structures/share/ModuleTitle";
 
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
-import { AppearanceSection, MoneySection, ProfileCard } from "./lazy";
+import { AppearanceSection, GoalSection, MoneySection, ProfileCard, WorkSection } from "./lazy";
 
 export default async function BodyPage() {
   const t = await getTranslations();
@@ -15,6 +15,8 @@ export default async function BodyPage() {
       <ProfileCard />
       <AppearanceSection />
       <MoneySection />
+      <WorkSection />
+      <GoalSection />
     </>
   );
 }
