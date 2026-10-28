@@ -1,5 +1,13 @@
 import type { Locale } from "@/types";
 
+import {
+  EmailButton,
+  EmailFallbackLink,
+  EmailHeading,
+  EmailLayout,
+  EmailNote,
+  EmailText,
+} from "./Layout";
 import { translatorFor } from "@/i18n/translator";
 
 interface EmailTemplateProps {
@@ -16,16 +24,18 @@ export function EmailTemplate({ firstName, url, locale, endpoint, token }: Email
   const link = `${url}${locale}/${endpoint}/${token}`;
 
   return (
-    <div>
-      <h1>{t("email.reset_password.greeting", { name: firstName })}</h1>
-      <p>
-        {t("email.reset_password.intro")} <strong>{t("email.reset_password.ignore")}</strong>
-      </p>
-      <p>{t("email.reset_password.cta")}</p>
-      <a href={link}>
-        <span>{link}</span>
-      </a>
-    </div>
+    <EmailLayout
+      lang={locale}
+      title={t("email.reset_password.subject")}
+      preview={t("email.reset_password.preview")}
+      footer={t("email.footer")}
+    >
+      <EmailHeading>{t("email.reset_password.greeting", { name: firstName })}</EmailHeading>
+      <EmailText>{t("email.reset_password.body")}</EmailText>
+      <EmailButton href={link}>{t("email.reset_password.button")}</EmailButton>
+      <EmailFallbackLink label={t("email.fallback")} href={link} />
+      <EmailNote>{t("email.reset_password.not_you")}</EmailNote>
+    </EmailLayout>
   );
 }
 
@@ -41,16 +51,17 @@ export function VerifyEmailTemplate({ firstName, url, locale }: VerifyEmailTempl
   const t = translatorFor(locale);
 
   return (
-    <div>
-      <h1>{t("email.verify_email.greeting", { name: firstName })}</h1>
-      <p>{t("email.verify_email.intro")}</p>
-      <p>{t("email.verify_email.cta")}</p>
-      <a href={url}>
-        <span>{url}</span>
-      </a>
-      <p>
-        <strong>{t("email.verify_email.ignore")}</strong>
-      </p>
-    </div>
+    <EmailLayout
+      lang={locale}
+      title={t("email.verify_email.subject")}
+      preview={t("email.verify_email.preview")}
+      footer={t("email.footer")}
+    >
+      <EmailHeading>{t("email.verify_email.greeting", { name: firstName })}</EmailHeading>
+      <EmailText>{t("email.verify_email.body")}</EmailText>
+      <EmailButton href={url}>{t("email.verify_email.button")}</EmailButton>
+      <EmailFallbackLink label={t("email.fallback")} href={url} />
+      <EmailNote>{t("email.verify_email.not_you")}</EmailNote>
+    </EmailLayout>
   );
 }
