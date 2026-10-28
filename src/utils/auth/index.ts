@@ -8,15 +8,15 @@ import PasswordService from "@/services/Auth/password";
 
 import type { Locale } from "@/types";
 
-import { EmailTemplate } from "@/components/ui/EmailTemplate";
+import { EmailTemplate, VerifyEmailTemplate } from "@/components/ui/EmailTemplate";
 
 import { isLocale } from "@/utils/helpers/locale";
 
 import { translatorFor } from "@/i18n/translator";
 import prisma from "#/prisma/client";
 
-/** Locale of the page that asked for the reset, from the redirect it passed. */
-function localeFromResetUrl(url: string): Locale {
+/** Locale of the page that asked (reset, email change), from the redirect it passed. */
+function localeFromCallback(url: string): Locale {
   try {
     const callback = new URL(url).searchParams.get("callbackURL") ?? "";
     const locale = callback.split("/").filter(Boolean)[0];
@@ -58,7 +58,7 @@ export const auth = betterAuth({
     resetPasswordTokenExpiresIn: 60 * 60,
     revokeSessionsOnPasswordReset: true,
     async sendResetPassword({ user, url, token }) {
-      const locale = localeFromResetUrl(url);
+      const locale = localeFromCallback(url);
       const resend = new Resend(process.env.RESEND_API_KEY);
       const { error } = await resend.emails.send({
         from: `CasualApp Team <resetpassword@${process.env.RESEND_SENDER}>`,
@@ -75,6 +75,24 @@ export const auth = betterAuth({
         }),
       });
       if (error) throw new Error(`Reset email failed: ${error.message}`);
+    },
+  },
+
+  // Only used to confirm a new email from Settings (nothing is sent on sign
+  // up). The link goes to /api/auth/verify-email, which applies the change
+  // and redirects back to Settings.
+  emailVerification: {
+    expiresIn: 60 * 60,
+    async sendVerificationEmail({ user, url }) {
+      const locale = localeFromCallback(url);
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const { error } = await resend.emails.send({
+        from: `CasualApp Team <account@${process.env.RESEND_SENDER}>`,
+        to: user.email,
+        subject: translatorFor(locale)("email.verify_email.subject"),
+        react: VerifyEmailTemplate({ firstName: user.name, url, locale }),
+      });
+      if (error) throw new Error(`Verification email failed: ${error.message}`);
     },
   },
 
@@ -103,6 +121,9 @@ export const auth = betterAuth({
   },
 
   user: {
+    // The new address must be confirmed from its inbox before it replaces
+    // the current one (Settings → Account and security).
+    changeEmail: { enabled: true },
     additionalFields: {
       role: { type: "string", required: false, defaultValue: "USER", input: false },
       type_account: {
