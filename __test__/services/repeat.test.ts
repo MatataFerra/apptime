@@ -40,11 +40,17 @@ describe("repeatableFastCharge", () => {
     expect(repeatableFastCharge(last, new Date(2026, 9, 20, 8, 0))).not.toBeNull();
   });
 
-  test("gone 24h after the shift ended", () => {
-    const last = [shift(new Date(2026, 9, 19, 8, 0), 8)]; // ends 19 Oct 16:00
-    expect(repeatableFastCharge(last, new Date(2026, 9, 20, 15, 59))).not.toBeNull();
-    expect(repeatableFastCharge(last, new Date(2026, 9, 20, 16, 0))).toBeNull();
-    expect(repeatableFastCharge(last, new Date(2026, 9, 22, 9, 0))).toBeNull();
+  test("offered all of the next day, however late it ended (until midnight)", () => {
+    // Tue 27 Oct 08:15–17:45: still offered on Wed 28 at 21:37 and 23:59.
+    const last = [shift(new Date(2026, 9, 27, 8, 15), 9.5)];
+    expect(repeatableFastCharge(last, new Date(2026, 9, 28, 21, 37))).not.toBeNull();
+    expect(repeatableFastCharge(last, new Date(2026, 9, 28, 23, 59))).not.toBeNull();
+    expect(repeatableFastCharge(last, new Date(2026, 9, 29, 0, 0))).toBeNull();
+  });
+
+  test("a shift two days old is no longer offered", () => {
+    const last = [shift(new Date(2026, 9, 19, 8, 0), 8)];
+    expect(repeatableFastCharge(last, new Date(2026, 9, 21, 9, 0))).toBeNull();
   });
 
   test("night shift: offered the same calendar day once 8h have passed", () => {
