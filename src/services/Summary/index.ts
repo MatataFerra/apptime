@@ -274,3 +274,37 @@ export function formatHours(minutes: number) {
   const hours = minutes / 60;
   return `${Number.isInteger(hours) ? hours : hours.toFixed(1)}h`;
 }
+
+export type GoalPeriod = "week" | "month";
+
+export type GoalProgress = {
+  earned: number;
+  goal: number;
+  /** 0–1, capped at 1 for the bar. */
+  ratio: number;
+  remaining: number;
+  reached: boolean;
+};
+
+/** How far `earned` is from `goal`. */
+export function goalProgress(earned: number, goal: number): GoalProgress {
+  const safeGoal = goal > 0 ? goal : 0;
+  const ratio = safeGoal ? Math.min(1, Math.max(0, earned / safeGoal)) : 0;
+  return {
+    earned,
+    goal: safeGoal,
+    ratio,
+    remaining: Math.max(0, Math.round((safeGoal - earned) * 100) / 100),
+    reached: safeGoal > 0 && earned >= safeGoal,
+  };
+}
+
+/** The current week or calendar month, as the goal on Home counts it. */
+export function goalRange(
+  period: GoalPeriod,
+  { now = new Date(), weekStartsOn = 1 as 0 | 1 } = {}
+) {
+  return period === "month"
+    ? { from: startOfMonth(now), to: endOfMonth(now) }
+    : { from: startOfWeek(now, { weekStartsOn }), to: endOfWeek(now, { weekStartsOn }) };
+}

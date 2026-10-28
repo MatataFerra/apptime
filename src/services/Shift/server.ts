@@ -18,12 +18,28 @@ import prisma from "#/prisma/client";
  * the database here keeps Prisma and the libSQL driver out of the browser.
  */
 
+/**
+ * The holiday multiplier a new shift is saved with: the one it brings, else
+ * the owner's Settings. Stored on the shift so a later change in Settings
+ * doesn't rewrite what past shifts earned.
+ */
+async function holidayRateFor(shift: { holidayRate?: number | null; shiftId?: number | null }) {
+  if (shift.holidayRate != null) return shift.holidayRate;
+  if (shift.shiftId == null) return null;
+  const owner = await prisma.shift.findUnique({
+    where: { id: shift.shiftId },
+    select: { user: { select: { config: { select: { holidayRate: true } } } } },
+  });
+  return owner?.user?.config?.holidayRate ?? null;
+}
+
 /** HourlyService that can save the shift and create its taxes and contributions. */
 export class HourlyRecord extends HourlyService {
   async create() {
     return prisma.hourly.create({
       data: {
         ...this.shift,
+        holidayRate: await holidayRateFor(this.shift),
         taxes: { connect: this.taxes },
         contributions: { connect: this.contributions },
       },
@@ -81,6 +97,7 @@ export class ProductionRecord extends ProductionService {
     return prisma.production.create({
       data: {
         ...this.shift,
+        holidayRate: await holidayRateFor(this.shift),
         taxes: { connect: this.taxes },
         contributions: { connect: this.contributions },
       },

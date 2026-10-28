@@ -137,7 +137,15 @@ export async function saveBatch<D extends Common & { shifts: S[] }, S extends Sh
     ]);
 
     const ctx: Context = { shiftId, employerId: employerId ?? null };
-    const rows = accepted.map((shift) => row(shift, data, ctx));
+    // Every shift keeps the holiday multiplier from Settings at the time it was saved.
+    const config = await prisma.config.findUnique({
+      where: { userId: currentUser.id },
+      select: { holidayRate: true },
+    });
+    const rows = accepted.map((shift) => ({
+      ...row(shift, data, ctx),
+      holidayRate: config?.holidayRate ?? null,
+    }));
 
     // All or nothing: a half-saved batch would be hard to spot and fix.
     await prisma.$transaction(async (tx) => {

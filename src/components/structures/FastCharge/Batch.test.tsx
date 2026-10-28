@@ -17,6 +17,9 @@ vi.mock("@/hooks/useUser", () => ({
 }));
 vi.mock("@/hooks/useHourlyShifts", () => ({ default: () => ({ data: mocks.hourly }) }));
 vi.mock("@/hooks/useProductionShifts", () => ({ default: () => ({ data: [] }) }));
+vi.mock("@/hooks/useEmployers", () => ({
+  default: () => ({ employers: [], byId: new Map(), isLoading: false }),
+}));
 vi.mock("@/hooks/useShiftNames", () => ({ default: () => ({ names: [] }) }));
 vi.mock("@/hooks/useMoney", () => ({
   default: () => (value: number) => `$${value.toFixed(2)}`,

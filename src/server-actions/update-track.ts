@@ -11,6 +11,8 @@ import UserService from "@/services/User";
 
 import type { TrackInputs } from "@/types/forms";
 
+import { roundShiftTimes } from "@/utils/helpers/roundShift";
+
 import type { ContributionElement, TaxElement } from "@/store/useTaxOrContributionStore";
 import prisma from "#/prisma/client";
 
@@ -39,9 +41,26 @@ export default async function onUpdateTrackJob(data: UpdateTrackData, shiftId: n
   const employerId = await ownEmployerId(currentUser.id, data.employerId);
   if (employerId === false) return null;
 
+  // Settings → round tracked shifts to 5 or 15 minutes (0: exact).
+  const config = await prisma.config
+    .findUnique({ where: { userId: currentUser.id }, select: { roundMinutes: true } })
+    .catch(() => null);
+  const rounded =
+    config?.roundMinutes && data.startDate
+      ? roundShiftTimes(
+          new Date(data.startDate),
+          data.endDate ? new Date(data.endDate) : new Date(),
+          config.roundMinutes
+        )
+      : null;
+
   // Which row it is and whose container it's in come from the server, not the client.
   const prepareShift = {
     ...omit(data, ["id", "shiftId", "shift", "employer", "employerId"]),
+    ...(rounded && {
+      startDate: rounded.start.toString(),
+      endDate: rounded.end.toString(),
+    }),
     ...(employerId !== undefined && { employerId }),
     id: owned.id,
     shiftId: ownShiftId,

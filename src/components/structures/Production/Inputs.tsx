@@ -8,7 +8,7 @@ import { useTranslations } from "next-intl";
 
 import Toast from "@/services/Toast";
 
-import { ProductionJobFormCheckDataSchema, type ProductionType } from "@/types";
+import { ProductionJobFormCheckDataSchema, type ProductionType, type SavedEmployer } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 import type { ProductionInputs } from "@/types/forms";
 
@@ -29,6 +29,7 @@ import Text from "@/components/ui/Text";
 import { currencySymbol } from "@/utils/constants/currencies";
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import { defaultFinish, needsDefaultFinish } from "@/utils/helpers/defaultFinish";
+import useDefaultEmployer from "@/hooks/useDefaultEmployer";
 import useGetUniqueSalaryItems from "@/hooks/useGetUniqueSalaryItems";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
 import { useCurrency } from "@/hooks/useMoney";
@@ -96,6 +97,23 @@ function Inputs() {
   const { data: production } = useProductionShifts();
   const isFree = useOverlapGuard(hourly, production);
   const { names } = useShiftNames({ hourly, production }, nameWatch);
+
+  /** Picking an employer (by hand or the default from Settings) brings its currency;
+   * its rate is per hour, not per item. */
+  function pickEmployer(employer: SavedEmployer | null) {
+    setStoreValues({ employerId: employer?.id ?? null });
+    if (employer?.defaultCurrency) setStoreValues({ currency: employer.defaultCurrency });
+  }
+  useDefaultEmployer(shiftEmployerId, pickEmployer);
+
+  // Prefill the value per item saved in Settings, without overwriting what was typed.
+  const savedItemValue = user?.config?.itemValue;
+  useEffect(() => {
+    if (savedItemValue && !getValues("item-value")) {
+      setValue("item-value", String(savedItemValue));
+      setStoreValues({ itemValue: String(savedItemValue) });
+    }
+  }, [savedItemValue, getValues, setValue, setStoreValues]);
 
   /*
     set when user is typing to show datalist
@@ -360,14 +378,7 @@ function Inputs() {
             }}
           />
         </Stack>
-        <EmployerSelect
-          value={shiftEmployerId}
-          onChange={(employer) => {
-            setStoreValues({ employerId: employer?.id ?? null });
-            // Their currency as a starting point (the rate is per hour, not per item).
-            if (employer?.defaultCurrency) setStoreValues({ currency: employer.defaultCurrency });
-          }}
-        />
+        <EmployerSelect value={shiftEmployerId} onChange={pickEmployer} />
         <Stack grid cols={2} as="fieldset" classes="w-full">
           <Input
             classes="h-full"

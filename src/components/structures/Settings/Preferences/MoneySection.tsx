@@ -58,6 +58,15 @@ function MoneySection() {
         max={600}
         onSave={(unpaidBreaks) => save({ unpaidBreaks })}
       />
+      <NumberSetting
+        label={t("item_value")}
+        hint={t("item_value_hint")}
+        value={config?.itemValue}
+        unit={symbol}
+        unitPlace="left"
+        nullable
+        onSave={(itemValue) => save({ itemValue })}
+      />
       <Row label={t("week_starts")} stacked>
         <Segmented
           label={t("week_starts")}

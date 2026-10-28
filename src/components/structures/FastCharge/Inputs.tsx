@@ -9,7 +9,7 @@ import { useTranslations } from "next-intl";
 
 import Toast from "@/services/Toast";
 
-import { FastChargeFormCheckDataSchema, type HourlyType } from "@/types";
+import { FastChargeFormCheckDataSchema, type HourlyType, type SavedEmployer } from "@/types";
 import type { SuccessApiResponse } from "@/types/api_response";
 import type { FastChargeInputs } from "@/types/forms";
 
@@ -30,6 +30,7 @@ import Text from "@/components/ui/Text";
 import { currencySymbol } from "@/utils/constants/currencies";
 import { USE_QUERY_KEYS } from "@/utils/constants/use-query";
 import { defaultFinish, needsDefaultFinish } from "@/utils/helpers/defaultFinish";
+import useDefaultEmployer from "@/hooks/useDefaultEmployer";
 import useFormatAndAddTime from "@/hooks/useFormatAndAddTime";
 import useGetUniqueSalaryItems from "@/hooks/useGetUniqueSalaryItems";
 import useHourlyShifts from "@/hooks/useHourlyShifts";
@@ -174,6 +175,19 @@ function Inputs() {
     ================================================================================
     ================================================================================
   */
+
+  /** Picking an employer (by hand or the default from Settings) brings its rate and currency. */
+  function pickEmployer(employer: SavedEmployer | null) {
+    setStoreValue({ employerId: employer?.id ?? null });
+    if (!employer) return;
+    if (employer.defaultRate != null) {
+      const rate = String(employer.defaultRate);
+      setValue("hour-value", rate, { shouldDirty: true });
+      setStoreValue({ hourValue: rate });
+    }
+    if (employer.defaultCurrency) setStoreValue({ currency: employer.defaultCurrency });
+  }
+  useDefaultEmployer(shiftEmployerId, pickEmployer);
 
   // Prefill the rate and breaks saved in Settings, without overwriting what was typed.
   const savedRate = user?.config?.hourValue;
@@ -458,20 +472,7 @@ function Inputs() {
             }}
           />
         </Stack>
-        <EmployerSelect
-          value={shiftEmployerId}
-          onChange={(employer) => {
-            setStoreValue({ employerId: employer?.id ?? null });
-            if (!employer) return;
-            // Their usual rate and currency, as a starting point.
-            if (employer.defaultRate != null) {
-              const rate = String(employer.defaultRate);
-              setValue("hour-value", rate, { shouldDirty: true });
-              setStoreValue({ hourValue: rate });
-            }
-            if (employer.defaultCurrency) setStoreValue({ currency: employer.defaultCurrency });
-          }}
-        />
+        <EmployerSelect value={shiftEmployerId} onChange={pickEmployer} />
         <Input
           containerClasses="flex-1"
           classes="h-full"

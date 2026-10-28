@@ -106,3 +106,6 @@ export const TYPE_SHIFT = {
   TRACK: "Hourly",
   FAST: "Hourly",
 } as const;
+
+/** Pay multiplier for a worked public holiday when the shift or Settings says nothing else. */
+export const DEFAULT_HOLIDAY_RATE = 1.5;

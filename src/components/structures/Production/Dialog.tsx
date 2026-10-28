@@ -12,6 +12,7 @@ import ShiftReviewDialog from "@/components/structures/share/ShiftReviewDialog";
 
 import useMoney from "@/hooks/useMoney";
 import useShortDateTime from "@/hooks/useShortDateTime";
+import useUser from "@/hooks/useUser";
 
 import { useProductionForm } from "@/store/useProductionForm";
 import { useProductionTaxesOrContributionsStore } from "@/store/useTaxOrContributionStore";
@@ -20,6 +21,7 @@ function DialogProduction({ children }: PropsWithChildren) {
   const format$ = useMoney();
   const humanize = useShortDateTime();
   const t = useTranslations("shift");
+  const holidayRate = useUser().data?.config?.holidayRate;
   const { values, dialog, setDialogState, formError } = useProductionForm((state) => state);
   const currency = values.currency;
   // In the shift's own currency.
@@ -40,6 +42,8 @@ function DialogProduction({ children }: PropsWithChildren) {
     itemQuantity: Number(values.itemQuantity),
     isPublicHoliday: !!values.isPublicHoliday,
     publicHolidayWorked: !!values.publicHolidayWorked,
+    // Saved with the multiplier from Settings.
+    holidayRate: holidayRate ?? null,
   })
     .checkPublicHoliday()
     .calculateEarnings();

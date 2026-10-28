@@ -3,6 +3,8 @@ import { differenceInMinutes, endOfDay, isSameDay, startOfDay } from "date-fns";
 
 import type { HourlyType, SalaryItemInput } from "@/types";
 
+import { DEFAULT_HOLIDAY_RATE } from "@/utils/constants";
+
 export type HourlyOptions = {
   deleteTaxes?: Tax[];
   createTaxes?: SalaryItemInput[];
@@ -75,8 +77,10 @@ class HourlyService implements HourlyInterface {
 
     const totalAmount = amount + amountHolidayPayable;
 
-    // Adjust for public holiday rate and minimum minutes worked
-    const publicHolidayRate = this.shift.publicHolidayWorked ? 1.5 : 1;
+    // Adjust for public holiday rate (the one the shift was saved with) and minimum minutes worked
+    const publicHolidayRate = this.shift.publicHolidayWorked
+      ? (this.shift.holidayRate ?? DEFAULT_HOLIDAY_RATE)
+      : 1;
 
     if (totalAmount < MIN_MINUTES_WORKED) {
       totalTime = amount + amountHolidayPayable * publicHolidayRate;

@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 import MainModules from "@/components/structures/Home/MainModules";
 import MainOptions from "@/components/structures/Home/MainOptions";
 
-import { HomeHeader, LiveShift, RepeatFastCharge, WeekSummary } from "./Content.lazy";
+import { EarningsGoal, HomeHeader, LiveShift, RepeatFastCharge, WeekSummary } from "./Content.lazy";
 
 function Content() {
   const t = useTranslations("home");
@@ -15,6 +15,7 @@ function Content() {
         <LiveShift />
         <RepeatFastCharge />
         <WeekSummary />
+        <EarningsGoal />
       </div>
       <nav className="flex w-full flex-col gap-6" aria-label={t("sections.modules")}>
         <MainModules />

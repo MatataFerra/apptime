@@ -24,3 +24,6 @@ export const RepeatFastCharge = dynamic(
   () => import("@/components/structures/Home/RepeatFastCharge"),
   { ssr: false }
 );
+export const EarningsGoal = dynamic(() => import("@/components/structures/Home/EarningsGoal"), {
+  ssr: false,
+});

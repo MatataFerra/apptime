@@ -312,6 +312,13 @@
       "summary": "{start} – {end} · {hours} a {rate}/h",
       "log_today": "Registrarlo para hoy",
       "saved_description": "{name} para hoy."
+    },
+    "goal": {
+      "title_week": "Objetivo semanal",
+      "title_month": "Objetivo de {month}",
+      "of": "{earned} de {goal}",
+      "remaining": "Faltan {amount} · {days, plural, =0 {último día} one {queda # día} other {quedan # días}}",
+      "reached": "Objetivo cumplido. ¡Buen trabajo!"
     }
   },
   "no_mobile": {
@@ -700,7 +707,31 @@
       "week_starts": "La semana empieza el",
       "monday": "Lunes",
       "sunday": "Domingo",
-      "none": "Ninguno"
+      "none": "Ninguno",
+      "item_value": "Valor por unidad",
+      "item_value_hint": "Se completa en Producción."
+    },
+    "work": {
+      "title": "Trabajo y cálculos",
+      "description": "Cómo se completan y se pagan los turnos nuevos.",
+      "default_employer": "Empleador por defecto",
+      "default_employer_hint": "Se completa en Carga rápida, Turno en vivo y Producción.",
+      "no_employer": "Ninguno",
+      "holiday_rate": "Recargo por feriado",
+      "holiday_rate_hint": "Multiplicador de un feriado trabajado. Aplica a los turnos nuevos.",
+      "rounding": "Redondear turnos en vivo",
+      "rounding_hint": "Inicio y fin del Turno en vivo, al terminarlo.",
+      "exact": "Exacto",
+      "minutes": "{count} min"
+    },
+    "goal": {
+      "title": "Objetivo de ingresos",
+      "description": "Se ve en la Home, antes de impuestos, en {currency}.",
+      "amount": "Objetivo",
+      "amount_hint": "Déjalo vacío para no tener objetivo.",
+      "period": "Cada",
+      "week": "Semana",
+      "month": "Mes"
     },
     "details": {
       "title": "Tus datos",

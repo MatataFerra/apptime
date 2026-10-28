@@ -17,6 +17,7 @@ function NumberSetting({
   unit,
   unitPlace = "right",
   nullable,
+  min = 0,
   max,
   onSave,
 }: {
@@ -26,6 +27,7 @@ function NumberSetting({
   unit: string;
   unitPlace?: "left" | "right";
   nullable?: boolean;
+  min?: number;
   max?: number;
   onSave: (value: number | null) => void;
 }) {
@@ -45,7 +47,7 @@ function NumberSetting({
       return;
     }
     const number = Number(trimmed);
-    if (Number.isFinite(number) && number >= 0 && (max === undefined || number <= max)) {
+    if (Number.isFinite(number) && number >= min && (max === undefined || number <= max)) {
       onSave(number);
     }
   }
@@ -58,7 +60,7 @@ function NumberSetting({
           id={id}
           type="number"
           inputMode="decimal"
-          min={0}
+          min={min}
           max={max}
           step="any"
           placeholder={nullable ? t("none") : undefined}
