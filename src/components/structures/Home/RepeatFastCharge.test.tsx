@@ -51,7 +51,7 @@ function setup() {
 describe("RepeatFastCharge", () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date(2026, 9, 25, 8, 30));
+    vi.setSystemTime(new Date(2026, 9, 24, 8, 30));
     push.mockClear();
     create.mockClear();
   });

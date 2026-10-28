@@ -58,7 +58,13 @@ function DataSection() {
         </span>
       </Row>
       <Row label={t("log_out")} hint={t("log_out_hint")}>
-        <Button type="button" variant="outline" size="sm" onClick={() => signOutAndLeave("/")}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          classes="w-auto shrink-0"
+          onClick={() => signOutAndLeave("/")}
+        >
           <LogOut className="size-4" aria-hidden="true" />
           {t("log_out")}
         </Button>
@@ -112,7 +118,7 @@ function DataSection() {
             type="button"
             variant="ghost"
             size="sm"
-            classes="text-destructive"
+            classes="w-auto shrink-0 text-destructive"
             onClick={() => setDeleting(true)}
           >
             <Trash2 className="size-4" aria-hidden="true" />

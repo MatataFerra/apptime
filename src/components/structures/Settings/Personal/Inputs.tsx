@@ -1,64 +1,52 @@
 "use client";
 
+import { useId } from "react";
+
 import { useTranslations } from "next-intl";
 
-import AccordionItemSettings from "@/components/structures/Settings/AccordionItem";
-import Input from "@/components/structures/Settings/Input";
-import Dropdown from "@/components/structures/Settings/Personal/Dropdown";
+import CountrySelect from "@/components/structures/Settings/Personal/CountrySelect";
+import { FIELD, Row } from "@/components/structures/Settings/Preferences/Section";
+import Skeleton from "@/components/ui/Skeleton";
 
-import getCountryData from "@/utils/helpers/getCountryData";
-import useRegionName from "@/hooks/useRegionName";
 import useSettings from "@/hooks/useSettings";
 
+/** City and country, saved with "Save details". */
 function Inputs() {
   const { setValue, values, isLoading } = useSettings();
   const t = useTranslations("settings.details");
-  const regionName = useRegionName();
-
-  function onChangeInputs(e: React.ChangeEvent<HTMLInputElement>) {
-    const { value, id } = e.target;
-
-    setValue({
-      personal: {
-        ...values.personal,
-        [id]: value,
-      },
-    });
-  }
+  const countryId = useId();
 
   return (
-    <AccordionItemSettings value="personal" trigger={t("about_you")}>
-      <Input
-        name="city"
-        id="city"
-        label={t("city")}
-        description={t("city_hint")}
-        variant="outlined"
-        value={values.personal.city}
-        isLoading={isLoading}
-        onChange={onChangeInputs}
-      />
-      <Dropdown
-        staleTitle={
-          values.personal.country
-            ? `${getCountryData(values.personal.country).flag} ${regionName(
-                getCountryData(values.personal.country).countryId,
-                values.personal.country
-              )}`
-            : t("select_country")
-        }
-        searchingTitle={t("search_country")}
-        emptyTitle={t("no_country")}
-        setSelected={(value) =>
-          setValue({
-            personal: {
-              ...values.personal,
-              country: value,
-            },
-          })
-        }
-      />
-    </AccordionItemSettings>
+    <>
+      <Row label={t("city")} hint={t("city_hint")} htmlFor="city" stacked>
+        {isLoading ? (
+          <Skeleton classes="h-11 w-full rounded-xl" />
+        ) : (
+          <input
+            id="city"
+            name="city"
+            autoComplete="address-level2"
+            className={FIELD}
+            value={values.personal.city}
+            onChange={(e) => setValue({ personal: { ...values.personal, city: e.target.value } })}
+          />
+        )}
+      </Row>
+      <Row label={t("country")} htmlFor={countryId} stacked>
+        {isLoading ? (
+          <Skeleton classes="h-11 w-full rounded-xl" />
+        ) : (
+          <CountrySelect
+            id={countryId}
+            label={t("country")}
+            value={values.personal.country}
+            placeholder={t("select_country")}
+            searchPlaceholder={t("search_country")}
+            onChange={(country) => setValue({ personal: { ...values.personal, country } })}
+          />
+        )}
+      </Row>
+    </>
   );
 }
 

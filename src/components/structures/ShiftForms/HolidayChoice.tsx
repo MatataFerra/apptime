@@ -6,7 +6,9 @@ import { useTranslations } from "next-intl";
 
 import Segmented from "@/components/structures/Settings/Preferences/Segmented";
 
+import { DEFAULT_HOLIDAY_RATE } from "@/utils/constants";
 import { cn } from "@/utils/helpers/styleMerger";
+import useUser from "@/hooks/useUser";
 
 export type HolidayValue = "none" | "worked" | "off";
 
@@ -52,6 +54,11 @@ function HolidayChoice({
 }) {
   const id = useId();
   const t = useTranslations("shift.holiday");
+  // New shifts are paid with the multiplier from Settings.
+  const rate = useUser().data?.config?.holidayRate ?? DEFAULT_HOLIDAY_RATE;
+  function hint(option: HolidayValue) {
+    return option === "worked" ? t("worked.hint", { rate }) : t(`${option}.hint`);
+  }
   const question = legend ?? t("question");
 
   if (compact) {
@@ -73,7 +80,7 @@ function HolidayChoice({
           )}
           aria-live="polite"
         >
-          {t(`${value}.hint`)}
+          {hint(value)}
         </p>
       </div>
     );
@@ -110,7 +117,7 @@ function HolidayChoice({
                 <span className="text-[0.9375rem] font-medium text-ink">
                   {t(`${option}.label`)}
                 </span>
-                <span className="text-[0.8125rem] text-ink-muted">{t(`${option}.hint`)}</span>
+                <span className="text-[0.8125rem] text-ink-muted">{hint(option)}</span>
               </span>
             </label>
           );

@@ -13,6 +13,7 @@ import { shiftEarnings, shiftMinutes } from "@/services/Summary";
 
 import type { HourlyType, ProductionType } from "@/types";
 
+import { DEFAULT_HOLIDAY_RATE } from "@/utils/constants";
 import { datePattern } from "@/utils/helpers/dateFormats";
 
 export type ShiftKind = "hourly" | "production";
@@ -26,8 +27,10 @@ export type HistoryEntry = {
   minutes: number;
   earned: number;
   afterTaxes: number;
-  /** "worked" (1.5×), "off" (paid day off) or null for a regular day. */
+  /** "worked" (paid extra), "off" (paid day off) or null for a regular day. */
   holiday: "worked" | "off" | null;
+  /** Multiplier the shift was saved with for a worked holiday (older shifts: 1.5). */
+  holidayRate: number;
   /** The shift's own currency; null means the user's default. */
   currency: string | null;
   /** Who the shift was for; null when not set. */
@@ -92,6 +95,7 @@ function toEntry(shift: HourlyType | ProductionType, kind: ShiftKind): HistoryEn
     earned,
     afterTaxes: Pay.afterTax(earned, shift.taxes ?? []),
     holiday: shift.publicHolidayWorked ? "worked" : shift.isPublicHoliday ? "off" : null,
+    holidayRate: shift.holidayRate ?? DEFAULT_HOLIDAY_RATE,
     currency: shift.currency ?? null,
     employerId: shift.employerId ?? null,
   };
