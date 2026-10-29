@@ -10,6 +10,7 @@ type ModuleKey =
   | "fast_charge"
   | "production"
   | "employers"
+  | "extensions"
   | "dashboard"
   | "estimate"
   | "compare"
@@ -52,6 +53,10 @@ const MONEY: DrawerOption[] = [
   { id: "taxes", module: "taxes", dataTestId: "taxes", url: PATH_NAMES.TAXES },
 ];
 
+const REPORTS: DrawerOption[] = [
+  { id: "extensions", module: "extensions", dataTestId: "extensions", url: PATH_NAMES.EXTENSIONS },
+];
+
 const ACCOUNT: DrawerOption[] = [
   { id: "settings", module: "settings", dataTestId: "settings", url: PATH_NAMES.SETTINGS },
 ];
@@ -59,6 +64,7 @@ const ACCOUNT: DrawerOption[] = [
 const GROUPS = [
   { key: "log_work", options: LOG_WORK },
   { key: "your_money", options: MONEY },
+  { key: "reports", options: REPORTS },
   { key: "account", options: ACCOUNT },
 ] as const;
 

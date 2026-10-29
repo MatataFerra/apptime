@@ -21,6 +21,11 @@
       "description": "Where you work and their details",
       "subtitle": "Where you work, with the details visa and tax forms ask for."
     },
+    "extensions": {
+      "title": "Visa extensions",
+      "description": "Your days of work for a visa",
+      "subtitle": "Count the days of work a visa extension asks for, with who you worked for and the breaks in between."
+    },
     "dashboard": {
       "title": "Dashboard",
       "subtitle": "Your hours and earnings, all in one place."
@@ -56,7 +61,8 @@
     "groups": {
       "log_work": "Log work",
       "your_money": "Your money",
-      "account": "Account"
+      "account": "Account",
+      "reports": "Reports"
     }
   },
   "validation": {
@@ -990,5 +996,92 @@
     "edit_label": "Edit {name}",
     "remove_label": "Remove {name}",
     "my_contributions_description": "Added to the pay of the shifts that use them. You add them from each shift's form."
+  },
+  "extensions": {
+    "program_label": "Visa",
+    "programs": {
+      "au-88": {
+        "name": "Australia · 2nd year",
+        "detail": "88 days of specified work"
+      },
+      "au-179": {
+        "name": "Australia · 3rd year",
+        "detail": "179 days of specified work"
+      },
+      "nz-3m": {
+        "name": "New Zealand · extension",
+        "detail": "3 months of seasonal work (90 days)"
+      }
+    },
+    "rule_label": "How days count",
+    "rules": {
+      "days_worked": {
+        "label": "Days worked",
+        "hint": "Every day with a shift counts once. Casual and piece work count this way."
+      },
+      "full_time_weeks": {
+        "label": "Full-time weeks",
+        "hint": "A week with {hours} h or more counts all 7 days, weekends included. Only if you were employed full time."
+      }
+    },
+    "period": {
+      "label": "Period",
+      "pick": "Pick the dates",
+      "hint": "Only shifts in this period count. Shifts without an employer inside it count too, in red.",
+      "from_first": "From the first shift in {country}"
+    },
+    "countries": {
+      "AU": "Australia",
+      "NZ": "New Zealand"
+    },
+    "summary": {
+      "title": "Days counted",
+      "of_target": "of {target} days",
+      "remaining": "{count, plural, one {# day to go} other {# days to go}}",
+      "reached": "Target reached",
+      "confirmed": "Confirmed",
+      "assumed": "Assumed",
+      "hours": "{hours} h worked",
+      "progress": "Days counted towards {target}"
+    },
+    "assumed_notice": {
+      "title": "{count, plural, one {# day has no employer} other {# days have no employer}}",
+      "body": "They're inside the period, so they count as part of the same work. Set their employer (with its country) in the Dashboard to confirm them."
+    },
+    "excluded": "{count, plural, one {# shift for an employer in another country is left out.} other {# shifts for employers in other countries are left out.}}",
+    "gaps": {
+      "title": "Breaks",
+      "description": "More than 3 weeks in a row without work.",
+      "none": "No breaks longer than 3 weeks.",
+      "days": "{count} days without work"
+    },
+    "employers": {
+      "title": "Employers",
+      "description": "What the visa form asks for each one.",
+      "no_employer": "Shifts without employer",
+      "no_country": "No country set",
+      "assumed_badge": "Assumed",
+      "days": "{count, plural, one {# day} other {# days}}",
+      "shifts": "{count, plural, one {# shift} other {# shifts}}",
+      "hours": "{hours} h",
+      "dates": "Dates",
+      "tax_id": "ABN / NZBN",
+      "address": "Address",
+      "postcode": "Postcode",
+      "industry": "Industry",
+      "contact": "Contact"
+    },
+    "calendar": {
+      "title": "Day by day",
+      "confirmed": "Worked",
+      "assumed": "Without employer",
+      "filled": "Full-time week",
+      "day_label": "{date}: {status}"
+    },
+    "empty": {
+      "title": "No work in this period",
+      "body": "Log shifts with an employer in {country}, or change the dates."
+    },
+    "disclaimer": "A guide to prepare your application, not an official count. Check the requirements on the immigration website before applying."
   }
 }

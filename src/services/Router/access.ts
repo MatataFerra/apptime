@@ -26,6 +26,7 @@ export const ROUTE_RULES: Record<string, RouteRule> = {
   [PATH_NAMES.SETTINGS]: { access: "private" },
   [PATH_NAMES.TAXES]: { access: "private" },
   [PATH_NAMES.EMPLOYERS]: { access: "private" },
+  [PATH_NAMES.EXTENSIONS]: { access: "private" },
   [PATH_NAMES.FAST_CHARGE]: { access: "private" },
   [PATH_NAMES.TRACK]: { access: "private" },
   [PATH_NAMES.PRODUCTION]: { access: "private" },

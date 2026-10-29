@@ -7,6 +7,7 @@ import {
   Package,
   Receipt,
   Settings,
+  Stamp,
   Timer,
   Zap,
 } from "lucide-react";
@@ -66,6 +67,7 @@ export const MODULES: Record<string, { theme: ModuleTheme; icon: LucideIcon }> =
   [PATH_NAMES.DASHBOARD]: { theme: "insight", icon: ChartColumn },
   [PATH_NAMES.TAXES]: { theme: "insight", icon: Receipt },
   [PATH_NAMES.EMPLOYERS]: { theme: "insight", icon: Building2 },
+  [PATH_NAMES.EXTENSIONS]: { theme: "insight", icon: Stamp },
   [PATH_NAMES.SETTINGS]: { theme: "neutral", icon: Settings },
 };
 

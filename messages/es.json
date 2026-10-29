@@ -21,6 +21,11 @@
       "description": "Dónde trabajas y sus datos",
       "subtitle": "Dónde trabajas, con los datos que piden los formularios de visa e impuestos."
     },
+    "extensions": {
+      "title": "Extensiones de visa",
+      "description": "Tus días de trabajo para una visa",
+      "subtitle": "Cuenta los días de trabajo que pide una extensión de visa, con quién trabajaste y las pausas entre medio."
+    },
     "dashboard": {
       "title": "Panel",
       "subtitle": "Tus horas y ganancias, todo en un lugar."
@@ -56,7 +61,8 @@
     "groups": {
       "log_work": "Registrar trabajo",
       "your_money": "Tu dinero",
-      "account": "Cuenta"
+      "account": "Cuenta",
+      "reports": "Informes"
     }
   },
   "validation": {
@@ -990,5 +996,92 @@
     "edit_label": "Editar {name}",
     "remove_label": "Quitar {name}",
     "my_contributions_description": "Se suman al pago de los turnos que las usan. Se agregan desde el formulario de cada turno."
+  },
+  "extensions": {
+    "program_label": "Visa",
+    "programs": {
+      "au-88": {
+        "name": "Australia · 2.º año",
+        "detail": "88 días de trabajo específico"
+      },
+      "au-179": {
+        "name": "Australia · 3.º año",
+        "detail": "179 días de trabajo específico"
+      },
+      "nz-3m": {
+        "name": "Nueva Zelanda · extensión",
+        "detail": "3 meses de trabajo de temporada (90 días)"
+      }
+    },
+    "rule_label": "Cómo cuentan los días",
+    "rules": {
+      "days_worked": {
+        "label": "Días trabajados",
+        "hint": "Cada día con un turno cuenta una vez. Así cuentan el trabajo casual y a destajo."
+      },
+      "full_time_weeks": {
+        "label": "Semanas completas",
+        "hint": "Una semana con {hours} h o más cuenta los 7 días, fin de semana incluido. Solo si tenías empleo a tiempo completo."
+      }
+    },
+    "period": {
+      "label": "Período",
+      "pick": "Elige las fechas",
+      "hint": "Solo cuentan los turnos de este período. Los turnos sin empleador dentro de él también, en rojo.",
+      "from_first": "Desde el primer turno en {country}"
+    },
+    "countries": {
+      "AU": "Australia",
+      "NZ": "Nueva Zelanda"
+    },
+    "summary": {
+      "title": "Días contados",
+      "of_target": "de {target} días",
+      "remaining": "{count, plural, one {Falta # día} other {Faltan # días}}",
+      "reached": "Objetivo cumplido",
+      "confirmed": "Confirmados",
+      "assumed": "Supuestos",
+      "hours": "{hours} h trabajadas",
+      "progress": "Días contados para llegar a {target}"
+    },
+    "assumed_notice": {
+      "title": "{count, plural, one {# día no tiene empleador} other {# días no tienen empleador}}",
+      "body": "Están dentro del período, así que cuentan como parte del mismo trabajo. Asígnales su empleador (con su país) en el Panel para confirmarlos."
+    },
+    "excluded": "{count, plural, one {Queda fuera # turno de un empleador de otro país.} other {Quedan fuera # turnos de empleadores de otros países.}}",
+    "gaps": {
+      "title": "Pausas",
+      "description": "Más de 3 semanas seguidas sin trabajar.",
+      "none": "Sin pausas de más de 3 semanas.",
+      "days": "{count} días sin trabajo"
+    },
+    "employers": {
+      "title": "Empleadores",
+      "description": "Lo que pide el formulario de la visa de cada uno.",
+      "no_employer": "Turnos sin empleador",
+      "no_country": "Sin país",
+      "assumed_badge": "Supuesto",
+      "days": "{count, plural, one {# día} other {# días}}",
+      "shifts": "{count, plural, one {# turno} other {# turnos}}",
+      "hours": "{hours} h",
+      "dates": "Fechas",
+      "tax_id": "ABN / NZBN",
+      "address": "Dirección",
+      "postcode": "Código postal",
+      "industry": "Rubro",
+      "contact": "Contacto"
+    },
+    "calendar": {
+      "title": "Día por día",
+      "confirmed": "Trabajado",
+      "assumed": "Sin empleador",
+      "filled": "Semana completa",
+      "day_label": "{date}: {status}"
+    },
+    "empty": {
+      "title": "Sin trabajo en este período",
+      "body": "Registra turnos con un empleador de {country}, o cambia las fechas."
+    },
+    "disclaimer": "Una guía para preparar tu solicitud, no un conteo oficial. Revisa los requisitos en la web de inmigración antes de aplicar."
   }
 }

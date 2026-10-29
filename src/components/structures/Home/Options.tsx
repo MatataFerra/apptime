@@ -34,6 +34,11 @@ function Options() {
         description={t("employers.description")}
         path={PATH_NAMES.EMPLOYERS}
       />
+      <HomeCardOption
+        title={t("extensions.title")}
+        description={t("extensions.description")}
+        path={PATH_NAMES.EXTENSIONS}
+      />
     </div>
   );
 }
