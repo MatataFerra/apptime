@@ -4,7 +4,7 @@ import { useMemo } from "react";
 
 import { useLocale } from "next-intl";
 
-import { ChoicePopover } from "@/components/ui/Choice";
+import { type ChoiceOption, ChoicePopover } from "@/components/ui/Choice";
 
 import { COUNTRIES } from "@/utils/constants/countries";
 import getCountryData from "@/utils/helpers/getCountryData";
@@ -19,6 +19,11 @@ type Props = {
   placeholder: string;
   searchPlaceholder: string;
   onChange: (country: string) => void;
+  /** Adds a last option that clears the country (value ""), with this label. */
+  clearLabel?: string;
+  /** "filled" highlights a country the app filled in. */
+  tone?: "filled";
+  testId?: string;
 };
 
 /**
@@ -26,7 +31,17 @@ type Props = {
  * language, A to Z, with a search box that also matches the English name.
  * The value stays the English name, which is what is saved.
  */
-function CountrySelect({ id, label, value, placeholder, searchPlaceholder, onChange }: Props) {
+function CountrySelect({
+  id,
+  label,
+  value,
+  placeholder,
+  searchPlaceholder,
+  onChange,
+  clearLabel,
+  tone,
+  testId,
+}: Props) {
   const regionName = useRegionName();
   const locale = useLocale();
 
@@ -38,17 +53,21 @@ function CountrySelect({ id, label, value, placeholder, searchPlaceholder, onCha
         flag: getCountryData(country.name).flag,
       }))
         .sort((a, b) => a.name.localeCompare(b.name, locale))
-        .map(({ value, name, flag }) => ({
+        .map(({ value, name, flag }): ChoiceOption => ({
           value,
           label: `${flag} ${name}`,
           keywords: value,
         })),
     [regionName, locale]
   );
+  const all = clearLabel
+    ? [...options, { value: "", label: clearLabel, muted: true, separated: true }]
+    : options;
 
+  // A value not on the list (saved before the picker) shows as it was typed.
   function display(country: string) {
     const { flag, countryId } = getCountryData(country);
-    return `${flag} ${regionName(countryId, country)}`;
+    return countryId ? `${flag} ${regionName(countryId, country)}` : country;
   }
 
   return (
@@ -60,8 +79,10 @@ function CountrySelect({ id, label, value, placeholder, searchPlaceholder, onCha
       display={display}
       placeholder={placeholder}
       searchPlaceholder={searchPlaceholder}
-      options={options}
+      options={all}
       onChange={onChange}
+      tone={tone}
+      testId={testId}
     />
   );
 }
