@@ -13,6 +13,7 @@ import { attribution, defaultRegistry, isRegistryId } from "@/services/Registry/
 
 import type { SavedEmployer } from "@/types";
 
+import AuPostcodeHint from "@/components/structures/Employers/AuPostcodeHint";
 import BusinessLookup, {
   type BusinessSource,
 } from "@/components/structures/Employers/BusinessLookup";
@@ -388,6 +389,16 @@ function EmployerForm({
           {field("region")}
           {countryField()}
         </div>
+        {canonicalCountry(text.country) === "Australia" ? (
+          <AuPostcodeHint
+            postcode={text.postcode}
+            region={text.region}
+            onUseState={(state) => {
+              setText((current) => ({ ...current, region: state }));
+              edited("region");
+            }}
+          />
+        ) : null}
       </Group>
 
       <Group title={t("groups.contact")}>
