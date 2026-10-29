@@ -157,6 +157,34 @@
       "body": "You asked to use this address for your CasualApp account. Confirm it with the button below; the link works for one hour.",
       "button": "Confirm my email",
       "not_you": "Wasn't you? Ignore this email: nothing changes in the account."
+    },
+    "security": {
+      "greeting": "Hi, {name}.",
+      "device": "From: {device}.",
+      "on": "{browser} on {os}",
+      "reset_button": "Reset my password",
+      "footer": "CasualApp · We send these notices to keep your account safe; you can't turn them off.",
+      "password_changed": {
+        "subject": "Your CasualApp password was changed",
+        "preview": "If it was you, there's nothing to do.",
+        "title": "Your password was changed",
+        "body": "The password of your CasualApp account was just changed. If it was you, there's nothing else to do.",
+        "not_you": "Wasn't you? Someone may have your password. Reset it now: the link goes to this address only."
+      },
+      "password_created": {
+        "subject": "A password was added to your CasualApp account",
+        "preview": "You can now sign in with your email too.",
+        "title": "Your account has a password now",
+        "body": "A password was added to your CasualApp account, so you can now also sign in with your email and that password.",
+        "not_you": "Wasn't you? Reset the password now: the link goes to this address only."
+      },
+      "email_change": {
+        "subject": "Someone asked to change your CasualApp email",
+        "preview": "The change only applies if the new address confirms it.",
+        "title": "A request to change your email",
+        "body": "Someone asked to change the email of your CasualApp account to {email}. It only applies once that address confirms it.",
+        "not_you": "Wasn't you? Someone may have your password. Reset it now so they can't confirm the change."
+      }
     }
   },
   "shift": {

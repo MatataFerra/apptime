@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 
 import PasswordService from "@/services/Auth/password";
+import { sendSecurityNotice } from "@/services/Email/security";
 
 import type { ActionResult } from "@/types/i18n";
 
@@ -87,10 +88,21 @@ export async function setAccountPassword(newPassword: string): Promise<ActionRes
     return { response: false, error: "password_invalid" };
   }
 
+  const requestHeaders = await headers();
   try {
-    await auth.api.setPassword({ body: { newPassword }, headers: await headers() });
-    return { response: true };
+    await auth.api.setPassword({ body: { newPassword }, headers: requestHeaders });
   } catch {
     return { response: false, error: "password_already_set" };
   }
+
+  const session = await getSession();
+  if (session) {
+    await sendSecurityNotice({
+      to: session.user.email,
+      name: session.user.name,
+      kind: "password_created",
+      headers: requestHeaders,
+    });
+  }
+  return { response: true };
 }

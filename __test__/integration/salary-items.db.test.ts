@@ -39,8 +39,9 @@ vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("resend", () => ({
   Resend: class {
     emails = {
-      send: async ({ to, react }: { to: string; react: unknown }) => {
-        env.emails.push({ to, html: JSON.stringify(react) });
+      // Emails go out rendered (services/Email): html and text.
+      send: async ({ to, html }: { to: string; html: string }) => {
+        env.emails.push({ to, html });
         return { data: { id: "email-1" }, error: null };
       },
     };
