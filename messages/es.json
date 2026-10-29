@@ -925,7 +925,20 @@
       "country_none": "Sin país",
       "country_unknown": "“{value}” no está en la lista: elige el país.",
       "country_suggest": "“{value}” no está en la lista. ¿Quisiste decir {country}?",
-      "country_use": "Usar {country}"
+      "country_use": "Usar {country}",
+      "au_postcode": {
+        "four_digits": "Los códigos postales de Australia tienen 4 dígitos.",
+        "unknown": "{postcode} no es un código postal de Australia.",
+        "no_area": "{postcode} no está en una zona de trabajo específico (es zona urbana): el trabajo aquí no cuenta para la 2.ª o 3.ª Working Holiday, salvo el de recuperación.",
+        "areas": "{postcode} está en: {areas}. Que el trabajo cuente depende también del rubro.",
+        "state_mismatch": "{postcode} es un código postal de {state}, no de {typed}.",
+        "use_state": "Usar {state}",
+        "area": {
+          "regional": "Regional Australia",
+          "northern": "Northern Australia",
+          "remote": "Remote Australia"
+        }
+      }
     },
     "paste": {
       "label": "Pega cualquier texto con sus datos: una firma de email, un recibo de sueldo, el aviso de trabajo",

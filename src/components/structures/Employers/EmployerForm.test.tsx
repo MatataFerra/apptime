@@ -216,4 +216,41 @@ describe("EmployerForm helpers", () => {
     expect(screen.getByTestId("employer-country")).toHaveTextContent("Australia");
     expect(screen.queryByText(/isn't on the list/)).toBeNull();
   });
+
+  test("an Australian postcode says its specified-work areas and fixes the state", async () => {
+    const { user } = setup();
+
+    await user.click(screen.getByTestId("employer-country"));
+    await user.type(screen.getByRole("searchbox", { name: "Search country" }), "austral");
+    await user.click(screen.getByRole("option", { name: /Australia/ }));
+
+    await user.type(screen.getByLabelText("Postcode"), "4870");
+    const hint = screen.getByTestId("au-postcode-hint");
+    expect(hint).toHaveTextContent(
+      "4870 is in: Regional Australia · Northern Australia · Remote Australia"
+    );
+    // No state yet: offered from the postcode.
+    await user.click(within(hint).getByRole("button", { name: "Use QLD" }));
+    expect((screen.getByLabelText("State or region") as HTMLInputElement).value).toBe("QLD");
+
+    const region = screen.getByLabelText("State or region");
+    await user.clear(region);
+    await user.type(region, "VIC");
+    expect(screen.getByTestId("au-postcode-hint")).toHaveTextContent(
+      "4870 is a QLD postcode, not VIC."
+    );
+
+    const postcode = screen.getByLabelText("Postcode");
+    await user.clear(postcode);
+    await user.type(postcode, "3000");
+    expect(screen.getByTestId("au-postcode-hint")).toHaveTextContent(
+      "3000 isn't in a specified-work area"
+    );
+  });
+
+  test("no postcode hint outside Australia", async () => {
+    const { user } = setup();
+    await user.type(screen.getByLabelText("Postcode"), "4870");
+    expect(screen.queryByTestId("au-postcode-hint")).toBeNull();
+  });
 });
