@@ -919,7 +919,13 @@
       "cancel": "Cancelar",
       "saving": "Guardando…",
       "save": "Guardar",
-      "add": "Agregar empleador"
+      "add": "Agregar empleador",
+      "country_placeholder": "Elegir",
+      "country_search": "Busca un país",
+      "country_none": "Sin país",
+      "country_unknown": "“{value}” no está en la lista: elige el país.",
+      "country_suggest": "“{value}” no está en la lista. ¿Quisiste decir {country}?",
+      "country_use": "Usar {country}"
     },
     "paste": {
       "label": "Pega cualquier texto con sus datos: una firma de email, un recibo de sueldo, el aviso de trabajo",

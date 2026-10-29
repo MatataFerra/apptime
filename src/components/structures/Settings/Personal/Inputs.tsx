@@ -4,8 +4,8 @@ import { useId } from "react";
 
 import { useTranslations } from "next-intl";
 
-import CountrySelect from "@/components/structures/Settings/Personal/CountrySelect";
 import { FIELD, Row } from "@/components/structures/Settings/Preferences/Section";
+import CountrySelect from "@/components/structures/share/CountrySelect";
 import Skeleton from "@/components/ui/Skeleton";
 
 import useSettings from "@/hooks/useSettings";

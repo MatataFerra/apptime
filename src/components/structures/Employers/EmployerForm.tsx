@@ -5,6 +5,7 @@ import { type ReactNode, useId, useState } from "react";
 import { ClipboardPaste, Database, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+import { canonicalCountry, countryForCurrency, suggestCountry } from "@/services/Employer/country";
 import { currencyForCountry } from "@/services/Employer/currency";
 import type { PastedEmployer, PasteField } from "@/services/Employer/paste";
 import { type EmployerInput, EmployerInputSchema, fieldErrors } from "@/services/Employer/schema";
@@ -16,14 +17,17 @@ import BusinessLookup, {
   type BusinessSource,
 } from "@/components/structures/Employers/BusinessLookup";
 import PasteDetails from "@/components/structures/Employers/PasteDetails";
+import CountrySelect from "@/components/structures/share/CountrySelect";
 import Button from "@/components/ui/Button";
 import { ChoicePopover } from "@/components/ui/Choice";
 
 import { CURRENCIES, currencySymbol } from "@/utils/constants/currencies";
+import getCountryData from "@/utils/helpers/getCountryData";
 import { cn } from "@/utils/helpers/styleMerger";
 import useCurrencyName from "@/hooks/useCurrencyName";
 import useErrorMessage from "@/hooks/useErrorMessage";
 import { useCurrency } from "@/hooks/useMoney";
+import useRegionName from "@/hooks/useRegionName";
 import useZodI18n from "@/hooks/useZodI18n";
 
 type Errors = Partial<Record<keyof EmployerInput, string>>;
@@ -49,10 +53,11 @@ const TEXT_FIELDS = [
 type TextField = (typeof TEXT_FIELDS)[number];
 
 function initialText(employer?: SavedEmployer) {
-  return Object.fromEntries(TEXT_FIELDS.map((field) => [field, employer?.[field] ?? ""])) as Record<
-    TextField,
-    string
-  >;
+  const text = Object.fromEntries(
+    TEXT_FIELDS.map((field) => [field, employer?.[field] ?? ""])
+  ) as Record<TextField, string>;
+  // Saved before the picker as "NZ" or "Nueva Zelanda": shown as the picker's name.
+  return { ...text, country: canonicalCountry(text.country) ?? text.country };
 }
 
 function Group({ title, children }: { title: string; children: ReactNode }) {
@@ -120,6 +125,7 @@ function EmployerForm({
   const t = useTranslations("employers.form");
   const tf = useTranslations("employers.fields");
   const errorMessage = useErrorMessage();
+  const regionName = useRegionName();
   const [text, setText] = useState(() => initialText(employer));
   const [rate, setRate] = useState(
     employer?.defaultRate != null ? String(employer.defaultRate) : ""
@@ -142,12 +148,17 @@ function EmployerForm({
   const shown = { ...serverErrors, ...errors };
 
   function fill(values: PastedEmployer, guesses: PasteField[] = []) {
-    const entries = Object.entries(values).filter(([, v]) => v?.trim()) as [TextField, string][];
+    // "Deutschland" -> "Germany"; a misspelling stays, with a suggestion under the field.
+    const country = values.country && (canonicalCountry(values.country) ?? values.country.trim());
+    const entries = Object.entries({ ...values, country }).filter(([, v]) => v?.trim()) as [
+      TextField,
+      string,
+    ][];
     setText((current) => ({ ...current, ...Object.fromEntries(entries) }));
     setFilled(new Set(entries.map(([field]) => field)));
     setGuessed(new Set(guesses));
     // An employer in New Zealand pays in NZD, one in Germany in EUR…
-    const paidIn = currencyForCountry(values.country);
+    const paidIn = currencyForCountry(country);
     if (paidIn) setCurrency(paidIn);
     setCurrencyFilled(!!paidIn);
     setHelper(null);
@@ -157,6 +168,81 @@ function EmployerForm({
     if (!filled.has(name)) return;
     setFilled((current) => new Set([...current].filter((f) => f !== name)));
     setGuessed((current) => new Set([...current].filter((f) => f !== name)));
+  }
+
+  /** The country picked (or ""), and the currency it pays in unless one was chosen. */
+  function pickCountry(country: string) {
+    setText((current) => ({ ...current, country }));
+    edited("country");
+    const paidIn = currencyForCountry(country);
+    if (paidIn && (currency === "" || currencyFilled)) {
+      setCurrency(paidIn);
+      setCurrencyFilled(true);
+    }
+  }
+
+  /** The currency picked; AUD or NZD also say the country, when it's empty. */
+  function pickCurrency(code: string) {
+    setCurrency(code);
+    setCurrencyFilled(false);
+    const country = countryForCurrency(code);
+    if (country && !text.country.trim()) {
+      setText((current) => ({ ...current, country }));
+      setFilled((current) => new Set([...current, "country"]));
+    }
+  }
+
+  function countryField() {
+    const id = `${baseId}-country`;
+    const value = text.country.trim();
+    const error = shown.country ? errorMessage(shown.country) : undefined;
+    // Not on the list: typed before the picker, or pasted with a typo.
+    const unknown = value !== "" && !canonicalCountry(value);
+    const suggestion = unknown ? suggestCountry(value) : null;
+    const suggested = suggestion
+      ? `${getCountryData(suggestion).flag} ${regionName(getCountryData(suggestion).countryId, suggestion)}`
+      : "";
+    return (
+      <div className="flex flex-col gap-1 text-[0.8125rem] text-ink-muted">
+        <label htmlFor={id}>{tf("country")}</label>
+        <CountrySelect
+          id={id}
+          label={tf("country")}
+          value={value}
+          placeholder={t("country_placeholder")}
+          searchPlaceholder={t("country_search")}
+          clearLabel={t("country_none")}
+          tone={filled.has("country") ? "filled" : undefined}
+          testId="employer-country"
+          onChange={pickCountry}
+        />
+        {unknown && !error ? (
+          <span id={`${id}-hint`} className="flex flex-col items-start gap-1 text-[0.75rem]">
+            <span className="text-destructive">
+              {suggestion
+                ? t("country_suggest", { value, country: suggested })
+                : t("country_unknown", { value })}
+            </span>
+            {suggestion ? (
+              <button
+                type="button"
+                onClick={() => pickCountry(suggestion)}
+                className="font-semibold text-accent"
+              >
+                {t("country_use", { country: suggested })}
+              </button>
+            ) : null}
+          </span>
+        ) : guessed.has("country") && !error ? (
+          <span className="text-[0.75rem] text-ink-muted">{t("guessed")}</span>
+        ) : null}
+        {error ? (
+          <span id={`${id}-error`} className="text-[0.8125rem] text-destructive">
+            {error}
+          </span>
+        ) : null}
+      </div>
+    );
   }
 
   function field(name: TextField, props: { type?: string; inputMode?: "email" | "tel" } = {}) {
@@ -300,7 +386,7 @@ function EmployerForm({
         </div>
         <div className="grid grid-cols-2 gap-2">
           {field("region")}
-          {field("country")}
+          {countryField()}
         </div>
       </Group>
 
@@ -359,10 +445,7 @@ function EmployerForm({
                   separated: true,
                 },
               ]}
-              onChange={(code) => {
-                setCurrency(code);
-                setCurrencyFilled(false);
-              }}
+              onChange={pickCurrency}
             />
           </div>
         </div>

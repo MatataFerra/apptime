@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { canonicalCountry } from "@/services/Employer/country";
+
 import { isCurrency } from "@/utils/constants/currencies";
 
 /** Optional text: trimmed, and empty means "not set" (null). */
@@ -24,7 +26,8 @@ export const EmployerInputSchema = z
     city: optional(80),
     region: optional(80),
     postcode: optional(20),
-    country: optional(80),
+    // "NZ", "Nueva Zelanda"… are saved as the picker's "New Zealand".
+    country: optional(80).transform((value) => canonicalCountry(value) ?? value),
     industry: optional(80),
     contactName: optional(80),
     contactEmail: optional(120).refine(

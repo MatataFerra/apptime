@@ -85,4 +85,15 @@ describe("EmployerInputSchema", () => {
       expect(EmployerInputSchema.safeParse({ name: "Kiwi", source }).success).toBe(false);
     }
   });
+
+  test("saves the country as the picker's English name", () => {
+    expect(EmployerInputSchema.parse({ name: "Kiwi", country: "Nueva Zelanda" }).country).toBe(
+      "New Zealand"
+    );
+    expect(EmployerInputSchema.parse({ name: "Farm", country: "AU" }).country).toBe("Australia");
+    // A typo isn't guessed on the server: the form offers the fix.
+    expect(EmployerInputSchema.parse({ name: "Kiwi", country: "New Zeland" }).country).toBe(
+      "New Zeland"
+    );
+  });
 });

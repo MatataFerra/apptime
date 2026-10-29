@@ -919,7 +919,13 @@
       "cancel": "Cancel",
       "saving": "Saving…",
       "save": "Save",
-      "add": "Add employer"
+      "add": "Add employer",
+      "country_placeholder": "Choose",
+      "country_search": "Search country",
+      "country_none": "No country",
+      "country_unknown": "“{value}” isn't on the list: choose the country.",
+      "country_suggest": "“{value}” isn't on the list. Did you mean {country}?",
+      "country_use": "Use {country}"
     },
     "paste": {
       "label": "Paste anything with their details: an email signature, a payslip, the job ad",
