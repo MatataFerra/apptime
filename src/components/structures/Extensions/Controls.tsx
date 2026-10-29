@@ -8,6 +8,7 @@ import { CalendarDays, Check, ChevronDown, RotateCcw } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import {
+  type AuSubclass,
   type CountingRule,
   VISA_PROGRAMS,
   type VisaCountry,
@@ -136,6 +137,49 @@ export function RulePicker({
       <p className="px-1 text-[0.8125rem] text-ink-muted">
         {t(`rules.${value}.hint`, { hours: program.fullTimeHours })}
       </p>
+    </section>
+  );
+}
+
+/** 417 / 462: which Australian visa, since the work that counts differs. */
+export function SubclassPicker({
+  program,
+  value,
+  onChange,
+}: {
+  program: VisaProgram;
+  value: AuSubclass;
+  onChange: (subclass: AuSubclass) => void;
+}) {
+  const t = useTranslations("extensions");
+  if (!program.subclasses || program.subclasses.length < 2) return null;
+
+  return (
+    <section className="flex flex-col gap-2" aria-labelledby="visa-subclass-label">
+      <Label id="visa-subclass-label">{t("subclass_label")}</Label>
+      <div
+        role="radiogroup"
+        aria-labelledby="visa-subclass-label"
+        className="grid grid-cols-2 gap-1 rounded-xl bg-surface-sunken p-1"
+      >
+        {program.subclasses.map((subclass) => (
+          <button
+            key={subclass}
+            type="button"
+            role="radio"
+            aria-checked={subclass === value}
+            data-testid={`visa-subclass-${subclass}`}
+            onClick={() => onChange(subclass)}
+            className={cn(
+              "flex h-11 flex-col items-center justify-center rounded-lg px-2 leading-tight transition-colors focus-visible:ring-3 focus-visible:ring-accent/15 focus-visible:outline-hidden",
+              subclass === value ? "bg-surface text-ink shadow-sm" : "text-ink-muted hover:text-ink"
+            )}
+          >
+            <span className="text-sm font-semibold">{subclass}</span>
+            <span className="text-[0.6875rem]">{t(`subclasses.${subclass}`)}</span>
+          </button>
+        ))}
+      </div>
     </section>
   );
 }

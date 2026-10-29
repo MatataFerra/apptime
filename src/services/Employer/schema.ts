@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { canonicalCountry } from "@/services/Employer/country";
+import { isVisaWorkType } from "@/services/VisaReport/eligibility";
 
 import { isCurrency } from "@/utils/constants/currencies";
 
@@ -29,6 +30,12 @@ export const EmployerInputSchema = z
     // "NZ", "Nueva Zelanda"… are saved as the picker's "New Zealand".
     country: optional(80).transform((value) => canonicalCountry(value) ?? value),
     industry: optional(80),
+    visaWorkType: z
+      .string()
+      .nullish()
+      .transform((value) => value || null)
+      .refine((value) => value === null || isVisaWorkType(value), "employer_work_type_invalid"),
+    workPostcode: optional(20),
     contactName: optional(80),
     contactEmail: optional(120).refine(
       (value) => value === null || z.string().email().safeParse(value).success,

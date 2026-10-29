@@ -99,7 +99,8 @@
     "password_wrong": "The current password isn't right",
     "email_same": "That's already your email",
     "session_not_fresh": "For your security, sign out and back in to do this",
-    "google_link_failed": "Couldn't link Google. Use the Google account with your same email."
+    "google_link_failed": "Couldn't link Google. Use the Google account with your same email.",
+    "employer_work_type_invalid": "Pick the kind of work"
   },
   "auth": {
     "go_home": "Go back to home",
@@ -904,7 +905,8 @@
       "contactName": "Person",
       "contactEmail": "Email",
       "contactPhone": "Phone",
-      "notes": "Notes"
+      "notes": "Notes",
+      "workPostcode": "Work postcode"
     },
     "form": {
       "lookup": "Look up business",
@@ -916,7 +918,8 @@
         "business": "Business",
         "where": "Where",
         "contact": "Contact",
-        "pay": "Usual pay"
+        "pay": "Usual pay",
+        "visa": "Visa"
       },
       "per_hour": "Per hour",
       "currency": "Currency",
@@ -944,6 +947,22 @@
           "northern": "Northern Australia",
           "remote": "Remote Australia"
         }
+      },
+      "work_type": "Kind of work for the visa",
+      "work_type_placeholder": "Choose",
+      "work_type_none": "Not set",
+      "work_postcode_hint": "Only if the work is done somewhere else than the address: a labour hire office in the city, the farm elsewhere.",
+      "visa_hint": "What the visa extension counts depends on it.",
+      "eligibility": {
+        "visa_417": "417",
+        "visa_462": "462",
+        "visa_NZ": "NZ extension",
+        "eligible": "counts",
+        "work_type": "this work doesn't count",
+        "area": "doesn't count at {postcode}",
+        "no_postcode": "add the postcode to check",
+        "recovery": "only in declared areas: check on Home Affairs",
+        "no_work_type": "choose the kind of work"
       }
     },
     "paste": {
@@ -1089,11 +1108,12 @@
       "confirmed": "Confirmed",
       "assumed": "Assumed",
       "hours": "{hours} h worked",
-      "progress": "Days counted towards {target}"
+      "progress": "Days counted towards {target}",
+      "not_eligible": "{count, plural, one {# day worked doesn't count: the work doesn't qualify for this visa or there.} other {# days worked don't count: the work doesn't qualify for this visa or there.}}"
     },
     "assumed_notice": {
-      "title": "{count, plural, one {# day has no employer} other {# days have no employer}}",
-      "body": "They're inside the period, so they count as part of the same work. Set their employer (with its country) in the Dashboard to confirm them."
+      "title": "{count, plural, one {# day to confirm} other {# days to confirm}}",
+      "body": "They count, but something is missing: the shift's employer (with its country), or the employer's kind of work and postcode. Complete them in the Dashboard or in Employers."
     },
     "excluded": "{count, plural, one {# shift for an employer in another country is left out.} other {# shifts for employers in other countries are left out.}}",
     "gaps": {
@@ -1116,19 +1136,48 @@
       "address": "Address",
       "postcode": "Postcode",
       "industry": "Industry",
-      "contact": "Contact"
+      "contact": "Contact",
+      "work_type": "Kind of work",
+      "work_postcode": "Work postcode",
+      "not_eligible_badge": "Doesn't count",
+      "reasons": {
+        "no_country": "No country set",
+        "no_work_type": "No kind of work set",
+        "no_postcode": "No postcode to check the area",
+        "recovery": "Recovery work: check it's in a declared area",
+        "work_type": "This work doesn't count for this visa",
+        "area": "{postcode} isn't in an area where this work counts"
+      }
     },
     "calendar": {
       "title": "Day by day",
       "confirmed": "Worked",
       "assumed": "Without employer",
       "filled": "Full-time week",
-      "day_label": "{date}: {status}"
+      "day_label": "{date}: {status}",
+      "not_eligible": "Doesn't count"
     },
     "empty": {
       "title": "No work in this period",
       "body": "Log shifts with an employer in {country}, or change the dates."
     },
-    "disclaimer": "A guide to prepare your application, not an official count. Check the requirements on the immigration website before applying."
+    "disclaimer": "A guide to prepare your application, not an official count. Check the requirements on the immigration website before applying.",
+    "work_types": {
+      "plant_animal_cultivation": "Plant and animal cultivation (farm work)",
+      "fishing_pearling": "Fishing and pearling",
+      "tree_farming_felling": "Tree farming and felling",
+      "mining": "Mining",
+      "construction": "Construction",
+      "tourism_hospitality": "Tourism and hospitality",
+      "recovery": "Bushfire or disaster recovery",
+      "horticulture": "Horticulture (planting, picking, packing crops)",
+      "viticulture": "Viticulture (vineyards)",
+      "other": "Other (doesn't count)"
+    },
+    "subclass_label": "Your visa",
+    "subclasses": {
+      "417": "Working Holiday",
+      "462": "Work and Holiday"
+    }
   }
 }

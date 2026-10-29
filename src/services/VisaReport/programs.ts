@@ -26,6 +26,8 @@ export type VisaProgram = {
   rules: CountingRule[];
   /** Hours in a week from which `full_time_weeks` counts the whole week. */
   fullTimeHours: number;
+  /** Visa subclasses with different rules (Australia: 417 and 462); the first is the default. */
+  subclasses?: ("417" | "462")[];
 };
 
 /**
@@ -42,6 +44,7 @@ export const VISA_PROGRAMS: VisaProgram[] = [
     targetDays: 88,
     rules: ["days_worked", "full_time_weeks"],
     fullTimeHours: 35,
+    subclasses: ["417", "462"],
   },
   {
     id: "au-179",
@@ -49,6 +52,7 @@ export const VISA_PROGRAMS: VisaProgram[] = [
     targetDays: 179,
     rules: ["days_worked", "full_time_weeks"],
     fullTimeHours: 35,
+    subclasses: ["417", "462"],
   },
   {
     id: "nz-3m",

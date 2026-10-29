@@ -99,7 +99,8 @@
     "password_wrong": "La contraseña actual no es correcta",
     "email_same": "Ese ya es tu email",
     "session_not_fresh": "Por seguridad, cierra sesión y vuelve a entrar para hacer esto",
-    "google_link_failed": "No se pudo vincular Google. Usa la cuenta de Google con tu mismo email."
+    "google_link_failed": "No se pudo vincular Google. Usa la cuenta de Google con tu mismo email.",
+    "employer_work_type_invalid": "Elige el tipo de trabajo"
   },
   "auth": {
     "go_home": "Volver al inicio",
@@ -904,7 +905,8 @@
       "contactName": "Persona",
       "contactEmail": "Email",
       "contactPhone": "Teléfono",
-      "notes": "Notas"
+      "notes": "Notas",
+      "workPostcode": "C. P. de trabajo"
     },
     "form": {
       "lookup": "Buscar empresa",
@@ -916,7 +918,8 @@
         "business": "Empresa",
         "where": "Dónde",
         "contact": "Contacto",
-        "pay": "Pago habitual"
+        "pay": "Pago habitual",
+        "visa": "Visa"
       },
       "per_hour": "Por hora",
       "currency": "Moneda",
@@ -944,6 +947,22 @@
           "northern": "Northern Australia",
           "remote": "Remote Australia"
         }
+      },
+      "work_type": "Tipo de trabajo para la visa",
+      "work_type_placeholder": "Elegir",
+      "work_type_none": "Sin definir",
+      "work_postcode_hint": "Solo si el trabajo es en otro lugar que la dirección: una agencia en la ciudad y la granja en otro lado.",
+      "visa_hint": "De esto depende lo que cuenta la extensión de visa.",
+      "eligibility": {
+        "visa_417": "417",
+        "visa_462": "462",
+        "visa_NZ": "Extensión NZ",
+        "eligible": "cuenta",
+        "work_type": "este trabajo no cuenta",
+        "area": "no cuenta en {postcode}",
+        "no_postcode": "agrega el código postal para revisarlo",
+        "recovery": "solo en zonas declaradas: revísalo en Home Affairs",
+        "no_work_type": "elige el tipo de trabajo"
       }
     },
     "paste": {
@@ -1089,11 +1108,12 @@
       "confirmed": "Confirmados",
       "assumed": "Supuestos",
       "hours": "{hours} h trabajadas",
-      "progress": "Días contados para llegar a {target}"
+      "progress": "Días contados para llegar a {target}",
+      "not_eligible": "{count, plural, one {# día trabajado no cuenta: el trabajo no califica para esta visa o en ese lugar.} other {# días trabajados no cuentan: el trabajo no califica para esta visa o en ese lugar.}}"
     },
     "assumed_notice": {
-      "title": "{count, plural, one {# día no tiene empleador} other {# días no tienen empleador}}",
-      "body": "Están dentro del período, así que cuentan como parte del mismo trabajo. Asígnales su empleador (con su país) en el Panel para confirmarlos."
+      "title": "{count, plural, one {# día por confirmar} other {# días por confirmar}}",
+      "body": "Cuentan, pero falta algo: el empleador del turno (con su país), o el tipo de trabajo y el código postal del empleador. Complétalos en el Panel o en Empleadores."
     },
     "excluded": "{count, plural, one {Queda fuera # turno de un empleador de otro país.} other {Quedan fuera # turnos de empleadores de otros países.}}",
     "gaps": {
@@ -1116,19 +1136,48 @@
       "address": "Dirección",
       "postcode": "Código postal",
       "industry": "Rubro",
-      "contact": "Contacto"
+      "contact": "Contacto",
+      "work_type": "Tipo de trabajo",
+      "work_postcode": "C. P. de trabajo",
+      "not_eligible_badge": "No cuenta",
+      "reasons": {
+        "no_country": "Sin país",
+        "no_work_type": "Sin tipo de trabajo",
+        "no_postcode": "Sin código postal para revisar la zona",
+        "recovery": "Recuperación: revisa que sea una zona declarada",
+        "work_type": "Este trabajo no cuenta para esta visa",
+        "area": "{postcode} no está en una zona donde este trabajo cuente"
+      }
     },
     "calendar": {
       "title": "Día por día",
       "confirmed": "Trabajado",
       "assumed": "Sin empleador",
       "filled": "Semana completa",
-      "day_label": "{date}: {status}"
+      "day_label": "{date}: {status}",
+      "not_eligible": "No cuenta"
     },
     "empty": {
       "title": "Sin trabajo en este período",
       "body": "Registra turnos con un empleador de {country}, o cambia las fechas."
     },
-    "disclaimer": "Una guía para preparar tu solicitud, no un conteo oficial. Revisa los requisitos en la web de inmigración antes de aplicar."
+    "disclaimer": "Una guía para preparar tu solicitud, no un conteo oficial. Revisa los requisitos en la web de inmigración antes de aplicar.",
+    "work_types": {
+      "plant_animal_cultivation": "Cultivo de plantas y animales (granja)",
+      "fishing_pearling": "Pesca y perlas",
+      "tree_farming_felling": "Forestación y tala",
+      "mining": "Minería",
+      "construction": "Construcción",
+      "tourism_hospitality": "Turismo y hospitalidad",
+      "recovery": "Recuperación de incendios o desastres",
+      "horticulture": "Horticultura (plantar, cosechar, empacar)",
+      "viticulture": "Viticultura (viñedos)",
+      "other": "Otro (no cuenta)"
+    },
+    "subclass_label": "Tu visa",
+    "subclasses": {
+      "417": "Working Holiday",
+      "462": "Work and Holiday"
+    }
   }
 }
