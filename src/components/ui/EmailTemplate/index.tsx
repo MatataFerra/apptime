@@ -1,6 +1,9 @@
 import type { Locale } from "@/types";
 
+import { PATH_NAMES } from "@/utils/constants/pathnames";
+
 import {
+  appBaseUrl,
   EmailButton,
   EmailFallbackLink,
   EmailHeading,
@@ -62,6 +65,49 @@ export function VerifyEmailTemplate({ firstName, url, locale }: VerifyEmailTempl
       <EmailButton href={url}>{t("email.verify_email.button")}</EmailButton>
       <EmailFallbackLink label={t("email.fallback")} href={url} />
       <EmailNote>{t("email.verify_email.not_you")}</EmailNote>
+    </EmailLayout>
+  );
+}
+
+export type SecurityNoticeKind = "password_changed" | "password_created" | "email_change";
+
+interface SecurityNoticeProps {
+  firstName: string;
+  locale: Locale;
+  kind: SecurityNoticeKind;
+  /** "Safari on iOS", when the request said. */
+  device?: string | null;
+  /** For "email_change": the address asked for. */
+  newEmail?: string;
+}
+
+/**
+ * "Your password was changed" and the like: a heads-up to the account's own
+ * address, with a way back in if it wasn't you (reset the password).
+ */
+export function SecurityNoticeTemplate({
+  firstName,
+  locale,
+  kind,
+  device,
+  newEmail,
+}: SecurityNoticeProps) {
+  const t = translatorFor(locale);
+  const reset = `${appBaseUrl()}${locale}${PATH_NAMES.RESET_PASSWORD}`;
+
+  return (
+    <EmailLayout
+      lang={locale}
+      title={t(`email.security.${kind}.subject`)}
+      preview={t(`email.security.${kind}.preview`)}
+      footer={t("email.security.footer")}
+    >
+      <EmailHeading>{t(`email.security.${kind}.title`)}</EmailHeading>
+      <EmailText>{t("email.security.greeting", { name: firstName })}</EmailText>
+      <EmailText>{t(`email.security.${kind}.body`, { email: newEmail ?? "" })}</EmailText>
+      {device ? <EmailText muted>{t("email.security.device", { device })}</EmailText> : null}
+      <EmailNote>{t(`email.security.${kind}.not_you`)}</EmailNote>
+      <EmailButton href={reset}>{t("email.security.reset_button")}</EmailButton>
     </EmailLayout>
   );
 }

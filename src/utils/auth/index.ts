@@ -1,10 +1,11 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { APIError, createAuthMiddleware } from "better-auth/api";
+import { APIError, createAuthMiddleware, getSessionFromCtx, isAPIError } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 
 import PasswordService from "@/services/Auth/password";
 import { sendEmail } from "@/services/Email";
+import { sendSecurityNotice } from "@/services/Email/security";
 
 import type { Locale } from "@/types";
 
@@ -57,6 +58,15 @@ export const auth = betterAuth({
     autoSignIn: true,
     resetPasswordTokenExpiresIn: 60 * 60,
     revokeSessionsOnPasswordReset: true,
+    // "Your password was changed", to the account's own address.
+    async onPasswordReset({ user }, request) {
+      await sendSecurityNotice({
+        to: user.email,
+        name: user.name,
+        kind: "password_changed",
+        headers: request?.headers,
+      });
+    },
     async sendResetPassword({ user, url, token }) {
       const locale = localeFromCallback(url);
       await sendEmail({
@@ -100,6 +110,38 @@ export const auth = betterAuth({
       const password = field ? (ctx.body as Record<string, unknown> | undefined)?.[field] : null;
       if (typeof password === "string" && !new PasswordService(password).validPassword().valid) {
         throw new APIError("BAD_REQUEST", { message: "Password is not valid" });
+      }
+    }),
+    // Heads-ups to the account's own address once a change went through.
+    after: createAuthMiddleware(async (ctx) => {
+      const returned = ctx.context.returned;
+      if (!returned || isAPIError(returned)) return;
+
+      if (ctx.path === "/change-password") {
+        const user = (returned as { user?: { email: string; name: string } }).user;
+        if (user) {
+          await sendSecurityNotice({
+            to: user.email,
+            name: user.name,
+            kind: "password_changed",
+            headers: ctx.headers,
+          });
+        }
+      }
+
+      if (ctx.path === "/change-email") {
+        // To the current address: if someone else asked, this is how you find out.
+        const session = await getSessionFromCtx(ctx).catch(() => null);
+        const newEmail = (ctx.body as { newEmail?: string } | undefined)?.newEmail;
+        if (session && newEmail) {
+          await sendSecurityNotice({
+            to: session.user.email,
+            name: session.user.name,
+            kind: "email_change",
+            headers: ctx.headers,
+            newEmail: newEmail.toLowerCase(),
+          });
+        }
       }
     }),
   },

@@ -90,7 +90,7 @@ function as(headers: Headers) {
 describe("account and security on a real database", () => {
   beforeAll(async () => {
     await migrate();
-    for (const email of ["ana@x.com", "bob@x.com", "eve@x.com"]) {
+    for (const email of ["ana@x.com", "bob@x.com", "eve@x.com", "dan@x.com", "fay@x.com"]) {
       await auth.api.signUpEmail({ body: { email, password: PASSWORD, name: email[0] } });
     }
   });
@@ -175,9 +175,14 @@ describe("account and security on a real database", () => {
     );
     expect(response.status).toBe(200);
 
+    // The current address is told, with the address asked for.
+    const notice = env.sent.find((m) => m.to === "eve@x.com")!;
+    expect(notice.subject).toBe("Someone asked to change your CasualApp email");
+    expect(notice.text).toContain("eve.new@x.com");
+
     // Still the old one until the link is used; the email went to the new address, in Spanish.
     expect(await prisma.user.findUnique({ where: { email: "eve@x.com" } })).not.toBeNull();
-    const mail = env.sent.at(-1)!;
+    const mail = env.sent.find((m) => m.to === "eve.new@x.com")!;
     expect(mail.to).toBe("eve.new@x.com");
     expect(mail.subject).toBe("Confirma tu nuevo email de CasualApp");
     // Sent with a plain-text part too, which carries the same link.
@@ -190,5 +195,63 @@ describe("account and security on a real database", () => {
     expect(verify.headers.get("location")).toBe("/es/settings?email=updated");
     expect(await prisma.user.findUnique({ where: { email: "eve.new@x.com" } })).not.toBeNull();
     expect(await prisma.user.findUnique({ where: { email: "eve@x.com" } })).toBeNull();
+  });
+
+  function post(path: string, body: unknown, headers: Record<string, string> = {}) {
+    return auth.handler(
+      new Request(`http://localhost:3000/api/auth${path}`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          origin: "http://localhost:3000",
+          ...headers,
+        },
+        body: JSON.stringify(body),
+      })
+    );
+  }
+
+  const IPHONE =
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1";
+
+  test("changing the password tells the account's address, in its language and with the device", async () => {
+    const cookie = (await signIn("dan@x.com")).get("cookie") ?? "";
+    env.sent.length = 0;
+
+    const wrong = await post(
+      "/change-password",
+      { currentPassword: "Nope-1234!", newPassword: "Otra-clave9!" },
+      { cookie }
+    );
+    expect(wrong.status).toBe(400);
+    expect(env.sent).toHaveLength(0); // nothing changed, nothing to tell
+
+    const ok = await post(
+      "/change-password",
+      { currentPassword: PASSWORD, newPassword: "Otra-clave9!" },
+      { cookie: `${cookie}; NEXT_LOCALE=es`, "user-agent": IPHONE }
+    );
+    expect(ok.status).toBe(200);
+    const notice = env.sent.find((m) => m.to === "dan@x.com")!;
+    expect(notice.subject).toBe("Se cambió tu contraseña de CasualApp");
+    expect(notice.text).toContain("Safari en iOS");
+    expect(notice.url).toBe("http://localhost:3000/es/forgot-password");
+  });
+
+  test("resetting it from the email link tells the account too", async () => {
+    env.sent.length = 0;
+    await post("/request-password-reset", {
+      email: "fay@x.com",
+      redirectTo: "http://localhost:3000/en/reset",
+    });
+    const token = /\/reset\/([^/?"]+)/.exec(env.sent.find((m) => m.to === "fay@x.com")!.url)?.[1];
+    expect(token).toBeTruthy();
+
+    env.sent.length = 0;
+    const reset = await post("/reset-password", { token, newPassword: "Nueva-clave9!" });
+    expect(reset.status).toBe(200);
+    expect(env.sent.map((m) => [m.to, m.subject])).toEqual([
+      ["fay@x.com", "Your CasualApp password was changed"],
+    ]);
   });
 });

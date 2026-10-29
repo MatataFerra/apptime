@@ -135,4 +135,85 @@ describe("EmployerForm helpers", () => {
     await user.click(screen.getByRole("button", { name: /add employer/i }));
     expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ defaultCurrency: "GBP" }));
   });
+
+  test("picking AUD with no country fills in Australia", async () => {
+    const { user, onSave } = setup();
+
+    await user.click(screen.getByLabelText("Currency"));
+    await user.click(
+      within(await screen.findByRole("listbox", { name: "Currency" })).getByRole("option", {
+        name: /^AUD ·/,
+      })
+    );
+
+    const country = screen.getByTestId("employer-country");
+    expect(country).toHaveTextContent("Australia");
+    expect(country.className).toMatch(/bg-accent-soft/);
+
+    await user.type(screen.getByLabelText("Name"), "Sunny Farms");
+    await user.click(screen.getByRole("button", { name: /add employer/i }));
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({ country: "Australia", defaultCurrency: "AUD" })
+    );
+  });
+
+  test("the country is picked from a list and sets the currency", async () => {
+    const { user, onSave } = setup();
+
+    await user.click(screen.getByTestId("employer-country"));
+    await user.type(screen.getByRole("searchbox", { name: "Search country" }), "zeal");
+    await user.click(screen.getByRole("option", { name: /New Zealand/ }));
+
+    expect(screen.getByLabelText("Currency")).toHaveTextContent("NZD");
+    await user.type(screen.getByLabelText("Name"), "Kiwi Orchards");
+    await user.click(screen.getByRole("button", { name: /add employer/i }));
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({ country: "New Zealand", defaultCurrency: "NZD" })
+    );
+  });
+
+  test("a misspelt saved country offers the right one", async () => {
+    const onSave = vi.fn();
+    const user = userEvent.setup();
+    renderWithIntl(
+      <EmployerForm
+        busy={false}
+        onCancel={() => {}}
+        onSave={onSave}
+        employer={
+          {
+            id: 1,
+            name: "Kiwi Orchards",
+            country: "New Zeland",
+            defaultCurrency: "NZD",
+            archived: false,
+            shifts: 0,
+          } as never
+        }
+      />
+    );
+
+    expect(screen.getByTestId("employer-country")).toHaveTextContent("New Zeland");
+    expect(
+      screen.getByText(/isn't on the list\. Did you mean .*New Zealand\?/)
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /Use .*New Zealand/ }));
+
+    expect(screen.queryByText(/isn't on the list/)).toBeNull();
+    await user.click(screen.getByRole("button", { name: /save/i }));
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ country: "New Zealand" }));
+  });
+
+  test("a country saved as a code shows as its name", () => {
+    renderWithIntl(
+      <EmployerForm
+        busy={false}
+        onCancel={() => {}}
+        onSave={vi.fn()}
+        employer={{ id: 1, name: "Farm", country: "AU", archived: false, shifts: 0 } as never}
+      />
+    );
+    expect(screen.getByTestId("employer-country")).toHaveTextContent("Australia");
+    expect(screen.queryByText(/isn't on the list/)).toBeNull();
+  });
 });
