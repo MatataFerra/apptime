@@ -931,7 +931,20 @@
       "country_none": "No country",
       "country_unknown": "“{value}” isn't on the list: choose the country.",
       "country_suggest": "“{value}” isn't on the list. Did you mean {country}?",
-      "country_use": "Use {country}"
+      "country_use": "Use {country}",
+      "au_postcode": {
+        "four_digits": "Australian postcodes have 4 digits.",
+        "unknown": "{postcode} isn't an Australian postcode.",
+        "no_area": "{postcode} isn't in a specified-work area (a city area): work here doesn't count towards a 2nd or 3rd Working Holiday visa, except recovery work.",
+        "areas": "{postcode} is in: {areas}. Whether the work counts also depends on the industry.",
+        "state_mismatch": "{postcode} is a {state} postcode, not {typed}.",
+        "use_state": "Use {state}",
+        "area": {
+          "regional": "Regional Australia",
+          "northern": "Northern Australia",
+          "remote": "Remote Australia"
+        }
+      }
     },
     "paste": {
       "label": "Paste anything with their details: an email signature, a payslip, the job ad",
