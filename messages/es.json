@@ -157,6 +157,34 @@
       "body": "Pediste usar esta dirección para tu cuenta de CasualApp. Confírmala con el botón; el enlace funciona durante una hora.",
       "button": "Confirmar mi email",
       "not_you": "¿No fuiste tú? Ignora este email: no cambia nada en la cuenta."
+    },
+    "security": {
+      "greeting": "Hola, {name}.",
+      "device": "Desde: {device}.",
+      "on": "{browser} en {os}",
+      "reset_button": "Restablecer mi contraseña",
+      "footer": "CasualApp · Te enviamos estos avisos para cuidar tu cuenta; no se pueden desactivar.",
+      "password_changed": {
+        "subject": "Se cambió tu contraseña de CasualApp",
+        "preview": "Si fuiste tú, no hace falta hacer nada.",
+        "title": "Se cambió tu contraseña",
+        "body": "Recién se cambió la contraseña de tu cuenta de CasualApp. Si fuiste tú, no hace falta hacer nada más.",
+        "not_you": "¿No fuiste tú? Alguien puede tener tu contraseña. Restablécela ahora: el enlace llega solo a esta dirección."
+      },
+      "password_created": {
+        "subject": "Se agregó una contraseña a tu cuenta de CasualApp",
+        "preview": "Ahora también puedes entrar con tu email.",
+        "title": "Tu cuenta ahora tiene contraseña",
+        "body": "Se agregó una contraseña a tu cuenta de CasualApp, así que ahora también puedes entrar con tu email y esa contraseña.",
+        "not_you": "¿No fuiste tú? Restablece la contraseña ahora: el enlace llega solo a esta dirección."
+      },
+      "email_change": {
+        "subject": "Pidieron cambiar el email de tu cuenta de CasualApp",
+        "preview": "El cambio solo se aplica si la dirección nueva lo confirma.",
+        "title": "Pidieron cambiar tu email",
+        "body": "Pidieron cambiar el email de tu cuenta de CasualApp a {email}. Solo se aplica cuando esa dirección lo confirme.",
+        "not_you": "¿No fuiste tú? Alguien puede tener tu contraseña. Restablécela ahora para que no pueda confirmar el cambio."
+      }
     }
   },
   "shift": {
