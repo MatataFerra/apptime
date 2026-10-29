@@ -179,7 +179,7 @@ describe("account and security on a real database", () => {
     expect(await prisma.user.findUnique({ where: { email: "eve@x.com" } })).not.toBeNull();
     const mail = env.sent.at(-1)!;
     expect(mail.to).toBe("eve.new@x.com");
-    expect(mail.subject).toBe("Confirma tu nuevo email de CasualApp");
+    expect(mail.subject).toBe("Confirma tu nuevo email de NomadShift");
     // Sent with a plain-text part too, which carries the same link.
     expect(mail.text).toContain(mail.url.split("?")[0]);
 

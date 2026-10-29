@@ -50,7 +50,7 @@ function Compatibility() {
         <span className="flex items-center gap-2 text-ink">
           <LogoMark className="size-8" />
           <span className="font-logo text-2xl leading-none font-extrabold tracking-[-0.03em]">
-            casualapp
+            nomadshift
           </span>
         </span>
         <span className="rounded-full border border-border bg-surface px-3.5 py-1.5 text-sm font-medium text-ink-muted">

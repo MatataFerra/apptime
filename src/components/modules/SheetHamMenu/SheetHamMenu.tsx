@@ -57,7 +57,7 @@ function SheetHamMenu({ children }: PropsWithChildren<Props>) {
           <span className="flex items-center gap-1.5 text-ink" aria-hidden="true">
             <LogoMark className="size-7" />
             <span className="font-logo text-[1.375rem] leading-none font-extrabold tracking-[-0.03em]">
-              casualapp
+              nomadshift
             </span>
           </span>
           <SheetTitle asChild>

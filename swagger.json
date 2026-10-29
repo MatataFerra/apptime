@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "CasualApp API",
+    "title": "NomadShift API",
     "version": "2.0.0",
-    "description": "REST endpoints of CasualApp (app-time). Mutations (creating and editing shifts, employers, taxes, settings) go through Next.js server actions and are not part of this API.\n\nEvery endpoint except `POST /waiting-list` needs a signed-in session: the Better Auth session cookie set by `/api/auth/*`. Without it they answer 401. Data is always scoped to the signed-in user."
+    "description": "REST endpoints of NomadShift (app-time). Mutations (creating and editing shifts, employers, taxes, settings) go through Next.js server actions and are not part of this API.\n\nEvery endpoint except `POST /waiting-list` needs a signed-in session: the Better Auth session cookie set by `/api/auth/*`. Without it they answer 401. Data is always scoped to the signed-in user."
   },
   "servers": [
     {

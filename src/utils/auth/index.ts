@@ -42,7 +42,7 @@ const baseURL = process.env.BETTER_AUTH_URL ?? process.env.NEXTAUTH_URL;
  * 5 minutes so most requests don't hit Turso.
  */
 export const auth = betterAuth({
-  appName: "CasualApp",
+  appName: "NomadShift",
   baseURL,
   // Vercel previews live on their own host; let them sign in too.
   trustedOrigins: process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : [],

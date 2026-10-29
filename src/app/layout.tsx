@@ -11,7 +11,7 @@ import "@/app/globals.css";
 import { bricolage, figtree, schibsted } from "./fonts";
 
 export const metadata = {
-  title: "CasualApp",
+  title: "NomadShift",
   description: "Track your hours and see what you earn, shift by shift.",
 };
 
