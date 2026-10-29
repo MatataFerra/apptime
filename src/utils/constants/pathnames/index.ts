@@ -14,6 +14,7 @@ export const PATH_NAMES = {
   SETTINGS: "/settings",
   TAXES: "/taxes",
   EMPLOYERS: "/employers",
+  EXTENSIONS: "/extensions",
   RESET_PASSWORD: "/forgot-password",
   RESET_TOKEN: "/reset",
   RESET_SUCCESS: "/success",
