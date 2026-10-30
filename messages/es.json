@@ -124,7 +124,7 @@
       "login_link": "Iniciar sesión",
       "invalid_body": "Ocurrió un error durante el registro, por favor intenta de nuevo",
       "user_already_exist": "El usuario ya existe",
-      "successful": "Cuenta creada. Confirma tu email en las próximas 8 horas: te enviamos un enlace.",
+      "successful": "Cuenta creada. Confirma tu email: te enviamos un enlace.",
       "max_attempts": "Demasiados intentos, espera un momento antes de volver a intentar",
       "disposable_email": "No se pueden usar emails temporales. Regístrate con un email que vayas a conservar."
     },
@@ -149,7 +149,7 @@
     "verify_email": {
       "title": "Confirma tu email",
       "body": "Te enviamos un enlace a {email}. Ábrelo para seguir usando CasualApp: la cuenta queda en pausa hasta que confirmes la dirección.",
-      "hint": "¿No lo encuentras? Revisa el spam o vuelve a enviarlo. El enlace funciona durante 8 horas.",
+      "hint": "¿No lo encuentras? Revisa el spam o vuelve a enviarlo. El enlace funciona durante 24 horas.",
       "resend": "Enviar el enlace otra vez",
       "sent": "Enlace enviado. Revisa tu bandeja de entrada.",
       "not_sent": "No pudimos enviarlo. Inténtalo de nuevo en un momento.",
@@ -174,13 +174,13 @@
       "signup": {
         "subject": "Confirma tu email de CasualApp",
         "preview": "Confirma tu dirección para seguir usando CasualApp.",
-        "body": "Gracias por registrarte en CasualApp. Confirma tu email con el botón dentro de las próximas 8 horas; pasado ese tiempo, la cuenta queda en pausa hasta que lo confirmes.",
+        "body": "Gracias por registrarte en CasualApp. Confirma tu email con el botón para seguir usando la app; el enlace funciona durante 24 horas.",
         "not_you": "¿No te registraste? Ignora este email: sin confirmar, la cuenta queda en pausa."
       },
       "change": {
         "subject": "Confirma tu nuevo email de CasualApp",
         "preview": "Confirma esta dirección para usarla en tu cuenta.",
-        "body": "Pediste usar esta dirección para tu cuenta de CasualApp. Confírmala con el botón; el enlace funciona durante 8 horas.",
+        "body": "Pediste usar esta dirección para tu cuenta de CasualApp. Confírmala con el botón; el enlace funciona durante 24 horas.",
         "not_you": "¿No fuiste tú? Ignora este email: no cambia nada en la cuenta."
       }
     },

@@ -101,44 +101,44 @@ describe("decideAccess", () => {
   });
 
   describe("an email not confirmed in time", () => {
-    function hours(n: number) {
-      return new Date(Date.now() - n * 60 * 60 * 1000);
+    function minutes(n: number) {
+      return new Date(Date.now() - n * 60 * 1000);
     }
     async function overdue(): Promise<AccessUser> {
       return {
         role: "USER",
         emailVerified: false,
-        createdAt: hours(9),
+        createdAt: minutes(10),
       };
     }
     async function inGrace(): Promise<AccessUser> {
       return {
         role: "USER",
         emailVerified: false,
-        createdAt: hours(7),
+        createdAt: minutes(3),
       };
     }
     async function verified(): Promise<AccessUser> {
       return {
         role: "USER",
         emailVerified: true,
-        createdAt: hours(100),
+        createdAt: minutes(10_000),
       };
     }
 
     test.each(["/es", "/es/track", "/es/settings", "/es/compare", "/es/login", "/es/admin"])(
-      "past 8 hours: %s goes to the confirm page",
+      "past 5 minutes: %s goes to the confirm page",
       async (path) => {
         expect(await decide(path, { getUser: overdue })).toEqual(to("/es/verify-email"));
       }
     );
 
-    test("past 8 hours: the confirm page and the reset link still open", async () => {
+    test("past 5 minutes: the confirm page and the reset link still open", async () => {
       expect(await decide("/es/verify-email", { getUser: overdue })).toEqual(next);
       expect(await decide("/es/reset/abc", { getUser: overdue })).toEqual(next);
     });
 
-    test("within 8 hours, or confirmed: the app as usual, and the confirm page goes Home", async () => {
+    test("within 5 minutes, or confirmed: the app as usual, and the confirm page goes Home", async () => {
       for (const getUser of [inGrace, verified]) {
         expect(await decide("/es/track", { getUser })).toEqual(next);
         expect(await decide("/es/verify-email", { getUser })).toEqual(to("/es"));

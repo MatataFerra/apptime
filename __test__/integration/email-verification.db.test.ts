@@ -1,7 +1,7 @@
 // @vitest-environment node
 /**
  * Email confirmation on a real SQLite database with the real Better Auth
- * instance: the email sent on sign up, the 8-hour grace period, what an
+ * instance: the email sent on sign up, the 5-minute grace period, what an
  * account past it can still do, and no temporary inboxes.
  */
 import { createClient } from "@libsql/client";
@@ -89,11 +89,11 @@ async function signUp(email: string) {
   return post("/sign-up/email", { email, password: PASSWORD, name: email.split("@")[0] });
 }
 
-/** Moves the account's creation back, as if `hours` had passed. */
-async function ageAccount(email: string, hours: number) {
+/** Moves the account's creation back, as if `minutes` had passed. */
+async function ageAccount(email: string, minutes: number) {
   await prisma.user.update({
     where: { email },
-    data: { createdAt: new Date(Date.now() - hours * 60 * 60 * 1000) },
+    data: { createdAt: new Date(Date.now() - minutes * 60 * 1000) },
   });
 }
 
@@ -112,21 +112,25 @@ describe("email confirmation on a real database", () => {
     const mail = env.sent.find((m) => m.to === "ana@x.com");
     expect(mail?.subject).toBe("Confirm your CasualApp email");
     expect(mail?.url).toContain("/api/auth/verify-email?token=");
+    // The link outlives the 5-minute grace: it works for 24 hours.
+    const token = new URL(mail!.url).searchParams.get("token")!;
+    const { iat, exp } = JSON.parse(Buffer.from(token.split(".")[1], "base64url").toString());
+    expect(exp - iat).toBe(24 * 60 * 60);
     expect(
       (await prisma.user.findUniqueOrThrow({ where: { email: "ana@x.com" } })).emailVerified
     ).toBe(false);
   });
 
-  test("within 8 hours the app works as usual", async () => {
+  test("within 5 minutes the app works as usual", async () => {
     await signUp("bob@x.com");
-    await ageAccount("bob@x.com", 7);
+    await ageAccount("bob@x.com", 3);
     const cookie = await signIn("bob@x.com");
     expect((await hourlyAs(cookie)).status).toBe(200);
   });
 
-  test("past 8 hours without confirming: signed in, but the app treats it as signed out", async () => {
+  test("past 5 minutes without confirming: signed in, but the app treats it as signed out", async () => {
     await signUp("cam@x.com");
-    await ageAccount("cam@x.com", 9);
+    await ageAccount("cam@x.com", 10);
     // Signing in still works: the account needs a session to reach the confirm page.
     const cookie = await signIn("cam@x.com");
     expect(cookie).toContain("session_token");
@@ -141,7 +145,7 @@ describe("email confirmation on a real database", () => {
     env.sent.length = 0;
     await signUp("dan@x.com");
     const link = env.sent.find((m) => m.to === "dan@x.com")!.url;
-    await ageAccount("dan@x.com", 9);
+    await ageAccount("dan@x.com", 10);
     const oldCookie = await signIn("dan@x.com");
     expect((await hourlyAs(oldCookie)).status).toBe(401);
 

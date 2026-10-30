@@ -5,7 +5,14 @@
  *
  * No dependencies: the proxy imports this on every page request.
  */
-export const EMAIL_VERIFY_GRACE_MS = 8 * 60 * 60 * 1000;
+export const EMAIL_VERIFY_GRACE_MS = 5 * 60 * 1000;
+
+/**
+ * How long a confirmation link works, in seconds (sign up and email change).
+ * Longer than the grace period on purpose: an email that arrives late, or
+ * lands in spam, still works from the "confirm your email" page.
+ */
+export const EMAIL_VERIFY_LINK_TTL_S = 24 * 60 * 60;
 
 type VerifiableUser = { emailVerified?: boolean | null; createdAt?: Date | string | null };
 

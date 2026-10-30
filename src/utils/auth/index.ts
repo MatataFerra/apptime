@@ -5,7 +5,7 @@ import { nextCookies } from "better-auth/next-js";
 
 import { isDisposableEmail } from "@/services/Auth/disposable";
 import PasswordService from "@/services/Auth/password";
-import { EMAIL_VERIFY_GRACE_MS } from "@/services/Auth/verification";
+import { EMAIL_VERIFY_LINK_TTL_S } from "@/services/Auth/verification";
 import { sendEmail } from "@/services/Email";
 import { sendSecurityNotice } from "@/services/Email/security";
 import { consumeRateLimit } from "@/services/RateLimit";
@@ -125,7 +125,7 @@ export const auth = betterAuth({
     // Signs the browser in (or refreshes its session cookie) when the link
     // is opened, so the restriction lifts right away.
     autoSignInAfterVerification: true,
-    expiresIn: EMAIL_VERIFY_GRACE_MS / 1000,
+    expiresIn: EMAIL_VERIFY_LINK_TTL_S,
     async sendVerificationEmail({ user, url }, request) {
       // user.email is the address being confirmed (the new one on a change).
       if (!(await withinRecipientBudget("verify", user.email))) return;
