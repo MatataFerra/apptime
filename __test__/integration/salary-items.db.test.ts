@@ -411,7 +411,7 @@ describe("auth and taxes on a real database", () => {
     });
   });
 
-  // Last: it changes Ana's email.
+  // Last: it edits Ana's details.
   describe("changing the email in Settings", () => {
     function settings(email: string) {
       return {
@@ -420,20 +420,35 @@ describe("auth and taxes on a real database", () => {
       } as never;
     }
 
-    test("an email someone else has is refused", async () => {
-      const result = await onUpdateSettings(settings("bob@x.com"));
-      expect(result).toMatchObject({ type_error: "DataProvidedIsNotValid" });
+    // The email only changes through better-auth's changeEmail (inbox
+    // confirmation + notice to the old address), never through this action.
+    test("an email that isn't yours is never written, even an unused one", async () => {
+      await prisma.user.update({ where: { id: ana.id }, data: { emailVerified: true } });
+      expect(await onUpdateSettings(settings("someone.else@x.com"))).not.toBeNull();
+      const user = await prisma.user.findUniqueOrThrow({ where: { id: ana.id } });
+      expect(user.email).toBe("ana@x.com");
+      expect(user.emailVerified).toBe(true);
+      expect(await prisma.user.findUnique({ where: { email: "someone.else@x.com" } })).toBeNull();
+    });
+
+    test("another user's email doesn't touch either account", async () => {
+      expect(await onUpdateSettings(settings("bob@x.com"))).not.toBeNull();
       expect((await prisma.user.findUniqueOrThrow({ where: { id: ana.id } })).email).toBe(
         "ana@x.com"
       );
     });
 
-    test("a new email is no longer verified", async () => {
-      await prisma.user.update({ where: { id: ana.id }, data: { emailVerified: true } });
-      expect(await onUpdateSettings(settings("ana.new@x.com"))).not.toBeNull();
-      const user = await prisma.user.findUniqueOrThrow({ where: { id: ana.id } });
-      expect(user.email).toBe("ana.new@x.com");
-      expect(user.emailVerified).toBe(false);
+    test("name, country and city are still saved", async () => {
+      await onUpdateSettings({
+        account: { name: "Ana María", email: "ana@x.com" },
+        personal: { country: "NZ", city: "Nelson" },
+      } as never);
+      const user = await prisma.user.findUniqueOrThrow({
+        where: { id: ana.id },
+        include: { profile: true },
+      });
+      expect(user.name).toBe("Ana María");
+      expect(user.profile).toMatchObject({ country: "NZ", city: "Nelson" });
     });
   });
 });
