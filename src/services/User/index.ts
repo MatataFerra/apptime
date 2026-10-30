@@ -145,17 +145,6 @@ class UserService {
     });
   }
 
-  static async updateUser({ id, user }: { id: string; user: Partial<User> }) {
-    return await prisma.user.update({
-      where: {
-        id,
-      },
-      data: {
-        ...user,
-      },
-    });
-  }
-
   isAdmin(): boolean {
     return this.user.role === USER_ROLES.ADMIN;
   }
