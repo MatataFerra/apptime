@@ -395,6 +395,39 @@ describe("auth and taxes on a real database", () => {
       );
     });
 
+    test("closing your shift only writes what closing can change", async () => {
+      const mine = await prisma.hourly.findUniqueOrThrow({ where: { id: september } });
+      const result = await onUpdateTrackJob(
+        {
+          ...mine,
+          name: "Closed",
+          holidayRate: 9,
+          source: "forged",
+          taxes: [],
+          contributions: [],
+        } as never,
+        september
+      );
+      expect(result?.response).toBe(true);
+      const after = await prisma.hourly.findUniqueOrThrow({ where: { id: september } });
+      expect(after.name).toBe("Closed");
+      expect(after.holidayRate).toBe(mine.holidayRate);
+      expect(after.source).toBe(mine.source);
+    });
+
+    test("a payload that isn't a shift is refused and nothing changes", async () => {
+      const mine = await prisma.hourly.findUniqueOrThrow({ where: { id: september } });
+      expect(
+        await onUpdateTrackJob(
+          { ...mine, hourValue: "20", taxes: [], contributions: [] } as never,
+          september
+        )
+      ).toBeNull();
+      expect((await prisma.hourly.findUniqueOrThrow({ where: { id: september } })).hourValue).toBe(
+        mine.hourValue
+      );
+    });
+
     test("PUT /api/user/[id] can't mark your own email as verified", async () => {
       const response = await putUser(
         requestAs(ana.cookies, {
