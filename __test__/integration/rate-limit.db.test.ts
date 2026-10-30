@@ -126,6 +126,36 @@ describe("rate limiting on a real database", () => {
         1
       );
     });
+
+    // A burst arriving together used to all fall into "open a new window"
+    // and every request was let through.
+    async function burst(key: string, rule: { window: number; max: number }, size = 30) {
+      const results = await Promise.all(
+        Array.from({ length: size }, () => consumeRateLimit(key, rule))
+      );
+      return results.filter(Boolean).length;
+    }
+
+    test("a concurrent burst on a new key gets exactly max", async () => {
+      expect(await burst("race-new", { window: 60, max: 3 })).toBe(3);
+      expect(
+        (await prisma.actionRateLimit.findUniqueOrThrow({ where: { key: "race-new" } })).count
+      ).toBe(3);
+    });
+
+    test("a concurrent burst when the window has just ended gets exactly max", async () => {
+      await prisma.actionRateLimit.create({
+        data: { key: "race-old", count: 3, windowStart: new Date(Date.now() - 61_000) },
+      });
+      expect(await burst("race-old", { window: 60, max: 3 })).toBe(3);
+    });
+
+    test("a concurrent burst on a full window gets nothing", async () => {
+      await prisma.actionRateLimit.create({
+        data: { key: "race-full", count: 3, windowStart: new Date() },
+      });
+      expect(await burst("race-full", { window: 60, max: 3 })).toBe(0);
+    });
   });
 
   describe("reset password email", () => {

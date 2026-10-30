@@ -20,26 +20,40 @@ export async function consumeRateLimit(key: string, rule: RateLimitRule) {
   const now = new Date();
   const windowStart = new Date(now.getTime() - rule.window * 1000);
 
-  // Inside the window and under the max: count it. One statement, so two
-  // requests at once can't both take the last slot.
-  const { count } = await prisma.actionRateLimit.updateMany({
-    where: { key, windowStart: { gt: windowStart }, count: { lt: rule.max } },
-    data: { count: { increment: 1 } },
+  // Every step is a single conditional write, so requests arriving together
+  // can't all pass: only one of them opens (or reopens) the window, the rest
+  // compete for the slots left in it.
+
+  // Inside the window and under the max: take a slot.
+  async function takeSlot() {
+    const { count } = await prisma.actionRateLimit.updateMany({
+      where: { key, windowStart: { gt: windowStart }, count: { lt: rule.max } },
+      data: { count: { increment: 1 } },
+    });
+    return count === 1;
+  }
+  if (await takeSlot()) return true;
+
+  // The window ended: restart it, only if nobody else just did.
+  const { count: reopened } = await prisma.actionRateLimit.updateMany({
+    where: { key, windowStart: { lte: windowStart } },
+    data: { count: 1, windowStart: now },
   });
-  if (count === 1) return true;
+  if (reopened === 1) return true;
 
-  const row = await prisma.actionRateLimit.findUnique({ where: { key } });
+  // No row yet: create it. If another request created it first, the key
+  // is taken; go back to competing for a slot in that window.
+  try {
+    await prisma.actionRateLimit.create({ data: { key, count: 1, windowStart: now } });
+    return true;
+  } catch (error) {
+    if (!isUniqueViolation(error)) throw error;
+  }
+  return takeSlot();
+}
 
-  // In the window with no slots left.
-  if (row && row.windowStart > windowStart) return false;
-
-  // No row yet, or the window ended: start a new one.
-  await prisma.actionRateLimit.upsert({
-    where: { key },
-    create: { key, count: 1, windowStart: now },
-    update: { count: 1, windowStart: now },
-  });
-  return true;
+function isUniqueViolation(error: unknown) {
+  return (error as { code?: string } | null)?.code === "P2002";
 }
 
 /**
