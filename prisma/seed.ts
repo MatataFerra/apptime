@@ -62,7 +62,24 @@ function addUsersMocked() {
   });
 }
 
+/**
+ * The seed wipes every table and creates users with known passwords (one
+ * of them ADMIN). It only runs on the local SQLite file unless asked for
+ * explicitly, so a .env pointing at Turso can't reach the real database.
+ */
+function assertSafeTarget() {
+  const remote = process.env.TURSO_ON === "true" || process.env.NODE_ENV === "production";
+  if (remote && process.env.ALLOW_REMOTE_SEED !== "true") {
+    console.error(
+      "Refusing to seed: TURSO_ON=true or NODE_ENV=production. The seed deletes all data. " +
+        "Set ALLOW_REMOTE_SEED=true to seed a remote (test) database on purpose."
+    );
+    process.exit(1);
+  }
+}
+
 async function main() {
+  assertSafeTarget();
   await clearDatabase();
 
   for (const userData of addUsersMocked()) {
