@@ -14,13 +14,14 @@ declare global {
  */
 function newPrismaClient() {
   const turso = process.env.TURSO_ON === "true";
+  // Server-only name: a NEXT_PUBLIC_ variable can end up in the browser bundle.
+  const tursoUrl = process.env.TURSO_DATABASE_URL;
+  if (turso && !tursoUrl) {
+    throw new Error("TURSO_ON is true but TURSO_DATABASE_URL isn't set");
+  }
   const adapter = new PrismaLibSql(
     turso
-      ? {
-          // Server-only name; the NEXT_PUBLIC_ one still works until it's renamed.
-          url: process.env.TURSO_DATABASE_URL ?? process.env.NEXT_PUBLIC_TURSO_DATABASE_URL ?? "",
-          authToken: process.env.TURSO_AUTH_TOKEN,
-        }
+      ? { url: tursoUrl!, authToken: process.env.TURSO_AUTH_TOKEN }
       : { url: LOCAL_DATABASE_URL }
   );
 
