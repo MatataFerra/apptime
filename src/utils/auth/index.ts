@@ -3,7 +3,9 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { APIError, createAuthMiddleware, getSessionFromCtx, isAPIError } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 
+import { isDisposableEmail } from "@/services/Auth/disposable";
 import PasswordService from "@/services/Auth/password";
+import { EMAIL_VERIFY_GRACE_MS } from "@/services/Auth/verification";
 import { sendEmail } from "@/services/Email";
 import { sendSecurityNotice } from "@/services/Email/security";
 import { consumeRateLimit } from "@/services/RateLimit";
@@ -34,6 +36,12 @@ const PASSWORD_FIELD_BY_PATH: Record<string, string> = {
   "/reset-password": "newPassword",
   "/change-password": "newPassword",
   "/set-password": "newPassword",
+};
+
+/** Where each endpoint takes the email of the account being created or changed. */
+const EMAIL_FIELD_BY_PATH: Record<string, string> = {
+  "/sign-up/email": "email",
+  "/change-email": "newEmail",
 };
 
 const baseURL = process.env.BETTER_AUTH_URL ?? process.env.NEXTAUTH_URL;
@@ -108,21 +116,34 @@ export const auth = betterAuth({
     },
   },
 
-  // Only used to confirm a new email from Settings (nothing is sent on sign
-  // up). The link goes to /api/auth/verify-email, which applies the change
-  // and redirects back to Settings.
+  // Sent on sign up (confirm within EMAIL_VERIFY_GRACE_MS or the account is
+  // restricted to the "confirm your email" page) and to confirm a new email
+  // from Settings. The link goes to /api/auth/verify-email, which marks the
+  // address verified (or applies the change) and redirects back.
   emailVerification: {
-    expiresIn: 60 * 60,
-    async sendVerificationEmail({ user, url }) {
+    sendOnSignUp: true,
+    // Signs the browser in (or refreshes its session cookie) when the link
+    // is opened, so the restriction lifts right away.
+    autoSignInAfterVerification: true,
+    expiresIn: EMAIL_VERIFY_GRACE_MS / 1000,
+    async sendVerificationEmail({ user, url }, request) {
       // user.email is the address being confirmed (the new one on a change).
       if (!(await withinRecipientBudget("verify", user.email))) return;
       const locale = localeFromCallback(url);
-      await sendEmail({
-        local: "account",
-        to: user.email,
-        subject: translatorFor(locale)("email.verify_email.subject"),
-        email: VerifyEmailTemplate({ firstName: user.name, url, locale }),
-      });
+      const kind = request?.url?.includes("/change-email") ? "change" : "signup";
+      try {
+        await sendEmail({
+          local: "account",
+          to: user.email,
+          subject: translatorFor(locale)(`email.verify_email.${kind}.subject`),
+          email: VerifyEmailTemplate({ firstName: user.name, url, locale, kind }),
+        });
+      } catch (error) {
+        // A failed email mustn't fail the sign up: the user can resend it
+        // from the "confirm your email" page.
+        // eslint-disable-next-line no-console -- server log for failed emails
+        console.error("[auth] verification email not sent", error);
+      }
     },
   },
 
@@ -130,6 +151,19 @@ export const auth = betterAuth({
   // the forms are only the client, and /api/auth/* can be called directly.
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
+      // No temporary inboxes (10minutemail, mailinator…): the account has to
+      // be reachable to confirm it and to recover it.
+      const emailField = EMAIL_FIELD_BY_PATH[ctx.path];
+      const email = emailField
+        ? (ctx.body as Record<string, unknown> | undefined)?.[emailField]
+        : null;
+      if (typeof email === "string" && isDisposableEmail(email)) {
+        throw new APIError("BAD_REQUEST", {
+          message: "Disposable email addresses aren't allowed",
+          code: "DISPOSABLE_EMAIL",
+        });
+      }
+
       const field = PASSWORD_FIELD_BY_PATH[ctx.path];
       const password = field ? (ctx.body as Record<string, unknown> | undefined)?.[field] : null;
       if (typeof password === "string" && !new PasswordService(password).validPassword().valid) {

@@ -1,3 +1,4 @@
+// @vitest-environment node
 /**
  * The admin:promote script on a real SQLite database (every migration
  * applied to a temp file), with the real Better Auth instance: the role

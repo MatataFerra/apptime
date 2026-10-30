@@ -89,12 +89,65 @@ describe("decideAccess", () => {
     expect(await decide("/es/no-mobile")).toEqual(to("/es"));
   });
 
-  test("public pages and unknown ones don't read the session", async () => {
+  test("public pages let anyone in; unknown ones and the reset link don't read the session", async () => {
+    for (const path of ["/en", "/en/compare", "/en/incomes"]) {
+      expect(await decide(path, { getUser: user })).toEqual(next);
+    }
     const getUser = vi.fn(user);
-    for (const path of ["/en", "/en/compare", "/en/incomes", "/en/reset/x", "/en/nope"]) {
+    for (const path of ["/en/reset/x", "/en/nope"]) {
       expect(await decide(path, { getUser })).toEqual(next);
     }
     expect(getUser).not.toHaveBeenCalled();
+  });
+
+  describe("an email not confirmed in time", () => {
+    function hours(n: number) {
+      return new Date(Date.now() - n * 60 * 60 * 1000);
+    }
+    async function overdue(): Promise<AccessUser> {
+      return {
+        role: "USER",
+        emailVerified: false,
+        createdAt: hours(9),
+      };
+    }
+    async function inGrace(): Promise<AccessUser> {
+      return {
+        role: "USER",
+        emailVerified: false,
+        createdAt: hours(7),
+      };
+    }
+    async function verified(): Promise<AccessUser> {
+      return {
+        role: "USER",
+        emailVerified: true,
+        createdAt: hours(100),
+      };
+    }
+
+    test.each(["/es", "/es/track", "/es/settings", "/es/compare", "/es/login", "/es/admin"])(
+      "past 8 hours: %s goes to the confirm page",
+      async (path) => {
+        expect(await decide(path, { getUser: overdue })).toEqual(to("/es/verify-email"));
+      }
+    );
+
+    test("past 8 hours: the confirm page and the reset link still open", async () => {
+      expect(await decide("/es/verify-email", { getUser: overdue })).toEqual(next);
+      expect(await decide("/es/reset/abc", { getUser: overdue })).toEqual(next);
+    });
+
+    test("within 8 hours, or confirmed: the app as usual, and the confirm page goes Home", async () => {
+      for (const getUser of [inGrace, verified]) {
+        expect(await decide("/es/track", { getUser })).toEqual(next);
+        expect(await decide("/es/verify-email", { getUser })).toEqual(to("/es"));
+      }
+    });
+
+    test("signed out: the confirm page asks to sign in", async () => {
+      expect(await decide("/es/verify-email")).toEqual(to("/es/login", "/es/verify-email"));
+    });
   });
 
   test("a path that only starts like a route isn't that route", async () => {

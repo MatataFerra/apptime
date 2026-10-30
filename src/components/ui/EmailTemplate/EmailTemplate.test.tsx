@@ -35,4 +35,18 @@ describe("email templates", () => {
     expect(text.toLowerCase()).toContain("hi, mati"); // headings come out in capitals
     expect(text).toContain("https://casualapp.test/api/auth/verify-email?token=abc");
   });
+
+  test("verify email on sign up: its own copy, with the 8-hour limit", async () => {
+    const url = "https://casualapp.test/api/auth/verify-email?token=abc&callbackURL=%2Fes";
+    const html = await render(
+      VerifyEmailTemplate({ firstName: "Mati", url, locale: "es", kind: "signup" })
+    );
+    const text = toPlainText(html);
+
+    expect(html).toContain("Confirmar mi email");
+    expect(text).toContain("Gracias por registrarte en CasualApp");
+    expect(text).toContain("8 horas");
+    expect(text).not.toContain("nuevo email");
+    expect(text).toContain("https://casualapp.test/api/auth/verify-email?token=abc");
+  });
 });

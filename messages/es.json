@@ -124,8 +124,9 @@
       "login_link": "Iniciar sesión",
       "invalid_body": "Ocurrió un error durante el registro, por favor intenta de nuevo",
       "user_already_exist": "El usuario ya existe",
-      "successful": "Cuenta creada, te llevamos a la app",
-      "max_attempts": "Demasiados intentos, espera un momento antes de volver a intentar"
+      "successful": "Cuenta creada. Confirma tu email en las próximas 8 horas: te enviamos un enlace.",
+      "max_attempts": "Demasiados intentos, espera un momento antes de volver a intentar",
+      "disposable_email": "No se pueden usar emails temporales. Regístrate con un email que vayas a conservar."
     },
     "forgot": {
       "email_label": "Ingresa tu email",
@@ -144,6 +145,16 @@
       "ONE_NUMBER": "Al menos 1 número",
       "MIN_LENGTH": "Al menos 8 caracteres",
       "SPECIAL_CHAR": "Al menos 1 carácter especial"
+    },
+    "verify_email": {
+      "title": "Confirma tu email",
+      "body": "Te enviamos un enlace a {email}. Ábrelo para seguir usando CasualApp: la cuenta queda en pausa hasta que confirmes la dirección.",
+      "hint": "¿No lo encuentras? Revisa el spam o vuelve a enviarlo. El enlace funciona durante 8 horas.",
+      "resend": "Enviar el enlace otra vez",
+      "sent": "Enlace enviado. Revisa tu bandeja de entrada.",
+      "not_sent": "No pudimos enviarlo. Inténtalo de nuevo en un momento.",
+      "too_many": "Demasiados emails a esta dirección. Inténtalo de nuevo en una hora.",
+      "sign_out": "Cerrar sesión"
     }
   },
   "email": {
@@ -158,12 +169,20 @@
       "not_you": "¿No lo pediste tú? Puedes ignorar este email: tu contraseña no cambia."
     },
     "verify_email": {
-      "subject": "Confirma tu nuevo email de CasualApp",
-      "preview": "Confirma esta dirección para usarla en tu cuenta.",
       "greeting": "Hola, {name}",
-      "body": "Pediste usar esta dirección para tu cuenta de CasualApp. Confírmala con el botón; el enlace funciona durante una hora.",
       "button": "Confirmar mi email",
-      "not_you": "¿No fuiste tú? Ignora este email: no cambia nada en la cuenta."
+      "signup": {
+        "subject": "Confirma tu email de CasualApp",
+        "preview": "Confirma tu dirección para seguir usando CasualApp.",
+        "body": "Gracias por registrarte en CasualApp. Confirma tu email con el botón dentro de las próximas 8 horas; pasado ese tiempo, la cuenta queda en pausa hasta que lo confirmes.",
+        "not_you": "¿No te registraste? Ignora este email: sin confirmar, la cuenta queda en pausa."
+      },
+      "change": {
+        "subject": "Confirma tu nuevo email de CasualApp",
+        "preview": "Confirma esta dirección para usarla en tu cuenta.",
+        "body": "Pediste usar esta dirección para tu cuenta de CasualApp. Confírmala con el botón; el enlace funciona durante 8 horas.",
+        "not_you": "¿No fuiste tú? Ignora este email: no cambia nada en la cuenta."
+      }
     },
     "security": {
       "greeting": "Hola, {name}.",

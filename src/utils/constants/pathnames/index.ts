@@ -18,4 +18,5 @@ export const PATH_NAMES = {
   RESET_PASSWORD: "/forgot-password",
   RESET_TOKEN: "/reset",
   RESET_SUCCESS: "/success",
+  VERIFY_EMAIL: "/verify-email",
 } as const;

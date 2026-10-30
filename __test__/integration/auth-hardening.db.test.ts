@@ -1,3 +1,4 @@
+// @vitest-environment node
 /**
  * On a real SQLite database (every migration applied to a temp file) with
  * the real Better Auth instance: the password rules on Better Auth's own
