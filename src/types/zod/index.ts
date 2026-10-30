@@ -266,10 +266,15 @@ const ProductionShiftWithTaxes = ProductionShiftSchema.merge(
   SearchParams Schema
 */
 
+// shifts/profile/config are flags, not JSON: they used to be JSON.parse'd
+// straight into a Prisma include, so any object (e.g. a nested include of
+// accounts and sessions) reached the query.
+const IncludeFlag = z.enum(["true", "false"]).nullable();
+
 const SearchParamsSchema = z.object({
-  shifts: z.string().nullable(),
-  profile: z.string().nullable(),
-  config: z.string().nullable(),
+  shifts: IncludeFlag,
+  profile: IncludeFlag,
+  config: IncludeFlag,
   email: z.string().nullable(),
   only: z.string().nullable(),
 });
