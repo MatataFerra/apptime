@@ -2,8 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 import ErrorFactory from "@/services/Error/factory";
+import { clientIp, consumeRateLimit } from "@/services/RateLimit";
 
 import prisma from "#/prisma/client";
+
+/** No sign-in here: per IP, enough for a few people sharing a network. */
+const PER_IP = { window: 60 * 60, max: 10 };
 
 const WaitingListSchema = z.object({ email: z.string().trim().toLowerCase().email().max(254) });
 
@@ -14,6 +18,13 @@ const WaitingListSchema = z.object({ email: z.string().trim().toLowerCase().emai
  * it doesn't tell who signed up.
  */
 export async function POST(req: NextRequest) {
+  if (!(await consumeRateLimit(`waiting-list:ip:${clientIp(req.headers)}`, PER_IP))) {
+    return NextResponse.json(
+      { error: "Too many requests", response: false },
+      { status: 429, headers: { "Retry-After": String(PER_IP.window) } }
+    );
+  }
+
   const body = await req.json().catch(() => null);
   const validate = WaitingListSchema.safeParse(body);
 
