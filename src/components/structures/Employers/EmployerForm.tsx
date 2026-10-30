@@ -10,6 +10,7 @@ import { currencyForCountry } from "@/services/Employer/currency";
 import type { PastedEmployer, PasteField } from "@/services/Employer/paste";
 import { type EmployerInput, EmployerInputSchema, fieldErrors } from "@/services/Employer/schema";
 import { attribution, defaultRegistry, isRegistryId } from "@/services/Registry/registries";
+import { VISA_WORK_TYPES, visaCountryOf } from "@/services/VisaReport";
 
 import type { SavedEmployer } from "@/types";
 
@@ -18,6 +19,7 @@ import BusinessLookup, {
   type BusinessSource,
 } from "@/components/structures/Employers/BusinessLookup";
 import PasteDetails from "@/components/structures/Employers/PasteDetails";
+import VisaWorkFields from "@/components/structures/Employers/VisaWorkFields";
 import CountrySelect from "@/components/structures/share/CountrySelect";
 import Button from "@/components/ui/Button";
 import { ChoicePopover } from "@/components/ui/Choice";
@@ -45,6 +47,7 @@ const TEXT_FIELDS = [
   "region",
   "postcode",
   "country",
+  "workPostcode",
   "contactName",
   "contactEmail",
   "contactPhone",
@@ -132,6 +135,7 @@ function EmployerForm({
     employer?.defaultRate != null ? String(employer.defaultRate) : ""
   );
   const [currency, setCurrency] = useState(employer?.defaultCurrency ?? "");
+  const [workType, setWorkType] = useState(employer?.visaWorkType ?? "");
   const [errors, setErrors] = useState<Errors>({});
   const [helper, setHelper] = useState<Helper>(null);
   // Filled in by a helper and not edited since: highlighted until checked.
@@ -246,7 +250,10 @@ function EmployerForm({
     );
   }
 
-  function field(name: TextField, props: { type?: string; inputMode?: "email" | "tel" } = {}) {
+  function field(
+    name: TextField,
+    props: { type?: string; inputMode?: "email" | "tel" | "numeric" } = {}
+  ) {
     const id = `${baseId}-${name}`;
     const label = tf(name);
     const error = shown[name] ? errorMessage(shown[name]) : undefined;
@@ -294,8 +301,14 @@ function EmployerForm({
       noValidate
       onSubmit={(e) => {
         e.preventDefault();
+        // A kind of work only means something for the country it's listed under.
+        const visaCountry = visaCountryOf(text.country);
+        const types: readonly string[] =
+          visaCountry === "AU" || visaCountry === "NZ" ? VISA_WORK_TYPES[visaCountry] : [];
         const input: EmployerInput = {
           ...text,
+          visaWorkType: types.includes(workType) ? workType : null,
+          workPostcode: visaCountry === "AU" ? text.workPostcode : null,
           defaultRate: rate.trim() === "" ? null : Number(rate),
           defaultCurrency: currency || null,
           // Only a new lookup is sent; the saved source stays as it is.
@@ -400,6 +413,19 @@ function EmployerForm({
           />
         ) : null}
       </Group>
+
+      {visaCountryOf(text.country) === "AU" || visaCountryOf(text.country) === "NZ" ? (
+        <Group title={t("groups.visa")}>
+          <VisaWorkFields
+            country={visaCountryOf(text.country) as "AU" | "NZ"}
+            workType={workType}
+            onWorkType={setWorkType}
+            postcode={text.postcode}
+            workPostcode={text.workPostcode}
+            workPostcodeField={field("workPostcode", { inputMode: "numeric" })}
+          />
+        </Group>
+      ) : null}
 
       <Group title={t("groups.contact")}>
         {field("contactName")}

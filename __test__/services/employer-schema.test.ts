@@ -96,4 +96,13 @@ describe("EmployerInputSchema", () => {
       "New Zeland"
     );
   });
+
+  test("the kind of work for a visa: a known one, or nothing", () => {
+    expect(EmployerInputSchema.parse({ name: "Farm", visaWorkType: "mining" }).visaWorkType).toBe(
+      "mining"
+    );
+    expect(EmployerInputSchema.parse({ name: "Farm", visaWorkType: "" }).visaWorkType).toBeNull();
+    const bad = EmployerInputSchema.safeParse({ name: "Farm", visaWorkType: "dog_walking" });
+    expect(bad.success).toBe(false);
+  });
 });

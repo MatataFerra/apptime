@@ -9,6 +9,7 @@ import { useTranslations } from "next-intl";
 import { historyEntries } from "@/services/History";
 import { weekStartsOnIndex } from "@/services/Summary";
 import {
+  type AuSubclass,
   type CountingRule,
   firstShiftIn,
   programById,
@@ -20,6 +21,7 @@ import {
   PeriodPicker,
   ProgramPicker,
   RulePicker,
+  SubclassPicker,
 } from "@/components/structures/Extensions/Controls";
 import {
   AssumedNotice,
@@ -53,6 +55,8 @@ function VisaReport() {
 
   const [programId, setProgramId] = useState<VisaProgramId>("au-88");
   const [rules, setRules] = useState<Partial<Record<VisaProgramId, CountingRule>>>({});
+  // One subclass for both Australian programs: it's the user's passport.
+  const [subclass, setSubclass] = useState<AuSubclass>("417");
   // null: from the first shift in the country to today.
   const [period, setPeriod] = useState<{ from: Date; to: Date } | null>(null);
 
@@ -70,7 +74,14 @@ function VisaReport() {
   const from = period?.from ?? defaultFrom;
   const to = period?.to ?? today;
 
-  const report = visaReport(entries, byId, { program, rule, from, to, weekStartsOn });
+  const report = visaReport(entries, byId, {
+    program,
+    rule,
+    from,
+    to,
+    weekStartsOn,
+    subclass: program.subclasses?.includes(subclass) ? subclass : program.subclasses?.[0],
+  });
 
   if (loadingHourly || loadingProduction || loadingEmployers) return <VisaReportSkeleton />;
 
@@ -86,6 +97,7 @@ function VisaReport() {
           setProgramId(id);
         }}
       />
+      <SubclassPicker program={program} value={subclass} onChange={setSubclass} />
       <RulePicker
         program={program}
         value={rule}

@@ -16,30 +16,56 @@ import {
 import type { HistoryEntry } from "@/services/History";
 
 import { visaCountryOf } from "./country";
+import { type AuSubclass, eligibility } from "./eligibility";
 import { type CountingRule, GAP_MIN_DAYS, type VisaProgram } from "./programs";
 
 export * from "./country";
+export * from "./eligibility";
 export * from "./programs";
 
 /** What the report needs to know about an employer. */
-export type ReportEmployer = { id: number; name: string; country: string | null };
+export type ReportEmployer = {
+  id: number;
+  name: string;
+  country: string | null;
+  visaWorkType?: string | null;
+  postcode?: string | null;
+  workPostcode?: string | null;
+};
 
 /**
- * - confirmed: the shift's employer is in the program's country.
- * - assumed: the shift has no employer, or its employer has no country; it's
- *   inside the period, so it's taken as part of the same work (shown in red
- *   until the user sets the employer).
+ * - confirmed: the shift's employer is in the program's country and its work
+ *   counts there.
+ * - assumed: counted, but not proven: no employer (or no country), or the
+ *   employer lacks the kind of work or postcode to check it (shown in red
+ *   until the user completes it).
+ * - not_eligible: the employer's work doesn't count for this visa, or not
+ *   where it's done; left out of the total (shown in amber).
  */
-export type EntryStatus = "confirmed" | "assumed";
+export type EntryStatus = "confirmed" | "assumed" | "not_eligible";
 
 /** Why a shift is assumed. */
-export type AssumedReason = "no_employer" | "no_country";
+export type AssumedReason =
+  "no_employer" | "no_country" | "no_work_type" | "no_postcode" | "recovery";
+
+/** Why a shift doesn't count. */
+export type NotEligibleReason = "work_type" | "area";
+
+export type ShiftReason = AssumedReason | NotEligibleReason;
 
 export type ReportShift = {
   entry: HistoryEntry;
   status: EntryStatus;
-  reason: AssumedReason | null;
+  reason: ShiftReason | null;
 };
+
+/** Higher wins when a day has shifts of several statuses. */
+const RANK: Record<EntryStatus, number> = { not_eligible: 0, assumed: 1, confirmed: 2 };
+
+/** Whether a day or shift counts towards the target. */
+export function counts(status: EntryStatus) {
+  return status !== "not_eligible";
+}
 
 export type ReportDay = {
   /** Start of the day. */
@@ -48,7 +74,7 @@ export type ReportDay = {
   key: string;
   /** Minutes worked that day (0 for a day counted by a full-time week). */
   minutes: number;
-  /** "assumed" when nothing confirmed backs the day. */
+  /** The best of its shifts: confirmed, else assumed, else not_eligible (not counted). */
   status: EntryStatus;
   /** Counted because its week was full-time, not because a shift was logged. */
   filled: boolean;
@@ -62,7 +88,7 @@ export type ReportGap = { from: Date; to: Date; days: number };
 export type ReportEmployerBlock = {
   employerId: number | null;
   status: EntryStatus;
-  reason: AssumedReason | null;
+  reason: ShiftReason | null;
   /** Calendar days with at least one of its shifts. */
   days: number;
   minutes: number;
@@ -74,18 +100,21 @@ export type ReportEmployerBlock = {
 export type VisaReport = {
   program: VisaProgram;
   rule: CountingRule;
+  subclass: AuSubclass | null;
   from: Date;
   to: Date;
-  /** Every counted day, oldest first. */
+  /** Every day worked or counted, oldest first; not_eligible ones don't count. */
   days: ReportDay[];
   /** Counted days backed by a confirmed shift (or a full-time week of them). */
   confirmedDays: number;
   /** Counted days that rest on assumed shifts only. */
   assumedDays: number;
   totalDays: number;
+  /** Days worked only for employers whose work doesn't count. */
+  notEligibleDays: number;
   /** Days still missing to reach the target (0 once reached). */
   remainingDays: number;
-  /** Minutes of every shift in the report. */
+  /** Minutes of the shifts that count (confirmed and assumed). */
   minutes: number;
   gaps: ReportGap[];
   employers: ReportEmployerBlock[];
@@ -98,6 +127,8 @@ type Options = {
   rule?: CountingRule;
   from: Date;
   to: Date;
+  /** Australian subclass whose rules apply; the program's first one by default. */
+  subclass?: AuSubclass;
   /** Day the week starts on, for full-time weeks (0 Sunday, 1 Monday). */
   weekStartsOn?: 0 | 1;
   /** Days without work in a row from which a gap is listed. */
@@ -112,7 +143,7 @@ function dayKey(date: Date) {
 export function classifyEntries(
   entries: HistoryEntry[],
   employers: Map<number, ReportEmployer>,
-  { program, from, to }: Pick<Options, "program" | "from" | "to">
+  { program, from, to, subclass }: Pick<Options, "program" | "from" | "to" | "subclass">
 ) {
   const start = startOfDay(from);
   const end = endOfDay(to);
@@ -130,9 +161,25 @@ export function classifyEntries(
     }
 
     const country = visaCountryOf(employer.country);
-    if (country === null) shifts.push({ entry, status: "assumed", reason: "no_country" });
-    else if (country === program.country) shifts.push({ entry, status: "confirmed", reason: null });
-    else excluded += 1;
+    if (country === null) {
+      shifts.push({ entry, status: "assumed", reason: "no_country" });
+    } else if (country !== program.country) {
+      excluded += 1;
+    } else {
+      const check = eligibility(
+        {
+          visaWorkType: employer.visaWorkType ?? null,
+          postcode: employer.postcode ?? null,
+          workPostcode: employer.workPostcode ?? null,
+        },
+        program.country,
+        subclass ?? program.subclasses?.[0]
+      );
+      if (check.status === "eligible") shifts.push({ entry, status: "confirmed", reason: null });
+      else if (check.status === "unknown")
+        shifts.push({ entry, status: "assumed", reason: check.reason });
+      else shifts.push({ entry, status: "not_eligible", reason: check.reason });
+    }
   }
 
   return { shifts, excluded };
@@ -148,13 +195,13 @@ function workedDays(shifts: ReportShift[]) {
       date,
       key,
       minutes: 0,
-      status: "assumed" as EntryStatus,
+      status: shift.status,
       filled: false,
       shifts: [],
     };
     day.minutes += shift.entry.minutes;
     day.shifts.push(shift);
-    if (shift.status === "confirmed") day.status = "confirmed";
+    if (RANK[shift.status] > RANK[day.status]) day.status = shift.status;
     days.set(key, day);
   }
   return days;
@@ -163,7 +210,7 @@ function workedDays(shifts: ReportShift[]) {
 /**
  * Full-time weeks: a week (inside the period) with `hours` or more counts its
  * 7 days. The added days are confirmed when the confirmed hours alone reach
- * the mark, assumed otherwise.
+ * the mark, assumed otherwise. Hours that don't count don't add up.
  */
 function fillFullTimeWeeks(
   days: Map<string, ReportDay>,
@@ -175,6 +222,7 @@ function fillFullTimeWeeks(
     const key = dayKey(start);
     const week = weeks.get(key) ?? { start, total: 0, confirmed: 0 };
     for (const shift of day.shifts) {
+      if (!counts(shift.status)) continue;
       week.total += shift.entry.minutes;
       if (shift.status === "confirmed") week.confirmed += shift.entry.minutes;
     }
@@ -193,8 +241,10 @@ function fillFullTimeWeeks(
       const day = days.get(key);
       if (!day) {
         days.set(key, { date, key, minutes: 0, status, filled: true, shifts: [] });
-      } else if (status === "confirmed") {
-        day.status = "confirmed";
+      } else if (RANK[status] > RANK[day.status]) {
+        // A day worked only for work that doesn't count, inside a full-time week.
+        if (!counts(day.status)) day.filled = true;
+        day.status = status;
       }
     }
   }
@@ -247,9 +297,8 @@ function byEmployer(shifts: ReportShift[]): ReportEmployerBlock[] {
     .map(({ dayKeys, ...block }) => ({ ...block, days: dayKeys.size }))
     .sort(
       (a, b) =>
-        // Confirmed first, then by when the work started.
-        Number(a.status === "assumed") - Number(b.status === "assumed") ||
-        a.first.valueOf() - b.first.valueOf()
+        // Confirmed first, then assumed, then not eligible; then by when the work started.
+        RANK[b.status] - RANK[a.status] || a.first.valueOf() - b.first.valueOf()
     );
 }
 
@@ -267,11 +316,17 @@ export function visaReport(
     rule = program.rules[0],
     from,
     to,
+    subclass = program.subclasses?.[0],
     weekStartsOn = 1,
     gapMinDays = GAP_MIN_DAYS,
   }: Options
 ): VisaReport {
-  const { shifts, excluded } = classifyEntries(entries, employers, { program, from, to });
+  const { shifts, excluded } = classifyEntries(entries, employers, {
+    program,
+    from,
+    to,
+    subclass,
+  });
   const days = workedDays(shifts);
   if (rule === "full_time_weeks") {
     fillFullTimeWeeks(days, { from, to, hours: program.fullTimeHours, weekStartsOn });
@@ -281,20 +336,26 @@ export function visaReport(
   for (const day of list)
     day.shifts.sort((a, b) => a.entry.date.valueOf() - b.entry.date.valueOf());
 
-  const confirmedDays = list.filter((day) => day.status === "confirmed").length;
-  const totalDays = list.length;
+  const counted = list.filter((day) => counts(day.status));
+  const confirmedDays = counted.filter((day) => day.status === "confirmed").length;
+  const totalDays = counted.length;
 
   return {
     program,
     rule,
+    subclass: subclass ?? null,
     from: startOfDay(from),
     to: startOfDay(to),
     days: list,
     confirmedDays,
     assumedDays: totalDays - confirmedDays,
     totalDays,
+    notEligibleDays: list.length - totalDays,
     remainingDays: Math.max(0, program.targetDays - totalDays),
-    minutes: shifts.reduce((sum, shift) => sum + shift.entry.minutes, 0),
+    minutes: shifts
+      .filter((shift) => counts(shift.status))
+      .reduce((sum, shift) => sum + shift.entry.minutes, 0),
+    // Breaks without any work, so days that don't count still end one.
     gaps: findGaps(list, gapMinDays),
     employers: byEmployer(shifts),
     excludedShifts: excluded,

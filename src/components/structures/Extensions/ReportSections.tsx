@@ -13,10 +13,15 @@ import {
   min as minDate,
   startOfMonth,
 } from "date-fns";
-import { CircleAlert, MoonStar } from "lucide-react";
+import { Ban, CircleAlert, MoonStar } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
-import type { ReportDay, ReportEmployerBlock, VisaReport } from "@/services/VisaReport";
+import {
+  type ReportDay,
+  type ReportEmployerBlock,
+  type VisaReport,
+  workPostcodeOf,
+} from "@/services/VisaReport";
 
 import type { SavedEmployer } from "@/types";
 
@@ -126,6 +131,15 @@ export function ReportSummary({ report }: { report: VisaReport }) {
             </dd>
           </div>
         </dl>
+        {report.notEligibleDays > 0 ? (
+          <p
+            className="flex items-center gap-1.5 border-t border-border pt-3 text-[0.8125rem] text-warning"
+            data-testid="visa-not-eligible"
+          >
+            <Ban className="size-3.5 shrink-0" aria-hidden="true" />
+            {t("not_eligible", { count: report.notEligibleDays })}
+          </p>
+        ) : null}
       </Card>
     </section>
   );
@@ -192,9 +206,13 @@ function EmployerCard({
   employer: SavedEmployer | undefined;
 }) {
   const t = useTranslations("extensions.employers");
+  const tw = useTranslations("extensions.work_types");
   const locale = useDateLocale();
   const hours = useHours();
   const assumed = block.status === "assumed";
+  const notEligible = block.status === "not_eligible";
+  const tone = assumed ? "text-destructive" : notEligible ? "text-warning" : "text-ink";
+  const workPostcode = employer?.workPostcode?.trim() ? employer.workPostcode : null;
 
   const name = employer?.name ?? t("no_employer");
   const address = employer
@@ -219,47 +237,49 @@ function EmployerCard({
     [t("tax_id"), employer?.taxId],
     [t("address"), address],
     [t("postcode"), employer?.postcode],
+    [t("work_postcode"), workPostcode],
     [t("industry"), employer?.industry],
+    [t("work_type"), employer?.visaWorkType ? tw(employer.visaWorkType as "other") : null],
     [t("contact"), contact],
   ];
 
   return (
     <article
-      className={cn("flex flex-col gap-3 px-4 py-3.5", assumed && "bg-destructive-soft/40")}
+      className={cn(
+        "flex flex-col gap-3 px-4 py-3.5",
+        assumed && "bg-destructive-soft/40",
+        notEligible && "bg-warning-soft/40"
+      )}
       data-testid="visa-employer"
     >
       <header className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-col gap-0.5">
-          <h3
-            className={cn(
-              "truncate text-[0.9375rem] font-semibold",
-              assumed ? "text-destructive" : "text-ink"
-            )}
-          >
-            {name}
-          </h3>
+          <h3 className={cn("truncate text-[0.9375rem] font-semibold", tone)}>{name}</h3>
           <p className="text-[0.8125rem] text-ink-muted">
             {[
               t("shifts", { count: block.shifts }),
               t("hours", { hours: hours(block.minutes) }),
-              block.reason === "no_country" ? t("no_country") : null,
+              block.reason && block.reason !== "no_employer"
+                ? t(`reasons.${block.reason}`, {
+                    postcode: employer ? (workPostcodeOf(employer) ?? "") : "",
+                  })
+                : null,
             ]
               .filter(Boolean)
               .join(" · ")}
           </p>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1">
-          <span
-            className={cn(
-              "text-[0.9375rem] font-semibold tabular-nums",
-              assumed ? "text-destructive" : "text-ink"
-            )}
-          >
+          <span className={cn("text-[0.9375rem] font-semibold tabular-nums", tone)}>
             {t("days", { count: block.days })}
           </span>
           {assumed ? (
             <span className="rounded-full bg-destructive-soft px-2 py-0.5 text-xs font-semibold text-destructive">
               {t("assumed_badge")}
+            </span>
+          ) : notEligible ? (
+            <span className="rounded-full bg-warning-soft px-2 py-0.5 text-xs font-semibold text-warning">
+              {t("not_eligible_badge")}
             </span>
           ) : null}
         </div>
@@ -309,6 +329,7 @@ const DAY_STYLES = {
   assumed: "bg-destructive text-white",
   filled: "bg-insight-soft text-insight-ink",
   filledAssumed: "bg-destructive-soft text-destructive",
+  not_eligible: "bg-warning-soft text-warning ring-1 ring-warning/40 ring-inset",
 } as const;
 
 function dayStyle(day: ReportDay) {
@@ -343,6 +364,7 @@ export function ReportCalendar({
 
   function statusLabel(day: ReportDay) {
     if (day.status === "assumed") return t("assumed");
+    if (day.status === "not_eligible") return t("not_eligible");
     return day.filled ? t("filled") : t("confirmed");
   }
 
@@ -409,7 +431,8 @@ export function ReportCalendar({
               ["confirmed", DAY_STYLES.confirmed],
               ["assumed", DAY_STYLES.assumed],
               ...(report.rule === "full_time_weeks" ? [["filled", DAY_STYLES.filled]] : []),
-            ] as ["confirmed" | "assumed" | "filled", string][]
+              ...(report.notEligibleDays > 0 ? [["not_eligible", DAY_STYLES.not_eligible]] : []),
+            ] as ["confirmed" | "assumed" | "filled" | "not_eligible", string][]
           ).map(([key, style]) => (
             <li key={key} className="flex items-center gap-1.5">
               <span className={cn("size-3 rounded-sm", style)} aria-hidden="true" />

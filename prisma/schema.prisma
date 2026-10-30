@@ -143,6 +143,12 @@ model Employer {
   postcode        String?
   country         String?
   industry        String?
+  /// Kind of work for a visa extension: "plant_animal_cultivation", "mining",
+  /// "horticulture"… (services/VisaReport/eligibility.ts). Null: not set.
+  visaWorkType    String?
+  /// Postcode where the work is done, when it isn't the address (a labour
+  /// hire office in the city, the farm elsewhere). Null: the address one.
+  workPostcode    String?
   contactName     String?
   contactEmail    String?
   contactPhone    String?

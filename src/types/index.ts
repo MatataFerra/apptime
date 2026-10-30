@@ -90,6 +90,10 @@ export type SavedEmployer = {
   postcode: string | null;
   country: string | null;
   industry: string | null;
+  /** Kind of work for a visa extension (VISA_WORK_TYPES). */
+  visaWorkType: string | null;
+  /** Postcode where the work is done, when it isn't the address one. */
+  workPostcode: string | null;
   contactName: string | null;
   contactEmail: string | null;
   contactPhone: string | null;

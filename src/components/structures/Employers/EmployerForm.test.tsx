@@ -253,4 +253,51 @@ describe("EmployerForm helpers", () => {
     await user.type(screen.getByLabelText("Postcode"), "4870");
     expect(screen.queryByTestId("au-postcode-hint")).toBeNull();
   });
+
+  test("an Australian employer gets the kind of work and says where it counts", async () => {
+    const { user, onSave } = setup();
+    expect(screen.queryByTestId("employer-work-type")).toBeNull();
+
+    await user.click(screen.getByTestId("employer-country"));
+    await user.type(screen.getByRole("searchbox", { name: "Search country" }), "austral");
+    await user.click(screen.getByRole("option", { name: /Australia/ }));
+
+    await user.click(screen.getByTestId("employer-work-type"));
+    await user.click(screen.getByRole("option", { name: "Mining" }));
+    await user.type(screen.getByLabelText("Postcode"), "4000");
+
+    const lines = screen.getByTestId("employer-eligibility");
+    expect(lines).toHaveTextContent("417· doesn't count at 4000");
+    expect(lines).toHaveTextContent("462· this work doesn't count");
+
+    // Work done elsewhere: Kalgoorlie.
+    await user.type(screen.getByLabelText("Work postcode"), "6430");
+    expect(lines).toHaveTextContent("417· counts");
+
+    await user.type(screen.getByLabelText("Name"), "Gold Mine");
+    await user.click(screen.getByRole("button", { name: /add employer/i }));
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({ visaWorkType: "mining", workPostcode: "6430", postcode: "4000" })
+    );
+  });
+
+  test("a New Zealand employer lists horticulture and viticulture, without work postcode", async () => {
+    const { user, onSave } = setup();
+
+    await user.click(screen.getByTestId("employer-country"));
+    await user.type(screen.getByRole("searchbox", { name: "Search country" }), "zeal");
+    await user.click(screen.getByRole("option", { name: /New Zealand/ }));
+
+    await user.click(screen.getByTestId("employer-work-type"));
+    expect(screen.queryByRole("option", { name: "Mining" })).toBeNull();
+    await user.click(screen.getByRole("option", { name: /^Viticulture/ }));
+    expect(screen.queryByLabelText("Work postcode")).toBeNull();
+    expect(screen.getByTestId("employer-eligibility")).toHaveTextContent("NZ extension· counts");
+
+    await user.type(screen.getByLabelText("Name"), "Vineyard");
+    await user.click(screen.getByRole("button", { name: /add employer/i }));
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({ visaWorkType: "viticulture", workPostcode: null })
+    );
+  });
 });

@@ -38,8 +38,23 @@ const data = vi.hoisted(() => {
       shift(4, 5, 2),
     ],
     employers: [
-      { id: 1, name: "Berry Farm", country: "Australia", taxId: "51 824 753 556", archived: false },
-      { id: 2, name: "Kiwi Orchard", country: "New Zealand", taxId: null, archived: false },
+      {
+        id: 1,
+        name: "Berry Farm",
+        country: "Australia",
+        taxId: "51 824 753 556",
+        visaWorkType: "mining",
+        postcode: "6430",
+        archived: false,
+      },
+      {
+        id: 2,
+        name: "Kiwi Orchard",
+        country: "New Zealand",
+        taxId: null,
+        visaWorkType: "horticulture",
+        archived: false,
+      },
     ],
   };
 });
@@ -71,7 +86,7 @@ describe("Visa report", () => {
 
     // From the first Australian shift to today: 2 confirmed days + 1 assumed.
     expect(screen.getByTestId("visa-total-days")).toHaveTextContent("3");
-    expect(screen.getByText(/1 day has no employer/)).toBeInTheDocument();
+    expect(screen.getByText(/1 day to confirm/)).toBeInTheDocument();
     expect(screen.getAllByTestId("visa-gap")).toHaveLength(1);
     expect(screen.getByText("Berry Farm")).toBeInTheDocument();
     expect(screen.getByText("Shifts without employer")).toBeInTheDocument();
@@ -87,5 +102,16 @@ describe("Visa report", () => {
     expect(screen.getByTestId("visa-total-days")).toHaveTextContent("1");
     expect(screen.getByText("Kiwi Orchard")).toBeInTheDocument();
     expect(screen.queryByText("Berry Farm")).not.toBeInTheDocument();
+  });
+
+  test("on a 462, mining doesn't count: its days move out of the total, in amber", async () => {
+    const user = userEvent.setup();
+    renderWithIntl(<VisaReport />);
+
+    await user.click(screen.getByTestId("visa-subclass-462"));
+    expect(screen.getByTestId("visa-total-days")).toHaveTextContent("1");
+    expect(screen.getByTestId("visa-not-eligible")).toHaveTextContent(/2 days worked don't count/);
+    expect(screen.getByText("Doesn't count", { selector: "span" })).toBeInTheDocument();
+    expect(screen.getByText(/This work doesn't count for this visa/)).toBeInTheDocument();
   });
 });

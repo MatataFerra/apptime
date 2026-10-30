@@ -29,11 +29,37 @@ function entry(date: string, hours: number, employerId: number | null): HistoryE
   };
 }
 
+const farm = { visaWorkType: "plant_animal_cultivation", postcode: "4670" };
+
 const employers = new Map<number, ReportEmployer>([
-  [1, { id: 1, name: "Berry Farm", country: "Australia" }],
-  [2, { id: 2, name: "Packhouse", country: "AU" }],
-  [3, { id: 3, name: "Orchard NZ", country: "New Zealand" }],
+  [1, { id: 1, name: "Berry Farm", country: "Australia", ...farm }],
+  [2, { id: 2, name: "Packhouse", country: "AU", ...farm }],
+  [3, { id: 3, name: "Orchard NZ", country: "New Zealand", visaWorkType: "horticulture" }],
   [4, { id: 4, name: "Somewhere", country: null }],
+  // In Australia, but its work can't be checked or doesn't count.
+  [5, { id: 5, name: "No details", country: "Australia" }],
+  [
+    6,
+    {
+      id: 6,
+      name: "City cafe",
+      country: "Australia",
+      visaWorkType: "tourism_hospitality",
+      postcode: "2000",
+    },
+  ],
+  [7, { id: 7, name: "Mine", country: "Australia", visaWorkType: "mining", postcode: "6430" }],
+  [
+    8,
+    {
+      id: 8,
+      name: "Labour hire",
+      country: "Australia",
+      visaWorkType: "plant_animal_cultivation",
+      postcode: "4000",
+      workPostcode: "4670",
+    },
+  ],
 ]);
 
 const au88 = programById("au-88");
@@ -187,5 +213,64 @@ describe("firstShiftIn", () => {
       new Date("2026-03-01T00:00:00")
     );
     expect(firstShiftIn([], employers, "AU", fallback)).toEqual(fallback);
+  });
+});
+
+describe("eligibility in the report", () => {
+  test("work that doesn't count is left out of the total, in its own status", () => {
+    const report = visaReport(
+      [entry("2026-01-05", 8, 1), entry("2026-01-06", 8, 6), entry("2026-01-07", 8, 5)],
+      employers,
+      { program: au88, ...range }
+    );
+    expect(report.totalDays).toBe(2);
+    expect(report.notEligibleDays).toBe(1);
+    expect(report.days.map((d) => [d.key, d.status])).toEqual([
+      ["2026-01-05", "confirmed"],
+      ["2026-01-06", "not_eligible"],
+      ["2026-01-07", "assumed"],
+    ]);
+    expect(report.employers.map((b) => [b.employerId, b.status, b.reason])).toEqual([
+      [1, "confirmed", null],
+      [5, "assumed", "no_work_type"],
+      [6, "not_eligible", "area"],
+    ]);
+    expect(report.minutes).toBe(16 * 60);
+  });
+
+  test("mining counts on a 417 but not on a 462", () => {
+    const shifts = [entry("2026-01-05", 8, 7)];
+    expect(visaReport(shifts, employers, { program: au88, ...range }).totalDays).toBe(1);
+    const r462 = visaReport(shifts, employers, { program: au88, subclass: "462", ...range });
+    expect(r462.totalDays).toBe(0);
+    expect(r462.employers[0]).toMatchObject({ status: "not_eligible", reason: "work_type" });
+  });
+
+  test("the work postcode wins over the address one", () => {
+    const report = visaReport([entry("2026-01-05", 8, 8)], employers, { program: au88, ...range });
+    expect(report.confirmedDays).toBe(1);
+  });
+
+  test("a day with work that counts and work that doesn't is counted", () => {
+    const report = visaReport([entry("2026-01-05", 4, 6), entry("2026-01-05", 4, 1)], employers, {
+      program: au88,
+      ...range,
+    });
+    expect(report.days[0].status).toBe("confirmed");
+    expect(report.notEligibleDays).toBe(0);
+  });
+
+  test("hours that don't count don't make a full-time week", () => {
+    const week = [
+      ...["05", "06", "07"].map((d) => entry(`2026-01-${d}`, 7, 1)),
+      ...["08", "09"].map((d) => entry(`2026-01-${d}`, 7, 6)),
+    ];
+    const report = visaReport(week, employers, {
+      program: au88,
+      rule: "full_time_weeks",
+      ...range,
+    });
+    expect(report.totalDays).toBe(3);
+    expect(report.notEligibleDays).toBe(2);
   });
 });

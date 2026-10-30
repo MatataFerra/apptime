@@ -1,33 +1,18 @@
+import { canonicalCountry } from "@/services/Employer/country";
+
 import type { VisaCountry } from "./programs";
 
 /*
-  An employer's country is free text ("Australia", "NZ", "Nueva Zelanda",
-  or what a register lookup filled in). Only the countries with a visa
-  program are told apart; anything else is "another country".
+  An employer's country is the picker's English name, but older employers
+  may have "NZ" or "Nueva Zelanda": canonicalCountry reads them all. Only
+  the countries with a visa program are told apart; anything else is
+  "another country".
 */
 
-const NAMES: Record<VisaCountry, string[]> = {
-  AU: ["au", "aus", "australia", "commonwealth of australia"],
-  NZ: [
-    "nz",
-    "nzl",
-    "new zealand",
-    "nueva zelanda",
-    "neuseeland",
-    "aotearoa",
-    "aotearoa new zealand",
-  ],
+const PROGRAM_COUNTRIES: Record<string, VisaCountry> = {
+  Australia: "AU",
+  "New Zealand": "NZ",
 };
-
-function normalize(text: string) {
-  return text
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{M}/gu, "")
-    .replace(/[.,]/g, "")
-    .replace(/\s+/g, " ");
-}
 
 /**
  * "Australia" -> "AU". `null` when the employer has no country, "other"
@@ -35,7 +20,6 @@ function normalize(text: string) {
  */
 export function visaCountryOf(country: string | null | undefined): VisaCountry | "other" | null {
   if (!country?.trim()) return null;
-  const value = normalize(country);
-  const match = (Object.keys(NAMES) as VisaCountry[]).find((code) => NAMES[code].includes(value));
-  return match ?? "other";
+  const name = canonicalCountry(country);
+  return (name && PROGRAM_COUNTRIES[name]) || "other";
 }
