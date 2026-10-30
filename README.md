@@ -1,6 +1,6 @@
-# CasualApp (App Time)
+# NomadShift (App Time)
 
-A time and earnings tracker for casual and seasonal workers. I built it for a real problem: while working casual jobs I never knew how much I was going to be paid. CasualApp records your shifts, applies your hourly rate, taxes and contributions, and shows what you earned.
+A time and earnings tracker for casual and seasonal workers. I built it for a real problem: while working casual jobs I never knew how much I was going to be paid. NomadShift records your shifts, applies your hourly rate, taxes and contributions, and shows what you earned.
 
 ## Features
 

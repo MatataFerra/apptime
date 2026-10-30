@@ -129,7 +129,7 @@ export function EmailLayout({
                               color: EMAIL_COLORS.ink,
                             }}
                           >
-                            casualapp
+                            nomadshift
                           </span>
                         </a>
                       </td>

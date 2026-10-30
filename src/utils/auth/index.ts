@@ -64,7 +64,7 @@ async function withinRecipientBudget(kind: "reset" | "verify", to: string) {
 }
 
 export const auth = betterAuth({
-  appName: "CasualApp",
+  appName: "NomadShift",
   baseURL,
   // Vercel previews live on their own host; let them sign in too.
   trustedOrigins: process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : [],

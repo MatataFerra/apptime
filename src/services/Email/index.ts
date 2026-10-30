@@ -7,7 +7,7 @@ import "server-only";
 
 /**
  * Sends one of the app's emails through Resend, from
- * "CasualApp <{local}@RESEND_SENDER>". It goes as HTML and plain text (a
+ * "NomadShift <{local}@RESEND_SENDER>". It goes as HTML and plain text (a
  * text part is one of the things spam filters look for; Resend doesn't add
  * one on its own), with an optional Reply-To so replies reach a real inbox.
  */
@@ -26,7 +26,7 @@ export async function sendEmail({
   const html = await render(email);
   const resend = new Resend(process.env.RESEND_API_KEY);
   const { error } = await resend.emails.send({
-    from: `CasualApp <${local}@${process.env.RESEND_SENDER}>`,
+    from: `NomadShift <${local}@${process.env.RESEND_SENDER}>`,
     to,
     subject,
     html,

@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "CasualApp",
+    "title": "NomadShift",
     "description": "Track your hours and see what you earn, shift by shift."
   },
   "modules": {
@@ -54,7 +54,7 @@
     "menu": "Menu",
     "open_menu": "Open menu",
     "description": "This is the main menu, you can navigate to different sections of the app.",
-    "home_label": "CasualApp, home",
+    "home_label": "NomadShift, home",
     "your_account": "Your account",
     "log_in": "Log in",
     "log_out": "Log out",
@@ -148,20 +148,20 @@
   },
   "email": {
     "fallback": "Button not working? Copy this link into your browser:",
-    "footer": "CasualApp · Your hours and pay, season after season. You're getting this email because of an action on your account.",
+    "footer": "NomadShift · Your hours and pay, season after season. You're getting this email because of an action on your account.",
     "reset_password": {
-      "subject": "Reset your CasualApp password",
+      "subject": "Reset your NomadShift password",
       "preview": "Choose a new password. The link works for one hour.",
       "greeting": "Hi, {name}",
-      "body": "We got a request to reset the password of your CasualApp account. Choose a new one with the button below; the link works for one hour.",
+      "body": "We got a request to reset the password of your NomadShift account. Choose a new one with the button below; the link works for one hour.",
       "button": "Choose a new password",
       "not_you": "Didn't ask for this? You can ignore this email: your password stays the same."
     },
     "verify_email": {
-      "subject": "Confirm your new CasualApp email",
+      "subject": "Confirm your new NomadShift email",
       "preview": "Confirm this address to use it for your account.",
       "greeting": "Hi, {name}",
-      "body": "You asked to use this address for your CasualApp account. Confirm it with the button below; the link works for one hour.",
+      "body": "You asked to use this address for your NomadShift account. Confirm it with the button below; the link works for one hour.",
       "button": "Confirm my email",
       "not_you": "Wasn't you? Ignore this email: nothing changes in the account."
     },
@@ -384,7 +384,7 @@
     "badge": "Mobile only, for now",
     "eyebrow": "Made for your phone",
     "title": "Your season, tracked from your pocket.",
-    "body": "CasualApp is meant to be used on the job: start a shift, log your pieces and see what you've earned. Open it on your phone to get going.",
+    "body": "NomadShift is meant to be used on the job: start a shift, log your pieces and see what you've earned. Open it on your phone to get going.",
     "scan": "Scan to open on your phone",
     "scan_hint": "Point your phone's camera at the code.",
     "or_visit": "Or visit",

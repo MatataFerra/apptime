@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "CasualApp",
+    "title": "NomadShift",
     "description": "Registra tus horas y mira cuánto ganas, turno a turno."
   },
   "modules": {
@@ -54,7 +54,7 @@
     "menu": "Menú",
     "open_menu": "Abrir menú",
     "description": "Este es el menú principal, desde aquí puedes ir a las distintas secciones de la app.",
-    "home_label": "CasualApp, inicio",
+    "home_label": "NomadShift, inicio",
     "your_account": "Tu cuenta",
     "log_in": "Iniciar sesión",
     "log_out": "Cerrar sesión",
@@ -148,20 +148,20 @@
   },
   "email": {
     "fallback": "¿El botón no funciona? Copia este enlace en tu navegador:",
-    "footer": "CasualApp · Tus horas y tu pago, temporada tras temporada. Recibes este email por una acción en tu cuenta.",
+    "footer": "NomadShift · Tus horas y tu pago, temporada tras temporada. Recibes este email por una acción en tu cuenta.",
     "reset_password": {
-      "subject": "Restablece tu contraseña de CasualApp",
+      "subject": "Restablece tu contraseña de NomadShift",
       "preview": "Elige una contraseña nueva. El enlace funciona durante una hora.",
       "greeting": "Hola, {name}",
-      "body": "Recibimos un pedido para restablecer la contraseña de tu cuenta de CasualApp. Elige una nueva con el botón; el enlace funciona durante una hora.",
+      "body": "Recibimos un pedido para restablecer la contraseña de tu cuenta de NomadShift. Elige una nueva con el botón; el enlace funciona durante una hora.",
       "button": "Elegir contraseña nueva",
       "not_you": "¿No lo pediste tú? Puedes ignorar este email: tu contraseña no cambia."
     },
     "verify_email": {
-      "subject": "Confirma tu nuevo email de CasualApp",
+      "subject": "Confirma tu nuevo email de NomadShift",
       "preview": "Confirma esta dirección para usarla en tu cuenta.",
       "greeting": "Hola, {name}",
-      "body": "Pediste usar esta dirección para tu cuenta de CasualApp. Confírmala con el botón; el enlace funciona durante una hora.",
+      "body": "Pediste usar esta dirección para tu cuenta de NomadShift. Confírmala con el botón; el enlace funciona durante una hora.",
       "button": "Confirmar mi email",
       "not_you": "¿No fuiste tú? Ignora este email: no cambia nada en la cuenta."
     },
@@ -384,7 +384,7 @@
     "badge": "Solo móvil, por ahora",
     "eyebrow": "Hecha para tu teléfono",
     "title": "Tu temporada, en tu bolsillo.",
-    "body": "CasualApp está pensada para usarla en el trabajo: empieza un turno, registra tus piezas y mira cuánto ganaste. Ábrela en tu teléfono para empezar.",
+    "body": "NomadShift está pensada para usarla en el trabajo: empieza un turno, registra tus piezas y mira cuánto ganaste. Ábrela en tu teléfono para empezar.",
     "scan": "Escanea para abrirla en tu teléfono",
     "scan_hint": "Apunta la cámara de tu teléfono al código.",
     "or_visit": "O entra a",

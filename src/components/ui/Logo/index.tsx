@@ -13,26 +13,17 @@ interface Props {
 }
 
 /**
- * Brand mark: an open clock that reads as the "c" of casual.
- * The ring follows the current text colour; the hands use the accent.
+ * Brand mark: a compass — a ring with a tilted needle.
+ * The ring and the south half follow the current text colour; the north half uses the accent.
  */
 export function LogoMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" aria-hidden="true" className={cn("size-6", className)}>
-      <path
-        d="M26.4 10 A12 12 0 1 0 26.4 22"
-        stroke="currentColor"
-        strokeWidth="4"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <path
-        d="M16 16 L16 9.5 M16 16 L20 18.5"
-        stroke="var(--color-accent)"
-        strokeWidth="3"
-        strokeLinecap="round"
-        fill="none"
-      />
+      <circle cx="16" cy="16" r="12.5" stroke="currentColor" strokeWidth="3" fill="none" />
+      <g transform="rotate(40 16 16)">
+        <path d="M16 6.5 L19.4 16 L12.6 16 Z" fill="var(--color-accent)" />
+        <path d="M16 25.5 L19.4 16 L12.6 16 Z" fill="currentColor" />
+      </g>
     </svg>
   );
 }
@@ -49,7 +40,7 @@ function Logo({ withText, classes }: Props) {
       <LogoMark className="size-7" />
       {withText ? (
         <span className="font-logo text-[1.375rem] leading-none font-extrabold tracking-[-0.03em]">
-          casualapp
+          nomadshift
         </span>
       ) : null}
     </Link>

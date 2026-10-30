@@ -8,13 +8,13 @@ describe("email templates", () => {
     const html = await render(
       EmailTemplate({
         firstName: "Mati",
-        url: "https://casualapp.test/",
+        url: "https://nomadshift.test/",
         locale: "es",
         endpoint: "reset",
         token: "tok123",
       })
     );
-    const link = "https://casualapp.test/es/reset/tok123";
+    const link = "https://nomadshift.test/es/reset/tok123";
 
     expect(html).toContain('lang="es"');
     expect(html).toContain("Hola, Mati");
@@ -26,13 +26,13 @@ describe("email templates", () => {
 
   test("verify email: English copy and Better Auth's link", async () => {
     const url =
-      "https://casualapp.test/api/auth/verify-email?token=abc&callbackURL=%2Fen%2Fsettings";
+      "https://nomadshift.test/api/auth/verify-email?token=abc&callbackURL=%2Fen%2Fsettings";
     const html = await render(VerifyEmailTemplate({ firstName: "Mati", url, locale: "en" }));
     const text = toPlainText(html);
 
     expect(html).toContain("Confirm my email");
     expect(html).toContain("Confirm this address to use it for your account.");
     expect(text.toLowerCase()).toContain("hi, mati"); // headings come out in capitals
-    expect(text).toContain("https://casualapp.test/api/auth/verify-email?token=abc");
+    expect(text).toContain("https://nomadshift.test/api/auth/verify-email?token=abc");
   });
 });
