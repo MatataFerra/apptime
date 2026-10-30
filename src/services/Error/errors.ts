@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import cloneDeep from "lodash/cloneDeep";
 import { ZodError } from "zod";
 
@@ -128,17 +127,14 @@ export class InternalServer extends Error implements ExceptionsInterface {
     type_error: "InternalServer",
   };
 
-  handleError(error: unknown) {
-    if (error instanceof Error) {
-      this.exception.cause = error.message;
+  // The details stay in the server log: error messages from Prisma or the
+  // driver name tables, fields and queries, and this goes to the client.
+  handleError(error?: unknown) {
+    if (error !== undefined) {
+      // eslint-disable-next-line no-console -- server log for unexpected errors
+      console.error("[InternalServer]", error);
     }
-
-    if (error instanceof Prisma.PrismaClientInitializationError) {
-      this.exception.cause = error.message.split("\n").join(" ").trim();
-      this.exception.message = "Prisma Client Initialization Error";
-    }
-
-    return { ...this.exception, info: error };
+    return { ...this.exception };
   }
 }
 
