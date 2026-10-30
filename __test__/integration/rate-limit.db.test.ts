@@ -1,3 +1,4 @@
+// @vitest-environment node
 /**
  * Rate limiting on a real SQLite database (every migration applied to a
  * temp file): Better Auth's limiter with storage "database", and our own
@@ -34,7 +35,10 @@ vi.mock("next/headers", () => ({
 }));
 vi.mock("server-only", () => ({}));
 // The email's React template needs the dev JSX runtime, which NODE_ENV=production swaps out.
-vi.mock("@/components/ui/EmailTemplate", () => ({ EmailTemplate: () => null }));
+vi.mock("@/components/ui/EmailTemplate", () => ({
+  EmailTemplate: () => null,
+  VerifyEmailTemplate: () => null,
+}));
 vi.mock("resend", () => ({
   Resend: class {
     emails = {
@@ -177,6 +181,52 @@ describe("rate limiting on a real database", () => {
       }
       expect(results.slice(0, 10).every(Boolean)).toBe(true);
       expect(results[10]).toBe(false);
+    });
+
+    // Better Auth's own endpoints reach the same email callbacks and only
+    // limit per IP. Each request below comes from a new IP, so only the
+    // per-recipient budget in the callbacks applies.
+    let nextIp = 100;
+    function authPost(path: string, body: object) {
+      return auth.handler(
+        new Request(`http://localhost:3000/api/auth${path}`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            origin: "http://localhost:3000",
+            "x-forwarded-for": `198.51.100.${nextIp++}`,
+          },
+          body: JSON.stringify(body),
+        })
+      );
+    }
+
+    test("POST /api/auth/request-password-reset: 3 emails per address per hour", async () => {
+      for (let i = 0; i < 5; i++) {
+        const response = await authPost("/request-password-reset", {
+          email: i % 2 ? "ANA@x.com" : "ana@x.com",
+          redirectTo: "/en/reset",
+        });
+        // Same answer whether or not the email went out.
+        expect(response.status).toBe(200);
+      }
+      expect(env.emails).toEqual(["ana@x.com", "ana@x.com", "ana@x.com"]);
+    });
+
+    test("POST /api/auth/send-verification-email: 3 emails per address per hour", async () => {
+      for (let i = 0; i < 5; i++) {
+        const response = await authPost("/send-verification-email", { email: "ana@x.com" });
+        expect(response.status).toBe(200);
+      }
+      expect(env.emails).toEqual(["ana@x.com", "ana@x.com", "ana@x.com"]);
+    });
+
+    test("the reset budget doesn't use up the verification one", async () => {
+      for (let i = 0; i < 3; i++) {
+        await authPost("/request-password-reset", { email: "ana@x.com", redirectTo: "/en/reset" });
+      }
+      await authPost("/send-verification-email", { email: "ana@x.com" });
+      expect(env.emails).toHaveLength(4);
     });
 
     test("when limited, it says so and sends nothing", async () => {

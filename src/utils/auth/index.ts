@@ -6,6 +6,7 @@ import { nextCookies } from "better-auth/next-js";
 import PasswordService from "@/services/Auth/password";
 import { sendEmail } from "@/services/Email";
 import { sendSecurityNotice } from "@/services/Email/security";
+import { consumeRateLimit } from "@/services/RateLimit";
 
 import type { Locale } from "@/types";
 
@@ -42,6 +43,26 @@ const baseURL = process.env.BETTER_AUTH_URL ?? process.env.NEXTAUTH_URL;
  * database sessions in the Session table, cached in a signed cookie for
  * 5 minutes so most requests don't hit Turso.
  */
+/**
+ * Reset and verification emails per recipient, checked where they're sent:
+ * the server action has its own limits, but /api/auth/request-password-reset,
+ * /send-verification-email and /change-email reach these callbacks directly
+ * and Better Auth only limits them per IP (3 a minute). Over the budget the
+ * email is skipped quietly; the response stays the same, so nothing tells
+ * whether the address has an account.
+ */
+const EMAILS_PER_RECIPIENT = { window: 60 * 60, max: 3 };
+
+async function withinRecipientBudget(kind: "reset" | "verify", to: string) {
+  const ok = await consumeRateLimit(
+    `${kind}-email:sent:${to.trim().toLowerCase()}`,
+    EMAILS_PER_RECIPIENT
+  );
+  // eslint-disable-next-line no-console -- server log when an email is skipped
+  if (!ok) console.warn(`[auth] ${kind} email skipped: recipient limit reached`);
+  return ok;
+}
+
 export const auth = betterAuth({
   appName: "CasualApp",
   baseURL,
@@ -68,6 +89,7 @@ export const auth = betterAuth({
       });
     },
     async sendResetPassword({ user, url, token }) {
+      if (!(await withinRecipientBudget("reset", user.email))) return;
       const locale = localeFromCallback(url);
       await sendEmail({
         local: "resetpassword",
@@ -92,6 +114,8 @@ export const auth = betterAuth({
   emailVerification: {
     expiresIn: 60 * 60,
     async sendVerificationEmail({ user, url }) {
+      // user.email is the address being confirmed (the new one on a change).
+      if (!(await withinRecipientBudget("verify", user.email))) return;
       const locale = localeFromCallback(url);
       await sendEmail({
         local: "account",
