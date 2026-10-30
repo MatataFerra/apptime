@@ -15,8 +15,6 @@ export const envSchema = z.object({
   NEXT_PUBLIC_SHOW_DEVTOOLS: z.string(),
   /** libsql:// URL of the Turso database. Server only. */
   TURSO_DATABASE_URL: z.string().optional(),
-  /** Old name of TURSO_DATABASE_URL, read as a fallback. */
-  NEXT_PUBLIC_TURSO_DATABASE_URL: z.string().optional(),
   TURSO_ON: z.string(),
   RESEND_API_KEY: z.string(),
   RESEND_SENDER: z.string(),
