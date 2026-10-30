@@ -183,6 +183,24 @@ export const auth = betterAuth({
   },
 
   databaseHooks: {
+    // A deactivated account (User.isActive false, set by an admin) can't get
+    // a session by any route: email, Google, the sign-in after sign up.
+    session: {
+      create: {
+        async before(session) {
+          const user = await prisma.user.findUnique({
+            where: { id: session.userId },
+            select: { isActive: true },
+          });
+          if (user && !user.isActive) {
+            throw new APIError("FORBIDDEN", {
+              message: "This account is disabled",
+              code: "ACCOUNT_DISABLED",
+            });
+          }
+        },
+      },
+    },
     user: {
       create: {
         // Every user needs their Shift container (shifts hang from it) and

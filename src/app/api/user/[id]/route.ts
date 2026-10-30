@@ -60,12 +60,14 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const updatedUser = await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: isAdmin ? parsedBody.data : selfServiceFields(parsedBody.data),
-    });
+    const data = isAdmin ? parsedBody.data : selfServiceFields(parsedBody.data);
+    // Deactivating an account also signs it out everywhere: without a
+    // session row, its cookies stop working once the 2-minute cache ends.
+    const deactivate = isAdmin && parsedBody.data.isActive === false && user.isActive;
+    const [updatedUser] = await prisma.$transaction([
+      prisma.user.update({ where: { id: user.id }, data }),
+      ...(deactivate ? [prisma.session.deleteMany({ where: { userId: user.id } })] : []),
+    ]);
 
     return NextResponse.json(
       {
