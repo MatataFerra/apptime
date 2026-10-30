@@ -1,8 +1,9 @@
 "use server";
 
+import { headers } from "next/headers";
 import { z } from "zod";
 
-import { consumeRateLimit } from "@/services/RateLimit";
+import { clientIp, consumeRateLimit } from "@/services/RateLimit";
 import { type LookupOutcome, readQuery, runQuery } from "@/services/Registry";
 import type { RegistryId } from "@/services/Registry/types";
 
@@ -10,6 +11,17 @@ import { getSession } from "@/utils/auth/session";
 
 /** Plenty for filling in a few employers; stops the action being used as a proxy. */
 const PER_USER = { window: 10 * 60, max: 30 };
+/**
+ * Accounts are free and unverified, so a per-user limit alone multiplies
+ * with sign-ups. Per IP: room for a few people behind the same network.
+ */
+const PER_IP = { window: 10 * 60, max: 60 };
+/**
+ * Every lookup spends the app's own ABR GUID / NZBN key, whoever asks.
+ * A ceiling per register keeps that quota from being drained. Set it below
+ * the provider's limit for the key.
+ */
+const PER_REGISTRY = { window: 60 * 60, max: 600 };
 
 const InputSchema = z.object({
   registry: z.enum(["abr", "nzbn", "vies"]),
@@ -37,8 +49,16 @@ export async function onLookupBusiness(
   // A mistyped number is caught here: no call, no quota spent.
   if (read.kind === "invalid") return { ok: false, error: read.error };
 
-  if (!(await consumeRateLimit(`business-lookup:user:${userId}`, PER_USER))) {
-    return { ok: false, error: "lookup_rate_limited" };
+  // Cheapest scope first, so one client can't use up the shared ceiling
+  // with requests its own limits would refuse.
+  const ip = clientIp(await headers());
+  const limits: [string, typeof PER_USER][] = [
+    [`business-lookup:user:${userId}`, PER_USER],
+    [`business-lookup:ip:${ip}`, PER_IP],
+    [`business-lookup:registry:${input.data.registry}`, PER_REGISTRY],
+  ];
+  for (const [key, rule] of limits) {
+    if (!(await consumeRateLimit(key, rule))) return { ok: false, error: "lookup_rate_limited" };
   }
 
   try {

@@ -3,11 +3,21 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   session: { user: { id: "u1" } } as { user: { id: string } } | null,
   allowed: true,
+  // Keys refused by the limiter (empty: everything allowed).
+  refused: [] as string[],
 }));
 
 vi.mock("server-only", () => ({}));
 vi.mock("@/utils/auth/session", () => ({ getSession: async () => mocks.session }));
-vi.mock("@/services/RateLimit", () => ({ consumeRateLimit: vi.fn(async () => mocks.allowed) }));
+vi.mock("next/headers", () => ({
+  headers: async () => new Headers({ "x-forwarded-for": "203.0.113.9, 10.0.0.1" }),
+}));
+vi.mock("@/services/RateLimit", async (importOriginal) => ({
+  clientIp: (await importOriginal<typeof import("@/services/RateLimit")>()).clientIp,
+  consumeRateLimit: vi.fn(
+    async (key: string) => mocks.allowed && !mocks.refused.some((p) => key.startsWith(p))
+  ),
+}));
 
 import { consumeRateLimit } from "@/services/RateLimit";
 
@@ -27,6 +37,7 @@ function calledUrl(i = 0) {
 beforeEach(() => {
   mocks.session = { user: { id: "u1" } };
   mocks.allowed = true;
+  mocks.refused = [];
   process.env.ABR_GUID = "abr-guid";
   process.env.NZBN_API_KEY = "nz-key";
   fetchMock.mockReset();
@@ -50,7 +61,11 @@ describe("onLookupBusiness", () => {
       details: { registry: "abr", id: "51 824 753 556" },
       searchedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T/),
     });
-    expect(consumeRateLimit).toHaveBeenCalledWith("business-lookup:user:u1", expect.anything());
+    expect(vi.mocked(consumeRateLimit).mock.calls.map(([key]) => key)).toEqual([
+      "business-lookup:user:u1",
+      "business-lookup:ip:203.0.113.9",
+      "business-lookup:registry:abr",
+    ]);
   });
 
   test("New Zealand: NZBN to /entities/{nzbn} with the key; a name to the search", async () => {
@@ -130,6 +145,28 @@ describe("onLookupBusiness", () => {
       error: "lookup_rate_limited",
     });
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  // The per-user limit multiplies with free sign-ups; the IP and the
+  // shared per-register ceiling don't.
+  test.each([
+    ["the client's IP", "business-lookup:ip:"],
+    ["the register's shared ceiling", "business-lookup:registry:nzbn"],
+  ])("over %s: refused, and no call is made", async (_label, prefix) => {
+    mocks.refused = [prefix];
+    expect(await onLookupBusiness("nzbn", "9429041234563")).toEqual({
+      ok: false,
+      error: "lookup_rate_limited",
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  test("a user over their own limit doesn't eat the IP or shared budget", async () => {
+    mocks.refused = ["business-lookup:user:"];
+    await onLookupBusiness("nzbn", "9429041234563");
+    expect(vi.mocked(consumeRateLimit).mock.calls.map(([key]) => key)).toEqual([
+      "business-lookup:user:u1",
+    ]);
   });
 
   test("a register down: a plain error", async () => {

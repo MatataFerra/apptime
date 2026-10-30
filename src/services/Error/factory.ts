@@ -43,12 +43,13 @@ export class ErrorBoundary extends Error implements ExceptionsInterface {
     type_error: "CustomError",
   };
 
+  // A custom message is meant for the client; a thrown error isn't (it
+  // goes to the server log instead).
   handleError(error?: unknown) {
-    if (error instanceof Error) {
-      this.exception.cause = error.message;
-    }
-
-    return { ...this.exception, info: error };
+    if (typeof error === "string") return { ...this.exception, info: error };
+    // eslint-disable-next-line no-console -- server log for unexpected errors
+    console.error("[CustomError]", error);
+    return { ...this.exception };
   }
 }
 

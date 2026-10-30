@@ -1,3 +1,4 @@
+// @vitest-environment node
 /**
  * Rate limiting on a real SQLite database (every migration applied to a
  * temp file): Better Auth's limiter with storage "database", and our own
@@ -34,7 +35,10 @@ vi.mock("next/headers", () => ({
 }));
 vi.mock("server-only", () => ({}));
 // The email's React template needs the dev JSX runtime, which NODE_ENV=production swaps out.
-vi.mock("@/components/ui/EmailTemplate", () => ({ EmailTemplate: () => null }));
+vi.mock("@/components/ui/EmailTemplate", () => ({
+  EmailTemplate: () => null,
+  VerifyEmailTemplate: () => null,
+}));
 vi.mock("resend", () => ({
   Resend: class {
     emails = {
@@ -126,6 +130,36 @@ describe("rate limiting on a real database", () => {
         1
       );
     });
+
+    // A burst arriving together used to all fall into "open a new window"
+    // and every request was let through.
+    async function burst(key: string, rule: { window: number; max: number }, size = 30) {
+      const results = await Promise.all(
+        Array.from({ length: size }, () => consumeRateLimit(key, rule))
+      );
+      return results.filter(Boolean).length;
+    }
+
+    test("a concurrent burst on a new key gets exactly max", async () => {
+      expect(await burst("race-new", { window: 60, max: 3 })).toBe(3);
+      expect(
+        (await prisma.actionRateLimit.findUniqueOrThrow({ where: { key: "race-new" } })).count
+      ).toBe(3);
+    });
+
+    test("a concurrent burst when the window has just ended gets exactly max", async () => {
+      await prisma.actionRateLimit.create({
+        data: { key: "race-old", count: 3, windowStart: new Date(Date.now() - 61_000) },
+      });
+      expect(await burst("race-old", { window: 60, max: 3 })).toBe(3);
+    });
+
+    test("a concurrent burst on a full window gets nothing", async () => {
+      await prisma.actionRateLimit.create({
+        data: { key: "race-full", count: 3, windowStart: new Date() },
+      });
+      expect(await burst("race-full", { window: 60, max: 3 })).toBe(0);
+    });
   });
 
   describe("reset password email", () => {
@@ -147,6 +181,52 @@ describe("rate limiting on a real database", () => {
       }
       expect(results.slice(0, 10).every(Boolean)).toBe(true);
       expect(results[10]).toBe(false);
+    });
+
+    // Better Auth's own endpoints reach the same email callbacks and only
+    // limit per IP. Each request below comes from a new IP, so only the
+    // per-recipient budget in the callbacks applies.
+    let nextIp = 100;
+    function authPost(path: string, body: object) {
+      return auth.handler(
+        new Request(`http://localhost:3000/api/auth${path}`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            origin: "http://localhost:3000",
+            "x-forwarded-for": `198.51.100.${nextIp++}`,
+          },
+          body: JSON.stringify(body),
+        })
+      );
+    }
+
+    test("POST /api/auth/request-password-reset: 3 emails per address per hour", async () => {
+      for (let i = 0; i < 5; i++) {
+        const response = await authPost("/request-password-reset", {
+          email: i % 2 ? "ANA@x.com" : "ana@x.com",
+          redirectTo: "/en/reset",
+        });
+        // Same answer whether or not the email went out.
+        expect(response.status).toBe(200);
+      }
+      expect(env.emails).toEqual(["ana@x.com", "ana@x.com", "ana@x.com"]);
+    });
+
+    test("POST /api/auth/send-verification-email: 3 emails per address per hour", async () => {
+      for (let i = 0; i < 5; i++) {
+        const response = await authPost("/send-verification-email", { email: "ana@x.com" });
+        expect(response.status).toBe(200);
+      }
+      expect(env.emails).toEqual(["ana@x.com", "ana@x.com", "ana@x.com"]);
+    });
+
+    test("the reset budget doesn't use up the verification one", async () => {
+      for (let i = 0; i < 3; i++) {
+        await authPost("/request-password-reset", { email: "ana@x.com", redirectTo: "/en/reset" });
+      }
+      await authPost("/send-verification-email", { email: "ana@x.com" });
+      expect(env.emails).toHaveLength(4);
     });
 
     test("when limited, it says so and sends nothing", async () => {

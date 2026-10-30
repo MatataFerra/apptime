@@ -1,5 +1,7 @@
 import { isWeekend, parseISO, subDays } from "date-fns";
 
+import { isCurrency } from "@/utils/constants/currencies";
+
 import "server-only";
 
 import {
@@ -37,7 +39,13 @@ async function fetchRates(from: string, to: string, quotes: string[]): Promise<R
  * API is down, whatever is stored is returned.
  */
 export async function getRateTable(from: string, to: string, quotes: string[]) {
-  const wanted = [...new Set(quotes.map((q) => q.toUpperCase()))].filter((q) => q !== RATE_BASE);
+  // Only the currencies the app offers. A code Frankfurter doesn't publish
+  // never gets a stored row, so it kept every day "missing": each request
+  // skipped the hourly throttle, fetched the whole range again and rewrote
+  // it. Unsupported codes just get no rates (the client shows them as-is).
+  const wanted = [...new Set(quotes.map((q) => q.toUpperCase()))].filter(
+    (q) => q !== RATE_BASE && isCurrency(q)
+  );
   if (wanted.length === 0) return {};
 
   const stored = await prisma.exchangeRate.findMany({

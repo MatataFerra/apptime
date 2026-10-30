@@ -67,11 +67,14 @@ export async function GET(req: NextRequest) {
         // shifts=true: the container with both shift lists. Otherwise only the
         // container row (its id is all the client needs; the lists have their
         // own queries).
-        shifts: JSON.parse(parsedSearchParams.data.shifts ?? "false")
-          ? { include: { hourly: true, production: true } }
-          : true,
-        profile: JSON.parse(parsedSearchParams.data.profile ?? "false"),
-        config: JSON.parse(parsedSearchParams.data.config ?? "false"),
+        // The flags are validated as "true" | "false" and only ever become
+        // booleans here: the client never shapes the include itself.
+        shifts:
+          parsedSearchParams.data.shifts === "true"
+            ? { include: { hourly: true, production: true } }
+            : true,
+        profile: parsedSearchParams.data.profile === "true",
+        config: parsedSearchParams.data.config === "true",
       },
     });
 
