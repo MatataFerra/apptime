@@ -45,6 +45,7 @@ import { auth } from "@/utils/auth";
 import { getRequestSession } from "@/utils/auth/session";
 
 import { GET as getHourly } from "@/app/api/shift/hourly/route";
+import { GET as getUser } from "@/app/api/user/route";
 import prisma from "#/prisma/client";
 
 const PASSWORD = "Secreto123!";
@@ -160,6 +161,35 @@ describe("email confirmation on a real database", () => {
     expect((await hourlyAs(newCookie)).status).toBe(200);
     // A device still holding the old cached cookie isn't locked out either.
     expect((await hourlyAs(oldCookie)).status).toBe(200);
+  });
+
+  test("the link from the register form lands on Settings, signed in and confirmed", async () => {
+    env.sent.length = 0;
+    await post("/sign-up/email", {
+      email: "gus@x.com",
+      password: PASSWORD,
+      name: "gus",
+      callbackURL: "/es/settings?email=verified",
+    });
+    const mail = env.sent.find((m) => m.to === "gus@x.com")!;
+    // Built from the callback: in Spanish.
+    expect(mail.subject).toBe("Confirma tu email de CasualApp");
+
+    // Opened on another device, with no session there.
+    const verify = await auth.handler(new Request(mail.url));
+    expect(verify.status).toBe(302);
+    expect(verify.headers.get("location")).toBe("/es/settings?email=verified");
+
+    // That device is signed in, and Settings reads the email as confirmed.
+    const cookie = cookieFrom(verify.headers);
+    const response = await getUser(
+      new NextRequest("http://localhost:3000/api/user", { headers: { cookie } })
+    );
+    expect(response.status).toBe(200);
+    expect((await response.json()).user).toMatchObject({
+      email: "gus@x.com",
+      emailVerified: true,
+    });
   });
 
   test("the confirmation link can be sent again", async () => {

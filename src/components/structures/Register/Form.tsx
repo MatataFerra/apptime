@@ -60,8 +60,9 @@ function RegisterForm() {
         email,
         password,
         name: email.split("@")[0],
-        // Where the confirmation email's link lands (and its language).
-        callbackURL: `/${locale}`,
+        // Where the confirmation email's link lands (and its language):
+        // Settings says the email is confirmed.
+        callbackURL: `/${locale}/settings?email=verified`,
       }),
 
     onMutate() {

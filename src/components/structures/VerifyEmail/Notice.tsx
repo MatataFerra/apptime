@@ -21,8 +21,9 @@ function VerifyEmailNotice({ email }: { email: string }) {
     setSending(true);
     const { error } = await authClient.sendVerificationEmail({
       email,
-      // After confirming, back to the app (signed in, restriction lifted).
-      callbackURL: `/${locale}`,
+      // After confirming, to Settings (signed in, restriction lifted), which
+      // says the email is confirmed.
+      callbackURL: `/${locale}${PATH_NAMES.SETTINGS}?email=verified`,
     });
     setSending(false);
     Toast(

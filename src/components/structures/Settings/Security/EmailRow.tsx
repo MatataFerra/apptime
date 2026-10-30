@@ -13,8 +13,11 @@ import { authClient } from "@/utils/auth/client";
 
 import { authErrorKey, FIELD, PANEL } from "./shared";
 
-/** The sign-in email; a new one is confirmed from its own inbox first. */
-function EmailRow({ email }: { email: string }) {
+/**
+ * The sign-in email, whether it's confirmed (with a way to resend the link
+ * if not), and changing it: a new one is confirmed from its own inbox first.
+ */
+function EmailRow({ email, verified }: { email: string; verified: boolean }) {
   const t = useTranslations("settings.security");
   const te = useTranslations("errors");
   const locale = useLocale();
@@ -22,6 +25,24 @@ function EmailRow({ email }: { email: string }) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
   const [busy, setBusy] = useState(false);
+  const [resending, setResending] = useState(false);
+
+  async function resend() {
+    setResending(true);
+    const { error } = await authClient.sendVerificationEmail({
+      email,
+      callbackURL: `/${locale}/settings?email=verified`,
+    });
+    setResending(false);
+    Toast(
+      error
+        ? {
+            type: "error",
+            message: t(error.status === 429 ? "verify_too_many" : "verify_not_sent"),
+          }
+        : { type: "success", message: t("verify_sent"), description: email }
+    );
+  }
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -57,6 +78,15 @@ function EmailRow({ email }: { email: string }) {
   return (
     <>
       <Row label={t("email")} hint={email}>
+        <span
+          className={
+            verified
+              ? "shrink-0 rounded-full bg-accent-soft px-2 py-0.5 text-xs font-medium text-accent"
+              : "shrink-0 rounded-full bg-warning-soft px-2 py-0.5 text-xs font-medium text-warning"
+          }
+        >
+          {verified ? t("email_verified") : t("email_unverified")}
+        </span>
         {open ? null : (
           <Button
             type="button"
@@ -69,6 +99,21 @@ function EmailRow({ email }: { email: string }) {
           </Button>
         )}
       </Row>
+      {verified ? null : (
+        <div className="flex items-center justify-between gap-4 px-4 pb-3">
+          <p className="text-[0.8125rem] text-ink-muted">{t("verify_hint")}</p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            classes="w-auto shrink-0"
+            disabled={resending}
+            onClick={resend}
+          >
+            {resending ? t("sending") : t("verify_resend")}
+          </Button>
+        </div>
+      )}
       {open ? (
         <form className={PANEL} onSubmit={onSubmit}>
           <label htmlFor={inputId} className="text-sm font-medium text-ink">

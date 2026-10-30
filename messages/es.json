@@ -887,7 +887,15 @@
       "sign_out_others": "Cerrar sesión en los demás",
       "signed_out_others": "Sesión cerrada en los demás dispositivos",
       "signed_out_others_hint": "Pueden seguir funcionando hasta 2 minutos.",
-      "no_other_sessions": "No hay otros dispositivos con la sesión abierta."
+      "no_other_sessions": "No hay otros dispositivos con la sesión abierta.",
+      "email_verified": "Confirmado",
+      "email_unverified": "Sin confirmar",
+      "email_verified_toast": "Email confirmado",
+      "verify_hint": "Confírmalo con el enlace que te enviamos.",
+      "verify_resend": "Reenviar enlace",
+      "verify_sent": "Enlace enviado",
+      "verify_not_sent": "No pudimos enviarlo. Inténtalo de nuevo en un momento.",
+      "verify_too_many": "Demasiados emails a esta dirección. Inténtalo de nuevo en una hora."
     },
     "data": {
       "title": "Tus datos guardados",

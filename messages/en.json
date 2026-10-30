@@ -887,7 +887,15 @@
       "sign_out_others": "Sign out of other devices",
       "signed_out_others": "Other devices signed out",
       "signed_out_others_hint": "They may keep working for up to 2 minutes.",
-      "no_other_sessions": "No other devices are signed in."
+      "no_other_sessions": "No other devices are signed in.",
+      "email_verified": "Confirmed",
+      "email_unverified": "Not confirmed",
+      "email_verified_toast": "Email confirmed",
+      "verify_hint": "Confirm it from the link we emailed you.",
+      "verify_resend": "Resend link",
+      "verify_sent": "Link sent",
+      "verify_not_sent": "We couldn't send it. Try again in a moment.",
+      "verify_too_many": "Too many emails to this address. Try again in an hour."
     },
     "data": {
       "title": "Your data",
