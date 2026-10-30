@@ -2,7 +2,7 @@
 
 import type { Hourly } from "@prisma/client";
 import isEmpty from "lodash/isEmpty";
-import omit from "lodash/omit";
+import { z } from "zod";
 
 import { ownEmployerId } from "@/services/Employer/owned";
 import ShiftService from "@/services/Shift";
@@ -21,6 +21,22 @@ type UpdateTrackData = Partial<TrackInputs> & {
   contributions: ContributionElement[];
 };
 
+/*
+ * What closing a tracked shift can change. The rest of the row (its id,
+ * container, holiday rate, source…) is the server's: unknown keys are dropped.
+ */
+const TrackClose = z.object({
+  name: z.string().max(120).nullish(),
+  startDate: z.string().min(1).max(100),
+  endDate: z.string().max(100).nullish(),
+  notes: z.string().max(2000).nullish(),
+  hourValue: z.number().min(0),
+  unpaidBreaks: z.number().min(0).nullish(),
+  isPublicHoliday: z.boolean().optional(),
+  publicHolidayWorked: z.boolean().optional(),
+  currency: z.string().max(8).nullish(),
+});
+
 export default async function onUpdateTrackJob(data: UpdateTrackData, shiftId: number | undefined) {
   const currentUser = await UserService.getSessionOwner();
 
@@ -30,6 +46,9 @@ export default async function onUpdateTrackJob(data: UpdateTrackData, shiftId: n
 
   const ownShiftId = currentUser.shifts?.id;
   if (!ownShiftId || !shiftId || isEmpty(data)) return null;
+
+  const fields = TrackClose.safeParse(data);
+  if (!fields.success) return null;
 
   // Only the user's own shift can be closed; someone else's id is "not found".
   const owned = await prisma.hourly
@@ -46,17 +65,17 @@ export default async function onUpdateTrackJob(data: UpdateTrackData, shiftId: n
     .findUnique({ where: { userId: currentUser.id }, select: { roundMinutes: true } })
     .catch(() => null);
   const rounded =
-    config?.roundMinutes && data.startDate
+    config?.roundMinutes && fields.data.startDate
       ? roundShiftTimes(
-          new Date(data.startDate),
-          data.endDate ? new Date(data.endDate) : new Date(),
+          new Date(fields.data.startDate),
+          fields.data.endDate ? new Date(fields.data.endDate) : new Date(),
           config.roundMinutes
         )
       : null;
 
   // Which row it is and whose container it's in come from the server, not the client.
   const prepareShift = {
-    ...omit(data, ["id", "shiftId", "shift", "employer", "employerId"]),
+    ...fields.data,
     ...(rounded && {
       startDate: rounded.start.toString(),
       endDate: rounded.end.toString(),
