@@ -45,12 +45,14 @@ vi.mock("@/services/Summary", async (orig) => ({
   summarizeWeek: () => week,
   summarizePeriod: () => ({ earned: 851 }),
 }));
-vi.mock("@/hooks/useUser", () => ({ default: () => ({ data: { config: {} } }) }));
+vi.mock("@/hooks/useUser", () => ({ default: () => ({ data: { config: {} }, isLoading: false }) }));
+const loading = vi.hoisted(() => ({ shifts: false, rates: false }));
 vi.mock("@/hooks/useShiftsInCurrency", () => ({
   default: () => ({
     allHourly: [],
     allProduction: [],
-    isLoading: false,
+    isLoadingShifts: loading.shifts,
+    isLoading: loading.shifts || loading.rates,
     otherCurrencies: [],
     convertedFrom: [],
     currency: "AUD",
@@ -67,7 +69,10 @@ vi.mock("@/hooks/useMoney", () => ({
   useCurrency: () => "AUD",
 }));
 
-import WeekSummary from "@/components/structures/Home/WeekSummary";
+import { calendarDays } from "@/components/structures/Home/WeekSummary/shared";
+import WeekSummaryCard from "@/components/structures/Home/WeekSummary/WeekSummaryCard";
+
+import { wallClock } from "@/utils/helpers/userNow";
 
 import { renderWithIntl } from "#/__test__/utils/intl";
 
@@ -75,9 +80,49 @@ describe("WeekSummary", () => {
   async function renderOn(day: Date, locale: "en" | "es") {
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(day);
-    renderWithIntl(<WeekSummary />, locale);
+    // What the server shell passes: the range and calendar row it worked out.
+    renderWithIntl(
+      <WeekSummaryCard range="server range" days={calendarDays(days[0].date, day, locale)} />,
+      locale
+    );
     await act(async () => {});
   }
+
+  test("while the shifts load, the server's range and calendar row show", async () => {
+    loading.shifts = true;
+    await renderOn(new Date(2026, 9, 22, 10), "es");
+
+    expect(screen.getByText("server range")).toBeInTheDocument();
+    const list = screen.getByRole("list", { name: "Ganancias por día" });
+    expect(list).toHaveAttribute("aria-busy", "true");
+    const items = within(list).getAllByRole("listitem");
+    expect(items.map((d) => d.textContent)).toEqual([
+      "L19",
+      "M20",
+      "X21",
+      "J22",
+      "V23",
+      "S24",
+      "D25",
+    ]);
+    expect(items[3]).toHaveAttribute("aria-current", "date");
+    expect(within(list).queryByRole("button")).toBeNull();
+    expect(screen.queryByText("32.3h")).toBeNull();
+    loading.shifts = false;
+    vi.useRealTimers();
+  });
+
+  test("hours and shifts show before the rates; money waits for them", async () => {
+    loading.rates = true;
+    await renderOn(new Date(2026, 9, 22, 10), "en");
+
+    expect(screen.getByText("19 to 25 Oct")).toBeInTheDocument();
+    expect(screen.getByText("32.3h")).toBeInTheDocument();
+    expect(screen.queryByText("$851.00")).toBeNull();
+    expect(screen.getByRole("list", { name: "Earnings per day" })).toHaveAttribute("aria-busy");
+    loading.rates = false;
+    vi.useRealTimers();
+  });
 
   test("each day shows its initial and date, today marked", async () => {
     await renderOn(new Date(2026, 9, 22, 10), "es");
@@ -141,5 +186,16 @@ describe("WeekSummary", () => {
     ]);
     expect(within(detail).getByText("Day total")).toBeInTheDocument();
     expect(within(detail).getByText("$215")).toBeInTheDocument();
+  });
+});
+
+describe("wallClock", () => {
+  test("reads the user's day, not the server's", () => {
+    // 23:30 UTC on Saturday is already Sunday morning in Auckland.
+    const now = new Date(Date.UTC(2026, 9, 31, 23, 30));
+    const auckland = wallClock("Pacific/Auckland", now);
+    expect([auckland.getDate(), auckland.getHours(), auckland.getMinutes()]).toEqual([1, 12, 30]);
+    const buenosAires = wallClock("America/Argentina/Buenos_Aires", now);
+    expect([buenosAires.getDate(), buenosAires.getHours()]).toEqual([31, 20]);
   });
 });

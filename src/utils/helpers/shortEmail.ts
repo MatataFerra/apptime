@@ -1,6 +1,4 @@
-import { UserType } from "@/types";
-
-export function shortEmail({ user }: { user: UserType | null }): string {
+export function shortEmail({ user }: { user: { email: string } | null }): string {
   if (!user) return "";
 
   const splitEmail = user?.email.split("@");

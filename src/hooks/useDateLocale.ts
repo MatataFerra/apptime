@@ -1,20 +1,14 @@
 import { useMemo } from "react";
 
-import { enUS, es } from "date-fns/locale";
 import { useLocale } from "next-intl";
 
 import type { Locale } from "@/types";
 
-import { withDateFormats } from "@/utils/helpers/dateFormats";
+import { DATE_LOCALES, dateLocaleFor, withDateFormats } from "@/utils/helpers/dateFormats";
 
 import { useDateFormatStore } from "@/store/useDateFormatStore";
 
-export const DATE_LOCALES = { en: enUS, es } as const;
-
-/** date-fns locale for an app locale (day and month names in `format`). */
-export function dateLocaleFor(locale: Locale) {
-  return DATE_LOCALES[locale] ?? enUS;
-}
+export { DATE_LOCALES, dateLocaleFor };
 
 /**
  * date-fns locale for the current language, with the 12/24 h clock and date

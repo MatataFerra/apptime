@@ -1,4 +1,12 @@
-import type { FormatLongFn,Locale as DateLocale } from "date-fns";
+import type { FormatLongFn, Locale as DateLocale } from "date-fns";
+import { enUS, es } from "date-fns/locale";
+
+export const DATE_LOCALES = { en: enUS, es } as const;
+
+/** date-fns locale for an app locale (day and month names in `format`). */
+export function dateLocaleFor(locale: string) {
+  return DATE_LOCALES[locale as keyof typeof DATE_LOCALES] ?? enUS;
+}
 
 /** "auto" follows the app's language. */
 export const TIME_FORMATS = ["auto", "12", "24"] as const;
