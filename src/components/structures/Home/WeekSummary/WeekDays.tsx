@@ -153,23 +153,19 @@ function WeekDays({ placeholder }: { placeholder: ReactNode }) {
       {week.days.map((day, i) => {
         const total = day.hourly + day.production;
         const otherOnly = total === 0 && worked.days[i].hourly + worked.days[i].production > 0;
-        const { isToday } = dates[i];
+        const { key, ...date } = dates[i];
         const label = `${format(day.date, "EEEE d", { locale })}: ${
           total > 0 ? money(total) : otherOnly ? t("other_currency") : t("no_shifts")
         }`;
         const content = (
           <>
             <DayBar day={day} max={max} otherOnly={otherOnly} />
-            <DayDate {...dates[i]} />
+            <DayDate {...date} />
           </>
         );
 
         return (
-          <li
-            key={dates[i].key}
-            className="flex flex-col"
-            aria-current={isToday ? "date" : undefined}
-          >
+          <li key={key} className="flex flex-col" aria-current={date.isToday ? "date" : undefined}>
             {day.shifts.length > 0 ? (
               <DayDetail day={day} money={money} label={label}>
                 {content}
