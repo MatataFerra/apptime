@@ -44,27 +44,34 @@ export function EmailTemplate({ firstName, url, locale, endpoint, token }: Email
 
 interface VerifyEmailTemplateProps {
   firstName: string;
-  /** Better Auth's verify link: applies the change and goes back to Settings. */
+  /** Better Auth's verify link: marks the address verified and goes back to the app. */
   url: string;
   locale: Locale;
+  /** signup: confirm the account's email; change: confirm a new one from Settings. */
+  kind?: "signup" | "change";
 }
 
-/** Confirms a new email address before it replaces the current one. */
-export function VerifyEmailTemplate({ firstName, url, locale }: VerifyEmailTemplateProps) {
+/** Confirms the email of a new account, or a new address before it replaces the current one. */
+export function VerifyEmailTemplate({
+  firstName,
+  url,
+  locale,
+  kind = "change",
+}: VerifyEmailTemplateProps) {
   const t = translatorFor(locale);
 
   return (
     <EmailLayout
       lang={locale}
-      title={t("email.verify_email.subject")}
-      preview={t("email.verify_email.preview")}
+      title={t(`email.verify_email.${kind}.subject`)}
+      preview={t(`email.verify_email.${kind}.preview`)}
       footer={t("email.footer")}
     >
       <EmailHeading>{t("email.verify_email.greeting", { name: firstName })}</EmailHeading>
-      <EmailText>{t("email.verify_email.body")}</EmailText>
+      <EmailText>{t(`email.verify_email.${kind}.body`)}</EmailText>
       <EmailButton href={url}>{t("email.verify_email.button")}</EmailButton>
       <EmailFallbackLink label={t("email.fallback")} href={url} />
-      <EmailNote>{t("email.verify_email.not_you")}</EmailNote>
+      <EmailNote>{t(`email.verify_email.${kind}.not_you`)}</EmailNote>
     </EmailLayout>
   );
 }

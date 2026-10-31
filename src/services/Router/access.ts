@@ -1,3 +1,5 @@
+import { isVerificationOverdue } from "@/services/Auth/verification";
+
 import { SUPPORTED_LOCALES, USER_ROLES } from "@/utils/constants";
 import { PATH_NAMES } from "@/utils/constants/pathnames";
 
@@ -12,9 +14,12 @@ import { PATH_NAMES } from "@/utils/constants/pathnames";
  *
  * `desktop: true` lets the page open on a computer; everything else sends
  * desktops to /no-mobile.
+ *
+ * An account past its grace period without confirming its email is sent to
+ * /verify-email from every listed page, except those with `unverified: true`.
  */
 type Access = "private" | "guest" | "public";
-type RouteRule = { access: Access; admin?: true; desktop?: true };
+type RouteRule = { access: Access; admin?: true; desktop?: true; unverified?: true };
 
 export const ROUTE_RULES: Record<string, RouteRule> = {
   [PATH_NAMES.HOME]: { access: "public" },
@@ -38,12 +43,19 @@ export const ROUTE_RULES: Record<string, RouteRule> = {
   [PATH_NAMES.RESET_SUCCESS]: { access: "guest" },
   // The link in the reset email: it may be opened on a computer, or while
   // signed in on this device, and should still work.
-  [PATH_NAMES.RESET_TOKEN]: { access: "public", desktop: true },
+  [PATH_NAMES.RESET_TOKEN]: { access: "public", desktop: true, unverified: true },
+  // Where a restricted account goes: resend the link or sign out. Only for
+  // accounts that need it; the rest go Home.
+  [PATH_NAMES.VERIFY_EMAIL]: { access: "private", desktop: true, unverified: true },
 };
 
 type Locale = (typeof SUPPORTED_LOCALES)[number];
 
-export type AccessUser = { role?: string | null } | null;
+export type AccessUser = {
+  role?: string | null;
+  emailVerified?: boolean | null;
+  createdAt?: Date | string | null;
+} | null;
 
 export type AccessDecision =
   { type: "next" } | { type: "redirect"; pathname: string; redirectBack?: string };
@@ -74,8 +86,8 @@ export function ruleFor(path: string): RouteRule | undefined {
 }
 
 /**
- * What the proxy does with a page request. `getUser` is only called for
- * pages whose access depends on the session.
+ * What the proxy does with a page request. `getUser` is called for every
+ * listed page except the ones open to anyone, unverified accounts included.
  */
 export async function decideAccess({
   pathname,
@@ -110,9 +122,17 @@ export async function decideAccess({
     return { type: "redirect", pathname: withLocale(PATH_NAMES.NO_MOBILE, locale) };
   }
 
-  if (rule.access === "public") return { type: "next" };
+  if (rule.access === "public" && rule.unverified) return { type: "next" };
 
   const user = await getUser();
+  const verifyEmail = withLocale(PATH_NAMES.VERIFY_EMAIL, locale);
+  const overdue = isVerificationOverdue(user);
+
+  if (overdue && !rule.unverified) {
+    return { type: "redirect", pathname: verifyEmail };
+  }
+
+  if (rule.access === "public") return { type: "next" };
 
   if (rule.access === "guest") {
     return user ? { type: "redirect", pathname: home } : { type: "next" };
@@ -124,6 +144,11 @@ export async function decideAccess({
       pathname: withLocale(PATH_NAMES.LOGIN, locale),
       redirectBack: pathname,
     };
+  }
+
+  // Nothing to confirm (or still within the grace period): back Home.
+  if (path === PATH_NAMES.VERIFY_EMAIL && !overdue) {
+    return { type: "redirect", pathname: home };
   }
 
   if (rule.admin && user.role !== USER_ROLES.ADMIN) {

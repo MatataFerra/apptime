@@ -1,3 +1,4 @@
+// @vitest-environment node
 /**
  * End to end on a real SQLite database (every migration in
  * prisma/migrations applied to a temp file), through the app's Prisma

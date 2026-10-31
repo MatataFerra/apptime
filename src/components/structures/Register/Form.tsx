@@ -56,7 +56,14 @@ function RegisterForm() {
     // Better Auth creates the user, the password account and the session
     // (autoSignIn), so there's no separate sign-in step anymore.
     mutationFn: ({ email, password }: RegisterInputs) =>
-      authClient.signUp.email({ email, password, name: email.split("@")[0] }),
+      authClient.signUp.email({
+        email,
+        password,
+        name: email.split("@")[0],
+        // Where the confirmation email's link lands (and its language):
+        // Settings says the email is confirmed.
+        callbackURL: `/${locale}/settings?email=verified`,
+      }),
 
     onMutate() {
       //Blocking the register button
@@ -80,6 +87,10 @@ function RegisterForm() {
           }, 1500);
 
           return;
+        }
+
+        if (error.code === "DISPOSABLE_EMAIL") {
+          return Toast({ message: t("disposable_email"), type: "error", duration: 3000 });
         }
 
         return Toast({

@@ -14,6 +14,9 @@ const mocks = vi.hoisted(() => ({
   revoke: vi.fn(async (_: string) => ({ response: true })),
   revokeOthers: vi.fn(async () => ({ response: true })),
   setPassword: vi.fn(async (_: string) => ({ response: true })),
+  sendVerificationEmail: vi.fn(async (_: unknown) => ({ data: { status: true }, error: null })),
+  emailVerified: true as boolean | undefined,
+  params: new URLSearchParams(),
 }));
 
 vi.mock("@/utils/auth/client", () => ({
@@ -23,6 +26,7 @@ vi.mock("@/utils/auth/client", () => ({
     changePassword: mocks.changePassword,
     unlinkAccount: mocks.unlinkAccount,
     linkSocial: vi.fn(async () => ({ data: {}, error: null })),
+    sendVerificationEmail: mocks.sendVerificationEmail,
   },
 }));
 vi.mock("@/server-actions/account-security", () => ({
@@ -49,14 +53,18 @@ vi.mock("@/server-actions/account-security", () => ({
   setAccountPassword: mocks.setPassword,
 }));
 vi.mock("@/hooks/useUser", () => ({
-  default: () => ({ data: { email: "mati@example.com", name: "Mati" } }),
+  default: () => ({
+    data: { email: "mati@example.com", name: "Mati", emailVerified: mocks.emailVerified },
+  }),
 }));
 vi.mock("@/services/Toast", () => ({ default: vi.fn() }));
-vi.mock("next/navigation", () => ({ useSearchParams: () => new URLSearchParams() }));
+vi.mock("next/navigation", () => ({ useSearchParams: () => mocks.params }));
 vi.mock("@/i18n/navigation", () => ({
   useRouter: () => ({ replace: vi.fn() }),
   usePathname: () => "/settings",
 }));
+
+import Toast from "@/services/Toast";
 
 import SecuritySection from "@/components/structures/Settings/Security/SecuritySection";
 
@@ -74,10 +82,52 @@ function setup() {
 
 beforeEach(() => {
   mocks.accounts = [{ id: "acc-1", providerId: "credential" }];
+  mocks.emailVerified = true;
+  mocks.params = new URLSearchParams();
+  vi.mocked(Toast).mockClear();
   for (const fn of Object.values(mocks)) if (typeof fn === "function") fn.mockClear();
 });
 
 describe("Account and security", () => {
+  test("a confirmed email says so, with nothing to resend", async () => {
+    setup();
+    expect(await screen.findByText("Confirmed")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Resend link" })).not.toBeInTheDocument();
+  });
+
+  test("an unconfirmed email says so and can resend the link to Settings", async () => {
+    mocks.emailVerified = false;
+    const { user } = setup();
+    expect(await screen.findByText("Not confirmed")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Resend link" }));
+
+    expect(mocks.sendVerificationEmail).toHaveBeenCalledWith({
+      email: "mati@example.com",
+      callbackURL: "/en/settings?email=verified",
+    });
+    expect(Toast).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "success", message: "Link sent" })
+    );
+  });
+
+  test("back from the confirmation link: says the email is confirmed", async () => {
+    mocks.params = new URLSearchParams("email=verified");
+    setup();
+    await screen.findByText("Email");
+    expect(Toast).toHaveBeenCalledWith({ type: "success", message: "Email confirmed" });
+  });
+
+  test("back from an expired link: says so", async () => {
+    mocks.params = new URLSearchParams("email=verified&error=TOKEN_EXPIRED");
+    setup();
+    await screen.findByText("Email");
+    expect(Toast).toHaveBeenCalledWith({
+      type: "error",
+      message: "The link expired or isn't valid. Ask for a new one.",
+    });
+  });
+
   test("asks to confirm a new email from its inbox", async () => {
     const { user } = setup();
     expect(await screen.findByText("mati@example.com")).toBeInTheDocument();

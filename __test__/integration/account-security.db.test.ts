@@ -159,6 +159,8 @@ describe("account and security on a real database", () => {
 
   test("a new email applies only after its link is opened", async () => {
     const cookie = await signIn("eve@x.com");
+    // Sign up already sent eve the "confirm your email" one.
+    env.sent.length = 0;
     const response = await auth.handler(
       new Request("http://localhost:3000/api/auth/change-email", {
         method: "POST",

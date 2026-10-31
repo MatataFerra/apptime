@@ -124,8 +124,9 @@
       "login_link": "Login",
       "invalid_body": "Something went wrong while registering, please try again",
       "user_already_exist": "This user already exists",
-      "successful": "Account created, taking you to the app",
-      "max_attempts": "Too many attempts, please wait before trying again"
+      "successful": "Account created. Confirm your email: we sent you a link.",
+      "max_attempts": "Too many attempts, please wait before trying again",
+      "disposable_email": "Temporary email addresses can't be used. Sign up with an email you'll keep."
     },
     "forgot": {
       "email_label": "Please enter your email",
@@ -144,6 +145,16 @@
       "ONE_NUMBER": "At least 1 number",
       "MIN_LENGTH": "At least 8 characters",
       "SPECIAL_CHAR": "At least 1 special character"
+    },
+    "verify_email": {
+      "title": "Confirm your email",
+      "body": "We sent a link to {email}. Open it to keep using CasualApp: your account is paused until the address is confirmed.",
+      "hint": "Can't find it? Check spam, or send it again. The link works for 24 hours.",
+      "resend": "Send the link again",
+      "sent": "Link sent. Check your inbox.",
+      "not_sent": "We couldn't send it. Try again in a moment.",
+      "too_many": "Too many emails to this address. Try again in an hour.",
+      "sign_out": "Sign out"
     }
   },
   "email": {
@@ -158,12 +169,20 @@
       "not_you": "Didn't ask for this? You can ignore this email: your password stays the same."
     },
     "verify_email": {
-      "subject": "Confirm your new CasualApp email",
-      "preview": "Confirm this address to use it for your account.",
       "greeting": "Hi, {name}",
-      "body": "You asked to use this address for your CasualApp account. Confirm it with the button below; the link works for one hour.",
       "button": "Confirm my email",
-      "not_you": "Wasn't you? Ignore this email: nothing changes in the account."
+      "signup": {
+        "subject": "Confirm your CasualApp email",
+        "preview": "Confirm your address to keep using CasualApp.",
+        "body": "Thanks for signing up to CasualApp. Confirm your email with the button below to keep using the app; the link works for 24 hours.",
+        "not_you": "Didn't sign up? Ignore this email: without confirming, the account stays paused."
+      },
+      "change": {
+        "subject": "Confirm your new CasualApp email",
+        "preview": "Confirm this address to use it for your account.",
+        "body": "You asked to use this address for your CasualApp account. Confirm it with the button below; the link works for 24 hours.",
+        "not_you": "Wasn't you? Ignore this email: nothing changes in the account."
+      }
     },
     "security": {
       "greeting": "Hi, {name}.",
@@ -868,7 +887,15 @@
       "sign_out_others": "Sign out of other devices",
       "signed_out_others": "Other devices signed out",
       "signed_out_others_hint": "They may keep working for up to 2 minutes.",
-      "no_other_sessions": "No other devices are signed in."
+      "no_other_sessions": "No other devices are signed in.",
+      "email_verified": "Confirmed",
+      "email_unverified": "Not confirmed",
+      "email_verified_toast": "Email confirmed",
+      "verify_hint": "Confirm it from the link we emailed you.",
+      "verify_resend": "Resend link",
+      "verify_sent": "Link sent",
+      "verify_not_sent": "We couldn't send it. Try again in a moment.",
+      "verify_too_many": "Too many emails to this address. Try again in an hour."
     },
     "data": {
       "title": "Your data",

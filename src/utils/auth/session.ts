@@ -1,8 +1,27 @@
 import { headers } from "next/headers";
 
+import { isVerificationOverdue } from "@/services/Auth/verification";
+
 import { auth } from "@/utils/auth";
 
 import "server-only";
+
+/**
+ * The session, unless the account is past its grace period without
+ * confirming its email: then it's treated as signed out everywhere except
+ * the "confirm your email" page (getSessionIncludingUnverified).
+ */
+async function usableSession(requestHeaders: Headers) {
+  const session = await auth.api.getSession({ headers: requestHeaders });
+  if (!session || !isVerificationOverdue(session.user)) return session;
+  // The cookie cache can be up to 2 minutes old: the email may have just
+  // been confirmed. Check the database before restricting.
+  const fresh = await auth.api.getSession({
+    headers: requestHeaders,
+    query: { disableCookieCache: true },
+  });
+  return fresh && !isVerificationOverdue(fresh.user) ? fresh : null;
+}
 
 /**
  * The signed-in session on the server (server components, server actions,
@@ -10,12 +29,20 @@ import "server-only";
  * usually doesn't hit the database.
  */
 export async function getSession() {
-  return auth.api.getSession({ headers: await headers() });
+  return usableSession(await headers());
 }
 
 /** Session for a route handler's request. */
 export async function getRequestSession(req: Request) {
-  return auth.api.getSession({ headers: req.headers });
+  return usableSession(req.headers);
+}
+
+/**
+ * The session even for an account restricted for not confirming its
+ * email. Only for the "confirm your email" page.
+ */
+export async function getSessionIncludingUnverified() {
+  return auth.api.getSession({ headers: await headers() });
 }
 
 /**

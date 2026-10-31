@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { isVerificationOverdue } from "@/services/Auth/verification";
 import i18n from "@/services/i18n";
 import { decideAccess, localeOf } from "@/services/Router/access";
 import ut from "@/services/Utilities";
@@ -18,8 +19,16 @@ export default async function proxy(req: NextRequest) {
     isMobile: ut.isMobile({ request: req }),
     // Proxy runs on Node in Next 16, so it can read the Better Auth session
     // (from the signed cookie cache; the database only every few minutes).
-    getUser: async () =>
-      (await auth.api.getSession({ headers: req.headers }).catch(() => null))?.user ?? null,
+    getUser: async () => {
+      const session = await auth.api.getSession({ headers: req.headers }).catch(() => null);
+      if (!session || !isVerificationOverdue(session.user)) return session?.user ?? null;
+      // Restricted per the cache: check the database, the email may have
+      // just been confirmed (on another device, say).
+      const fresh = await auth.api
+        .getSession({ headers: req.headers, query: { disableCookieCache: true } })
+        .catch(() => null);
+      return fresh?.user ?? null;
+    },
   });
 
   if (decision.type === "next") {

@@ -50,7 +50,7 @@ function SecuritySection() {
 
   return (
     <Section title={t("title")}>
-      <EmailRow email={user.email} />
+      <EmailRow email={user.email} verified={user.emailVerified !== false} />
       <PasswordRow hasPassword={hasPassword} />
       <LoginMethods accounts={list} />
       <Sessions sessions={sessions.data ?? []} />
@@ -81,6 +81,9 @@ function useReturnToast() {
       Toast({ type: "error", message: te("google_link_failed") });
     } else if (error) {
       Toast({ type: "error", message: te("reset_link_invalid") });
+    } else if (email === "verified") {
+      Toast({ type: "success", message: t("email_verified_toast") });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     } else if (email) {
       Toast({ type: "success", message: t("email_updated") });
       queryClient.invalidateQueries({ queryKey: ["user"] });
