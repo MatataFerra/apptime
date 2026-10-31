@@ -1,3 +1,4 @@
+import { hydrate, QueryClient } from "@tanstack/react-query";
 import { describe, expect, test, vi } from "vitest";
 
 import { prefetchUserData } from "@/services/Prefetch";
@@ -20,6 +21,7 @@ vi.mock("#/prisma/client", () => ({
 vi.mock("@/utils/auth/session", () => ({ getSession }));
 
 const start = new Date("2026-10-18T08:00:00.000Z");
+const session = { user: { id: "u1", email: "ana@example.com", name: "Ana", image: null } };
 const dbUser = {
   id: "u1",
   email: "ana@example.com",
@@ -41,50 +43,67 @@ function seedDb() {
   findProduction.mockResolvedValueOnce(dbProduction);
 }
 
-function query(state: Awaited<ReturnType<typeof prefetchUserData>>["state"], key: unknown[]) {
-  return state.queries.find((q) => JSON.stringify(q.queryKey) === JSON.stringify(key))?.state
-    .data as any;
+type State = Awaited<ReturnType<typeof prefetchUserData>>["state"];
+
+function dehydrated(state: State, key: unknown[]) {
+  return state.queries.find((q) => JSON.stringify(q.queryKey) === JSON.stringify(key));
+}
+
+/** What the client cache ends up with once the streamed promise lands. */
+async function onClient(state: State, key: unknown[]) {
+  const client = new QueryClient();
+  hydrate(client, state);
+  await dehydrated(state, key)?.promise?.catch(() => {});
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  return client.getQueryState(key);
 }
 
 describe("prefetchUserData", () => {
-  test("seeds user, hourly and production", async () => {
-    getSession.mockResolvedValueOnce({ user: { id: "u1", email: "ana@example.com" } });
-    seedDb();
+  test("doesn't wait for the database: the queries go out pending", async () => {
+    getSession.mockResolvedValueOnce(session);
+    // The shift lists never answer, and the page still renders.
+    findUnique.mockResolvedValueOnce(dbUser);
+    findHourly.mockReturnValueOnce(new Promise(() => {}));
+    findProduction.mockReturnValueOnce(new Promise(() => {}));
 
     const { state, profile } = await prefetchUserData();
 
-    expect(findUnique).toHaveBeenCalledTimes(1);
-    // By id: the email in the session cookie cache can be stale.
-    expect(findUnique.mock.calls[0][0].where).toEqual({ id: "u1" });
-    expect(findHourly.mock.calls[0][0].where).toEqual({ shift: { userId: "u1" } });
-    expect(findProduction.mock.calls[0][0].where).toEqual({ shift: { userId: "u1" } });
-    expect(query(state, ["user", "ana@example.com"]).user.name).toBe("Ana");
-    expect(query(state, ["hourly"]).hourly[0].taxes[0].name).toBe("PAYE");
-    expect(query(state, ["production"]).production).toHaveLength(1);
+    expect(state.queries.map((q) => [q.queryKey, q.state.status])).toEqual([
+      [["user", "ana@example.com"], "pending"],
+      [["hourly"], "pending"],
+      [["production"], "pending"],
+    ]);
+    expect(state.queries.every((q) => q.promise)).toBe(true);
+    // The side menu reads the session, no database needed.
     expect(profile).toEqual({ name: "Ana", email: "ana@example.com", image: null });
   });
 
-  test("the user carries only its shift container, so each shift is sent once", async () => {
-    getSession.mockResolvedValueOnce({ user: { id: "u1", email: "ana@example.com" } });
+  test("each query resolves in the client cache with the API's shape", async () => {
+    getSession.mockResolvedValueOnce(session);
     seedDb();
 
     const { state } = await prefetchUserData();
 
-    expect(findUnique.mock.calls.at(-1)?.[0].select.shifts).toBe(true);
-    expect(query(state, ["user", "ana@example.com"]).user.shifts).toEqual({ id: 1, userId: "u1" });
-  });
+    // By id: the email in the session cookie cache can be stale.
+    expect(findUnique.mock.calls.at(-1)?.[0].where).toEqual({ id: "u1" });
+    expect(findHourly.mock.calls.at(-1)?.[0].where).toEqual({ shift: { userId: "u1" } });
+    expect(findProduction.mock.calls.at(-1)?.[0].where).toEqual({ shift: { userId: "u1" } });
 
-  test("dates arrive as strings, like the API sends them", async () => {
-    getSession.mockResolvedValueOnce({ user: { id: "u1", email: "ana@example.com" } });
-    seedDb();
+    const user = await onClient(state, ["user", "ana@example.com"]);
+    expect(user?.status).toBe("success");
+    expect((user?.data as any).user.name).toBe("Ana");
+    // Only the shift container, so each shift is sent once.
+    expect((user?.data as any).user.shifts).toEqual({ id: 1, userId: "u1" });
 
-    const { state } = await prefetchUserData();
-
-    expect(query(state, ["hourly"]).hourly[0].startDate).toBe("2026-10-18T08:00:00.000Z");
+    const hourly = (await onClient(state, ["hourly"]))?.data as any;
+    expect(hourly.hourly[0].taxes[0].name).toBe("PAYE");
+    // Dates arrive as strings, like the API sends them.
+    expect(hourly.hourly[0].startDate).toBe("2026-10-18T08:00:00.000Z");
+    expect(((await onClient(state, ["production"]))?.data as any).production).toHaveLength(1);
   });
 
   test("never selects the password", async () => {
-    getSession.mockResolvedValueOnce({ user: { id: "u1", email: "ana@example.com" } });
+    getSession.mockResolvedValueOnce(session);
     seedDb();
 
     await prefetchUserData();
@@ -92,14 +111,37 @@ describe("prefetchUserData", () => {
     expect(findUnique.mock.calls.at(-1)?.[0].select.password).toBeUndefined();
   });
 
-  test("signed out or database down: nothing is seeded and the client fetches as before", async () => {
+  test("signed out: nothing is seeded", async () => {
     getSession.mockResolvedValueOnce(null);
-    expect((await prefetchUserData()).state.queries).toHaveLength(0);
+    const { state, profile } = await prefetchUserData();
+    expect(state.queries).toHaveLength(0);
+    expect(profile).toBeNull();
+  });
 
-    getSession.mockResolvedValueOnce({ user: { id: "u1", email: "ana@example.com" } });
+  test("database down: the query fails on the client, which retries it through the API", async () => {
+    getSession.mockResolvedValueOnce(session);
     findUnique.mockRejectedValueOnce(new Error("db down"));
-    const down = await prefetchUserData();
-    expect(down.state.queries).toHaveLength(0);
-    expect(down.profile).toBeNull();
+    findHourly.mockResolvedValueOnce(dbHourly);
+    findProduction.mockResolvedValueOnce(dbProduction);
+
+    const { state } = await prefetchUserData();
+
+    const client = new QueryClient({ defaultOptions: { queries: { retry: 1, retryDelay: 0 } } });
+    hydrate(client, state);
+    const fromApi = vi.fn().mockResolvedValue({ user: { name: "Ana" } });
+    // useQuery's options reach the query once a component observes it.
+    client
+      .getQueryCache()
+      .find({ queryKey: ["user", "ana@example.com"] })
+      ?.setOptions({
+        queryKey: ["user", "ana@example.com"],
+        queryFn: fromApi,
+        retry: 1,
+        retryDelay: 0,
+      });
+    await vi.waitFor(() =>
+      expect(client.getQueryState(["user", "ana@example.com"])?.status).toBe("success")
+    );
+    expect(fromApi).toHaveBeenCalledTimes(1);
   });
 });
