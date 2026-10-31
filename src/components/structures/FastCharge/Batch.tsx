@@ -179,7 +179,13 @@ function Batch() {
           />
         </Stack>
 
-        <EmployerSelect value={employerId} onChange={pickEmployer} />
+        {/* Adding the first employer here keeps the form; a link to Employers would lose it. */}
+        <EmployerSelect
+          allowCreate
+          value={employerId}
+          newDefaults={{ rate: toNumber(hourValue) || null, currency: currency || defaultCurrency }}
+          onChange={pickEmployer}
+        />
 
         <BatchScheduleFields schedule={schedule} theme="fast" />
 

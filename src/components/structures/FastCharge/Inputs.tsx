@@ -472,7 +472,16 @@ function Inputs() {
             }}
           />
         </Stack>
-        <EmployerSelect value={shiftEmployerId} onChange={pickEmployer} />
+        {/* Adding the first employer here keeps the form; a link to Employers would lose it. */}
+        <EmployerSelect
+          allowCreate
+          value={shiftEmployerId}
+          newDefaults={{
+            rate: Number(hourValueWatch) || null,
+            currency: shiftCurrency || defaultCurrency,
+          }}
+          onChange={pickEmployer}
+        />
         <Input
           containerClasses="flex-1"
           classes="h-full"
