@@ -378,7 +378,13 @@ function Inputs() {
             }}
           />
         </Stack>
-        <EmployerSelect value={shiftEmployerId} onChange={pickEmployer} />
+        {/* Adding the first employer here keeps the form; a link to Employers would lose it. */}
+        <EmployerSelect
+          allowCreate
+          value={shiftEmployerId}
+          newDefaults={{ currency: shiftCurrency || defaultCurrency }}
+          onChange={pickEmployer}
+        />
         <Stack grid cols={2} as="fieldset" classes="w-full">
           <Input
             classes="h-full"
