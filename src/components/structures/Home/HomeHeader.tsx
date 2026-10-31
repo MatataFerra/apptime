@@ -1,20 +1,27 @@
-"use client";
-
 import { format, getISOWeek } from "date-fns";
-import { useTranslations } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 
+import { getSession } from "@/utils/auth/session";
+import { dateLocaleFor } from "@/utils/helpers/dateFormats";
 import { shortEmail } from "@/utils/helpers/shortEmail";
-import useDateLocale from "@/hooks/useDateLocale";
-import useUser from "@/hooks/useUser";
+import { getUserNow } from "@/utils/helpers/userNow";
 
 import ThemeToggle from "./ThemeToggle";
 
-/** Today's date as the headline, with a short greeting. */
-function HomeHeader() {
-  const { data: user } = useUser();
-  const t = useTranslations("home.header");
-  const now = new Date();
-  const dateLocale = useDateLocale();
+/**
+ * Today's date as the headline, with a short greeting. A server component:
+ * it's in the first HTML, in the user's time zone (getUserNow), and only
+ * the theme button hydrates.
+ */
+async function HomeHeader() {
+  const [session, now, locale, t] = await Promise.all([
+    getSession(),
+    getUserNow(),
+    getLocale(),
+    getTranslations("home.header"),
+  ]);
+  const dateLocale = dateLocaleFor(locale);
+  const user = session?.user;
 
   const name = user?.name
     ? user.name.split(" ")[0].trim()

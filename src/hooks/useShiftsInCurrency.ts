@@ -125,6 +125,8 @@ function useShiftsInCurrency() {
     /** Every shift (converted where possible): hours and counts use all of them. */
     allHourly,
     allProduction,
+    /** Only the shift lists (hours, counts and worked days don't need rates). */
+    isLoadingShifts: loadingHourly || loadingProduction,
     isLoading: loadingHourly || loadingProduction || loadingRates,
   };
 }

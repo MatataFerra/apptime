@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { headers } from "next/headers";
 
 import { isVerificationOverdue } from "@/services/Auth/verification";
@@ -26,11 +28,10 @@ async function usableSession(requestHeaders: Headers) {
 /**
  * The signed-in session on the server (server components, server actions,
  * route handlers). Read from the signed session cookie cache, so it
- * usually doesn't hit the database.
+ * usually doesn't hit the database. Memoized per request, so layouts and
+ * server components can each ask for it.
  */
-export async function getSession() {
-  return usableSession(await headers());
-}
+export const getSession = cache(async () => usableSession(await headers()));
 
 /** Session for a route handler's request. */
 export async function getRequestSession(req: Request) {
