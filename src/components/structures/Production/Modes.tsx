@@ -4,12 +4,12 @@ import type { ReactNode } from "react";
 
 import dynamic from "next/dynamic";
 
+import { BatchSkeleton } from "@/components/structures/Production/Skeletons";
 import BatchModes from "@/components/structures/share/batch/BatchModes";
-import Skeleton from "@/components/ui/Skeleton";
 
 const Batch = dynamic(() => import("@/components/structures/Production/Batch"), {
   ssr: false,
-  loading: () => <Skeleton classes="min-h-[50dvh] w-full" />,
+  loading: () => <BatchSkeleton />,
 });
 
 /** Production: one shift, or the same shift over several days. */

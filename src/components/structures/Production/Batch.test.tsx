@@ -2,7 +2,7 @@ import { fireEvent, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ save: vi.fn() }));
+const mocks = vi.hoisted(() => ({ save: vi.fn(), employerSelect: vi.fn() }));
 
 vi.mock("@tanstack/react-query", () => ({
   useQueryClient: () => ({ invalidateQueries: vi.fn() }),
@@ -21,7 +21,12 @@ vi.mock("@/hooks/useMoney", () => ({
   useCurrency: () => "AUD",
 }));
 vi.mock("@/components/modules/Production/Drawer", () => ({ default: () => null }));
-vi.mock("@/components/structures/ShiftForms/EmployerSelect", () => ({ default: () => null }));
+vi.mock("@/components/structures/ShiftForms/EmployerSelect", () => ({
+  default: (props: unknown) => {
+    mocks.employerSelect(props);
+    return null;
+  },
+}));
 vi.mock("@/components/structures/ShiftForms/CurrencySelect", () => ({ default: () => null }));
 vi.mock("@/components/structures/ShiftForms/Datalist", () => ({ default: () => null }));
 
@@ -35,6 +40,14 @@ beforeEach(() => {
 });
 
 describe("Production, several days", () => {
+  test("an employer can be added right in the form, so the days aren't lost", () => {
+    renderWithIntl(<Batch />);
+
+    expect(mocks.employerSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ allowCreate: true, newDefaults: { currency: "AUD" } })
+    );
+  });
+
   test("the default quantity fills every day and each day can be changed", async () => {
     const user = userEvent.setup();
     renderWithIntl(<Batch />);
