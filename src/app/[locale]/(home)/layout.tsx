@@ -9,6 +9,8 @@ import Header from "@/components/ui/Header";
 
 export default async function HomeLayout({ children }: LayoutProps<"/[locale]">) {
   // Runs on full page loads; client-side navigation keeps the layout and its cache.
+  // Only the session is awaited: the user and shift queries stream in
+  // through HydrationBoundary instead of holding the first byte.
   const { profile, state } = await prefetchUserData();
 
   return (
