@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   save: vi.fn(),
   hourly: [] as { startDate: string; endDate: string | null }[],
+  employerSelect: vi.fn(),
 }));
 
 vi.mock("@tanstack/react-query", () => ({
@@ -26,7 +27,12 @@ vi.mock("@/hooks/useMoney", () => ({
   useCurrency: () => "AUD",
 }));
 vi.mock("@/components/modules/FastCharge/Drawer", () => ({ default: () => null }));
-vi.mock("@/components/structures/ShiftForms/EmployerSelect", () => ({ default: () => null }));
+vi.mock("@/components/structures/ShiftForms/EmployerSelect", () => ({
+  default: (props: unknown) => {
+    mocks.employerSelect(props);
+    return null;
+  },
+}));
 vi.mock("@/components/structures/ShiftForms/CurrencySelect", () => ({ default: () => null }));
 vi.mock("@/components/structures/ShiftForms/Datalist", () => ({ default: () => null }));
 
@@ -47,6 +53,14 @@ beforeEach(() => {
 });
 
 describe("Fast charge, several days", () => {
+  test("an employer can be added right in the form, so the days aren't lost", () => {
+    renderWithIntl(<Batch />);
+
+    expect(mocks.employerSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ allowCreate: true, newDefaults: { rate: 30, currency: "AUD" } })
+    );
+  });
+
   test("repeats the first shift Mon–Fri, skips a logged day and saves what's ticked", async () => {
     const user = userEvent.setup();
     renderWithIntl(<Batch />);
