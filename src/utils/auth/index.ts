@@ -151,13 +151,14 @@ export const auth = betterAuth({
   // the forms are only the client, and /api/auth/* can be called directly.
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
-      // No temporary inboxes (10minutemail, mailinator…): the account has to
-      // be reachable to confirm it and to recover it.
+      // No temporary inboxes (10minutemail, mailinator…, plus the CMS's
+      // block rules): the account has to be reachable to confirm it and to
+      // recover it.
       const emailField = EMAIL_FIELD_BY_PATH[ctx.path];
       const email = emailField
         ? (ctx.body as Record<string, unknown> | undefined)?.[emailField]
         : null;
-      if (typeof email === "string" && isDisposableEmail(email)) {
+      if (typeof email === "string" && (await isDisposableEmail(email))) {
         throw new APIError("BAD_REQUEST", {
           message: "Disposable email addresses aren't allowed",
           code: "DISPOSABLE_EMAIL",
