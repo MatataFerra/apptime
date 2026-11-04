@@ -1,6 +1,6 @@
 {
   "name": "app-time",
-  "version": "0.9.6",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -60,10 +60,10 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.4.0",
+    "disposable-check": "0.2.0",
     "embla-carousel-react": "8.6.0",
     "lodash": "^4.17.21",
     "lucide-react": "^1.66.0",
-    "mailchecker": "6.0.21",
     "negotiator": "^1.1.0",
     "next": "16.4.3",
     "next-intl": "4.14.9",
@@ -120,6 +120,6 @@
     "vitest-mock-extended": "^5.1.1"
   },
   "engines": {
-    "node": "^24.0.0"
+    "node": "^26.0.0"
   }
 }
