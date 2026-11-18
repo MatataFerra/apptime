@@ -23,7 +23,15 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
     locale: isLocale(locale) ? locale : "en",
     namespace: "metadata",
   });
-  return { title: t("title"), description: t("description") };
+  const title = t("title");
+  const description = t("description");
+  // The image comes from ./opengraph-image.tsx; X falls back to og:image.
+  return {
+    title,
+    description,
+    openGraph: { type: "website", siteName: title, title, description, locale },
+    twitter: { card: "summary_large_image", title, description },
+  };
 }
 
 export default async function LocaleLayout({ children, params }: LayoutProps<"/[locale]">) {

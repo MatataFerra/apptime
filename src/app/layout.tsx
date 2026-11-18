@@ -2,7 +2,9 @@ import { ReactNode } from "react";
 
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import type { Metadata } from "next";
 
+import { SITE_URL } from "@/utils/constants/site";
 import { cn } from "@/utils/helpers/styleMerger";
 import { THEME_SCRIPT } from "@/utils/theme";
 
@@ -10,7 +12,9 @@ import "@/app/globals.css";
 
 import { bricolage, figtree, schibsted } from "./fonts";
 
-export const metadata = {
+export const metadata: Metadata = {
+  // Base for the relative URLs in metadata (the Open Graph image).
+  metadataBase: SITE_URL,
   title: "CasualApp",
   description: "Track your hours and see what you earn, shift by shift.",
 };

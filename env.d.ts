@@ -10,8 +10,12 @@ export const envSchema = z.object({
   BETTER_AUTH_URL: z.string().optional(),
   NEXTAUTH_SECRET: z.string().optional(),
   NEXTAUTH_URL: z.string().optional(),
+  /** Public URL of the app (Open Graph, sitemap, robots). */
+  NEXT_PUBLIC_URL: z.string().optional(),
   /** Set by Vercel: the deployment's own host (previews included). */
   VERCEL_URL: z.string().optional(),
+  /** Set by Vercel: the production domain, without protocol. */
+  VERCEL_PROJECT_PRODUCTION_URL: z.string().optional(),
   NEXT_PUBLIC_SHOW_DEVTOOLS: z.string(),
   /** libsql:// URL of the Turso database. Server only. */
   TURSO_DATABASE_URL: z.string().optional(),
